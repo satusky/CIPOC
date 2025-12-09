@@ -8,7 +8,7 @@ from limiter import RateLimiter
 
 
 class ChatClient:
-    _default_limiter_settings = {
+    DEFAULT_LIMITER_SETTINGS = {
         "max_retries": 10,
         "initial_delay": 1.0,
         "exponential_base": 2.0,
@@ -30,11 +30,11 @@ class ChatClient:
         self.model_name = model_name
         self.api_key = api_key
         self.endpoint_url = endpoint_url
-        self.client = OpenAI(api_key=self.api_key, base_url=self.endpoint_url)
+        self.client = OpenAI(api_key=self.api_key, base_url=self.endpoint_url, max_retries=0)
         self._tools = tools or []
         self.tool_choice_mode = tool_choice_mode
         
-        self._limiter_settings = self._default_limiter_settings
+        self._limiter_settings = self.DEFAULT_LIMITER_SETTINGS
         self.set_limiter(limiter_kwargs)
 
     def __repr__(self) -> str:
@@ -54,7 +54,7 @@ class ChatClient:
         self._chat = limiter(lambda **kw: original_chat(self, **kw))
 
     def set_limiter(self, limiter_kwargs: dict | None = None):
-        self._limiter_settings.update(limiter_kwargs or self._default_limiter_settings)
+        self._limiter_settings.update(limiter_kwargs or self.DEFAULT_LIMITER_SETTINGS)
         self._set_limiter()
 
     def get_limiter_settings(self):
