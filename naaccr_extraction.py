@@ -12,8 +12,8 @@ from pydantic import BaseModel, Field
 from typing import Any
 from dataclasses import dataclass
 
-from note_preprocessing import select_notes_within_date_of_diagnosis, select_notes_by_note_type
 from llm_client import ChatClient
+from note_filter import NoteFilter
 
 
 class NAACCRVariable(BaseModel):
@@ -28,7 +28,9 @@ class NAACCRVariable(BaseModel):
 class ExtractionConfig:
     target_vars: list | pd.Series
     target_df: pd.DataFrame
-    note_types: list[str] | pd.Series
+    note_column: str
+    id_column: str
+    note_types: list[str]
     note_days_before: int
     note_days_after: int
     llm_client: ChatClient
@@ -59,7 +61,7 @@ def get_variable_info_from_id(variable_id: str | int, df: pd.DataFrame) -> dict:
 
     # Remove invalid keys
     col_map = {key: val for key, val in col_map.items() if key in df.columns}
-    return df.loc[df["Item_Number"] == int(variable_id), list(col_map.keys())].rename(columns=col_map).to_dict("records")[0]
+    return df.loc[df["Item_Number"] == int(variable_id), list(col_map.keys())].rename(columns=col_map).to_dict("records")[0] # type: ignore
 
 def build_prompt(
     variable_id: str | int,
@@ -136,16 +138,16 @@ def validate_tool_call(tool_call: ChatCompletionMessageToolCall, data_model: typ
     return parsed
 
 def run_extraction(
-        notes_df: pd.DataFrame,
-        config: ExtractionConfig,
-        current_index: int = 0,
-        pbar = None
+    notes_df: pd.DataFrame,
+    config: ExtractionConfig,
+    current_index: int = 0,
+    pbar = None
 ):
     if pbar is None:
         pbar = tqdm(total=config.end_index - config.start_index, position=0, desc="Patients")
 
     with open(config.output_file, "a") as f, open(config.error_file, "a") as error_log:
-        for i, (mrn, notes) in enumerate(zip(notes_df["MRN"], notes_df["kept_notes"]), start=current_index):
+        for i, (patient_id, notes) in enumerate(zip(notes_df[config.id_column], notes_df["KEPT_NOTES"]), start=current_index):
             if i >= config.end_index:
                 break
             
@@ -158,21 +160,21 @@ def run_extraction(
                     output_code = extract_naaccr_variable(target_info, notes, config.llm_client)
                 except Exception as e:
                     output_code = None
-                    error = {"mrn": mrn, "item_id": target_info["variable_id"], "error": getattr(e, "message", str(e))}
+                    error = {"patient_id": patient_id, "item_id": target_info["variable_id"], "error": getattr(e, "message", str(e))}
                     error_log.write(json.dumps(error) + "\n")
 
                 if output_code is None:
                     output_code = NAACCRVariable(item_id=target_info["variable_id"], item_name=target_info["variable_name"], explanation="Error", value="")
 
                 write_dict = output_code.model_dump()
-                write_dict.update({"mrn": mrn})
+                write_dict.update({"patient_id": patient_id})
                 f.write(json.dumps(write_dict) + "\n")
 
             pbar.update(1)
 
 def run_extraction_batches(
-        notes_db: spark.DataFrame,
-        config: ExtractionConfig
+    notes_db: spark.DataFrame,
+    config: ExtractionConfig
 ):
     if config.batch_size is None:
         raise ValueError("Batch size must be set in ExtractionConfig to run in batch mode.")
@@ -188,17 +190,28 @@ def run_extraction_batches(
             current_index += config.batch_size
             continue
 
-        notes_df = notes_db.where(notes_db.PERSON_ID.isin(patient_batch)).toPandas()
-        notes_df = filter_notes(notes_df, config.note_types, config.note_days_before, config.note_days_after)
+        notes_df = notes_db.select(["PERSON_ID", "MRN", config.note_column]).where(notes_db.PERSON_ID.isin(patient_batch)).toPandas()
+        note_filter = NoteFilter(note_types_to_keep=config.note_types, days_before=config.note_days_before, days_after=config.note_days_after)
+        notes_df["KEPT_NOTES"] = note_filter.apply_filters(notes_df.pop(config.note_column).to_list())
         run_extraction(notes_df=notes_df, config=config, current_index=current_index, pbar=pbar)
 
         current_index += config.batch_size
 
-def filter_notes(notes_df: pd.DataFrame, note_types: list[str] | pd.Series, days_before: int, days_after: int) -> pd.DataFrame:
-    notes_df["kept_notes"] = notes_df.apply(select_notes_within_date_of_diagnosis, axis=1, args=("ALL_NOTES", days_before, days_after))
-    notes_df = notes_df.drop(columns=["ALL_NOTES"])
-    notes_df["kept_notes"] = notes_df.apply(select_notes_by_note_type, axis=1, args=("kept_notes", note_types))
-    return notes_df
+def run_extraction_batch_filter(
+    notes_db: spark.DataFrame,
+    config: ExtractionConfig
+):
+    if config.batch_size is None:
+        raise ValueError("Batch size must be set in ExtractionConfig to run in batch mode.")
+    
+    notes_df = pd.DataFrame(columns=["PERSON_ID", "MRN", "KEPT_NOTES"])
+    for patient_batch in batch_patients(notes_db, batch_size=config.batch_size):
+        batch_df = notes_db.select(["PERSON_ID", "MRN", config.note_column]).where(notes_db.PERSON_ID.isin(patient_batch)).toPandas()
+        note_filter = NoteFilter(note_types_to_keep=config.note_types, days_before=config.note_days_before, days_after=config.note_days_after)
+        batch_df["KEPT_NOTES"] = note_filter.apply_filters(batch_df.pop(config.note_column).to_list())
+        notes_df = pd.concat((notes_df, batch_df))
+        
+    run_extraction(notes_df=notes_df, config=config)
 
 def batch_patients(db: spark.DataFrame, batch_size=100):
     person_ids = db.rdd.map(lambda x: x.PERSON_ID).collect()
