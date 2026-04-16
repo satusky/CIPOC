@@ -23,6 +23,7 @@ class ChatClient:
         model_name: str,
         api_key: str,
         endpoint_url: str,
+        text_format: type[BaseModel] | None = None,
         tools: list[dict] | None = None,
         tool_choice_mode: Literal["auto", "required", "none"] | dict = "auto",
         limiter_kwargs: dict | Literal["default"] | None = None,
@@ -31,7 +32,8 @@ class ChatClient:
         self.api_key = api_key
         self.endpoint_url = endpoint_url
         self.client = OpenAI(api_key=self.api_key, base_url=self.endpoint_url, max_retries=0)
-        self._tools = tools or []
+        self._text_format = text_format
+        self._tools = [self._normalize_tool(t) for t in (tools or [])]
         self.tool_choice_mode = tool_choice_mode
 
         self._limiter_settings: dict | None = None
@@ -42,13 +44,15 @@ class ChatClient:
             self.set_limiter(limiter_kwargs)
 
     def __repr__(self) -> str:
+        text_format_name = self._text_format.__name__ if self._text_format else None
         rep = f"""
-Model name: {self.model_name}
-Endpoint URL: {self.endpoint_url}
-Tool choice mode: {self.tool_choice_mode}
-Tools: {json.dumps(self.get_tools(), indent=2)}
-Limiter: {json.dumps(self._limiter_settings, indent=2)}
-"""
+        Model name: {self.model_name}
+        Endpoint URL: {self.endpoint_url}
+        Text format: {text_format_name}
+        Tool choice mode: {self.tool_choice_mode}
+        Tools: {json.dumps(self.get_tools(), indent=2)}
+        Limiter: {json.dumps(self._limiter_settings, indent=2)}
+        """
         return rep
 
     def set_limiter(self, limiter_kwargs: dict | None = None):
@@ -68,64 +72,40 @@ Limiter: {json.dumps(self._limiter_settings, indent=2)}
         self._limiter_settings = None
         self._limiter_wrapped_chat = None
 
-    @staticmethod
-    def tool_from_pydantic(name: str, description: str, data_model: type[BaseModel]) -> dict:
-        schema = data_model.model_json_schema()
+    def get_limiter_settings(self):
+        return self._limiter_settings
 
-        # Strip fields that strict OpenAI-compatible endpoints reject:
-        # - "title" at the top level and on each property
-        # - missing "additionalProperties": false (required for strict mode)
-        schema.pop("title", None)
-        for prop in schema.get("properties", {}).values():
-            prop.pop("title", None)
-        schema["additionalProperties"] = False
-
-        tool = {
-            "type": "function",
-            "function": {
-                "name": name,
-                "description": description,
-                "parameters": schema,
-                "strict": True,
-            }
-        }
-
+    def _normalize_tool(self, tool: dict) -> dict:
         return tool
 
-    def add_tool_from_pydantic(self, name: str, description: str, data_model: type[BaseModel]):
-        self._tools.append(ChatClient.tool_from_pydantic(name=name, description=description, data_model=data_model))
+    def add_tool(self, tool: dict):
+        self._tools.append(self._normalize_tool(tool))
 
     def get_tools(self):
         return self._tools
 
-    def _raw_chat(self, **kwargs):
-        """Core chat method — always unwrapped."""
-        if self._tools:
-            kwargs.update({"tools": self._tools, "tool_choice": self.tool_choice_mode})
-        response = self.client.chat.completions.create(model=self.model_name, **kwargs)
-        return response
-
     def _chat(self, **kwargs):
-        """Dispatches to rate-limited or raw chat depending on config."""
-        if self._limiter_wrapped_chat is not None:
-            return self._limiter_wrapped_chat(**kwargs)
-        return self._raw_chat(**kwargs)
+        kwargs.setdefault("text_format", self._text_format)
+        if self._tools:
+            kwargs.setdefault("tools", self._tools)
+            kwargs.setdefault("tool_choice", self.tool_choice_mode)
+        return self.client.responses.parse(model=self.model_name, **kwargs)
 
-    def chat(self, messages, **kwargs):
-        return self._chat(messages=messages, **kwargs)
-
+    def chat(self, input, **kwargs):
+        return self._chat(input=input, **kwargs)
+    
 
 class OpenAIChatClient(ChatClient):
     def __init__(self, reasoning_effort: Literal["minimal", "low", "medium", "high"] | None = "medium", **kwargs):
         super().__init__(**kwargs)
         self._reasoning_effort = reasoning_effort
 
-    def chat(self, messages: list[dict], reasoning_effort: Literal["minimal", "low", "medium", "high"] | None = None, **kwargs):
-        reasoning_effort = reasoning_effort or self._reasoning_effort  # type: ignore
+    def chat(self, input, reasoning_effort: Literal["minimal", "low", "medium", "high"] | None = None, **kwargs):
+        reasoning_effort = reasoning_effort or self._reasoning_effort #type: ignore
         if reasoning_effort is not None:
-            kwargs.update({"reasoning_effort": reasoning_effort})
+            kwargs.update({"reasoning": {"effort": reasoning_effort}})
 
-        return self._chat(messages=messages, **kwargs)
+        return self._chat(input=input, **kwargs)
 
 
 class AnthropicChatClient(ChatClient):
@@ -133,7 +113,16 @@ class AnthropicChatClient(ChatClient):
         super().__init__(**kwargs)
         self._thinking_enabled = thinking_enabled
 
-    def chat(self, messages: list[dict], thinking_enabled: bool | None = None, thinking_tokens: int = 1024, **kwargs):
+    def _normalize_tool(self, tool: dict) -> dict:
+        tool = dict(tool)
+        params = tool.get("parameters")
+        if isinstance(params, dict):
+            params = dict(params)
+            params.pop("title", None)
+            tool["parameters"] = params
+        return tool
+
+    def chat(self, input, thinking_enabled: bool | None = None, thinking_tokens: int = 1024, **kwargs):
         if thinking_enabled or (thinking_enabled is None and self._thinking_enabled):
             if not thinking_tokens > 0:
                 raise ValueError("Thinking token budget must be an integer > 0")
@@ -149,4 +138,4 @@ class AnthropicChatClient(ChatClient):
             extra_body.update(thinking)
             kwargs.update({"extra_body": extra_body})
 
-        return self._chat(messages=messages, **kwargs)
+        return self._chat(input=input, **kwargs)

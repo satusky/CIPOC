@@ -118,13 +118,13 @@ def extract_naaccr_variable(variable_info: dict, notes: str, llm_client: ChatCli
     ]
 
     completion = llm_client.chat(
-        messages=messages,
+        input=messages,
         **kwargs
     )
 
-    tool_call = completion.choices[0].message.tool_calls[0]
-    tool_input = tool_call.function.arguments
-    parsed = NAACCRVariable.model_validate_json(tool_input)
+    parsed = completion.output_parsed
+    if parsed is None:
+        raise ValueError(f"No parsed output (refusal: {getattr(completion, 'refusal', None)})")
 
     return parsed
 
@@ -142,15 +142,8 @@ def submit_naaccr_chat_request(variable_info: dict, notes: str, llm_client: Chat
         }
     ]
 
-    completion = llm_client.chat(messages=messages, **kwargs)
+    completion = llm_client.chat(input=messages, **kwargs)
     return completion
-
-
-def validate_tool_call(tool_call: ChatCompletionMessageToolCall, data_model: type[BaseModel] = NAACCRVariable):
-    tool_input = tool_call.function.arguments
-    parsed = data_model.model_validate_json(tool_input)
-    return parsed
-
 
 def run_extraction(
     notes_df: pd.DataFrame,

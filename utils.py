@@ -58,7 +58,7 @@ def append_temp_file_to_output(temp_file: str, output_file: str) -> None:
 def cleanup_temp_files(model_name: str, output_directory: str = ".") -> None:
     print(model_name)
     for state_type in ["results", "error"]:
-        temp_groups = find_temp_files(model_name, state_type, output_directory)
+        temp_groups = find_temp_files(model_name, state_type, output_directory) # type: ignore
         if len(temp_groups) == 0:
             print(f"No {state_type} temp files found.")
             continue
