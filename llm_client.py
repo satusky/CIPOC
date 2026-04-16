@@ -25,7 +25,7 @@ class ChatClient:
         endpoint_url: str,
         tools: list[dict] | None = None,
         tool_choice_mode: Literal["auto", "required", "none"] | dict = "auto",
-        limiter_kwargs: dict | None = None
+        limiter_kwargs: dict | None = None,
     ):
         self.model_name = model_name
         self.api_key = api_key
@@ -33,7 +33,7 @@ class ChatClient:
         self.client = OpenAI(api_key=self.api_key, base_url=self.endpoint_url, max_retries=0)
         self._tools = tools or []
         self.tool_choice_mode = tool_choice_mode
-        
+
         self._limiter_settings = self.DEFAULT_LIMITER_SETTINGS
         self.set_limiter(limiter_kwargs)
 
@@ -46,7 +46,7 @@ class ChatClient:
         Limiter: {json.dumps(self._limiter_settings, indent=2)}
         """
         return rep
-    
+
     def _set_limiter(self):
         limiter = RateLimiter(**self._limiter_settings)
         # Get undecorated _chat function and wrap it
@@ -59,7 +59,7 @@ class ChatClient:
 
     def get_limiter_settings(self):
         return self._limiter_settings
-    
+
     @staticmethod
     def tool_from_pydantic(name: str, description: str, data_model: type[BaseModel]) -> dict:
         tool = {
@@ -70,7 +70,6 @@ class ChatClient:
                 "parameters": data_model.model_json_schema()
             }
         }
-
         return tool
 
     def add_tool_from_pydantic(self, name: str, description: str, data_model: type[BaseModel]):
@@ -78,17 +77,17 @@ class ChatClient:
 
     def get_tools(self):
         return self._tools
-    
+
     def _chat(self, **kwargs):
         if self._tools:
             kwargs.update({"tools": self._tools, "tool_choice": self.tool_choice_mode})
 
         response = self.client.chat.completions.create(model=self.model_name, **kwargs)
         return response
-    
+
     def chat(self, messages, **kwargs):
         return self._chat(messages=messages, **kwargs)
-    
+
 
 class OpenAIChatClient(ChatClient):
     def __init__(self, reasoning_effort: Literal["minimal", "low", "medium", "high"] | None = "medium", **kwargs):
@@ -96,8 +95,7 @@ class OpenAIChatClient(ChatClient):
         self._reasoning_effort = reasoning_effort
 
     def chat(self, messages: list[dict], reasoning_effort: Literal["minimal", "low", "medium", "high"] | None = None, **kwargs):
-        reasoning_effort = reasoning_effort or self._reasoning_effort #type: ignore
-        if reasoning_effort is not None:
+        if reasoning_effort is not None or self._reasoning_effort:
             kwargs.update({"reasoning_effort": reasoning_effort})
 
         return self._chat(messages=messages, **kwargs)
@@ -112,7 +110,7 @@ class AnthropicChatClient(ChatClient):
         if thinking_enabled or (thinking_enabled is None and self._thinking_enabled):
             if not thinking_tokens > 0:
                 raise ValueError("Thinking token budget must be an integer > 0")
-            
+
             thinking = {
                 "thinking": {
                     "type": "enabled",
