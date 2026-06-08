@@ -1,0 +1,19 @@
+[project]
+name = "cipoc"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    # Pinned to Databricks Runtime 18.2 ML CPU preinstalled versions:
+    # https://docs.databricks.com/aws/en/release-notes/runtime/18.2ml#python-libraries-on-cpu-clusters
+    "databricks-sdk==0.67.0",
+    "mlflow-skinny==3.8.1",
+    "openai==2.7.0",
+    "pandas==2.2.3",
+    "pydantic==2.10.6",
+    "pyyaml==6.0.2",
+    "tqdm==4.67.1",
+    # DBR 18.2 is built on Apache Spark 4.1.0; PySpark is not listed in the Python-libraries table.
+    "pyspark==4.1.0",
+]
