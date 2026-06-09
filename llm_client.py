@@ -8,16 +8,6 @@ from limiter import RateLimiter
 
 
 class ChatClient:
-    DEFAULT_LIMITER_SETTINGS = {
-        "max_retries": 10,
-        "initial_delay": 1.0,
-        "exponential_base": 2.0,
-        "max_delay": 60.0,
-        "jitter": True,
-        "retry_on": (RateLimitError,),
-        "logger_name": None,
-    }
-
     def __init__(
         self,
         model_name: str,
@@ -50,11 +40,23 @@ Tools: {json.dumps(self.get_tools(), indent=2)}
 Limiter: {json.dumps(self._limiter_settings, indent=2)}
 """
         return rep
+    
+    @staticmethod
+    def _default_limiter_settings() -> dict:
+      return {
+          "max_retries": 10,
+          "initial_delay": 1.0,
+          "exponential_base": 2.0,
+          "max_delay": 60.0,
+          "jitter": True,
+          "retry_on": (RateLimitError,),
+          "logger_name": None,
+      }
 
     def set_limiter(self, limiter_kwargs: dict | None = None):
         """Enable and configure the rate limiter. Pass None or {} to use defaults."""
         if self._limiter_settings is None:
-            self._limiter_settings = self.DEFAULT_LIMITER_SETTINGS
+            self._limiter_settings = self._default_limiter_settings()
 
         if limiter_kwargs:
             self._limiter_settings.update(limiter_kwargs)
