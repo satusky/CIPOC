@@ -16,4 +16,12 @@ dependencies = [
     "tqdm==4.67.1",
     # DBR 18.2 is built on Apache Spark 4.1.0; PySpark is not listed in the Python-libraries table.
     "pyspark==4.1.0",
+    "langchain-openai==1.0.2",
+    "langchain==1.0.3",
+    "langgraph==1.0.3",
+    "langchain-core==1.0.4",
+    "langgraph-prebuilt==1.0.3",
+    "ipython>=9.14.1",
+    "grandalf>=0.8",
+    "graphviz>=0.21",
 ]

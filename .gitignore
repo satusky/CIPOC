@@ -2,3 +2,8 @@
 .DS_STORE
 CLAUDE.md
 .python-version
+__pycache__
+.CLAUDE
+.venv
+planning/
+*.egg-info
