@@ -1,0 +1,26 @@
+[
+  {
+    "note_id": 40,
+    "date": "2023-06-15",
+    "type": "Urgent Care Visit",
+    "content": "CHIEF COMPLAINT: Cough and congestion for 5 days.\n\nHISTORY OF PRESENT ILLNESS: 62-year-old male presents with a 5-day history of productive cough, nasal congestion, sore throat, and low-grade fever to 100.4F. Several coworkers have had similar symptoms. No shortness of breath, no chest pain, no hemoptysis. Able to maintain oral intake.\n\nPAST MEDICAL HISTORY: Type 2 diabetes mellitus, hypertension. History of basal cell carcinoma of the left forearm excised in 2009 with clear margins, no recurrence.\n\nMEDICATIONS: Metformin, lisinopril.\n\nVITALS: Temp 100.1F, HR 84, BP 138/86, RR 16, SpO2 98% on room air.\n\nEXAM: Oropharynx mildly erythematous without exudate. Nares congested. Lungs with scattered rhonchi that clear with cough, no wheezes or focal crackles. Heart regular rate and rhythm. No lymphadenopathy.\n\nASSESSMENT/PLAN: Acute viral upper respiratory infection. Supportive care with rest, fluids, and over-the-counter analgesics/decongestants. Return precautions reviewed for worsening dyspnea or persistent high fever. Encouraged continued home glucose monitoring during illness."
+  },
+  {
+    "note_id": 41,
+    "date": "2023-12-05",
+    "type": "Surgical Pathology Report",
+    "content": "SPECIMEN: Sigmoid colon, segmental resection.\n\nCLINICAL HISTORY: 62-year-old male with biopsy-proven adenocarcinoma of the sigmoid colon, status post colonoscopy 2023-11. Presents for sigmoid colectomy performed 2023-12-04.\n\nGROSS DESCRIPTION: Segment of colon measuring 22 cm in length with an ulcerated, partially circumferential mass measuring 4.2 x 3.5 cm located in the sigmoid colon. The mass invades through the muscularis propria into the pericolonic adipose tissue. Proximal and distal resection margins grossly uninvolved. Fourteen lymph nodes identified.\n\nMICROSCOPIC DESCRIPTION: Sections show moderately differentiated adenocarcinoma invading through the muscularis propria into pericolonic soft tissue (pT3). Lymphovascular invasion present. Perineural invasion not identified. Proximal, distal, and radial margins are negative for tumor. Three of fourteen regional lymph nodes are positive for metastatic adenocarcinoma (3/14, pN1b).\n\nDIAGNOSIS: Sigmoid colon, segmental resection - Moderately differentiated adenocarcinoma, pT3 pN1b. Margins negative. Pathologic stage III (AJCC 8th edition). Mismatch repair (MMR) protein immunohistochemistry pending."
+  },
+  {
+    "note_id": 42,
+    "date": "2024-03-12",
+    "type": "Oncology Progress Note",
+    "content": "CHIEF COMPLAINT: Follow-up for colon adenocarcinoma.\n\nHISTORY OF PRESENT ILLNESS: 62-year-old male with stage III adenocarcinoma of the sigmoid colon, diagnosed 2023-11 following colonoscopy and confirmed on biopsy (moderately differentiated adenocarcinoma). Underwent sigmoid colectomy on 2023-12-04 with 3 of 14 regional lymph nodes positive for metastatic disease. No evidence of distant metastasis on staging CT chest/abdomen/pelvis.\n\nINTERVAL HISTORY: Completed cycle 4 of 12 of adjuvant FOLFOX chemotherapy. Tolerating treatment with mild peripheral neuropathy and fatigue. No new GI bleeding, no weight loss this interval.\n\nPAST MEDICAL HISTORY: Type 2 diabetes mellitus, hypertension. History of basal cell carcinoma of the left forearm excised in 2009 with clear margins, no recurrence.\n\nASSESSMENT/PLAN: Stage III sigmoid colon adenocarcinoma, on adjuvant FOLFOX. Continue chemotherapy as scheduled. Repeat CEA and surveillance imaging in 3 months. Manage neuropathy symptomatically."
+  },
+  {
+    "note_id": 43,
+    "date": "2024-08-20",
+    "type": "Oncology Surveillance Note",
+    "content": "CHIEF COMPLAINT: Post-treatment surveillance for stage III sigmoid colon adenocarcinoma.\n\nINTERVAL HISTORY: 62-year-old male who completed all 12 cycles of adjuvant FOLFOX chemotherapy on 2024-06-18. Oxaliplatin was dose-reduced for cycles 9 through 12 due to grade 2 peripheral neuropathy. Since completing treatment the patient reports improving energy and stable, mild residual neuropathy in the fingertips and toes. No abdominal pain, no rectal bleeding, no change in bowel habits, no weight loss.\n\nDIAGNOSTICS: Surveillance CEA 1.8 ng/mL (within normal limits, down from 2.4 ng/mL at baseline). CT chest/abdomen/pelvis with contrast dated 2024-08-14 shows no evidence of locoregional recurrence or distant metastatic disease. Surgical anastomosis intact without stricture.\n\nPAST MEDICAL HISTORY: Type 2 diabetes mellitus, hypertension. History of basal cell carcinoma of the left forearm excised in 2009 with clear margins, no recurrence.\n\nASSESSMENT/PLAN: Stage III sigmoid colon adenocarcinoma, status post sigmoid colectomy and completion of adjuvant FOLFOX, with no evidence of disease. Continue surveillance: CEA every 3 months, CT imaging every 6 months, and surveillance colonoscopy at 1 year post-resection. Continue symptomatic management of residual neuropathy."
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "note_id": 50,
+    "date": "2025-02-20",
+    "type": "Breast Imaging Report",
+    "content": "Screening mammogram on 2025-02-06 showed a developing asymmetry in the upper outer left breast. Diagnostic mammogram with targeted ultrasound on 2025-02-14 demonstrated a 2.3 cm irregular hypoechoic mass at 2 o'clock, 6 cm from the nipple, with angular margins and posterior shadowing. Left axillary nodes were not enlarged by imaging criteria. Impression was BI-RADS 5, highly suspicious for malignancy. Ultrasound-guided core biopsy was recommended and completed on 2025-02-20."
+  },
+  {
+    "note_id": 51,
+    "date": "2025-02-24",
+    "type": "Pathology Report",
+    "content": "Specimen: Left breast, 2 o'clock mass, core biopsy.\nFinal Diagnosis: Invasive mammary carcinoma with ductal features. The invasive carcinoma involves multiple cores and measures at least 1.1 cm in the submitted tissue. Associated ductal carcinoma in situ is present, intermediate nuclear grade. Lymphovascular invasion is not identified in this biopsy material. Estrogen receptor positive, progesterone receptor positive, HER2 negative by immunohistochemistry. Comment: Overall findings are most in keeping with a primary breast invasive ductal carcinoma. This biopsy establishes malignancy; definitive size and nodal status are deferred to excision."
+  },
+  {
+    "note_id": 52,
+    "date": "2025-03-03",
+    "type": "Surgical Oncology Consultation",
+    "content": "Seen 2025-03-03 after biopsy confirmation of left breast cancer. MRI from 2025-02-27 shows enhancement corresponding to the known lesion only, without multifocal or contralateral disease. No chest wall invasion. Clinical stage reviewed as cT2 cN0 cM0. We discussed breast-conserving surgery versus mastectomy. Given localized disease and patient preference, plan was for left lumpectomy with sentinel lymph node biopsy. Differential considerations from the original imaging report such as radial scar or complex sclerosing lesion are no longer relevant after tissue diagnosis. No evidence of inflammatory breast cancer on exam."
+  },
+  {
+    "note_id": 53,
+    "date": "2025-03-18",
+    "type": "Operative Pathology Report",
+    "content": "Procedure performed 2025-03-18: left breast lumpectomy with sentinel lymph node biopsy. Final surgical pathology shows invasive ductal carcinoma, 2.4 cm, Nottingham grade 2, with associated intermediate-grade DCIS. Margins negative for invasive carcinoma and DCIS. Three sentinel lymph nodes examined, all negative for carcinoma (0/3). Pathologic stage pT2 pN0(sn). Post-op recovery uncomplicated aside from mild axillary soreness and a small resolving seroma."
+  },
+  {
+    "note_id": 54,
+    "date": "2025-04-02",
+    "type": "Medical Oncology Consultation",
+    "content": "Initial med onc visit 2025-04-02. We reviewed that she has a resected left breast primary with hormone receptor positive, HER2-negative disease and node-negative status after sentinel node sampling. Because the tumor is over 2 cm and the patient is otherwise fit, genomic assay was sent to help estimate benefit of adjuvant chemotherapy. There is no suggestion in the record of a purely in situ process or benign lesion; treatment recommendations are being made for an invasive breast cancer. Staging scans were not ordered because she has no bone pain, cough, weight loss, or abnormal liver tests, and presentation remains consistent with localized disease."
+  },
+  {
+    "note_id": 55,
+    "date": "2025-04-10",
+    "type": "Systemic Therapy Note",
+    "content": "Genomic assay returned in the intermediate-high range, and adjuvant chemotherapy was recommended. Docetaxel/cyclophosphamide cycle 1 was administered on 2025-04-10. She tolerated infusion with expected fatigue and transient metallic taste, no febrile symptoms. Radiation oncology referral placed for adjuvant whole-breast radiation after completion of chemotherapy. Endocrine therapy to follow radiation. The patient asked whether the in situ component changes the main diagnosis; we reviewed that the invasive component drives prognosis and treatment planning."
+  },
+  {
+    "note_id": 56,
+    "date": "2025-04-11",
+    "type": "Clinical History",
+    "content": "Past history includes hypertension and hyperlipidemia. She had a benign cyst aspiration in the same breast many years earlier, but no prior breast malignancy. She denies nipple discharge, skin ulceration, dyspnea, or focal neurologic symptoms. ECOG performance status 0. Routine CBC and CMP before chemotherapy were adequate for treatment."
+  }
+]
