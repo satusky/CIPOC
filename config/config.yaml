@@ -1,0 +1,43 @@
+# CIPOC configuration
+#
+# `llm` defines the default LLM settings applied to every agent.
+# `agents` holds optional per-agent overrides; any field set under an agent
+# is merged on top of the defaults in `llm`. Omit an agent (or leave it empty)
+# to have it use the defaults as-is.
+
+# Default LLM configuration (see cipoc.llm.OpenAIConfig).
+llm:
+  # model: gpt-5.5
+  model: gpt-oss-120b
+  provider: openai          # "openai" or "anthropic"
+
+  # Credentials / endpoint. Prefer environment variables over hardcoding
+  # secrets here; ${VAR} placeholders are expanded at load time.
+  base_url: ${AZURE_OPENAI_URL}
+  api_key: ${RENCI_AZURE_API_KEY}
+
+  # Reasoning settings (OpenAI-style). Set to null to disable.
+  reasoning:
+    effort: medium          # "low", "medium", or "high"
+    summary: auto           # "detailed", "auto", or null
+
+  # Rate limiter settings (see cipoc.llm.RateLimiter).
+  limiter:
+    max_retries: 10
+    initial_delay: 1.0
+    exponential_base: 2.0
+    max_delay: 60.0
+    jitter: true
+
+# Optional per-agent overrides. Keys are agent names from the `agents` module.
+# Only specify the fields you want to change; everything else falls back to `llm`.
+agents:
+  extractor: {}
+    # Example override:
+    # model: gpt-5.5
+    # reasoning:
+    #   effort: high
+
+documents:
+  documents_path: documents/
+  data_dictionary_path: documents/naaccr_data_dictionary_v25.json
