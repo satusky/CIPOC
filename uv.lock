@@ -242,7 +242,6 @@ dependencies = [
     { name = "openai" },
     { name = "pandas" },
     { name = "pydantic" },
-    { name = "pyspark" },
     { name = "pyyaml" },
     { name = "tqdm" },
 ]
@@ -257,13 +256,12 @@ requires-dist = [
     { name = "langchain-core", specifier = "==1.0.4" },
     { name = "langchain-openai", specifier = "==1.0.2" },
     { name = "langgraph", specifier = "==1.0.3" },
-    { name = "langgraph-prebuilt", specifier = "==1.0.3" },
+    { name = "langgraph-prebuilt", specifier = "==1.0.4" },
     { name = "matplotlib", specifier = ">=3.11.0" },
     { name = "mlflow-skinny", specifier = "==3.8.1" },
     { name = "openai", specifier = "==2.7.0" },
     { name = "pandas", specifier = "==2.2.3" },
     { name = "pydantic", specifier = "==2.10.6" },
-    { name = "pyspark", specifier = "==4.1.0" },
     { name = "pyyaml", specifier = "==6.0.2" },
     { name = "tqdm", specifier = "==4.67.1" },
 ]
@@ -1011,15 +1009,15 @@ wheels = [
 
 [[package]]
 name = "langgraph-prebuilt"
-version = "1.0.3"
+version = "1.0.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "langchain-core" },
     { name = "langgraph-checkpoint" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/02/94/870496abc8ed0c225a70cafae13d3cca68ce3b22488fc0bb738d06d93469/langgraph_prebuilt-1.0.3.tar.gz", hash = "sha256:082470e38575089bed315aa429a30ef41b4286ef849f483ec58c70bec0067a30", size = 142215, upload-time = "2025-11-13T18:41:21.344Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/84/08/45857c7c65f696307834af13946a72293e6cc49141de887f0957c2eb2c46/langgraph_prebuilt-1.0.4.tar.gz", hash = "sha256:7b4f9e97a146d2d625695c3549bdb432974b80817165139ec2ec869721e72c0f", size = 142470, upload-time = "2025-11-13T19:02:14.807Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/18/d9/a29e5c6152f2bb205a66bef540716e8f4e75326f18c5bff0acfa35840994/langgraph_prebuilt-1.0.3-py3-none-any.whl", hash = "sha256:a72651c1ad121a4e9e90da54c494af31a9a6c86e70916ba2a998ac75994f1d23", size = 34414, upload-time = "2025-11-13T18:41:20.372Z" },
+    { url = "https://files.pythonhosted.org/packages/69/14/a83e50129f66df783a68acb89e7b3e9c39b5c128a8748e961bc2b187f003/langgraph_prebuilt-1.0.4-py3-none-any.whl", hash = "sha256:50b1aa2b434783b6da30785568cf7155136b484750cc2ec695c0d4255db08262", size = 34414, upload-time = "2025-11-13T19:02:13.416Z" },
 ]
 
 [[package]]
@@ -1657,15 +1655,6 @@ wheels = [
 ]
 
 [[package]]
-name = "py4j"
-version = "0.10.9.9"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/38/31/0b210511177070c8d5d3059556194352e5753602fa64b85b7ab81ec1a009/py4j-0.10.9.9.tar.gz", hash = "sha256:f694cad19efa5bd1dee4f3e5270eb406613c974394035e5bfc4ec1aba870b879", size = 761089, upload-time = "2025-01-15T03:53:18.624Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/bd/db/ea0203e495be491c85af87b66e37acfd3bf756fd985f87e46fc5e3bf022c/py4j-0.10.9.9-py2.py3-none-any.whl", hash = "sha256:c7c26e4158defb37b0bb124933163641a2ff6e3a3913f7811b0ddbe07ed61533", size = 203008, upload-time = "2025-01-15T03:53:15.648Z" },
-]
-
-[[package]]
 name = "pyasn1"
 version = "0.6.3"
 source = { registry = "https://pypi.org/simple" }
@@ -1779,15 +1768,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/f3/91/9c6ee907786a473bf
 wheels = [
     { url = "https://files.pythonhosted.org/packages/10/bd/c038d7cc38edc1aa5bf91ab8068b63d4308c66c4c8bb3cbba7dfbc049f9c/pyparsing-3.3.2-py3-none-any.whl", hash = "sha256:850ba148bd908d7e2411587e247a1e4f0327839c40e2e5e6d05a007ecc69911d", size = 122781, upload-time = "2026-01-21T03:57:55.912Z" },
 ]
-
-[[package]]
-name = "pyspark"
-version = "4.1.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "py4j" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/88/0d/f280cbd070e424008f370c068c6a371e0cbb902e33d9709b01e97d479b01/pyspark-4.1.0.tar.gz", hash = "sha256:09c714ada88dfac3e1213c066617c6f473c1e22fbe279855028f77e12434147d", size = 455337789, upload-time = "2025-12-16T12:30:47.141Z" }
 
 [[package]]
 name = "python-dateutil"
