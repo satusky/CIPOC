@@ -1,16 +1,11 @@
 from typing import Literal
 from typing_extensions import Annotated
-from pydantic import BaseModel, Field, ConfigDict, StringConstraints, field_serializer
+from pydantic import BaseModel, Field, ConfigDict, field_serializer
 
-from .base import ConfidenceLevel, confidence_field
+from .base import ConfidenceLevel, confidence_field, TextSpan
 
 
 CancerStatus = Literal["historical", "recent", "current"]
-
-
-class TextSpan(BaseModel):
-    text: str = Field(description="Verbatim text snippet from a document that provides evidence for a claim.")
-    # text: StrippedStr = Field(description="Verbatim text snippet from a document that provides evidence for a claim.")
 
 
 class CancerMention(BaseModel):

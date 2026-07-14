@@ -1,6 +1,12 @@
 from enum import Enum
 
-from pydantic import Field
+from pydantic import BaseModel, Field
+
+
+class TextSpan(BaseModel):
+    text: str = Field(description="Verbatim text snippet from a document that provides evidence for a claim.")
+    # text: StrippedStr = Field(description="Verbatim text snippet from a document that provides evidence for a claim.")
+
 
 class ConfidenceLevel(str, Enum):
     LOW = "low"
