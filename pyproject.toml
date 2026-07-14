@@ -24,4 +24,5 @@ dependencies = [
     "ipython>=9.14.1",
     "grandalf>=0.8",
     "graphviz>=0.21",
+    "matplotlib>=3.11.0",
 ]
