@@ -1,6 +1,11 @@
 """LLM agent prompts."""
 
-from .extractor import EXTRACTOR_SYSTEM_PROMPT, EXTRACT_VALUES_PROMPT, extractor_user_prompt
+from .extractor import (
+    EXTRACTOR_SYSTEM_PROMPT,
+    EXTRACT_GROUP_VALUES_PROMPT,
+    EXTRACT_VARIABLE_VALUE_PROMPT,
+    REPAIR_VARIABLE_VALUE_PROMPT,
+)
 from .note_scanner import (
     NOTE_SCANNER_SYSTEM_PROMPT,
     CANCER_IN_NOTE_PROMPT,
@@ -10,8 +15,9 @@ from .note_scanner import (
 
 __all__ = [
     "EXTRACTOR_SYSTEM_PROMPT",
-    "EXTRACT_VALUES_PROMPT",
-    "extractor_user_prompt",
+    "EXTRACT_GROUP_VALUES_PROMPT",
+    "EXTRACT_VARIABLE_VALUE_PROMPT",
+    "REPAIR_VARIABLE_VALUE_PROMPT",
     "NOTE_SCANNER_SYSTEM_PROMPT",
     "CANCER_IN_NOTE_PROMPT",
     "NOTE_SUMMARY_PROMPT",
