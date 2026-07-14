@@ -5,11 +5,42 @@ from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.tools import StructuredTool
+from langchain_core.runnables.graph import CurveStyle, NodeStyles
 from langgraph.graph import StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
 from cipoc.llm import BaseAgentModel, LLMConfig, agent_model_for
 from cipoc.utils import CipocConfig, load_config
+
+
+# House style for graph PNGs. font-family must ride in the NodeStyles strings:
+# langgraph wraps node labels in HTML <p> tags, which ignore themeVariables.fontFamily.
+# The end-node fill is blue-550 (#1c5cab), not #2a78d6 — white text on the brighter
+# blue fails WCAG AA contrast (4.42:1).
+MERMAID_STYLE: dict[str, Any] = dict(
+    curve_style=CurveStyle.BASIS,
+    node_colors=NodeStyles(
+        default="fill:#cde2fb,stroke:#2a78d6,stroke-width:1.5px,color:#0b0b0b,font-family:sans-serif,line-height:1.2",
+        first="fill:#fcfcfb,stroke:#898781,stroke-width:1.5px,color:#52514e,font-family:sans-serif",
+        last="fill:#1c5cab,stroke:#104281,stroke-width:1.5px,color:#ffffff,font-family:sans-serif",
+    ),
+    background_color="#fcfcfb",
+    padding=20,
+    frontmatter_config={
+        "config": {
+            "theme": "base",
+            "themeVariables": {
+                "lineColor": "#898781",
+                "clusterBkg": "#f0efec",
+                "clusterBorder": "#c3c2b7",
+                "titleColor": "#52514e",
+                "edgeLabelBackground": "#fcfcfb",
+                "fontSize": "15px",
+            },
+            "flowchart": {"curve": "basis", "nodeSpacing": 40, "rankSpacing": 45},
+        }
+    },
+)
 
 
 class BaseAgent(ABC):
@@ -51,12 +82,16 @@ class BaseAgent(ABC):
     def run(self) -> Any:
         ... 
 
-    def draw(self, path: str) -> None:
+    def draw(self, path: str, **mermaid_kwargs) -> None:
         """Render the compiled graph. Writes a PNG where possible (needs network),
-        otherwise prints the ASCII diagram so the CLI stays self-contained."""
-        graph = self._graph.get_graph()
+        otherwise prints the ASCII diagram so the CLI stays self-contained.
+
+        Styled with ``MERMAID_STYLE``; pass any ``draw_mermaid_png`` keyword to
+        override individual settings.
+        """
+        graph = self._graph.get_graph(xray=True)
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         try:
-            graph.draw_mermaid_png(output_file_path=path)
+            graph.draw_mermaid_png(output_file_path=path, **{**MERMAID_STYLE, **mermaid_kwargs})
         except Exception:
             print(graph.draw_ascii())
