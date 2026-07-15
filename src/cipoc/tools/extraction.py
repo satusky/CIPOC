@@ -2,9 +2,14 @@ import json
 import re
 from datetime import date
 from pathlib import Path
+from typing import TYPE_CHECKING
 from langchain.tools import tool
 
 from cipoc.models import VariableInfo, VariableGroupInfo, VariableOutput
+
+if TYPE_CHECKING:
+    from cipoc.models import CaseFacts
+    from cipoc.tools.coding_context import RuleStore
 
 
 _ENTRY_FIELD_MAP = {
@@ -91,6 +96,29 @@ class VariableValueValidator:
         return []
 
 
+_MORPHOLOGY_KEY = re.compile(r"(\d{4})/(\d)")
+
+
+def _collapse_morphology_valid_codes(codes: dict, length) -> dict:
+    """Collapse ICD-O-3 'xxxx/x' morphology/behavior keys to the stored 4-digit base.
+
+    The data dictionary enumerates histology codes with their behavior suffix
+    (e.g. '8500/2', '8500/3'), but the NAACCR field stores only the 4-digit
+    morphology (behavior is its own item). Left as-is, every key exceeds the
+    field length and value validation can never pass. Only applies when the
+    field length is 4 and every key is in 'xxxx/x' form; per-behavior
+    descriptions are merged so the distinction stays visible to the model.
+    """
+    if str(length) != "4" or not codes or not all(_MORPHOLOGY_KEY.fullmatch(k) for k in codes):
+        return codes
+    collapsed: dict[str, str] = {}
+    for key, description in codes.items():
+        base = key.partition("/")[0]
+        entry = f"{key} {description}"
+        collapsed[base] = f"{collapsed[base]}; {entry}" if base in collapsed else entry
+    return collapsed
+
+
 def lookup_variable_info(item_id: int, data_dictionary_path: str | Path) -> VariableInfo | None:
     """Look up NAACCR variable metadata by item ID from a JSON data dictionary.
 
@@ -117,15 +145,55 @@ def lookup_variable_info(item_id: int, data_dictionary_path: str | Path) -> Vari
     fields = {field: item_entry.get(col) for col, field in _ENTRY_FIELD_MAP.items()}
     if isinstance(fields["description"], list):
         fields["description"] = "".join(fields["description"])
+    if isinstance(fields["valid_codes"], dict):
+        fields["valid_codes"] = _collapse_morphology_valid_codes(fields["valid_codes"], fields.get("length"))
     return VariableInfo(item_id=item_id, **fields)
 
 
-def build_variable_group(item_ids: int | list[int], data_dictionary_path: str | Path | None) -> VariableGroupInfo:
+def build_variable_group(
+    item_ids: int | list[int],
+    data_dictionary_path: str | Path | None,
+    *,
+    case_facts: "CaseFacts | None" = None,
+    rule_store: "RuleStore | None" = None,
+) -> VariableGroupInfo:
+    """Build variable metadata for the requested items, optionally scoped to a case.
+
+    When both ``case_facts`` and ``rule_store`` are supplied, each variable's
+    ``coding_instructions`` is filled from the applicable manual rules and its
+    ``valid_codes`` is replaced by the case-reduced set when a reduction applies.
+    Scoping is deterministic; unknown case facts widen scope rather than narrow it.
+    """
     if data_dictionary_path is None:
         raise ValueError("Cannot retrieve variable information. Please supply a data dictionary path.")
-    
+
     if isinstance(item_ids, int):
         item_ids = [item_ids]
 
     item_info = [lookup_variable_info(item, data_dictionary_path) for item in sorted(set(item_ids))]
-    return VariableGroupInfo(variables=[item for item in item_info if item is not None])
+    variables = [item for item in item_info if item is not None]
+
+    if case_facts is not None and rule_store is not None:
+        from cipoc.tools.coding_context import assemble_coding_instructions, scope_coding_context
+
+        full_codes_by_item = {
+            variable.item_id: variable.valid_codes
+            for variable in variables
+            if isinstance(variable.valid_codes, dict) and variable.valid_codes
+        }
+        contexts = scope_coding_context(
+            [variable.item_id for variable in variables],
+            case_facts,
+            rule_store,
+            full_codes_by_item=full_codes_by_item,
+        )
+        for variable in variables:
+            context = contexts.get(variable.item_id)
+            if context is None:
+                continue
+            instructions, _ = assemble_coding_instructions(context, rule_store.manifest)
+            variable.coding_instructions = instructions
+            if context.reduced_codes is not None:
+                variable.valid_codes = context.reduced_codes
+
+    return VariableGroupInfo(variables=variables)

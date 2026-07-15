@@ -37,6 +37,10 @@ class DocumentsConfig(BaseModel):
         default=None,
         description="Path to the NAACCR data dictionary JSON.",
     )
+    rules_path: Path | None = Field(
+        default=None,
+        description="Directory holding the compiled manual rule store (manifest.json plus per-manual rule files).",
+    )
     model_config = ConfigDict(extra="allow")
 
 # User-edited runtime config; resolved relative to the current working directory.
