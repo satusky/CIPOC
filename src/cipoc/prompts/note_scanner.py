@@ -20,12 +20,22 @@ Answer with:
 
 
 NOTE_SUMMARY_PROMPT = """\
-Write a concise clinical summary of the note. Focus on any cancer-related findings: \
-diagnoses, sites, staging, treatments, and disease status. Keep it factual and grounded \
-only in the note's contents.
+Summarize the note and tag it with keywords.
 
-Output only the summary prose. Do not add any preamble, heading, labels, or statements \
-about cancer presence or your confidence.
+- summary: a concise overview of the note (maximum three sentences), used as a skimmable \
+index to identify which notes contain relevant information. Prioritize high-level \
+descriptions of what information is contained in the note (visit activity/purpose, \
+diagnoses, treatments, disease status, etc.) over specific values. Output only the summary \
+prose. Do not add any preamble, heading, labels, or statements about cancer presence or \
+your confidence.
+- keywords: three to eight keywords that can be used as tags for content filters. Focus on \
+the main activities/findings. Always provide keywords — every note has at least a visit \
+purpose or main finding to tag.
+
+Guidelines:
+- Keep everything factual and grounded only in the note's contents.
+- Do not include any demographic information about the patient or the physician(s).
+- Do not include medical history unless that is the sole purpose of the visit detailed in the note.
 """
 
 
@@ -38,3 +48,13 @@ Identify every distinct cancer case mentioned in the note. For each mention, rep
 
 If no cancer is mentioned, return an empty list.
 """
+
+##### OLD #####
+# NOTE_SUMMARY_PROMPT = """\
+# Write a concise clinical summary of the note. Focus on any cancer-related findings: \
+# diagnoses, sites, staging, treatments, and disease status. Keep it factual and grounded \
+# only in the note's contents.
+
+# Output only the summary prose. Do not add any preamble, heading, labels, or statements \
+# about cancer presence or your confidence.
+# """
