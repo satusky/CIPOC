@@ -1,0 +1,13 @@
+[
+  {
+    "rule_id": "spcsm_2024:date_of_diagnosis",
+    "source_doc": "spcsm_2024",
+    "section_path": ["Date of Diagnosis"],
+    "anchor": "date-of-diagnosis",
+    "kind": "instruction",
+    "item_ids": [390],
+    "applies_to": null,
+    "text": "Date of Diagnosis: Record the month, day, and year the tumor was first diagnosed, clinically or microscopically, by a recognized medical practitioner. If an ambiguous term (e.g., 'suspicious for malignancy') is the only indication of diagnosis, use the date the ambiguous term was documented.",
+    "notes": "Fixture: SEER half of the cross-family overlap pair on item 390 (paired with store_2024:date_of_initial_diagnosis; SEER should win precedence)."
+  }
+]

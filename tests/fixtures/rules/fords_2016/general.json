@@ -1,0 +1,13 @@
+[
+  {
+    "rule_id": "fords_2016:laterality",
+    "source_doc": "fords_2016",
+    "section_path": ["Cancer Identification", "Laterality"],
+    "anchor": "laterality",
+    "kind": "instruction",
+    "item_ids": [410],
+    "applies_to": null,
+    "text": "Laterality: Record the laterality for paired organs. Code 0 when the primary site is not a paired organ.",
+    "notes": "Fixture: older half of the CoC-family recency pair on item 410. Remains the applicable CoC manual for a diagnosis before 2023-10-01 (e.g., 2017), where store_2024 fails the temporal filter."
+  }
+]

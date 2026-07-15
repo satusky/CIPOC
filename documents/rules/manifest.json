@@ -1,0 +1,9 @@
+{
+  "solid_tumor_rules": {
+    "title": "Solid Tumor Rules (Combined)",
+    "family": "SEER",
+    "publication_date": "2024-01-01",
+    "source_markdown": "documents/markdown/SolidTumorRules_Combined.md",
+    "compiled_at": "2026-07-15"
+  }
+}

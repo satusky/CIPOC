@@ -1,0 +1,81 @@
+[
+  {
+    "rule_id": "solid_tumor_rules:breast:general",
+    "source_doc": "solid_tumor_rules",
+    "section_path": ["Breast", "Introduction"],
+    "anchor": "breast-introduction",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": ["C500-C509"],
+      "dx_date_min": "2018-01-01"
+    },
+    "text": "The Breast Solid Tumor Rules are effective for cases diagnosed 1/1/2018 and forward. Use these rules to determine the number of primaries and the histology for tumors of the breast (C500-C509).",
+    "notes": "Fixture: general principle (empty item_ids) with a unit-level dx_date_min overriding the manual-level publication date."
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:h_priority",
+    "source_doc": "solid_tumor_rules",
+    "section_path": ["Breast", "Histology Coding Rules", "Instructions"],
+    "anchor": "breast-histology-instructions",
+    "kind": "priority_rule",
+    "item_ids": [522],
+    "applies_to": {
+      "sites": ["C500-C509"],
+      "dx_date_min": "2018-01-01"
+    },
+    "text": "The histology coding rules are in hierarchical order. Use the first rule that applies to the case and stop; do not continue through the remaining rules.",
+    "notes": "Fixture: priority_rule kind."
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:h4",
+    "source_doc": "solid_tumor_rules",
+    "section_path": ["Breast", "Histology Coding Rules", "Single Tumor"],
+    "anchor": "breast-histology-single-tumor",
+    "kind": "instruction",
+    "item_ids": [522],
+    "applies_to": {
+      "sites": ["C500-C509"],
+      "dx_date_min": "2018-01-01"
+    },
+    "text": "Code the histology when only one histologic type is identified. When both invasive duct and invasive lobular carcinoma are present in a single tumor, code 8522/3 (invasive duct and lobular carcinoma).",
+    "notes": "Fixture: item-specific instruction for histology."
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table3",
+    "source_doc": "solid_tumor_rules",
+    "section_path": ["Breast", "Terms and Definitions", "Table 3"],
+    "anchor": "breast-table-3",
+    "kind": "code_table",
+    "item_ids": [522],
+    "applies_to": {
+      "sites": ["C500-C509"],
+      "dx_date_min": "2018-01-01"
+    },
+    "text": "Table 3. Specific histologies, NOS/NST, and subtypes/variants for breast (excerpt).",
+    "codes": {
+      "8500/2": "Ductal carcinoma in situ (DCIS); intraductal carcinoma, noninfiltrating",
+      "8500/3": "Invasive carcinoma of no special type (carcinoma NST); infiltrating duct carcinoma",
+      "8520/2": "Lobular carcinoma in situ (LCIS)",
+      "8520/3": "Invasive lobular carcinoma",
+      "8522/3": "Invasive duct and lobular carcinoma",
+      "8540/3": "Paget disease of the breast"
+    },
+    "notes": "Fixture: the one required code_table unit; codes are a subset of the item 522 set in documents/naaccr_data_dictionary_v25.json."
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:behavior_epc",
+    "source_doc": "solid_tumor_rules",
+    "section_path": ["Breast", "Terms and Definitions", "Behavior"],
+    "anchor": "breast-behavior",
+    "kind": "instruction",
+    "item_ids": [523],
+    "applies_to": {
+      "sites": ["C500-C509"],
+      "histologies": ["8504"],
+      "dx_date_min": "2018-01-01"
+    },
+    "text": "Encapsulated papillary carcinoma without documented invasion is coded to behavior /2 (in situ). Code behavior /3 only when invasion is documented in the pathology report.",
+    "notes": "Fixture: histology-conditioned applicability (only matches when histology 8504 is known; unknown histology widens)."
+  }
+]

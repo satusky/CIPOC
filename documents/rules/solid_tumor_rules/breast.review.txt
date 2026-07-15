@@ -1,0 +1,823 @@
+========================================================================
+RULE COMPILATION REVIEW REPORT
+========================================================================
+Source: documents/markdown/SolidTumorRules_Combined.md
+Units emitted: 204  |  accepted: 204  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     10
+  definition     24
+  example        23
+  instruction    87
+  priority_rule  60
+
+Accepted fidelity: min 0.98  mean 1.00
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED ACCEPTED UNITS (source vs. compiled, up to 5)
+------------------------------------------------------------------------
+
+[solid_tumor_rules:breast:breast_nos_c509:p1]  kind=priority_rule  items=[560]  fidelity=1.00
+  applies_to: {'sites': ['C500-C509'], 'dx_date_min': '2018-01-01', 'dx_date_max': '2017-12-31'}
+  SOURCE REGION:
+    | # Breast NOS C509.
+
+    | ***Note 2: The MPH Rules and Solid Tumor Rules are used based on date of diagnosis.***
+
+    | - Tumors diagnosed 01/01/2007 through 12/31/2017: Use MPH Rules
+    | - Tumors diagnosed 01/01/2018 and later: Use Solid Tumor Rules
+    | - The original tumor diagnosed before 1/1/2018 and a subsequent tumor diagnosed 1/1/2018 or later in the same
+
+    | primary site: Use the Solid Tumor Rules
+
+    | ***Note 3:*** **NST (No Special Type), mammary carcinoma NST, and carcinoma NST are new terms for duct or ductal carcinoma for**
+
+    | diagnosis years 2018 forward. Previously, it was thought that carcinoma originated in the ducts or lobules of the breast, hence the names duct carcinoma and lobular carcinoma. Current thinking is that carcinoma originates in the "terminal duct lobular unit" therefore the preferred term is NST or carcinoma NST.
+
+    | ***Note 4:*** **Mammary carcinoma is a synonym for carcinoma no special type (NST)/duct carcinoma not otherwise specified (NOS)**
+
+    | **8500. For diagnosis year 2018 forward, it is no longer be coded as carcinoma NOS 8010.** ***Note 5:*** **DCIS/Carcinoma NST in situ has a major classification change for diagnosis year 2018 forward.**
+
+    | A. Architecture, pattern, and features ARE NOT CODED. The majority of in situ tumors will be coded to DCIS 8500/2. B. It is very important to code the grade of all DCIS.
+
+    | i. Code grade as designated in current AJCC Manual, SEER Coding Manual, and COC Coding Manual. ii. The current breast WHO edition emphasizes coding the grade of tumor rather than the subtype/variant. iii. The WHO editions are used internationally by pathologists to keep their nomenclature and histology identification
+
+    | current. iv. Over time, subtypes/variants will be diagnosed less frequently. ***Note 6:*** The invasive subtype/variant is coded ONLY when it comprises greater than 90% of the tumor. This change has been
+
+    | implemented in both the WHO and in the CAP protocols.
+
+    | Jump to Multiple Primary Rules **Solid Tumor Rules 21** Jump to Histology Rules **2025 Update**
+
+    | -----
+
+    | ##### Breast Equivalent Terms and Definitions C500-C506, C508-C509
+
+    | ***Note 7:*** Excerpt from the CAP Invasive Breast Protocol (page 17): "A modified list is presented in the protocol based on the most
+
+    | frequent types of invasive carcinomas and terminology that is in widespread usage. The modified list is intended to capture the majority of tumors and reduce the classification of tumors being reported as 'other.' The WHO classification is presented for completeness".
+
+  COMPILED TEXT:
+    > Tumors diagnosed 01/01/2007 through 12/31/2017: Use MPH Rules
+
+[solid_tumor_rules:breast:table_1_primary_site:i20]  kind=instruction  items=[522]  fidelity=1.00
+  applies_to: {'sites': ['C500-C509'], 'dx_date_min': '2018-01-01'}
+  SOURCE REGION:
+    | ### Table 1: Primary Site Codes
+
+    | Table 1 contains terms used in mammograms, clinical diagnosis, and less frequently the operative and pathology reports to describe the location of the tumor. Find the term in Column 1 and use the site code in Column 2. ***Note:*** See the "clock" diagram at the end of the Equivalent Terms and Definitions for a graphic of the o'clock designations and corresponding
+
+    | **quadrants/subsites of the breast.**
+
+    | Refer to the SEER Manual and COC Manual for a priority list for using documents such as mammograms, operative reports, and pathology reports to determine the tumor location.
+
+    | **Column 1 includes terms used to describe the location/site of the tumor. Column 2 contains the site term and code.**
+
+    | ##### Terms and Descriptive Language Site Term and Code
+
+    | Areolar Nipple C500 Nipple Paget disease without underlying tumor ***Note:*** Paget with underlying tumor is
+
+    | coded to the quadrant of breast in which the underlying tumor is located
+
+    | Jump to Multiple Primary Rules **Solid Tumor Rules 24** Jump to Histology Rules **2025 Update**
+
+    | -----
+
+    | ##### Breast Equivalent Terms and Definitions C500-C506, C508-C509 Table 1: Primary Site Codes
+
+    | | Terms and Descriptive Language | Site Term and Code |
+    | |---|---|
+    | | Above nipple Area extending 1 cm around areolar complex Behind the nipple Below the nipple Beneath the nipple Central portion of breast Cephalad to nipple Infra-areolar Lower central Next to areola NOS Next to nipple Retroareolar Subareolar Under the nipple Underneath the nipple | Central portion of breast C501 |
+    | | Superior inner Superior medial Upper inner quadrant (UIQ) Upper medial | Upper inner quadrant of breast C502 |
+    | | Inferior inner Inferior medial Lower inner quadrant (LIQ) Lower medial | Lower inner quadrant of breast C503 |
+    | | Superior lateral Superior outer Upper lateral Upper outer quadrant (UOQ) | Upper outer quadrant of breast C504 |
+
+    | Jump to Multiple Primary Rules Jump to Histology Rules
+
+    | -----
+
+    | ##### Breast Equivalent Terms and Definitions C500-C506, C508-C509 Table 1: Primary Site Codes
+
+    | | Terms and Descriptive Language | Site Term and Code |
+    | |---|---|
+    | | Inferior lateral Inferior outer Lower lateral Lower outer quadrant (LOQ) | Lower outer quadrant of breast C505 |
+    | | Axillary tail of breast Tail of breast NOS Tail of Spence | Axillary tail of breast C506 |
+    | | 12:00 o'clock 3:00 o'clock 6:00 o'clock 9:00 o'clock Inferior breast NOS Inner breast NOS Lateral breast NOS Lower breast NOS Medial breast NOS Midline breast NOS Outer breast NOS Overlapping lesion of breast Superior breast NOS Upper breast NOS | Overlapping lesion of breast C508 Note: This is a single tumor which overlaps quadrants/subsite. |
+    | | ¾ or more of breast involved with tumor Diffuse (tumor size 998) Entire breast Inflammatory without palpable mass Multiple tumors in different subsites (quadrants) within the same breast | Breast NOS C509 Note: Used for: • Non-contiguous multiple tumors in different quadrants/subsites of same breast OR • Unknown/unable to identify in which quadrant/subsite the tumor is located (Example: Outpatient biopsy with no quadrant identified. Patient lost to follow-up.) • Inflammatory carcinoma; diffuse tumor |
+
+    | Jump to Multiple Primary Rules Jump to Histology Rules
+
+    | -----
+
+    | **Breast Equivalent Terms and Definitions C500-C506, C508-C509**
+
+    | **Table 2: Histology Combination Codes Instructions:**
+
+    | 1. Use Table 2 when instructed to by the Multiple Primary and Histology Rules.
+    | 2. Compare the terms in the diagnosis (pathology, cytology, radiographic, clinical) to the terms in Column 1.
+    | 3. When the terms match, use the combination code listed in Column 2.
+    | 4. The last row in the table is a "last resort" code: adenocarcinoma mixed subtypes 8255.
+    | 5. Use the combination codes only when the histologies are in a single tumor OR multiple tumors abstracted as a single primary.
+    | 6. Mixed histologies may be described as follows:
+
+    | A. A "combination of" B. Histology 1 AND histology 2 C. Histology 1 WITH histology 2 D. **Mixed histology 1 and histology 2**
+
+    | ***Note 1:*** **Do not use Table 2 in the following situations:**
+
+    | - For tumors with both invasive and in situ behavior. The Histology Rules instruct to code the invasive histology.
+    | - When one of the histologies is described as differentiation or features
+    | - When the terms are a NOS and a subtype/variant of that NOS. See the Histology Rules for instructions on coding a
+
+    | NOS and a subtype/variant in a single tumor or multiple tumors abstracted as a single primary.
+
+    | ***Note 2: Some histologies can be in situ or invasive; others are limited to either /2 or /3 behavior code.***
+
+    | - When a code is limited to in situ, /2 will be added to the code (both components are in situ)
+    | - When a code is limited to invasive, /3 will be added to the code (both components are invasive) ***Note 3:*** This table is not a complete listing of histology combinations.
+
+    | **Column 1 contains the required ICD-O histology terms. Column 2 contains the histology combination term and code.**
+
+    | Jump to Multiple Primary Rules **Solid Tumor Rules 27** Jump to Histology Rules **2025 Update**
+
+    | -----
+
+    | ##### Breast Equivalent Terms and Definitions C500-C506, C508-C509
+
+    | ***Table 2: Histology Combination Codes***
+
+    | | Required Histology Terms | Histology Combination Term and Code |  |
+    | |---|---|---|
+    | | DCIS/duct carcinoma/carcinoma NST 8500 AND LCIS/lobular carcinoma 8520 or 8519 Note 1: Histologies may be a mix of in situ and invasive Note 2: 8522 is used when: • Duct and lobular carcinoma are present in a single tumor OR • Duct is present in at least one tumor and lobular present in a least one tumor in the same breast OR • One tumor is mixed duct and lobular; the other tumor in the same breast is either duct or lobular OR • All tumors in the same breast are mixed duct and lobular Example: One tumor with invasive duct carcinoma in LOQ RT breast; second tumor with invasive lobular carcinoma in UOQ RT breast Note 3: Do not use 8522 when the diagnosis is carcinoma NST/duct carcinoma with lobular differentiation. See Histology Rules for instructions on coding differentiation. | DCIS and in situ lobular carcinoma 8522/2 Note: The lobular includes pleomorphic lobular carcinoma 8519/2 Invasive carcinoma NST/duct carcinoma and invasive carcinoma 8522/3 Note 1: CAP uses the term Invasive carcinoma with features ("mixed type carcinoma") to indicate both duct are present. Note 2: This is an exception to the instruction that features coded. Note 3: Carcinoma NST includes all subtypes of Note 4: Lobular carcinoma includes invasive pleomorphic carcinoma Additional combinations of duct and lobular coded • Intraductal and lobular carcinoma (includes pleomorphic lobular carcinoma) • Infiltrating duct and lobular carcinoma in situ • Infiltrating duct and pleomorphic lobular carcinoma • Infiltrating lobular carcinoma and ductal carcinoma (DCIS) Infiltrating pleomorphic lobular carcinoma and ductal situ (DCIS) | in situ lobular ductal and lobular and lobular are not carcinoma NST lobular 8522/3: invasive (LCIS) in situ in situ carcinoma in |
+
+    | Jump to Multiple Primary Rules Jump to Histology Rules
+
+    | -----
+
+    | ##### Breast Equivalent Terms and Definitions C500-C506, C508-C509 Table 2: Histology Combination Codes
+
+    | ##### Required Histology Terms
+
+    | DCIS/duct carcinoma/carcinoma NST OR any ONE subtype/variant of carcinoma NST
+
+    | ##### AND Any histology in Table 3 with exception of
+
+    | - Lobular carcinoma 8520 and pleomorphic lobular
+
+    | carcinoma in situ 8519/2\*
+
+    | - Paget disease 8540 ***Note 1:*** Both histologies must have the same behavior code. ***Note 2:*** See Table 3 for carcinoma NST/duct carcinoma
+
+    | subtypes/variants.
+
+    | ***Note 3:*** **Do not use combination code for duct with lobular**
+
+    | **differentiation.** This is a synonym for carcinoma NST.
+
+    | ##### Lobular carcinoma AND Any histology in Table 3 with exception of
+
+    | - Duct carcinoma/carcinoma NST/DCIS (and
+
+    | subtypes/variants) 8500
+
+    | - Paget disease, in situ and invasive ***Note 1:*** See Table 3 for carcinoma NST/duct carcinoma
+
+    | subtypes/variants. ***Note 2:*** This code does not include lobular and Paget disease.
+
+    | See Multiple Primary Rules. Lobular carcinoma and Paget are separate primaries.
+
+    | ##### Histology Combination Term and Code
+
+    | Invasive carcinoma NST/duct mixed with other types of invasive carcinoma 8523/3 DCIS mixed with other in situ carcinoma 8500/2 ***Note:*** Prior to 2018, DCIS and other in situ was coded 8523/2.
+
+    | Infiltrating lobular mixed with other types of carcinoma 8524/3 In situ lobular mixed with other types of in situ carcinoma 8524/2
+
+    | ##### (Cases diagnosed prior to 1/1/2024 only)
+
+    | ***Note:*** Beginning with cases diagnosed 1/1/2024 forward, in situ lobular
+
+    | carcinoma with other types of in situ carcinoma 8524/2 has been deemed biologically impossible based on expert pathologist review for the Cancer PathCHART project. See Rule H7 and H8 for coding instructions.
+
+    | Jump to Multiple Primary Rules Jump to Histology Rules
+
+    | -----
+
+    | ##### Breast Equivalent Terms and Definitions C500-C506, C508-C509 Table 2: Histology Combination Codes
+
+    | | Required Histology Terms | Histology Combination Term and Code |
+    | |---|---|
+    | | Metaplastic carcinoma OR any ONE subtype/variant of metaplastic carcinoma AND Duct carcinoma/carcinoma NST OR Lobular carcinoma | Code metaplastic carcinoma 8575 OR Subtype/variant of metaplastic carcinoma Note: Metaplastic carcinoma, NOS and subtypes are almost always mixed with invasive mammary carcinoma, NST and at times lobular carcinoma. These tumors should be coded to metaplastic regardless of percent invasive mammary carcinoma or lobular carcinoma present. |
+    | | Paget disease AND Underlying DCIS Note: Paget disease is classified as malignant /3 in the ICD-O. Paget disease is coded as in situ /2 ONLY when the pathology states the Paget disease is in situ. | Paget disease (invasive or behavior not specified) and DCIS/intraductal carcinoma 8543/3 Paget disease (specified as in situ) and DCIS/intraductal carcinoma 8543/2 |
+    | | Paget disease AND Underlying infiltrating duct carcinoma/carcinoma NST and all subtypes/variants of infiltrating duct/carcinoma NST (must be a /3) Note: See Table 3 for subtypes/variants of carcinoma NST/duct carcinoma. | Paget disease and infiltrating duct carcinoma 8541/3 |
+
+    | Jump to Multiple Primary Rules Jump to Histology Rules
+
+    | -----
+
+    | ##### Breast Equivalent Terms and Definitions C500-C506, C508-C509 Table 2: Histology Combination Codes
+
+    | | Required | Histology Terms | Histology Combination Term and Code |
+    | |---|---|---|
+    | | Any | two invasive carcinoma NST subtypes/variants | Adenocarcinoma with mixed subtypes 8255/3 |
+    | | (percentage Note Note | not stated) abstracted as a single primary 1: The diagnosis may be two subtypes/variants and the pathologist may mention the presence of duct/carcinoma NST. Ignore the mention of carcinoma NST. 2: See Table 3 for subtypes/variants of carcinoma NST/duct carcinoma. |  |
+
+    | Jump to Multiple Primary Rules Jump to Histology Rules
+
+    | -----
+
+    | ##### Breast Equivalent Terms and Definitions C500-C506, C508-C509
+
+    | |  |  |  | Table 3: | Specific | Histologies, NOS/NST, and Subtypes/Variants |
+    | |---|---|---|---|---|---|
+    | | either /2 or /3, | a | behavior | code is not | listed. Code | behavior from pathology. |
+
+    | ***Note 4: Only use the histology code from the table when the diagnosis is EXACTLY the term listed.*** **Column 1 contains specific and NOS histology terms.**
+
+    | - **Specific histology terms do not have subtypes/variants**
+    | - **NOS histology terms do have subtypes/variants.**
+
+    | **Column 2 contains synonyms for the specific or NOS term. Synonyms have the same histology code as the specific or NOS term. Column 3 contains subtypes/variants of the NOS histology. Subtypes/variants do not have the same histology code as the NOS**
+
+    | term. Column 3 may contain NOS histologies which are part of a bigger histologic group. For example, sarcoma NOS 8800/3 (column 1) is a generic term which encompasses a number of soft tissue tumors, including rhabdomyosarcoma 8900/3 (column 3). Rhabdomyosarcoma is also a NOS because it has subtypes/variants. The subtypes/variants are indented under the NOS (rhabdomyosarcoma) in column 3. There is also a note in column 1 which calls attention to the fact that rhabdomyosarcoma has subtypes/variants. When subtypes/variants are indented under a NOS in Column 3, use coding rules for a NOS and a single subtype/variant. For example, rhabdomyosarcoma 8900/3 and alveolar type rhabdomyosarcoma 8920/3 are a NOS and a subtype/variant, NOT two different subtypes.
+
+    | ##### Table begins on next page
+
+    | Jump to Multiple Primary Rules **Solid Tumor Rules 32** Jump to Histology Rules **2025 Update**
+
+    | -----
+
+    | ##### Breast Equivalent Terms and Definitions C500-C506, C508-C509 Table 3: Specific Histologies, NOS/NST, and Subtypes/Variants
+
+    | | and 8200 carcinoma Note: | Specific and NOS/NST Terms Code Acinic cell carcinoma 8550 Adenomyoepithelioma with 8983 Apocrine carcinoma 8401 This is EXACTLY apocrine | Adenoid cystic carcinoma (ACC) a carcinoma, not a carcinoma NST with apocrine features, differentiation, or type. | diagnosis | that | is |  | Synonyms Acinar adenocarcinoma Acinar carcinoma ACC Adenocystic basal cell carcinoma Carcinoma adenoides cysticum Cylindromatous carcinoma AME Malignant AME | Subtypes/Variants Epithelial-myoepithelial carcinoma 8562 |
+    | |---|---|---|---|---|---|---|---|---|
+    | | Note: | Carcinoma NST 8500 consist formations. The term | Cribriform carcinoma may of | up cribriform/tubular carcinoma is coded as cribriform carcinoma. | to | 50% | tubular | Carcinoma, NOS Carcinoma of no special type (ductal/NST) Carcinoma/carcinoma NST with choriocarcinomatous features Carcinoma/carcinoma NST with cribriform features Carcinoma/carcinoma NST with melanotic features Carcinoma/carcinoma NST with neuroendocrine features Carcinoma/carcinoma NST with signet ring cell differentiation | Carcinoma with osteoclastic-like stromal giant cells 8035 Cribriform carcinoma/Ductal carcinoma, cribriform type 8201/3; Cribriform carcinoma in situ 8201/2 Pleomorphic carcinoma 8022/3 Ductal carcinoma in situ, solid type/intraductal carcinoma, solid type 8230/2; Solid carcinoma/solid adenocarcinoma 8230/3 ++(cases diagnosed prior to 1/1/2024 only; applies to invasive only) |
+
+    | Jump to Multiple Primary Rules Jump to Histology Rules
+
+    | -----
+
+    | ##### Breast Equivalent Terms and Definitions C500-C506, C508-C509 Table 3: Specific Histologies, NOS/NST, and Subtypes/Variants
+
+    | **Specific and NOS/NST Terms Synonyms Subtypes/Variants and Code**
+
+    | DCIS 8500/2 DCIS of high nuclear grade 8500/2 DCIS of intermediate nuclear grade 8500/2 DCIS of low nuclear grade 8500/2 Duct/ductal carcinoma Duct/ductal carcinoma in situ 8500/2 Duct/ductal carcinoma NOS Duct/ductal carcinoma NST (no special
+
+    | type) Duct/ductal carcinoma with apocrine
+
+    | features Duct/ductal carcinoma with apocrine
+
+    | metaplasia Duct/ductal carcinoma with lobular features Duct/ductal carcinoma with micropapillary
+
+    | features Duct/ductal carcinoma with mucin
+
+    | production Duct/ductal carcinoma with neuroendocrine
+
+    | features Duct/ductal carcinoma with squamous
+
+    | metaplasia Infiltrating ductal carcinoma 8500/3 Intraductal carcinoma 8500/2 Invasive carcinoma with medullary features
+
+    | **8500/3**
+
+    | Invasive carcinoma with micropapillary
+
+    | features 8500/3 Jump to Multiple Primary Rules **Solid Tumor Rules 34** Jump to Histology Rules **2025 Update**
+
+    | -----
+
+    | ##### Breast Equivalent Terms and Definitions C500-C506, C508-C509 Table 3: Specific Histologies, NOS/NST, and Subtypes/Variants
+
+    | **Specific and NOS/NST Terms Synonyms Subtypes/Variants and Code**
+
+    | Invasive carcinoma with neuroendocrine
+
+    | features 8500/3 Invasive carcinoma not otherwise specified
+
+    | (ductal/NOS) 8500/3 Invasive carcinoma NST with metaplastic
+
+    | features 8500/3 Invasive carcinoma NST/duct with
+
+    | medullary features 8500/3 Invasive carcinoma, with signet-ring cell
+
+    | features 8500/3 Invasive carcinoma of no special type
+
+    | (NST) 8500/3 Invasive carcinoma with clear cell (glycogen rich) features 8500/3 Invasive carcinoma, NST 8500/3 Invasive carcinoma, type cannot be
+
+    | determined 8500/3 Invasive mammary carcinoma 8500/3 Invasive mammary carcinoma associated
+
+    | with encysted papillary carcinoma 8500/3 Invasive mammary carcinoma NST with
+
+    | lobular features 8500/3 Invasive mammary carcinoma NST with
+
+    | medullary features 8500/3 Invasive mammary carcinoma NST with
+
+    | mucinous features 8500/3 Invasive mammary carcinoma NST with
+
+    | neuroendocrine features 8500/3 Jump to Multiple Primary Rules **Solid Tumor Rules 35** Jump to Histology Rules **2025 Update**
+
+    | -----
+
+    | ##### Breast Equivalent Terms and Definitions C500-C506, C508-C509 Table 3: Specific Histologies, NOS/NST, and Subtypes/Variants
+
+    | | Specific and NOS/NST Terms | Synonyms | Subtypes/Variants |
+    | |---|---|---|
+    | | and Code |  |  |
+    | |  | Invasive mammary carcinoma NST with tubulo-lobular variant 8500/3 Invasive mammary carcinoma with apocrine features 8500/3 Invasive mammary carcinoma with cribriform features 8500/3 Invasive mammary carcinoma with tubular features 8500/3 Invasive solid carcinoma/ adenocarcinoma 8500/3 ++(cases diagnosed 1/1/2024 forward) Mammary carcinoma in situ 8500/2 Mammary carcinoma/cancer Non-invasive mammary carcinoma 8500/2 |  |
+    | | Glycogen-rich clear cell carcinoma 8315 | Glycogen-rich carcinoma | Clear cell carcinoma 8310 |
+    | | Inflammatory carcinoma 8530 |  |  |
+    | | Lipid-rich carcinoma 8314 | Lipid-secreting carcinoma |  |
+
+    | Jump to Multiple Primary Rules Jump to Histology Rules
+
+    | -----
+
+    | ##### Breast Equivalent Terms and Definitions C500-C506, C508-C509 Table 3: Specific Histologies, NOS/NST, and Subtypes/Variants
+
+    | | Specific and NOS/NST Terms | Synonyms | Subtypes/Variants |
+    | |---|---|---|
+    | | and Code |  |  |
+    | | Lobular carcinoma 8520 | Alveolar lobular carcinoma Classic lobular carcinoma Florid lobular carcinoma 8520/2 Intraductal papilloma with lobular carcinoma in situ 8520/2 Invasive lobular carcinoma, alveolar type/variant 8520/3 Invasive lobular carcinoma, solid type 8520/3 Lobular carcinoma in situ 8520/2 Lobular carcinoma with cribriform features Mixed lobular carcinoma (lobular carcinoma NOS and one or more variants of lobular carcinoma) Invasive pleomorphic lobular carcinoma 8520/3 Solid lobular carcinoma Tubulolobular carcinoma | Pleomorphic lobular carcinoma in situ 8519/2* Note: 8519/2 is a new code for in situ /2 tumors only. |
+    | | Medullary carcinoma 8510 | MC | Atypical medullary carcinoma (AMC) 8513 |
+
+    | Jump to Multiple Primary Rules Jump to Histology Rules
+
+    | -----
+
+    | ##### Breast Equivalent Terms and Definitions C500-C506, C508-C509
+
+    | ***Table 3: Specific Histologies, NOS/NST, and Subtypes/Variants***
+
+    | | Specific and NOS/NST Terms | Synonyms | Subtypes/Variants |
+    | |---|---|---|
+    | | and Code |  |  |
+    | | Metaplastic carcinoma NOS or of no special type (NST) 8575 Note 1: Squamous cell carcinoma of the breast is extremely rare. Carefully check the pathology report to verify the squamous cell originated in the breast parenchyma, rather than the skin of the breast. Note 2: Metaplastic carcinoma, NOS and subtypes are almost always mixed with invasive mammary carcinoma, NST and at times lobular carcinoma. These tumors should be coded to metaplastic regardless of percent invasive mammary carcinoma or lobular carcinoma present. | Invasive mammary carcinoma with matrix production Metaplastic carcinoma, mixed epithelial and mesenchymal type Metaplastic carcinoma with mesenchymal differentiation Metaplastic carcinoma with squamous features Metaplastic carcinoma with other types of mesenchymal differentiation Mixed metaplastic carcinoma Metaplastic carcinoma spindle- cell type/spindle cell carcinoma ++(cases diagnosed 1/1/2024 forward) | Carcinosarcoma 8980/3 Fibromatosis-like metaplastic carcinoma 8572 Low grade adenosquamous carcinoma 8570 Metaplastic carcinoma spindle-cell type/spindle cell carcinoma 8032 ++(cases diagnosed prior to 1/1/2024) Metaplastic carcinoma with chondroid differentiation/with osseous differentiation 8571 Myoepithelial carcinoma 8982 Squamous cell carcinoma 8070 |
+
+    | Jump to Multiple Primary Rules Jump to Histology Rules
+
+    | -----
+
+    | ##### Breast Equivalent Terms and Definitions C500-C506, C508-C509
+
+    | ***Table 3: Specific Histologies, NOS/NST, and Subtypes/Variants***
+
+    | | Specific and NOS/NST Terms and Code | Synonyms | Subtypes/Variants |
+    | |---|---|---|
+    | | Mucinous carcinoma 8480 | Colloid carcinoma Mucinous adenocarcinoma |  |
+    | | Note 1: This is a diagnosis that is EXACTLY "mucinous carcinoma," "mucinous duct | Mucoid carcinoma |  |
+
+    | carcinoma," "mucinous DCIS" OR "greater than 90% mucinous." See Histology
+
+    | **Rules.**
+
+    | ***Note 2:*** Mucinous duct carcinoma is
+
+    | listed on the CAP protocol. It is not recognized by WHO or IARC. Mucinous carcinoma is not a subtype/variant of Carcinoma NST/duct carcinoma.
+
+    | ##### Mucoepidermoid carcinoma 8430
+
+    | | Neuroendocrine carcinoma NOS | Poorly differentiated neuroendocrine | Carcinoma with neuroendocrine differentiation |
+    | |---|---|---|
+    | | 8246/3 | carcinoma | 8574/3 |
+
+    | Large cell neuroendocrine carcinoma/large cell
+
+    | carcinoma 8013/3 Small cell neuroendocrine carcinoma/small cell
+
+    | carcinoma 8041/3
+
+    | Jump to Multiple Primary Rules Jump to Histology Rules
+
+    | -----
+
+    | | Specific and NOS/NST Terms and Code | Synonyms | Subtypes/Variants |
+    | |---|---|---|
+    | | Neuroendocrine tumor NOS 8240/3 | Carcinoid of breast Neuroendocrine carcinoma, low | Neuroendocrine tumor, grade 2 8249/3 |
+
+    | ##### Oncocytic carcinoma 8290 Paget disease of the nipple with no underlying tumor 8540
+
+    | **Papillary carcinoma 8503** Intraductal papillary carcinoma 8503/2\* Encapsulated papillary carcinoma, NOS/non-
+
+    | | Phyllodes tumor, malignant | Cystosarcoma phyllodes, malignant |
+    | |---|---|
+    | | 9020/3 | Periductal stromal tumor, low grade |
+
+    | ##### Polymorphous carcinoma 8525
+
+    | ##### Breast Equivalent Terms and Definitions C500-C506, C508-C509 Table 3: Specific Histologies, NOS/NST, and Subtypes/Variants
+
+    | grade/neuroendocrine carcinoma, well differentiated Neuroendocrine tumor, grade 1
+
+    | Intraductal papillary carcinoma with DCIS
+
+    | **8503/2\***
+
+    | Intraductal papilloma with ductal carcinoma
+
+    | in situ 8503/2 Invasive ductal papillary carcinoma 8503/3 Invasive papillary carcinoma 8503/3 Papillary carcinoma of breast, NOS 8503/3 Papillary carcinoma non-invasive 8503/2\* Papillary ductal carcinoma in situ 8503/2\* infiltrating/intracystic 8504/2
+
+    | with invasion/ with invasive carcinoma, NST/invasive duct carcinoma 8504/3 Micropapillary carcinoma 8507\* Tall cell carcinoma with reverse polarity 8509/3;
+
+    | Solid papillary carcinoma in situ 8509/2\* with invasion 8509/3\*
+
+    | Jump to Multiple Primary Rules Jump to Histology Rules
+
+    | -----
+
+    | ***Table 3: Specific Histologies, NOS/NST, and Subtypes/Variants***
+
+    | ##### Specific and NOS/NST Terms Synonyms and Code Sarcoma NOS 8800/3
+
+    | ##### Note 1: Angiosarcoma 9120/3 is also a
+
+    | NOS with the following subtypes/variants: Lymphangiosarcoma 9170/3 Malignant hemangioendothelioma 9130/3
+
+    | ##### Note 2: Rhabdomyosarcoma 8900/3 is
+
+    | also a NOS with the following subtypes/variants: Alveolar type rhabdomyosarcoma 8920/3 Embryonal type rhabdomyosarcoma 8910/3 Pleomorphic rhabdomyosarcoma 8901/3
+
+    | ##### Sebaceous carcinoma 8410 Signet ring carcinoma 8490 Tubular carcinoma 8211
+
+    | **Secretory carcinoma 8502** Juvenile breast carcinoma
+
+    | ##### *New codes approved by IARC/WHO Committee for ICD-O
+
+    | **++Denotes change per Cancer PathCHART Specialty Matter Expert review. ICD-O codes and terms with ++ have a separate ICD-O code, however, per the expert review, are considered a synonym for the NOS term. This change applies to cases diagnosed 1/1/2024 forward. The terms and ICD-O codes remain subtype/variants for cases diagnosed prior to 1/1/2024.**
+
+    | ##### Breast Equivalent Terms and Definitions C500-C506, C508-C509
+
+    | ##### Subtypes/Variants
+
+    | Angiosarcoma/ Epithelioid angiosarcoma/
+
+    | Hemangiosarcoma/ Post radiation angiosarcoma of breast 9120/3 Lymphangiosarcoma 9170/3 Malignant hemangioendothelioma 9130/3 Liposarcoma 8850/3 Leiomyosarcoma 8890/3 Osteosarcoma 9180/3 Rhabdomyosarcoma 8900/3
+
+    | Alveolar type 8920/3 Embryonal type 8910/3 Pleomorphic 8901/3
+
+    | Jump to Multiple Primary Rules Jump to Histology Rules
+
+    | -----
+
+    | ##### Breast Equivalent Terms and Definitions C500-C506, C508-C509
+
+  COMPILED TEXT:
+    > When subtypes/variants are indented under a NOS in Column 3, use coding rules for a NOS and a single subtype/variant. For example, rhabdomyosarcoma 8900/3 and alveolar type rhabdomyosarcoma 8920/3 are a NOS and a subtype/variant, NOT two different subtypes.
+
+[solid_tumor_rules:breast:multiple_tumors:i28]  kind=instruction  items=[522, 523]  fidelity=1.00
+  applies_to: {'sites': ['C500-C509'], 'dx_date_min': '2018-01-01'}
+  SOURCE REGION:
+    | ### Multiple Tumors
+
+    | | Note 1: | Multiple tumors may be single primary or multiple primaries. |
+    | |---|---|
+    | | Note 2: | ER, PR, and/or HER2 are not used to determine multiple primaries. |
+    | | Note 3: | A subsequent tumor in the chest wall or surgical scar without evidence of residual breast tissue is regional metastasis. |
+    | | Note 4: | For those sites which have recognized biomarkers, the biomarkers are most frequently used to target treatment. Follow the rules; do not code multiple primaries or histology based on biomarkers. |
+
+    | **Rule M4** Abstract multiple primariesii when there are separate, non-contiguous tumors in sites with ICD-O site codes that
+
+    | **differ at the second (CXxx) and/or third characters (CxXx).**
+
+    | Jump to Equivalent Terms and Definitions **Solid Tumor Rules 48** Jump to Histology Rules **2025 Update**
+
+    | -----
+
+    | ##### Breast Multiple Primary Rules C500-C506, C508-C509
+
+    | ***Note 1:*** Tumors with site codes that differ at the second or third character are in different primary sites; for example, a breast
+
+    | tumor C50x and a colon tumor C18x differ at the second and third character. ***Note 2:*** This rule does not include metastases. Metastatic tumors are not used to determine multiple primaries; for example, liver
+
+    | metastases from the breast cancer would not be counted as a second primary. **Rule M5** Abstract multiple primariesii when the patient has a subsequent tumor after being clinically disease-free for greater
+
+    | **than five years after the original diagnosis or last recurrence.**
+
+    | ***Note 1:*** The rules are hierarchical. This rule only applies when there is a subsequent tumor in the same breast. In other words, a
+
+    | primary in the contralateral breast does not start the "clock" over.
+
+    | ***Note 2:*** **Clinically disease-free means that there was no evidence of recurrence on follow-up.**
+
+    | - Mammograms are NED
+    | - Scans are NED ***Note 3:*** When there is a recurrence less than or equal to five years of diagnosis, the "clock" starts over. The time interval is
+
+    | calculated from the date of last recurrence. In other words, the patient must have been disease-free for greater than five years from the date of the last recurrence. ***Note 4:*** When it is unknown/not documented whether the patient had a recurrence, use date of diagnosis to compute the time
+
+    | interval. ***Note 5:*** The physician may state this is a recurrence, meaning the patient had a previous breast tumor and now has another breast
+
+    | tumor. Follow the rules; do not attempt to interpret the physician's statement. ***Note 6:*** When a breast resection was done and a subsequent tumor is identified in the remaining chest wall, muscle, or skin AND
+
+    | there was no residual breast tissue identified in the resected specimen, this is a recurrence and not a new primary.
+
+    | | Rule M6 | Abstract a single primaryi when there is inflammatory carcinoma in: • Multiple quadrants of same breast OR • Bilateral breasts |
+    | |---|---|
+    | | Rule M7 | Abstract multiple primariesii when there is bilateral breast cancer (both right and left breast). Note 1: Physician statement of "bilateral breast cancer" should not be interpreted as meaning a single primary. The term is not |
+
+    | used consistently. The literal definition of bilateral is "cancer in both breasts". ***Note 2:*** The histologies within each breast may be the same or different. **Rule M8** Abstract a single primaryi when the diagnosis is Paget disease with synchronous underlying in situ or invasive
+
+    | carcinoma NST (duct/ductal) or subtypes of duct.
+
+    | Jump to Equivalent Terms and Definitions Jump to Histology Rules
+
+    | -----
+
+    | ##### Breast Multiple Primary Rules C500-C506, C508-C509
+
+    | ***Note:*** If the underlying tumor is any histology other than duct or subtypes of duct, continue through the rules. **Rule M9** Abstract multiple primariesii when the diagnosis is Paget disease with underlying tumor which is NOT duct.
+
+    | ***Example: Paget disease of the nipple with underlying lobular carcinoma are multiple primaries.***
+
+    | **Rule M10** Abstract a single primaryi when there are multiple tumors of carcinoma NST/duct and lobular.
+
+    | - Both/all tumors may be a mixture of carcinoma NST/duct and lobular 8522 OR
+    | - One tumor may be duct and another tumor lobular OR
+    | - One tumor may be mixed duct and lobular 8522, the other tumor either duct or lobular ***Note 1:*** Tumors must be in the same breast. ***Note 2:*** Carcinoma NST/duct includes:
+    |       - DCIS 8500/2
+    |       - Carcinoma NST 8500/3
+    |       - Carcinoma with osteoclastic-like stromal giant cells 8035/3 (subtype/variant of carcinoma NST)
+    |       - Cribriform carcinoma 8201/3
+    |       - Pleomorphic carcinoma 8022/3 ***Note 3:*** Lobular carcinoma includes:
+    |       - In situ lobular carcinoma 8520/2
+    |       - In situ pleomorphic lobular carcinoma 8519/2
+    |       - Invasive lobular carcinoma 8520/3
+    |       - Invasive pleomorphic lobular carcinoma 8520/3
+
+    | ***Note 4:*** **When a mixture of behaviors is present in carcinoma, NST and lobular carcinoma, follow the H rules to determine**
+
+    | **the correct histology code.**
+
+    | ***Note 5:*** For cases initially diagnosed as in situ with subsequent invasive tumor and stated to be a single primary per M10, edit the
+
+    | original abstract as follows:
+
+    | - Do not change date of diagnosis.
+    | - For cases which were abstracted as in situ (/2), change the code on the original abstract to 8522/3.
+    | - Report all data changes for cases which have been submitted to the central registry.
+
+    | Jump to Equivalent Terms and Definitions Jump to Histology Rules
+
+    | -----
+
+    | ##### Breast Multiple Primary Rules C500-C506, C508-C509
+
+    | **Rule M11** Abstract a single primaryi when a ductal carcinoma occurs after a combination code in the same breast. See the
+
+    | following list:
+
+    | - **DCIS following a diagnosis of:**
+
+    | ο DCIS + lobular carcinoma in situ 8522/2 OR ο DCIS + in situ Paget 8543/2 OR ο DCIS + Invasive Paget 8543/3 OR ο DCIS mixed with other in situ 8523/2 (code used for cases diagnosed prior to 1/1/2018)
+
+    | - **Invasive carcinoma NST/duct following a diagnosis of:**
+
+    | ο Invasive duct + invasive lobular 8522/3 OR ο Invasive duct + invasive Paget 8541/3 OR ο Invasive duct + other invasive carcinoma 8523/3 **Rule M12** Abstract multiple primariesii when separate/non-contiguous tumors are two or more different subtypes/variants in
+
+    | Column 3 of Table 3 in the Equivalent Terms and Definitions. Timing is irrelevant. ***Note:*** The tumors may be subtypes/variants of the same or different NOS histologies.
+
+    | - **Same NOS: Encapsulated papillary carcinoma with invasion 8504/3 and solid papillary carcinoma with invasion**
+
+    | 8509/3 are both subtypes of invasive papillary carcinoma 8503/3 but are distinctly different histologies. Abstract multiple primaries.
+
+    | - **Different NOS: Encapsulated papillary carcinoma 8504/2 is a subtype/variant of in situ papillary carcinoma 8503/2.**
+
+    | Pleomorphic lobular carcinoma in situ 8519/2 is a subtype/variant of lobular carcinoma in situ 8520/2. They are distinctly different histologies. Abstract multiple primaries. **Rule M13** Abstract a single primaryi when synchronous, separate/non-contiguous tumors are on the same row in Table 3 in the
+
+    | Equivalent Terms and Definitions. ***Note:*** The same row means the tumors are:
+
+    | - The same histology (same four-digit ICD-O code) OR
+    | - One is the preferred term (column 1) and the other is a synonym for the preferred term (column 2) OR
+    | - A NOS (column 1/column 2) and the other is a subtype/variant of that NOS (column 3) OR
+    | - A NOS histology in column 3 with an indented subtype/variant
+
+    | Jump to Equivalent Terms and Definitions Jump to Histology Rules
+
+    | -----
+
+    | ##### Breast Multiple Primary Rules C500-C506, C508-C509
+
+    | **Rule M14** Abstract multiple primariesii when separate/non-contiguous tumors are:
+
+    | - On different rows in Table 3 in the Equivalent Terms and Definitions
+    | - A combination code in Table 2 and a code from Table 3 ***Note 1:*** Timing is irrelevant. Tumors may be synchronous or non-synchronous. ***Note 2:*** Each row in the table is a distinctly different histology. ***Example 1:*** Paget disease of the nipple with underlying lobular are multiple primaries. Paget and lobular are on different rows in
+
+    | Table 3. ***Example 2:*** Two tumors right breast. One tumor is invasive mixed duct and lobular 8522/3 (combination code from Table 2) and
+
+    | the second tumor is tubular 8211/3 (histology from Table 3). Abstract two primaries: 8522/3 and 8211/3. **Rule M15** Abstract a single primaryi (the invasive) when an in situ tumor is diagnosed after an invasive tumor in the same breast.
+
+    | ***Note 1:*** Once the patient has an invasive tumor, the in situ is recorded as a recurrence for those registrars who collect recurrence
+
+    | data. ***Note 2:*** The rules are hierarchical. Only use this rule when none of the previous rules apply. ***Note 3:*** The tumors may be a NOS and a subtype/variant of that NOS. **Rule M16** Abstract a single primaryi (the invasive) when an invasive tumor is diagnosed less than or equal to 60 days after an in
+
+    | **situ tumor in the same breast.**
+
+    | ***Note 1:*** The rules are hierarchical. Only use this rule when none of the previous rules apply. ***Note 2:*** The tumors may be a NOS and a subtype/variant of that NOS. ***Note 3:*** When the case has been abstracted, change behavior code on original abstract from /2 to /3. ***Note 4:*** Do not change date of diagnosis. ***Note 5:*** If the case has already been submitted to the central registry, report all changes. ***Note 6:*** The physician may stage both tumors because staging and determining multiple primaries are done for different reasons.
+
+    | Staging determines which treatment would be most effective. Determining multiple primaries is done to stabilize the data for the study of epidemiology (long-term studies done on incidence, mortality, and causation of a disease with the goal of reducing or eliminating that disease). ***Note 7:*** See the COC and SEER manuals for instructions on coding other data items such as Date of Diagnosis, Accession Year
+
+    | and Sequence Number.
+
+    | Jump to Equivalent Terms and Definitions Jump to Histology Rules
+
+    | -----
+
+    | ##### Breast Multiple Primary Rules C500-C506, C508-C509
+
+    | **Rule M17** Abstract multiple primariesii when an invasive tumor occurs more than 60 days after an in situ tumor in the same
+
+    | breast. ***Note 1:*** The rules are hierarchical. Only use this rule when none of the previous rules apply. ***Note 2:*** Abstract both the invasive and in situ tumors. ***Note 3:*** Abstract as multiple primaries even if physician states the invasive tumor is disease recurrence or progression. ***Note 4:*** This rule is based on long-term epidemiologic studies of recurrence intervals. The specialty medical experts (SMEs) reviewed and approved these rules. Many of the SMEs were also authors, co-authors, or editors of the AJCC Staging Manual.
+
+    | **Rule M18** Abstract a single primaryi when none of the previous rules apply.
+
+    | ***Note:*** Use this rule as a last resort. Please confirm that you have not overlooked an applicable rule. ***Example:*** One tumor is invasive carcinoma NST/ductal 8500/3 and a separate non-contiguous tumor in the same breast is DCIS
+
+    | 8500/2. Abstract a single primary: invasive carcinoma NST/ductal 8500/3.
+
+    | **This is the end of instructions for Multiple Tumors.**
+
+    | **i Prepare one abstract. Use the histology rules to assign the appropriate histology code. For registries collecting recurrence data: When a** **subsequent tumor is "single primary," record that subsequent tumor as a recurrence.** **ii Prepare two or more abstracts. Use the histology rules to assign the appropriate histology code to each case abstracted.** ***Note: Only code differentiation or features when there is a specific code for the NOS with differentiation or the NOS with features in Table 2***
+
+    | **or Table 3 or the ICD-O and all updates.**
+
+    | Jump to Equivalent Terms and Definitions Jump to Histology Rules
+
+    | -----
+
+    | ##### Breast Histology Rules C500-C506, C508-C509
+
+  COMPILED TEXT:
+    > When a mixture of behaviors is present in carcinoma, NST and lobular carcinoma, follow the H rules to determine the correct histology code.
+
+[solid_tumor_rules:breast:coding_histology:i10]  kind=instruction  items=[522]  fidelity=1.00
+  applies_to: {'sites': ['C500-C509'], 'dx_date_min': '2018-01-01'}
+  SOURCE REGION:
+    | ### Coding Histology
+
+    | ***Note 1:*** The rules for coding breast histology are different from the histology coding rules for all other sites. DO NOT USE THESE
+
+    | **RULES FOR ANY SITE OTHER THAN BREAST.** ***Note 2: Only use this section for one or more histologies within a single tumor.*** ***Note 3: Do not use this section in place of the Histology Rules.*** **Two INVASIVE histologies** **Two histologies within a single tumor will be either:**
+
+    | - A NOS and a subtype/variant OR
+    | - Different histologies (different rows in Table 3 OR different subtypes in Table 3 Column 3 OR a combination code
+
+    | from Table 2 and a code from Table 3) The following instructions are in priority order:
+
+    | 1. **NOS and a subtype/variant**
+
+    | A. Code the subtype/variant (specific histology) ONLY when documented to be greater than 90% of the tumor.
+
+    | ***Note: When a histology is listed as "minimal", "focus/foci/focal", "microscopic", you can assume the other histological***
+
+    | portion comprises greater than 90% of the tumor. ***Example:*** Patient had an excisional biopsy with a pathologic diagnosis of invasive cribriform carcinoma 8201/3. There was
+
+    | microscopic involvement of one margin. The patient chose to have a total mastectomy. Pathology from the total mastectomy showed minimal residual invasive carcinoma NST 8500/3. Because the invasive carcinoma NST was minimal, the subtype/variant invasive cribriform carcinoma 8201/3 is assumed to be greater than 90% of the tumor. B. Code the NOS/NST when the subtype/variant is documented to be less than or equal to 90% of the tumor OR the percentage
+
+    | of subtype/variant is unknown/not documented.
+
+    | Jump to Equivalent Terms and Definitions **Solid Tumor Rules 54** Jump to Multiple Primary Rules **2025 Update**
+
+    | -----
+
+    | ##### Breast Histology Rules C500-C506, C508-C509
+
+    | 2. Different histologies
+
+    | A. Code the histology which comprises the majority of tumor.
+
+    | ***Note 1:*** This instruction does not apply to:
+
+    | - Invasive carcinoma NST/ductal and lobular carcinoma (use the combination code 8522/3).
+    | - Mucinous carcinoma and a different histology (see Histology Rules)
+    | - Metaplastic carcinoma, NOS and subtypes/variants and invasive carcinoma, NST (see Histology Rules) ***Note 2:*** The following terms do not describe the majority of tumor.
+
+    | | Architecture | Pattern(s) |
+    | |---|---|
+    | | Component | Subtype |
+    | | Differentiation* | Type |
+    | | Features (of)* | Variant |
+
+    | Foci; focus, focal \*Unless there is an exact ICD-O term that includes "differentiation" or "features"
+
+    | B. Code a combination code using Table 2 in the Equivalent Terms and Definitions when the majority is unknown/not
+
+    | documented.
+
+    | **Do not code apocrine carcinoma when the diagnosis specifies apocrine differentiation or features. Apocrine differentiation**
+
+    | is frequently present in:
+
+    | - Carcinoma NST/duct carcinoma
+
+    | ο Subtypes/variants of carcinoma NST/duct carcinoma
+
+    | - Lobular carcinoma NOS
+
+    | ο Pleomorphic lobular carcinoma in situ
+
+    | ##### Ambiguous Terminology
+
+    | 3. Code the specific histology described by ambiguous terminology (list follows) ONLY when A or B is true:
+
+    | A. The only diagnosis available is one histology term described by ambiguous terminology
+
+    | - CoC and SEER require reporting of cases diagnosed only by ambiguous terminology
+
+    | Jump to Equivalent Terms and Definitions Jump to Multiple Primary Rules
+
+    | -----
+
+    | ##### Breast Histology Rules C500-C506, C508-C509
+
+    | - Case is accessioned (added to your database) based on ambiguous terminology and no other histology information is
+
+    | available/documented ***Example:*** Outpatient biopsy says probably apocrine carcinoma. The case is accessioned (entered into the database) as required
+
+    | by both SEER and COC. No further information is available. Code the histology apocrine carcinoma. The case meets the criteria in #3A. B. There is a NOS histology and a more specific (subtype/variant) described by ambiguous terminology
+
+    | - Specific histology is clinically confirmed by a physician (attending, surgeon, oncologist, etc.) OR
+    | - Patient is receiving treatment based on the specific histology described by ambiguous term ***Example 1:*** The pathology diagnosis is carcinoma NST consistent with pleomorphic carcinoma. The oncology consult says
+
+    | the patient has pleomorphic carcinoma of the right breast. This is clinical confirmation of the diagnosis. Code pleomorphic carcinoma. The case meets the criteria in bullet 1. ***Example 2:*** The pathology diagnosis is sarcoma consistent with liposarcoma. The treatment plan says the patient will receive
+
+    | the following treatment for liposarcoma of the breast. Treatment plan confirms liposarcoma. Code liposarcoma. The case meets the criteria in bullet 2.
+
+    | **If the specific histology does not meet the criteria in #3B, then code the NOS histology.**
+
+    | ##### List of Ambiguous Terminology
+
+    | | Apparently | Most likely |
+    | |---|---|
+    | | Appears | Presumed |
+    | | Comparable with | Probable |
+    | | Compatible with | Suspect(ed) |
+    | | Consistent with | Suspicious (for) |
+    | | Favor(s) | Typical (of) |
+
+    | Malignant appearing
+
+    | Jump to Equivalent Terms and Definitions Jump to Multiple Primary Rules
+
+    | -----
+
+    | ##### Breast Histology Rules C500-C506, C508-C509
+
+  COMPILED TEXT:
+    > Note 1: This instruction does not apply to:
+
+    > - Invasive carcinoma NST/ductal and lobular carcinoma (use the combination code 8522/3).
+    > - Mucinous carcinoma and a different histology (see Histology Rules)
+    > - Metaplastic carcinoma, NOS and subtypes/variants and invasive carcinoma, NST (see Histology Rules)
+
+[solid_tumor_rules:breast:single_tumor_invasive_and:p5]  kind=priority_rule  items=[522, 523]  fidelity=1.00
+  applies_to: {'sites': ['C500-C509'], 'histologies': ['8522'], 'dx_date_min': '2018-01-01'}
+  SOURCE REGION:
+    | ### Single Tumor: Invasive and In Situ Components
+
+    | **Rule H10** Code the invasive histology when both invasive and in situ components are present (see Notes 2 and 3).
+
+    | ***Note 1:*** **Ignore the in situ term.**
+
+    | - This is consistent with the 2007 MPH Rules. ***Note 2:*** When a single tumor has one of the histologies listed, see Table 3. These are specific histology terms that capture both
+
+    | invasive and in situ components.
+
+    | - Encapsulated papillary carcinoma with invasion/with invasive carcinoma, NST/invasive duct carcinoma Jump to Equivalent Terms and Definitions **Solid Tumor Rules 60** Jump to Multiple Primary Rules **2025 Update**
+
+    | -----
+
+    | ##### Breast Histology Rules C500-C506, C508-C509
+
+    | - Solid papillary carcinoma with invasion ***Note 3:*** When a single tumor has carcinoma NST/duct and lobular with different behaviors, continue through the rules.
+
+    | **Rule H11** Code duct and lobular 8522/3 when the final diagnosis is any of the following:
+
+    | - Intraductal and invasive lobular carcinoma (includes invasive pleomorphic lobular carcinoma)
+    | - Infiltrating duct and lobular carcinoma in situ (LCIS)
+    | - Infiltrating duct and pleomorphic lobular carcinoma in situ
+    | - Infiltrating lobular carcinoma and ductal carcinoma in situ (DCIS)
+    | - Infiltrating pleomorphic lobular carcinoma and ductal carcinoma in situ (DCIS) ***Note 1:*** Assign behavior code /3 even when an in situ histology is mixed with an invasive. This aligns with ICD-O-3.2 and was
+
+    | vetted with specialty matter experts. ***Note 2:*** CAP uses the term Invasive carcinoma with ductal and lobular features ("mixed type carcinoma") as a synonym for
+
+    | duct carcinoma/carcinoma NST AND lobular carcinoma 8522/3. ***Note 3:*** Although the instructions in the "Coding Multiple Histologies in a Single Tumor" section state, "Code the histology that
+
+    | comprises the majority of tumor", 8522/3 identifies both invasive carcinoma NST/duct carcinoma and invasive lobular carcinoma and is the most accurate description.
+
+    | **This is the end of instructions for a Single Tumor: Invasive and In Situ Components Code the histology according to the rule that fits the case**
+
+    | Jump to Equivalent Terms and Definitions Jump to Multiple Primary Rules
+
+    | -----
+
+    | ##### Breast Histology Rules C500-C506, C508-C509
+
+  COMPILED TEXT:
+    > Rule H11 Code duct and lobular 8522/3 when the final diagnosis is any of the following:
+
+    > - Intraductal and invasive lobular carcinoma (includes invasive pleomorphic lobular carcinoma)
+    > - Infiltrating duct and lobular carcinoma in situ (LCIS)
+    > - Infiltrating duct and pleomorphic lobular carcinoma in situ
+    > - Infiltrating lobular carcinoma and ductal carcinoma in situ (DCIS)
+    > - Infiltrating pleomorphic lobular carcinoma and ductal carcinoma in situ (DCIS)
+
+========================================================================

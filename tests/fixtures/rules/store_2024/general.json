@@ -1,0 +1,24 @@
+[
+  {
+    "rule_id": "store_2024:date_of_initial_diagnosis",
+    "source_doc": "store_2024",
+    "section_path": ["Cancer Identification", "Date of Initial Diagnosis"],
+    "anchor": "date-of-initial-diagnosis",
+    "kind": "instruction",
+    "item_ids": [390],
+    "applies_to": null,
+    "text": "Date of Initial Diagnosis: Record the date of the first clinical or pathologic diagnosis of the cancer being reported, regardless of where the diagnosis was made.",
+    "notes": "Fixture: CoC half of the cross-family overlap pair on item 390 (paired with spcsm_2024:date_of_diagnosis; SEER should win precedence)."
+  },
+  {
+    "rule_id": "store_2024:laterality",
+    "source_doc": "store_2024",
+    "section_path": ["Cancer Identification", "Laterality"],
+    "anchor": "laterality",
+    "kind": "instruction",
+    "item_ids": [410],
+    "applies_to": null,
+    "text": "Laterality identifies the side of a paired organ on which the tumor originated. Code laterality for all sites listed in the paired-organ table; code 0 for all other sites.",
+    "notes": "Fixture: newer half of the CoC-family recency pair on item 410 (supersedes fords_2016:laterality for cases diagnosed on or after 2023-10-01)."
+  }
+]

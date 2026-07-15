@@ -1,0 +1,5543 @@
+[
+  {
+    "rule_id": "solid_tumor_rules:breast:breast_nos_c509:p1",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509."
+    ],
+    "anchor": "L495-L530:breast-nos-c509",
+    "kind": "priority_rule",
+    "item_ids": [
+      560
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": "2017-12-31"
+    },
+    "text": "Tumors diagnosed 01/01/2007 through 12/31/2017: Use MPH Rules",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:breast_nos_c509:p2",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509."
+    ],
+    "anchor": "L495-L530:breast-nos-c509",
+    "kind": "priority_rule",
+    "item_ids": [
+      560
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumors diagnosed 01/01/2018 and later: Use Solid Tumor Rules",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:breast_nos_c509:p3",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509."
+    ],
+    "anchor": "L495-L530:breast-nos-c509",
+    "kind": "priority_rule",
+    "item_ids": [
+      560
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "The original tumor diagnosed before 1/1/2018 and a subsequent tumor diagnosed 1/1/2018 or later in the same primary site: Use the Solid Tumor Rules",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:breast_nos_c509:d4",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509."
+    ],
+    "anchor": "L495-L530:breast-nos-c509",
+    "kind": "definition",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "NST (No Special Type), mammary carcinoma NST, and carcinoma NST are new terms for duct or ductal carcinoma for diagnosis years 2018 forward.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:breast_nos_c509:d5",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509."
+    ],
+    "anchor": "L495-L530:breast-nos-c509",
+    "kind": "definition",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8500"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Mammary carcinoma is a synonym for carcinoma no special type (NST)/duct carcinoma not otherwise specified (NOS) 8500.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:breast_nos_c509:i6",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509."
+    ],
+    "anchor": "L495-L530:breast-nos-c509",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8500"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "For diagnosis year 2018 forward, it is no longer be coded as carcinoma NOS 8010.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:breast_nos_c509:i7",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509."
+    ],
+    "anchor": "L495-L530:breast-nos-c509",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": [
+        "2"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Architecture, pattern, and features ARE NOT CODED. The majority of in situ tumors will be coded to DCIS 8500/2.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:breast_nos_c509:i8",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509."
+    ],
+    "anchor": "L495-L530:breast-nos-c509",
+    "kind": "instruction",
+    "item_ids": [
+      440
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": [
+        "2"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "It is very important to code the grade of all DCIS. Code grade as designated in current AJCC Manual, SEER Coding Manual, and COC Coding Manual.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:breast_nos_c509:i9",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509."
+    ],
+    "anchor": "L495-L530:breast-nos-c509",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": [
+        "3"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "The invasive subtype/variant is coded ONLY when it comprises greater than 90% of the tumor.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:equivalent_or_equal_terms:d1",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Equivalent or Equal Terms"
+    ],
+    "anchor": "L547-L569:equivalent-or-equal-terms",
+    "kind": "definition",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "And; with; (duct and lobular is equivalent to duct with lobular)\n\nNote: \"And\" and \"with\" are used as synonyms when describing multiple histologies within a single tumor.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:equivalent_or_equal_terms:d2",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Equivalent or Equal Terms"
+    ],
+    "anchor": "L547-L569:equivalent-or-equal-terms",
+    "kind": "definition",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Behavior code /2; DCIS; intraductal; noninfiltrating; noninvasive; carcinoma in situ",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:equivalent_or_equal_terms:d3",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Equivalent or Equal Terms"
+    ],
+    "anchor": "L547-L569:equivalent-or-equal-terms",
+    "kind": "definition",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Carcinoma; adenocarcinoma",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:equivalent_or_equal_terms:d4",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Equivalent or Equal Terms"
+    ],
+    "anchor": "L547-L569:equivalent-or-equal-terms",
+    "kind": "definition",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "De novo; new tumor; frank (obsolete term)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:equivalent_or_equal_terms:d5",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Equivalent or Equal Terms"
+    ],
+    "anchor": "L547-L569:equivalent-or-equal-terms",
+    "kind": "definition",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Duct; ductal; NST (no special type); carcinoma NST; mammary carcinoma",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:equivalent_or_equal_terms:d6",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Equivalent or Equal Terms"
+    ],
+    "anchor": "L547-L569:equivalent-or-equal-terms",
+    "kind": "definition",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Mammary; breast",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:equivalent_or_equal_terms:d7",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Equivalent or Equal Terms"
+    ],
+    "anchor": "L547-L569:equivalent-or-equal-terms",
+    "kind": "definition",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Simultaneous; synchronous; existing at the same time; concurrent; prior to first course treatment",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:equivalent_or_equal_terms:d8",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Equivalent or Equal Terms"
+    ],
+    "anchor": "L547-L569:equivalent-or-equal-terms",
+    "kind": "definition",
+    "item_ids": [
+      400
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Topography; site code",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:equivalent_or_equal_terms:i9",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Equivalent or Equal Terms"
+    ],
+    "anchor": "L547-L569:equivalent-or-equal-terms",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "The terms tumor, mass, tumor mass, lesion, and neoplasm are not used in a standard manner in clinical diagnoses, scans, or consults. Disregard the terms unless there is a physician's statement that the term is malignant/cancer. These terms are used ONLY to determine multiple primaries. Do not use these terms for casefinding or determining reportability.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:equivalent_or_equal_terms:d10",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Equivalent or Equal Terms"
+    ],
+    "anchor": "L547-L569:equivalent-or-equal-terms",
+    "kind": "definition",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Type; subtype; variant",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:terms_that_are_not:d1",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Terms that are NOT Equivalent or Equal"
+    ],
+    "anchor": "L570-L582:terms-that-are-not-equivalent-or-equal",
+    "kind": "definition",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Phenotype is not equivalent to subtype/type/variant",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:terms_that_are_not:d2",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Terms that are NOT Equivalent or Equal"
+    ],
+    "anchor": "L570-L582:terms-that-are-not-equivalent-or-equal",
+    "kind": "definition",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Invasive carcinoma, NST with lobular features is not equivalent to invasive carcinoma with ductal and lobular features",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:i1",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "instruction",
+    "item_ids": [
+      400
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Find the term in Column 1 and use the site code in Column 2.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:i2",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "instruction",
+    "item_ids": [
+      400
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Refer to the SEER Manual and COC Manual for a priority list for using documents such as mammograms, operative reports, and pathology reports to determine the tumor location.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:t3",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "code_table",
+    "item_ids": [
+      400
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Terms and Descriptive Language Site Term and Code\n\nAreolar Nipple C500 Nipple Paget disease without underlying tumor\n\nNote: Paget with underlying tumor is coded to the quadrant of breast in which the underlying tumor is located",
+    "codes": {
+      "C500": "Nipple",
+      "C501": "Central portion of breast",
+      "C502": "Upper inner quadrant of breast",
+      "C503": "Lower inner quadrant of breast",
+      "C504": "Upper outer quadrant of breast",
+      "C505": "Lower outer quadrant of breast",
+      "C506": "Axillary tail of breast",
+      "C508": "Overlapping lesion of breast",
+      "C509": "Breast NOS"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:d4",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "definition",
+    "item_ids": [
+      400
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Overlapping lesion of breast C508 Note: This is a single tumor which overlaps quadrants/subsite.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:i5",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "instruction",
+    "item_ids": [
+      400
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Breast NOS C509 Note: Used for: • Non-contiguous multiple tumors in different quadrants/subsites of same breast OR • Unknown/unable to identify in which quadrant/subsite the tumor is located (Example: Outpatient biopsy with no quadrant identified. Patient lost to follow-up.) • Inflammatory carcinoma; diffuse tumor",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:i6",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "1. Use Table 2 when instructed to by the Multiple Primary and Histology Rules.\n2. Compare the terms in the diagnosis (pathology, cytology, radiographic, clinical) to the terms in Column 1.\n3. When the terms match, use the combination code listed in Column 2.\n4. The last row in the table is a \"last resort\" code: adenocarcinoma mixed subtypes 8255.\n5. Use the combination codes only when the histologies are in a single tumor OR multiple tumors abstracted as a single primary.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:d7",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "definition",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Mixed histologies may be described as follows:\n\nA. A \"combination of\" B. Histology 1 AND histology 2 C. Histology 1 WITH histology 2 D. Mixed histology 1 and histology 2",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:i8",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Do not use Table 2 in the following situations:\n\n- For tumors with both invasive and in situ behavior. The Histology Rules instruct to code the invasive histology.\n- When one of the histologies is described as differentiation or features\n- When the terms are a NOS and a subtype/variant of that NOS. See the Histology Rules for instructions on coding a NOS and a subtype/variant in a single tumor or multiple tumors abstracted as a single primary.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:i9",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "When a code is limited to in situ, /2 will be added to the code (both components are in situ)\n\nWhen a code is limited to invasive, /3 will be added to the code (both components are invasive)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:t10",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "code_table",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "DCIS/duct carcinoma/carcinoma NST 8500 AND LCIS/lobular carcinoma 8520 or 8519\n\nDCIS and in situ lobular carcinoma 8522/2\n\nInvasive carcinoma NST/duct carcinoma and invasive carcinoma 8522/3",
+    "codes": {
+      "8522/2": "DCIS and in situ lobular carcinoma",
+      "8522/3": "Invasive carcinoma NST/duct carcinoma and invasive lobular carcinoma"
+    },
+    "notes": "The table states that lobular includes pleomorphic lobular carcinoma 8519/2."
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:i11",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Do not use 8522 when the diagnosis is carcinoma NST/duct carcinoma with lobular differentiation. See Histology Rules for instructions on coding differentiation.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:e12",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "example",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: One tumor with invasive duct carcinoma in LOQ RT breast; second tumor with invasive lobular carcinoma in UOQ RT breast",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:t13",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "code_table",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "DCIS/duct carcinoma/carcinoma NST OR any ONE subtype/variant of carcinoma NST\n\nAND Any histology in Table 3 with exception of\n\n- Lobular carcinoma 8520 and pleomorphic lobular carcinoma in situ 8519/2\n- Paget disease\n\nInvasive carcinoma NST/duct mixed with other types of invasive carcinoma 8523/3\nDCIS mixed with other in situ carcinoma 8500/2",
+    "codes": {
+      "8523/3": "Invasive carcinoma NST/duct mixed with other types of invasive carcinoma",
+      "8500/2": "DCIS mixed with other in situ carcinoma"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:t14",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "code_table",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": "2023-12-31"
+    },
+    "text": "Lobular carcinoma AND Any histology in Table 3 with exception of\n\n- Duct carcinoma/carcinoma NST/DCIS (and subtypes/variants) 8500\n- Paget disease, in situ and invasive\n\nInfiltrating lobular mixed with other types of carcinoma 8524/3\nIn situ lobular mixed with other types of in situ carcinoma 8524/2\n\n(Cases diagnosed prior to 1/1/2024 only)",
+    "codes": {
+      "8524/3": "Infiltrating lobular mixed with other types of carcinoma",
+      "8524/2": "In situ lobular mixed with other types of in situ carcinoma"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:p15",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Metaplastic carcinoma OR any ONE subtype/variant of metaplastic carcinoma AND Duct carcinoma/carcinoma NST OR Lobular carcinoma | Code metaplastic carcinoma 8575 OR Subtype/variant of metaplastic carcinoma\n\nNote: Metaplastic carcinoma, NOS and subtypes are almost always mixed with invasive mammary carcinoma, NST and at times lobular carcinoma. These tumors should be coded to metaplastic regardless of percent invasive mammary carcinoma or lobular carcinoma present.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:t16",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "code_table",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Paget disease AND Underlying DCIS\n\nPaget disease (invasive or behavior not specified) and DCIS/intraductal carcinoma 8543/3\nPaget disease (specified as in situ) and DCIS/intraductal carcinoma 8543/2\n\nPaget disease AND Underlying infiltrating duct carcinoma/carcinoma NST and all subtypes/variants of infiltrating duct/carcinoma NST (must be a /3)\n\nPaget disease and infiltrating duct carcinoma 8541/3",
+    "codes": {
+      "8543/3": "Paget disease (invasive or behavior not specified) and DCIS/intraductal carcinoma",
+      "8543/2": "Paget disease (specified as in situ) and DCIS/intraductal carcinoma",
+      "8541/3": "Paget disease and infiltrating duct carcinoma"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:t17",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "code_table",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Any two invasive carcinoma NST subtypes/variants\n\nAdenocarcinoma with mixed subtypes 8255/3",
+    "codes": {
+      "8255/3": "Adenocarcinoma with mixed subtypes"
+    },
+    "notes": "The table specifies this applies when the percentage is not stated and the tumors are abstracted as a single primary."
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:i18",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Only use the histology code from the table when the diagnosis is EXACTLY the term listed.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:d19",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "definition",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Specific histology terms do not have subtypes/variants\n\nNOS histology terms do have subtypes/variants.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:i20",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "When subtypes/variants are indented under a NOS in Column 3, use coding rules for a NOS and a single subtype/variant. For example, rhabdomyosarcoma 8900/3 and alveolar type rhabdomyosarcoma 8920/3 are a NOS and a subtype/variant, NOT two different subtypes.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:t21",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "code_table",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Specific and NOS/NST Terms and Code\n\nAcinic cell carcinoma 8550\nAdenomyoepithelioma with carcinoma 8983\nApocrine carcinoma 8401\nCarcinoma NST 8500\nGlycogen-rich clear cell carcinoma 8315\nInflammatory carcinoma 8530\nLipid-rich carcinoma 8314\nLobular carcinoma 8520\nMedullary carcinoma 8510\nMetaplastic carcinoma NOS or of no special type (NST) 8575\nMucinous carcinoma 8480\nMucoepidermoid carcinoma 8430\nNeuroendocrine carcinoma NOS 8246/3\nNeuroendocrine tumor NOS 8240/3\nOncocytic carcinoma 8290\nPaget disease of the nipple with no underlying tumor 8540\nPapillary carcinoma 8503\nPhyllodes tumor, malignant 9020/3\nPolymorphous carcinoma 8525\nSarcoma NOS 8800/3\nSebaceous carcinoma 8410\nSignet ring carcinoma 8490\nTubular carcinoma 8211\nSecretory carcinoma 8502",
+    "codes": {
+      "8550": "Acinic cell carcinoma",
+      "8983": "Adenomyoepithelioma with carcinoma",
+      "8401": "Apocrine carcinoma",
+      "8500": "Carcinoma NST",
+      "8315": "Glycogen-rich clear cell carcinoma",
+      "8530": "Inflammatory carcinoma",
+      "8314": "Lipid-rich carcinoma",
+      "8520": "Lobular carcinoma",
+      "8510": "Medullary carcinoma",
+      "8575": "Metaplastic carcinoma NOS or of no special type (NST)",
+      "8480": "Mucinous carcinoma",
+      "8430": "Mucoepidermoid carcinoma",
+      "8246/3": "Neuroendocrine carcinoma NOS",
+      "8240/3": "Neuroendocrine tumor NOS",
+      "8290": "Oncocytic carcinoma",
+      "8540": "Paget disease of the nipple with no underlying tumor",
+      "8503": "Papillary carcinoma",
+      "9020/3": "Phyllodes tumor, malignant",
+      "8525": "Polymorphous carcinoma",
+      "8800/3": "Sarcoma NOS",
+      "8410": "Sebaceous carcinoma",
+      "8490": "Signet ring carcinoma",
+      "8211": "Tubular carcinoma",
+      "8502": "Secretory carcinoma"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:i22",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "This is EXACTLY apocrine carcinoma, not a carcinoma NST with apocrine features, differentiation, or type.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:i23",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Mucinous carcinoma is not a subtype/variant of Carcinoma NST/duct carcinoma.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:i24",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Squamous cell carcinoma of the breast is extremely rare. Carefully check the pathology report to verify the squamous cell originated in the breast parenchyma, rather than the skin of the breast.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:table_1_primary_site:t25",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Table 1: Primary Site Codes"
+    ],
+    "anchor": "L583-L976:table-1-primary-site-codes",
+    "kind": "code_table",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2024-01-01",
+      "dx_date_max": null
+    },
+    "text": "++Denotes change per Cancer PathCHART Specialty Matter Expert review. ICD-O codes and terms with ++ have a separate ICD-O code, however, per the expert review, are considered a synonym for the NOS term. This change applies to cases diagnosed 1/1/2024 forward.",
+    "codes": {
+      "8230/3": "Invasive solid carcinoma/adenocarcinoma",
+      "8032": "Metaplastic carcinoma spindle-cell type/spindle cell carcinoma"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:unknown_if_single_or:p1",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Unknown if Single or Multiple Tumors"
+    ],
+    "anchor": "L1040-L1062:unknown-if-single-or-multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      560
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule M1 Abstract a single primaryi when it is not possible to determine if there is a single tumor or multiple tumors.\n\nNote 1: Use this rule only after all information sources have been exhausted.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:unknown_if_single_or:e2",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Unknown if Single or Multiple Tumors"
+    ],
+    "anchor": "L1040-L1062:unknown-if-single-or-multiple-tumors",
+    "kind": "example",
+    "item_ids": [
+      560
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note 2: Examples of cases with minimal information include:\n\n- Death certificate only (DCO)\n- Cases for which information is limited to pathology report only\n\nο Outpatient biopsy with no follow-up information available ο Multiple pathology reports which do not specify whether a single tumor or multiple tumors have been biopsied\n\nand/or resected",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:unknown_if_single_or:i3",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Unknown if Single or Multiple Tumors"
+    ],
+    "anchor": "L1040-L1062:unknown-if-single-or-multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Prepare one abstract. Use the histology rules to assign the appropriate histology code.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_module:i1",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor module."
+    ],
+    "anchor": "L1063-L1074:single-tumor-module",
+    "kind": "instruction",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "IMPORTANT: If the current tumor was preceded by a tumor in the same breast or contralateral breast, go to the Multiple Tumors",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_module:p2",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor module."
+    ],
+    "anchor": "L1063-L1074:single-tumor-module",
+    "kind": "priority_rule",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule M2 | Abstract a single primaryi when the diagnosis is inflammatory carcinoma in: • Multiple quadrants of same breast OR • Bilateral breasts",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_module:p3",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor module."
+    ],
+    "anchor": "L1063-L1074:single-tumor-module",
+    "kind": "priority_rule",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule M3 | Abstract a single primaryi when there is a single tumor. Note 1: A single tumor is always a single primary. Note 2: The tumor may overlap onto or extend into adjacent/contiguous site or subsites/quadrants. Note 3: The tumor may have in situ and invasive components. Note 4: The tumor may have two or more histologic components.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_module:i4",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor module."
+    ],
+    "anchor": "L1063-L1074:single-tumor-module",
+    "kind": "instruction",
+    "item_ids": [
+      380,
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Prepare one abstract. Use the histology rules to assign the appropriate histology code.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i1",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380,
+      400,
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Multiple tumors may be single primary or multiple primaries.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i2",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380,
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "ER, PR, and/or HER2 are not used to determine multiple primaries.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i3",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "A subsequent tumor in the chest wall or surgical scar without evidence of residual breast tissue is regional metastasis.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i4",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380,
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "For those sites which have recognized biomarkers, the biomarkers are most frequently used to target treatment. Follow the rules; do not code multiple primaries or histology based on biomarkers.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:p5",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      380,
+      400
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule M4 Abstract multiple primariesii when there are separate, non-contiguous tumors in sites with ICD-O site codes that differ at the second (CXxx) and/or third characters (CxXx).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i6",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380,
+      400
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumors with site codes that differ at the second or third character are in different primary sites; for example, a breast tumor C50x and a colon tumor C18x differ at the second and third character.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i7",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "This rule does not include metastases. Metastatic tumors are not used to determine multiple primaries; for example, liver metastases from the breast cancer would not be counted as a second primary.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:p8",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule M5 Abstract multiple primariesii when the patient has a subsequent tumor after being clinically disease-free for greater than five years after the original diagnosis or last recurrence.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:p9",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "The rules are hierarchical. This rule only applies when there is a subsequent tumor in the same breast. In other words, a primary in the contralateral breast does not start the \"clock\" over.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:d10",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "definition",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Clinically disease-free means that there was no evidence of recurrence on follow-up.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:e11",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "example",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "- Mammograms are NED\n- Scans are NED",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i12",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "When there is a recurrence less than or equal to five years of diagnosis, the \"clock\" starts over. The time interval is calculated from the date of last recurrence. In other words, the patient must have been disease-free for greater than five years from the date of the last recurrence.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i13",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "When it is unknown/not documented whether the patient had a recurrence, use date of diagnosis to compute the time interval.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i14",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "The physician may state this is a recurrence, meaning the patient had a previous breast tumor and now has another breast tumor. Follow the rules; do not attempt to interpret the physician's statement.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i15",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "When a breast resection was done and a subsequent tumor is identified in the remaining chest wall, muscle, or skin AND there was no residual breast tissue identified in the resected specimen, this is a recurrence and not a new primary.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:p16",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8530"
+      ],
+      "behaviors": [
+        "3"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule M6 Abstract a single primaryi when there is inflammatory carcinoma in: • Multiple quadrants of same breast OR • Bilateral breasts",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:p17",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule M7 Abstract multiple primariesii when there is bilateral breast cancer (both right and left breast).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i18",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Physician statement of \"bilateral breast cancer\" should not be interpreted as meaning a single primary. The term is not used consistently. The literal definition of bilateral is \"cancer in both breasts\".",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i19",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380,
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "The histologies within each breast may be the same or different.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:p20",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      380,
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule M8 Abstract a single primaryi when the diagnosis is Paget disease with synchronous underlying in situ or invasive carcinoma NST (duct/ductal) or subtypes of duct.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i21",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380,
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "If the underlying tumor is any histology other than duct or subtypes of duct, continue through the rules.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:p22",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      380,
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule M9 Abstract multiple primariesii when the diagnosis is Paget disease with underlying tumor which is NOT duct.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:e23",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "example",
+    "item_ids": [
+      380,
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: Paget disease of the nipple with underlying lobular carcinoma are multiple primaries.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:p24",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      380,
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule M10 Abstract a single primaryi when there are multiple tumors of carcinoma NST/duct and lobular.\n\n- Both/all tumors may be a mixture of carcinoma NST/duct and lobular 8522 OR\n- One tumor may be duct and another tumor lobular OR\n- One tumor may be mixed duct and lobular 8522, the other tumor either duct or lobular",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i25",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumors must be in the same breast.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:t26",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "code_table",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Carcinoma NST/duct includes:\n- DCIS 8500/2\n- Carcinoma NST 8500/3\n- Carcinoma with osteoclastic-like stromal giant cells 8035/3 (subtype/variant of carcinoma NST)\n- Cribriform carcinoma 8201/3\n- Pleomorphic carcinoma 8022/3",
+    "codes": {
+      "8500/2": "DCIS",
+      "8500/3": "Carcinoma NST",
+      "8035/3": "Carcinoma with osteoclastic-like stromal giant cells (subtype/variant of carcinoma NST)",
+      "8201/3": "Cribriform carcinoma",
+      "8022/3": "Pleomorphic carcinoma"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:t27",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "code_table",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Lobular carcinoma includes:\n- In situ lobular carcinoma 8520/2\n- In situ pleomorphic lobular carcinoma 8519/2\n- Invasive lobular carcinoma 8520/3\n- Invasive pleomorphic lobular carcinoma 8520/3",
+    "codes": {
+      "8520/2": "In situ lobular carcinoma",
+      "8519/2": "In situ pleomorphic lobular carcinoma",
+      "8520/3": "Invasive lobular carcinoma; Invasive pleomorphic lobular carcinoma"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i28",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "When a mixture of behaviors is present in carcinoma, NST and lobular carcinoma, follow the H rules to determine the correct histology code.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i29",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      390,
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "For cases initially diagnosed as in situ with subsequent invasive tumor and stated to be a single primary per M10, edit the original abstract as follows:\n\n- Do not change date of diagnosis.\n- For cases which were abstracted as in situ (/2), change the code on the original abstract to 8522/3.\n- Report all data changes for cases which have been submitted to the central registry.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:p30",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      380,
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule M11 Abstract a single primaryi when a ductal carcinoma occurs after a combination code in the same breast. See the following list:\n\n- DCIS following a diagnosis of:\n\nο DCIS + lobular carcinoma in situ 8522/2 OR ο DCIS + in situ Paget 8543/2 OR ο DCIS + Invasive Paget 8543/3 OR ο DCIS mixed with other in situ 8523/2 (code used for cases diagnosed prior to 1/1/2018)\n\n- Invasive carcinoma NST/duct following a diagnosis of:\n\nο Invasive duct + invasive lobular 8522/3 OR ο Invasive duct + invasive Paget 8541/3 OR ο Invasive duct + other invasive carcinoma 8523/3",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:p31",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      380,
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule M12 Abstract multiple primariesii when separate/non-contiguous tumors are two or more different subtypes/variants in Column 3 of Table 3 in the Equivalent Terms and Definitions. Timing is irrelevant.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i32",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380,
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "The tumors may be subtypes/variants of the same or different NOS histologies.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:e33",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "example",
+    "item_ids": [
+      380,
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Same NOS: Encapsulated papillary carcinoma with invasion 8504/3 and solid papillary carcinoma with invasion 8509/3 are both subtypes of invasive papillary carcinoma 8503/3 but are distinctly different histologies. Abstract multiple primaries.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:e34",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "example",
+    "item_ids": [
+      380,
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Different NOS: Encapsulated papillary carcinoma 8504/2 is a subtype/variant of in situ papillary carcinoma 8503/2. Pleomorphic lobular carcinoma in situ 8519/2 is a subtype/variant of lobular carcinoma in situ 8520/2. They are distinctly different histologies. Abstract multiple primaries.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:p35",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      380,
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule M13 Abstract a single primaryi when synchronous, separate/non-contiguous tumors are on the same row in Table 3 in the Equivalent Terms and Definitions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:d36",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "definition",
+    "item_ids": [
+      380,
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "The same row means the tumors are:\n\n- The same histology (same four-digit ICD-O code) OR\n- One is the preferred term (column 1) and the other is a synonym for the preferred term (column 2) OR\n- A NOS (column 1/column 2) and the other is a subtype/variant of that NOS (column 3) OR\n- A NOS histology in column 3 with an indented subtype/variant",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:p37",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      380,
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule M14 Abstract multiple primariesii when separate/non-contiguous tumors are:\n\n- On different rows in Table 3 in the Equivalent Terms and Definitions\n- A combination code in Table 2 and a code from Table 3",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i38",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Timing is irrelevant. Tumors may be synchronous or non-synchronous.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:d39",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "definition",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Each row in the table is a distinctly different histology.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:e40",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "example",
+    "item_ids": [
+      380,
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 1: Paget disease of the nipple with underlying lobular are multiple primaries. Paget and lobular are on different rows in Table 3.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:e41",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "example",
+    "item_ids": [
+      380,
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 2: Two tumors right breast. One tumor is invasive mixed duct and lobular 8522/3 (combination code from Table 2) and the second tumor is tubular 8211/3 (histology from Table 3). Abstract two primaries: 8522/3 and 8211/3.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:p42",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      380,
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule M15 Abstract a single primaryi (the invasive) when an in situ tumor is diagnosed after an invasive tumor in the same breast.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i43",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Once the patient has an invasive tumor, the in situ is recorded as a recurrence for those registrars who collect recurrence data.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:p44",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "The rules are hierarchical. Only use this rule when none of the previous rules apply.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i45",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380,
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "The tumors may be a NOS and a subtype/variant of that NOS.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:p46",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      380,
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule M16 Abstract a single primaryi (the invasive) when an invasive tumor is diagnosed less than or equal to 60 days after an in situ tumor in the same breast.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i47",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "When the case has been abstracted, change behavior code on original abstract from /2 to /3.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i48",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      390
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Do not change date of diagnosis.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i49",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "If the case has already been submitted to the central registry, report all changes.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:p50",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      380,
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule M17 Abstract multiple primariesii when an invasive tumor occurs more than 60 days after an in situ tumor in the same breast.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i51",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Abstract both the invasive and in situ tumors.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i52",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Abstract as multiple primaries even if physician states the invasive tumor is disease recurrence or progression.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:p53",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule M18 Abstract a single primaryi when none of the previous rules apply.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:p54",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "priority_rule",
+    "item_ids": [
+      380
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use this rule as a last resort. Please confirm that you have not overlooked an applicable rule.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:e55",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "example",
+    "item_ids": [
+      380,
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: One tumor is invasive carcinoma NST/ductal 8500/3 and a separate non-contiguous tumor in the same breast is DCIS 8500/2. Abstract a single primary: invasive carcinoma NST/ductal 8500/3.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i56",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380,
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Prepare one abstract. Use the histology rules to assign the appropriate histology code. For registries collecting recurrence data: When a subsequent tumor is \"single primary,\" record that subsequent tumor as a recurrence.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i57",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      380,
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Prepare two or more abstracts. Use the histology rules to assign the appropriate histology code to each case abstracted.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors:i58",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors"
+    ],
+    "anchor": "L1075-L1252:multiple-tumors",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Only code differentiation or features when there is a specific code for the NOS with differentiation or the NOS with features in Table 2 or Table 3 or the ICD-O and all updates.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:i1",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note 1: The rules for coding breast histology are different from the histology coding rules for all other sites. DO NOT USE THESE RULES FOR ANY SITE OTHER THAN BREAST.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:i2",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note 2: Only use this section for one or more histologies within a single tumor.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:i3",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note 3: Do not use this section in place of the Histology Rules.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:d4",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "definition",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Two histologies within a single tumor will be either:\n\n- A NOS and a subtype/variant OR\n- Different histologies (different rows in Table 3 OR different subtypes in Table 3 Column 3 OR a combination code from Table 2 and a code from Table 3)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:p5",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "1. NOS and a subtype/variant\n\nA. Code the subtype/variant (specific histology) ONLY when documented to be greater than 90% of the tumor.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:i6",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note: When a histology is listed as \"minimal\", \"focus/foci/focal\", \"microscopic\", you can assume the other histological portion comprises greater than 90% of the tumor.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:e7",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "example",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: Patient had an excisional biopsy with a pathologic diagnosis of invasive cribriform carcinoma 8201/3. There was microscopic involvement of one margin. The patient chose to have a total mastectomy. Pathology from the total mastectomy showed minimal residual invasive carcinoma NST 8500/3. Because the invasive carcinoma NST was minimal, the subtype/variant invasive cribriform carcinoma 8201/3 is assumed to be greater than 90% of the tumor.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:p8",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "B. Code the NOS/NST when the subtype/variant is documented to be less than or equal to 90% of the tumor OR the percentage of subtype/variant is unknown/not documented.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:p9",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "2. Different histologies\n\nA. Code the histology which comprises the majority of tumor.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:i10",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note 1: This instruction does not apply to:\n\n- Invasive carcinoma NST/ductal and lobular carcinoma (use the combination code 8522/3).\n- Mucinous carcinoma and a different histology (see Histology Rules)\n- Metaplastic carcinoma, NOS and subtypes/variants and invasive carcinoma, NST (see Histology Rules)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:d11",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "definition",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note 2: The following terms do not describe the majority of tumor.\n\n| Architecture | Pattern(s) |\n|---|---|\n| Component | Subtype |\n| Differentiation | Type |\n| Features (of) | Variant |\n\nFoci; focus, focal\n\nUnless there is an exact ICD-O term that includes \"differentiation\" or \"features\"",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:p12",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "B. Code a combination code using Table 2 in the Equivalent Terms and Definitions when the majority is unknown/not documented.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:i13",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Do not code apocrine carcinoma when the diagnosis specifies apocrine differentiation or features. Apocrine differentiation is frequently present in:\n\n- Carcinoma NST/duct carcinoma\n  - Subtypes/variants of carcinoma NST/duct carcinoma\n- Lobular carcinoma NOS\n  - Pleomorphic lobular carcinoma in situ",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:p14",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "3. Code the specific histology described by ambiguous terminology (list follows) ONLY when A or B is true:\n\nA. The only diagnosis available is one histology term described by ambiguous terminology\n\n- CoC and SEER require reporting of cases diagnosed only by ambiguous terminology\n- Case is accessioned (added to your database) based on ambiguous terminology and no other histology information is available/documented",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:e15",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "example",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: Outpatient biopsy says probably apocrine carcinoma. The case is accessioned (entered into the database) as required by both SEER and COC. No further information is available. Code the histology apocrine carcinoma. The case meets the criteria in #3A.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:p16",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "B. There is a NOS histology and a more specific (subtype/variant) described by ambiguous terminology\n\n- Specific histology is clinically confirmed by a physician (attending, surgeon, oncologist, etc.) OR\n- Patient is receiving treatment based on the specific histology described by ambiguous term",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:e17",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "example",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 1: The pathology diagnosis is carcinoma NST consistent with pleomorphic carcinoma. The oncology consult says the patient has pleomorphic carcinoma of the right breast. This is clinical confirmation of the diagnosis. Code pleomorphic carcinoma. The case meets the criteria in bullet 1.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:e18",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "example",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 2: The pathology diagnosis is sarcoma consistent with liposarcoma. The treatment plan says the patient will receive the following treatment for liposarcoma of the breast. Treatment plan confirms liposarcoma. Code liposarcoma. The case meets the criteria in bullet 2.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:p19",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "If the specific histology does not meet the criteria in #3B, then code the NOS histology.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:coding_histology:d20",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Coding Histology"
+    ],
+    "anchor": "L1253-L1362:coding-histology",
+    "kind": "definition",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "List of Ambiguous Terminology\n\n| Apparently | Most likely |\n|---|---|\n| Appears | Presumed |\n| Comparable with | Probable |\n| Compatible with | Suspect(ed) |\n| Consistent with | Suspicious (for) |\n| Favor(s) | Typical (of) |\n\nMalignant appearing",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:priority_order_for_using:i1",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Priority Order for Using Documentation to Identify Histology IMPORTANT NOTES"
+    ],
+    "anchor": "L1363-L1420:priority-order-for-using-documentation-to-identify-histology",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code the histology diagnosed prior to neoadjuvant treatment.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:priority_order_for_using:d2",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Priority Order for Using Documentation to Identify Histology IMPORTANT NOTES"
+    ],
+    "anchor": "L1363-L1420:priority-order-for-using-documentation-to-identify-histology",
+    "kind": "definition",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Neoadjuvant treatment is any tumor-related treatment given prior to surgical removal of the malignancy.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:priority_order_for_using:p3",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Priority Order for Using Documentation to Identify Histology IMPORTANT NOTES"
+    ],
+    "anchor": "L1363-L1420:priority-order-for-using-documentation-to-identify-histology",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Exception: If the initial diagnosis is based on histology from FNA, core biopsy, smears, cytology, or from a regional or metastatic site, and neoadjuvant treatment is given and followed by resection of primary site which identifies a different or specific histology, code the histology from the primary site. For breast primaries, you cannot determine if histology comprises greater than 90% of the tumor by these diagnostic methods.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:priority_order_for_using:p4",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Priority Order for Using Documentation to Identify Histology IMPORTANT NOTES"
+    ],
+    "anchor": "L1363-L1420:priority-order-for-using-documentation-to-identify-histology",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code the histology using the following priority list and the Histology Rules. Do not change histology in order to make the case applicable for staging. Use documentation in the following priority order to identify the histology type(s):",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:priority_order_for_using:p5",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Priority Order for Using Documentation to Identify Histology IMPORTANT NOTES"
+    ],
+    "anchor": "L1363-L1420:priority-order-for-using-documentation-to-identify-histology",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "1. Tissue or pathology report from primary site (in priority order)\n\nA. Addendum(s) and/or comment(s)\nB. Final diagnosis / synoptic report as required by CAP\nC. CAP protocol",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:priority_order_for_using:p6",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Priority Order for Using Documentation to Identify Histology IMPORTANT NOTES"
+    ],
+    "anchor": "L1363-L1420:priority-order-for-using-documentation-to-identify-histology",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "2. Cytology (nipple discharge or fine needle aspirate (FNA) of primary site)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:priority_order_for_using:p7",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Priority Order for Using Documentation to Identify Histology IMPORTANT NOTES"
+    ],
+    "anchor": "L1363-L1420:priority-order-for-using-documentation-to-identify-histology",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "3. Tissue/pathology from a metastatic site",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:priority_order_for_using:i8",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Priority Order for Using Documentation to Identify Histology IMPORTANT NOTES"
+    ],
+    "anchor": "L1363-L1420:priority-order-for-using-documentation-to-identify-histology",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code the behavior /3.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:priority_order_for_using:i9",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Priority Order for Using Documentation to Identify Histology IMPORTANT NOTES"
+    ],
+    "anchor": "L1363-L1420:priority-order-for-using-documentation-to-identify-histology",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "4. Radiography: The following list is not in priority order because they are not a reliable method for identifying specific histology(ies). They are, however, valuable in diagnosing a malignancy. A. Mammography B. Ultrasound C. CT D. MRI",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:priority_order_for_using:p10",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Priority Order for Using Documentation to Identify Histology IMPORTANT NOTES"
+    ],
+    "anchor": "L1363-L1420:priority-order-for-using-documentation-to-identify-histology",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "5. Code the histology documented by the physician when none of the above are available. Use the documentation in the following priority order:\n\nA. Treatment Plan\nB. Documentation from Tumor Board\nC. Documentation in the medical record that refers to original pathology, cytology, or scan(s)\nD. Physician's reference to type of cancer (histology) in the medical record",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:priority_order_for_using:i11",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Priority Order for Using Documentation to Identify Histology IMPORTANT NOTES"
+    ],
+    "anchor": "L1363-L1420:priority-order-for-using-documentation-to-identify-histology",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code the specific histology when documented.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:priority_order_for_using:i12",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Priority Order for Using Documentation to Identify Histology IMPORTANT NOTES"
+    ],
+    "anchor": "L1363-L1420:priority-order-for-using-documentation-to-identify-histology",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code the histology to 8000 (cancer/malignant neoplasm, NOS) or as stated by the physician when nothing more specific is documented.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_in_situ:i1",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: In Situ Only"
+    ],
+    "anchor": "L1421-L1454:single-tumor-in-situ-only",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "DCIS is often multifocal/multicentric; use this module.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_in_situ:i2",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: In Situ Only"
+    ],
+    "anchor": "L1421-L1454:single-tumor-in-situ-only",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Architecture, pattern, and features ARE NOT CODED. The majority of in situ tumors will be coded to DCIS 8500/2.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_in_situ:i3",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: In Situ Only"
+    ],
+    "anchor": "L1421-L1454:single-tumor-in-situ-only",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8540"
+      ],
+      "behaviors": [
+        "2"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H1: Code Paget disease in situ 8540/2 when the diagnosis is exactly Paget disease in situ. Note 1: This is a de novo primary of the nipple (new tumor) with no underlying tumor. Note 2: Paget is coded as in situ /2 only when pathology documents in situ behavior.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_in_situ:i4",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: In Situ Only"
+    ],
+    "anchor": "L1421-L1454:single-tumor-in-situ-only",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H2: Code the histology when only one histology is present. Note 1: Use Table 3 to code histology. New codes, terms, and synonyms are included in Table 3 and coding errors may occur if the table is not used. Note 2: The terms type, subtype or variant may be included in the WHO preferred term. See Table 3 for histologies with these terms included. Note 3: When the histology is not listed in Table 3, use the ICD-O and all updates. Note 4: Submit a question to Ask a SEER Registrar when the histology code is not found in Table 3, ICD-O or all updates.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_in_situ:e5",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: In Situ Only"
+    ],
+    "anchor": "L1421-L1454:single-tumor-in-situ-only",
+    "kind": "example",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: Ductal carcinoma in situ, solid type has an ICD-O code of 8230/2.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_in_situ:p6",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: In Situ Only"
+    ],
+    "anchor": "L1421-L1454:single-tumor-in-situ-only",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8500",
+        "8520"
+      ],
+      "behaviors": [
+        "2"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H3: Code DCIS and in situ lobular carcinoma 8522/2 when DCIS and in situ lobular carcinoma are present. Note 1: Although the notes preceding the in situ section say most tumors will be coded to DCIS, 8522/2 identifies both DCIS and lobular carcinoma in situ. Note 2: 8522/2 is the most accurate description of DCIS and lobular carcinoma in situ. Note 3: 8522/2 includes DCIS and pleomorphic lobular carcinoma in situ.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_in_situ:p7",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: In Situ Only"
+    ],
+    "anchor": "L1421-L1454:single-tumor-in-situ-only",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8500",
+        "8540"
+      ],
+      "behaviors": [
+        "2"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H4: Code DCIS and in situ Paget 8543/2. Note 1: Although the notes preceding the in situ section say most tumors will be coded to DCIS, 8543/2 identifies both DCIS and in situ Paget. Note 2: 8543/2 is the most accurate description of DCIS and in situ Paget.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_in_situ:p8",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: In Situ Only"
+    ],
+    "anchor": "L1421-L1454:single-tumor-in-situ-only",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8500"
+      ],
+      "behaviors": [
+        "2"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H5: Code DCIS 8500/2 when there is a combination of DCIS and any other carcinoma in situ. See Table 2.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_in_situ:p9",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: In Situ Only"
+    ],
+    "anchor": "L1421-L1454:single-tumor-in-situ-only",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8519",
+        "8520"
+      ],
+      "behaviors": [
+        "2"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H6: Code pleomorphic lobular carcinoma in situ 8519/2 when there is a combination of lobular carcinoma in situ and pleomorphic lobular carcinoma in situ.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_in_situ:p10",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: In Situ Only"
+    ],
+    "anchor": "L1421-L1454:single-tumor-in-situ-only",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8520"
+      ],
+      "behaviors": [
+        "2"
+      ],
+      "sex": null,
+      "dx_date_min": "2024-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H7: Code in situ lobular carcinoma 8520/2 when there is a combination of lobular carcinoma in situ and one histology other than DCIS AND • The percentage of lobular in situ comprises greater than 50% of the tumor OR • Percentage of lobular in situ is unknown/not documented Note: This is a new rule and applies to cases diagnosed 1/1/2024 forward. See H9 for cases diagnosed prior to 1/1/2024.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_in_situ:p11",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: In Situ Only"
+    ],
+    "anchor": "L1421-L1454:single-tumor-in-situ-only",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8520"
+      ],
+      "behaviors": [
+        "2"
+      ],
+      "sex": null,
+      "dx_date_min": "2024-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H8: Code the histology that comprises greater than 50% of the tumor when two histologies are in situ lobular AND any histology other than DCIS. Note: This is a new rule and applies to cases diagnosed 1/1/2024 forward. See H9 for cases diagnosed prior to 1/1/2024.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_in_situ:p12",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: In Situ Only"
+    ],
+    "anchor": "L1421-L1454:single-tumor-in-situ-only",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": [
+        "2"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": "2023-12-31"
+    },
+    "text": "Rule H9: Code the histology using Table 2 when there are multiple in situ histologies (2 or more) within a single tumor. • Lobular and any histology other than DCIS 8524/2 • Two or more histologies other than lobular and DCIS 8255/2 Note: This rule does not include DCIS. See previous rules.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_in_situ:i13",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: In Situ Only"
+    ],
+    "anchor": "L1421-L1454:single-tumor-in-situ-only",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code the histology according to the rule that fits the case.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_and:p1",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive and In Situ Components"
+    ],
+    "anchor": "L1455-L1494:single-tumor-invasive-and-in-situ-components",
+    "kind": "priority_rule",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H10 Code the invasive histology when both invasive and in situ components are present (see Notes 2 and 3).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_and:i2",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive and In Situ Components"
+    ],
+    "anchor": "L1455-L1494:single-tumor-invasive-and-in-situ-components",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Ignore the in situ term.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_and:i3",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive and In Situ Components"
+    ],
+    "anchor": "L1455-L1494:single-tumor-invasive-and-in-situ-components",
+    "kind": "instruction",
+    "item_ids": [
+      522
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "When a single tumor has one of the histologies listed, see Table 3. These are specific histology terms that capture both invasive and in situ components.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_and:i4",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive and In Situ Components"
+    ],
+    "anchor": "L1455-L1494:single-tumor-invasive-and-in-situ-components",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "When a single tumor has carcinoma NST/duct and lobular with different behaviors, continue through the rules.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_and:p5",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive and In Situ Components"
+    ],
+    "anchor": "L1455-L1494:single-tumor-invasive-and-in-situ-components",
+    "kind": "priority_rule",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8522"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H11 Code duct and lobular 8522/3 when the final diagnosis is any of the following:\n\n- Intraductal and invasive lobular carcinoma (includes invasive pleomorphic lobular carcinoma)\n- Infiltrating duct and lobular carcinoma in situ (LCIS)\n- Infiltrating duct and pleomorphic lobular carcinoma in situ\n- Infiltrating lobular carcinoma and ductal carcinoma in situ (DCIS)\n- Infiltrating pleomorphic lobular carcinoma and ductal carcinoma in situ (DCIS)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_and:i6",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive and In Situ Components"
+    ],
+    "anchor": "L1455-L1494:single-tumor-invasive-and-in-situ-components",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8522"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Assign behavior code /3 even when an in situ histology is mixed with an invasive.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:p1",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "priority_rule",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C509"
+      ],
+      "histologies": [
+        "8540"
+      ],
+      "behaviors": [
+        "3"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H12 Code Paget disease 8540/3 when the diagnosis is exactly Paget disease.\n\nNote 1: This is a de novo primary of the nipple (new tumor) with no underlying tumor. Note 2: Paget is coded /3 when:\n\n- Pathology documents invasive behavior OR\n- Behavior is not documented/unknown",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:p2",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "priority_rule",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H13 Code the underlying tumor when there is a diagnosis of inflammatory carcinoma.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:e3",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "example",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: The patient has a clinical diagnosis of inflammatory breast carcinoma. Pathology shows carcinoma NST with dermal invasion as well as erythema. Code the underlying tumor: carcinoma NST 8500/3.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:i4",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code inflammatory carcinoma 8530/3 when it is the only diagnosis available (DCO, outpatient only, no follow-up).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:p5",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "priority_rule",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8480"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H14 Code mucinous carcinoma/adenocarcinoma 8480 ONLY when:\n\n- The diagnosis is exactly mucinous carcinoma or mucinous duct carcinoma OR\n- Multiple histologies are present and mucinous carcinoma is documented as greater than 90% of the tumor\n\nNote 1: The pure mucinous carcinoma category includes only cases which are diagnosed as exactly mucinous or documented to be greater than 90% of the tumor. Note 3: When a tumor has both mucinous carcinoma and a different histology, and mucinous is less than or equal to 90% of the tumor (or the percentage is not documented), code the other histology.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:p6",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "priority_rule",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H15 Code the primary invasive histology when there is a carcinoma with signet ring cells OR signet ring cell differentiation.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:e7",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "example",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: Resection pathology diagnosis is invasive lobular carcinoma with signet ring cell differentiation. Code the invasive lobular carcinoma 8520/3.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:p8",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "priority_rule",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H16 Code metaplastic carcinoma, NOS, or subtype/variant of metaplastic carcinoma, NOS when invasive carcinoma, NST OR invasive lobular carcinoma is present along with the metaplastic carcinoma.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:e9",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "example",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: Resection pathology diagnosis is invasive mammary carcinoma, NST with extensive metaplastic carcinoma present. Code metaplastic carcinoma 8575/3.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:p10",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "priority_rule",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H17 Code the histology when only one histology is present.\n\nNote 1: Use Table 3 to code histology. New codes, terms, and synonyms are included in Table 3 and coding errors may occur if the table is not used. Note 2: The terms type, subtype or variant may be included in the WHO preferred term. See Table 3 for histologies with these terms included. Note 3: When the histology is not listed in Table 3, use the ICD-O and all updates. Note 4: Submit a question to Ask a SEER Registrar when the histology code is not found in Table 3, ICD-O or all updates.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:p11",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "priority_rule",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H18 Code duct carcinoma and lobular carcinoma 8522/3 when the final diagnosis is invasive carcinoma NST/duct carcinoma and invasive lobular carcinoma (includes invasive pleomorphic lobular carcinoma)\n\nNote 1: CAP uses the term Invasive carcinoma with ductal and lobular features (\"mixed type carcinoma\") as a synonym for duct carcinoma/carcinoma NST AND lobular carcinoma 8522/3. Note 2: Although the instructions in the \"Coding Multiple Histologies in a Single Tumor\" section state, \"Code the histology that comprises the majority of tumor\", 8522/3 identifies both invasive carcinoma NST/duct carcinoma and invasive lobular carcinoma and is the most accurate description.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:p12",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "priority_rule",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H19 Code the subtype/variant (specific histology) ONLY when there is a NOS/NST and a subtype/variant AND the subtype/variant is documented to be greater than 90% of the tumor.\n\nNote 1: When a histology is listed as \"minimal\", \"focus/foci/focal\", \"microscopic\", you can assume the other histological portion comprises greater than 90% of the tumor. Note 2: Use Table 3 to identify NOS/NST and subtypes/variants. Note 3: Do not code any histology described as features or differentiation unless it is part of the preferred term.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:e13",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "example",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 1: Pathology from excision shows a 1.4 cm tumor and a diagnosis of clear cell carcinoma 8310/3 with a focus of glycogen-rich clear cell carcinoma NOS 8315/3. Because the glycogen-rich clear cell carcinoma NOS is just a focus, more than 90% of the tumor is clear cell carcinoma. Code the subtype/variant: clear cell carcinoma 8310/3.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:e14",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "example",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 2: Pathology from an excised tumor says tumor is 95% metaplastic carcinoma squamous cell carcinoma 8070/3 and the remainder is metaplastic carcinoma NOS 8575/3. Code the subtype/variant: squamous cell carcinoma 8070/3.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:p15",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "priority_rule",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H20 Code the NOS/NST when there is a NOS/NST and a subtype/variant AND\n\n- The subtype/variant is designated as less than or equal to 90% of tumor OR\n- The percentage of each is unknown/not documented",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:e16",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "example",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 1: Pathology diagnosis is carcinoma NST 8500/3 and pleomorphic carcinoma 8022/3. The percentage of subtype/variant is unknown. Code the NOS: carcinoma NST 8500/3.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:e17",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "example",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 2: Pathology says the majority of tumor is metaplastic carcinoma with chondroid differentiation 8571/3 and the remainder is metaplastic carcinoma NOS 8575/3. Majority simply means greater than 50%, so it is unknown whether or not the subtype/variant is greater than 90% of the tumor. Code metaplastic carcinoma NOS 8575/3.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:p18",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "priority_rule",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H21 Code the histology that comprises greater than 50% of tumor when two histologies are:\n\n- On different rows in Table 3 in the Equivalent Terms and definitions OR\n- Different subtypes of the same NOS OR\n- A combination code from Table 2 and a code from Table 3\n\nNote 1: This rule does not apply to mucinous. See previous rules. Note 2: The rules are hierarchical, so the tumors are NOT a NOS/NST and subtype/variant. Note 3: If the majority histology is unknown/not documented, continue through the rules.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:e19",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "example",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: Pathology reads the tumor is predominantly carcinoma NST 8500/3 with areas of tubular carcinoma 8211/3. Code the predominant histology: carcinoma NST 8500/3. Carcinoma NST and tubular carcinoma are on different rows in Table 3, so they are distinctly different histologies.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:single_tumor_invasive_only:p20",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Single Tumor: Invasive Only"
+    ],
+    "anchor": "L1495-L1630:single-tumor-invasive-only",
+    "kind": "priority_rule",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H22 Code a combination code when there are two histologies (two components) within a single tumor and the majority histology is unknown/not documented.\n\nNote 1: Use Table 2 in the Equivalent Terms and Definitions to identify valid combination codes. Note 2: The rules are hierarchical, so the tumors are NOT a NOS/NST and a single subtype/variant. Note 3: The diagnosis may be two subtypes/variants and the pathologist may mention the presence of duct/carcinoma NST. Ignore the mention of carcinoma NST.\n\nNote 4: Do not use a combination code when the second histology is described as features or differentiation unless it is part of the preferred term. Note 5: The histologies may be identified as:\n\n- Mixed histologies\n- Combination histologies\n- Histology 1 AND histology 2\n- Histology 1 WITH histology 2",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:i1",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8530"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H23 Code the underlying tumor when there is a diagnosis of inflammatory carcinoma2:",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:e2",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "example",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8530"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: The patient has a clinical diagnosis of inflammatory breast carcinoma. Pathology shows carcinoma NST with dermal invasion as well as erythema. Code the underlying tumor: carcinoma NST 8500/3.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:i3",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8530"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Record the inflammatory carcinoma in staging fields.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:i4",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8530"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code inflammatory carcinoma 8530/3 when it is the only diagnosis available (DCO, outpatient only, no follow-up).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:i5",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8541",
+        "8543"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H24 Code Paget disease and ductal carcinoma as follows when:\n\n- Pathology specifies Paget disease as invasive /3 OR behavior not documented AND\n- Underlying tumor is:\n\nο Invasive carcinoma NST/duct carcinoma 8541/3\nο DCIS 8543/3\n\nNote: Ignore the presence of lobular carcinoma in situ (LCIS).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:i6",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8543"
+      ],
+      "behaviors": [
+        "2"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H25 Code Paget disease and DCIS 8543/2 when there is Paget disease (specified as in situ) with underlying DCIS.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:i7",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H26 Code the histology when only one histology is present in all tumors.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:i8",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note 1: Use Table 3 to code histology. New codes, terms, and synonyms are included in Table 3 and coding errors may occur if the table is not used.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:i9",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note 3: When the histology is not listed in Table 3, use the ICD-O and all updates.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:i10",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note 4: Submit a question to Ask a SEER Registrar when the histology code is not found in Table 3, ICD-O or all updates.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:p11",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "priority_rule",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H27 Code the invasive histology when there are both invasive and in situ histologies.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:i12",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Exception: Continue through the rules when there are multiple tumors of ductal and lobular carcinoma with different behaviors.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:i13",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8522"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H28 Code 8522 when carcinoma NST and lobular are present in multiple tumors.\n\n- DCIS and in situ lobular 8522/2\n- DCIS and pleomorphic lobular carcinoma in situ 8522/2\n- Invasive carcinoma NST/duct carcinoma and invasive lobular carcinoma (includes invasive pleomorphic lobular carcinoma) 8522/3\n- Intraductal and invasive lobular carcinoma (includes invasive pleomorphic lobular carcinoma) 8522/3\n- Infiltrating duct and lobular carcinoma in situ (LCIS) 8522/3\n- Infiltrating duct and pleomorphic lobular carcinoma in situ 8522/3\n- Infiltrating lobular carcinoma and ductal carcinoma in situ (DCIS) 8522/3\n- Infiltrating pleomorphic lobular carcinoma and ductal carcinoma in situ (DCIS) 8522/3",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:i14",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8522"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note 1: Assign behavior code /3 even when an in situ histology is mixed with an invasive.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:d15",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "definition",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8522"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note 2: CAP uses the term Invasive carcinoma with ductal and lobular features (\"mixed type carcinoma\") as a synonym for duct carcinoma/carcinoma NST AND lobular carcinoma 8522/3.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:i16",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8522"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note 4: This combination code specifically identifies carcinoma NST and lobular carcinoma. For all other histological combinations, continue through the rules.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:i17",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8500"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H29 Code the NOS/NST when there is a NOS/NST and a subtype/variant:\n\n- Mixed in all of the tumors OR\n- Separate tumors with different histologies",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:p18",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "priority_rule",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Rule H30 Code a combination code when there are two histologies (two components) within all tumors.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:i19",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note 1: Use Table 2 in the Equivalent Terms and Definitions to identify valid combination codes.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:i20",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note 2: Do not use a combination code when the second histology is described as differentiation or features, unless it is part of the preferred term.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:i21",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note 4: Table 2 is used for two histologies. When there are greater than two histologies, use the \"last resort\" code 8255 because none of the other combinations include greater than two histologies.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "solid_tumor_rules:breast:multiple_tumors_abstracted_as:i22",
+    "source_doc": "solid_tumor_rules",
+    "section_path": [
+      "Breast NOS C509.",
+      "Multiple Tumors Abstracted as a Single Primary Note 1: DCIS is often multifocal/multicentric; use the Single Tumor: In Situ module."
+    ],
+    "anchor": "L1631-L1719:multiple-tumors-abstracted-as-a-single-primary-note",
+    "kind": "instruction",
+    "item_ids": [
+      522,
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "This is the end of instructions for Multiple Tumors Abstracted as a Single Primary Code the histology according to the rule that fits the case",
+    "codes": null,
+    "notes": null
+  }
+]
