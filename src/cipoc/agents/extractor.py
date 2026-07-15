@@ -13,6 +13,7 @@ from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
 from cipoc.models import (
+    CaseFacts,
     ClinicalNote,
     ConfidenceLevel,
     VariableGroupInfo,
@@ -26,8 +27,8 @@ from cipoc.prompts import (
     EXTRACT_VARIABLE_VALUE_PROMPT,
     REPAIR_VARIABLE_VALUE_PROMPT,
 )
-from cipoc.tools import VariableValueValidator, build_variable_group
-from cipoc.utils import CipocConfig
+from cipoc.tools import VariableValueValidator, build_variable_group, load_rule_store
+from cipoc.utils import CipocConfig, run_with_progress
 
 from .base import BaseAgent
 
@@ -130,12 +131,6 @@ class ExtractorAgent(BaseAgent):
             )
             for variable in variables
         ]
-
-    # TODO: create this tool. Skip for now
-    # For each variable
-    def retrieve_coding_instructions(self, state: ExtractorState):
-        """Look up variable-level coding instructions from documents"""
-        pass
 
     def extract_group_values(self, state: ExtractorState) -> Command[Literal["variable_branch"]]:
         group_output = self.agent.model.with_structured_output(
@@ -364,20 +359,51 @@ class ExtractorAgent(BaseAgent):
         workflow.add_edge("merge_variable_results", END)
 
     # --- Public API ---
-    def run(self, item_ids: int | list[int], *, extract_group: bool = False) -> ExtractorOutput:
-        """Extract coded values for the given NAACCR item ID(s) from the clinical notes."""
+    def run(
+        self,
+        item_ids: int | list[int],
+        *,
+        extract_group: bool = False,
+        case_facts: CaseFacts | None = None,
+        rules_dir: str | Path | None = None,
+    ) -> ExtractorOutput:
+        """Extract coded values for the given NAACCR item ID(s) from the clinical notes.
+
+        Pass ``case_facts`` to scope manual coding instructions and valid codes to
+        the case deterministically. The rule store is read from ``rules_dir`` when
+        given, else from the config's ``documents.rules_path``; without either,
+        variables carry unscoped data-dictionary metadata only.
+        """
+        rule_store = None
+        if case_facts is not None:
+            rules_path = rules_dir or getattr(self._config.documents(), "rules_path", None)
+            if rules_path is not None:
+                rule_store = load_rule_store(rules_path)
+
         variable_group = build_variable_group(
-            item_ids, data_dictionary_path=self._config.documents().data_dictionary_path
+            item_ids,
+            data_dictionary_path=self._config.documents().data_dictionary_path,
+            case_facts=case_facts,
+            rule_store=rule_store,
         )
         if not variable_group.variables:
             raise ValueError("None of the requested item IDs exist in the data dictionary.")
         variable_group = variable_group.model_copy(update={"extract_group": extract_group})
-        result = self._graph.invoke({"requested_variables": variable_group})
+        # result = self._graph.invoke({"requested_variables": variable_group})
+        result = run_with_progress(
+            self._graph,
+            {"requested_variables": variable_group},
+            subgraphs=True,
+            description="Extractor",
+        )
         return ExtractorOutput(**result)
 
 
 if __name__ == "__main__":
     agent = ExtractorAgent()
     agent.draw(path="src/cipoc/agents/visualization/extractor.png")
-    result = agent.run([400, 410, 440])  # Primary Site, Laterality, Grade
+    # Case facts matching tests/fixtures/note_bundle.json (left breast, dx 2025);
+    # scopes coding instructions and valid codes from documents/rules.
+    facts = CaseFacts(primary_site="C504", date_of_diagnosis="2025-02-24", sex="female")
+    result = agent.run([400, 410, 522], case_facts=facts)  # Primary Site, Laterality, Histology
     print(json.dumps(result.model_dump(), indent=2))

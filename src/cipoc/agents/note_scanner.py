@@ -7,7 +7,7 @@ from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
 from cipoc.models import ClinicalNote, ProcessedClinicalNote, CancerMentionList, CancerStatus, ConfidenceLevel, confidence_field
-from cipoc.utils.utils import load_config, CipocConfig
+from cipoc.utils import CipocConfig, run_with_progress
 from cipoc.prompts.note_scanner import (
     NOTE_SCANNER_SYSTEM_PROMPT,
     CANCER_IN_NOTE_PROMPT,
@@ -114,7 +114,11 @@ class NoteScannerAgent(BaseAgent):
         """Run the scanner over a single note and return the enriched note."""
         if isinstance(notes, dict):
             notes = ClinicalNote(**notes)
-        result = self._graph.invoke({"note": notes})
+        result = run_with_progress(
+            self._graph,
+            {"note": notes},
+            description="Note Scanner",
+        )
         return ProcessedClinicalNote(**notes.model_dump(), **result)
 
 
