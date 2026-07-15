@@ -41,3 +41,4 @@ agents:
 documents:
   documents_path: documents/
   data_dictionary_path: documents/naaccr_data_dictionary_v25.json
+  rules_path: documents/rules/
