@@ -13,6 +13,7 @@ class VariableInfo(BaseModel):
     allowable_values: str | None = Field(default=None, description="Allowable values defined by the data dictionary.")
     format: str | None = Field(default=None, description="Format for coded value as defined by the data dictionary and/or instructions.")
     valid_codes: str | dict | None = Field(default=None, description="Valid codes from the data dictionary. When applicable, the scope is reduced when based on case specifics (e.g., primary site).")
+    coding_instructions: str | None = Field(default=None, description="Manual coding instructions scoped to this variable and the current case, with per-rule source citations. None when no rule store was consulted or no rules apply.")
     model_config = ConfigDict(protected_namespaces=())
 
 
