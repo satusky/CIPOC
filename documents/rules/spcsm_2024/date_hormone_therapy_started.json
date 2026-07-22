@@ -1,0 +1,175 @@
+[
+  {
+    "rule_id": "spcsm_2024:date_hormone_therapy_started:date_hormone_therapy_started:i1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Hormone Therapy Started"
+    ],
+    "anchor": "L6770-L6775:date-hormone-therapy-started",
+    "kind": "instruction",
+    "item_ids": [
+      1230
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Date Hormone Therapy Started must be transmitted in the YYYYMMDD format.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_hormone_therapy_started:date_hormone_therapy_started:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Hormone Therapy Started"
+    ],
+    "anchor": "L6770-L6775:date-hormone-therapy-started",
+    "kind": "instruction",
+    "item_ids": [
+      1230
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Date Hormone Therapy Started may be recorded in the transmission format, or recorded in the traditional format (MMDDYYYY) and converted electronically to the transmission format.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_hormone_therapy_started:date_hormone_therapy_started:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Hormone Therapy Started"
+    ],
+    "anchor": "L6770-L6775:date-hormone-therapy-started",
+    "kind": "instruction",
+    "item_ids": [
+      1230
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "SEER Central Registries: Collect when available from CoC reporting facilities.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_hormone_therapy_started:coding_instructions:i1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Hormone Therapy Started",
+      "Coding Instructions"
+    ],
+    "anchor": "L6776-L6791:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1230
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Record the date of the first/earliest hormone therapy if hormone therapy was given as part of the first course of therapy",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_hormone_therapy_started:coding_instructions:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Hormone Therapy Started",
+      "Coding Instructions"
+    ],
+    "anchor": "L6776-L6791:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1230
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code the date that the prescription was written if date administered unknown",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_hormone_therapy_started:coding_instructions:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Hormone Therapy Started",
+      "Coding Instructions"
+    ],
+    "anchor": "L6776-L6791:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1230,
+      1270
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Hormone therapy date should be the same as the Date Therapy Initiated when hormone therapy is the only treatment administered",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_hormone_therapy_started:coding_instructions:i4",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Hormone Therapy Started",
+      "Coding Instructions"
+    ],
+    "anchor": "L6776-L6791:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1230
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Transmit date data items in the year, month, day format (YYYYMMDD)",
+    "codes": null,
+    "notes": null
+  }
+]

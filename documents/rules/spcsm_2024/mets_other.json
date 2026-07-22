@@ -1,0 +1,514 @@
+[
+  {
+    "rule_id": "spcsm_2024:mets_other:mets_at_diagnosisother:d1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other"
+    ],
+    "anchor": "L4434-L4452:mets-at-diagnosisother",
+    "kind": "definition",
+    "item_ids": [
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "The six Mets at Diagnosis-metastatic sites data items provide information on metastases for data analysis. This data item identifies any type of distant involvement not captured in the Mets at Diagnosis--Bone, Mets at Diagnosis--Brain, Mets at Diagnosis--Liver, Mets at Diagnosis--Lung, and Mets at Diagnosis--Distant Lymph Nodes data items. It includes involvement of other specific sites and more generalized metastases such as carcinomatosis. Some examples include but are not limited to the adrenal gland, bone marrow, pleura, malignant pleural effusion, peritoneum, and skin.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:mets_at_diagnosisother:t2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other"
+    ],
+    "anchor": "L4434-L4452:mets-at-diagnosisother",
+    "kind": "code_table",
+    "item_ids": [
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "| Code | Description |\n|---|---|\n| 0 | None; no other metastases |\n| 1 | Yes; distant metastases in known site(s) other than bone, brain, liver, lung, or distant lymph nodes |\n\nNote: includes bone marrow involvement for lymphomas\n\n2 Generalized metastases such as carcinomatosis\n\n8 Not applicable\n\n9 Unknown whether any other metastatic site or generalized metastases\n\nNot documented in patient record",
+    "codes": {
+      "0": "None; no other metastases",
+      "1": "Yes; distant metastases in known site(s) other than bone, brain, liver, lung, or distant lymph nodes. Note: includes bone marrow involvement for lymphomas",
+      "2": "Generalized metastases such as carcinomatosis",
+      "8": "Not applicable",
+      "9": "Unknown whether any other metastatic site or generalized metastases. Not documented in patient record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:coding_instructions:i1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other",
+      "Coding Instructions"
+    ],
+    "anchor": "L4453-L4515:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code information about other metastases only (discontinuous or distant metastases) identified at the time of diagnosis. This data item should not be coded for bone, brain, liver, lung, or distant lymph node metastases.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:coding_instructions:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other",
+      "Coding Instructions"
+    ],
+    "anchor": "L4453-L4515:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Other involvement may be single or multiple.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:coding_instructions:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other",
+      "Coding Instructions"
+    ],
+    "anchor": "L4453-L4515:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Information about other involvement may be clinical or pathological.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:coding_instructions:i4",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other",
+      "Coding Instructions"
+    ],
+    "anchor": "L4453-L4515:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code this data item whether or not the patient had any preoperative (neoadjuvant) systemic therapy unless determined to be disease progression.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:coding_instructions:i5",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other",
+      "Coding Instructions"
+    ],
+    "anchor": "L4453-L4515:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code this data item for all solid tumor schemas (including Kaposi Sarcoma and Ill-Defined Other [includes unknown primary site]) and the following Hematopoietic schemas except as noted in 2.d. and 2.e. i. Lymphoma Ocular Adnexa 00710 ii. Lymphoma 00790 (see 2.d.) iii. Lymphoma-CLL/SLL 00795 (see 2.d.) iv. Mycosis Fungoides (MF) 00811 v. Primary Cutaneous Lymphoma (excluding MF and SS) 00812 vi. HemeRetic 00830 (excluding primary sites C420, C421, C423, C424, see 2.d.).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:coding_instructions:i6",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other",
+      "Coding Instructions"
+    ],
+    "anchor": "L4453-L4515:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Do not code spleen involvement for Hodgkin lymphoma in Mets at Diagnosis--Other. Spleen involvement is not classified as distant mets for Hodgkin lymphoma in most staging systems.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:coding_instructions:i7",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other",
+      "Coding Instructions"
+    ],
+    "anchor": "L4453-L4515:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use of codes: Assign the code that best describes whether the case has other metastases at diagnosis.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:coding_instructions:i8",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other",
+      "Coding Instructions"
+    ],
+    "anchor": "L4453-L4515:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 0 when the medical record i. Indicates that there are no distant (discontinuous) metastases at all ii. Confirms the tumor is benign (/0), borderline (/1), or in situ (/2) iii. Includes a clinical or pathologic statement that there are no other metastases iv. Includes imaging reports that are negative for other metastases v. Indicates that the patient has distant (discontinuous) metastases but other sites are not mentioned as involved.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:coding_instructions:e9",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other",
+      "Coding Instructions"
+    ],
+    "anchor": "L4453-L4515:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 0 when the patient has metastasis to lung and liver only.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:coding_instructions:i10",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other",
+      "Coding Instructions"
+    ],
+    "anchor": "L4453-L4515:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 1 when the medical record indicates i. Distant (discontinuous) metastases in any site(s) other than bone, brain, liver, lung, or distant lymph node(s) 1. Includes, but not limited to, the adrenal gland, bone marrow, pleura, malignant pleural effusion, peritoneum, and skin ii. Lymphomas with bone marrow involvement (Stage IV disease).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:coding_instructions:i11",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other",
+      "Coding Instructions"
+    ],
+    "anchor": "L4453-L4515:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1117
+    ],
+    "applies_to": {
+      "sites": [
+        "C421"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Does not include lymphomas or lymphoma/leukemias where primary site is C421 (bone marrow).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:coding_instructions:i12",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other",
+      "Coding Instructions"
+    ],
+    "anchor": "L4453-L4515:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 2 when the medical record i. Indicates that the patient has carcinomatosis.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:coding_instructions:d13",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other",
+      "Coding Instructions"
+    ],
+    "anchor": "L4453-L4515:coding-instructions",
+    "kind": "definition",
+    "item_ids": [
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Carcinomatosis is a condition in which cancer is spread widely throughout the body, or, in some cases, to a relatively large region of the body.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:coding_instructions:p14",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other",
+      "Coding Instructions"
+    ],
+    "anchor": "L4453-L4515:coding-instructions",
+    "kind": "priority_rule",
+    "item_ids": [
+      1112,
+      1113,
+      1114,
+      1115,
+      1116,
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "It is possible to have metastatic disease to a specific organ AND also have carcinomatosis. If a patient has metastatic disease to bone, brain, liver, lung or distant nodes AND carcinomatosis, use code 1 for the appropriate data item (bone, brain, liver, lung, or distant nodes) and use code 2 for carcinomatosis. If a patient has metastatic disease to a site other than bone, brain, liver, lung or distant nodes AND carcinomatosis, assign code 2 for carcinomatosis. Code 2 for carcinomatosis takes priority.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:coding_instructions:e15",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other",
+      "Coding Instructions"
+    ],
+    "anchor": "L4453-L4515:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      1114,
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 1: Patient with breast cancer noted to have mets to the liver and carcinomatosis. Code \"Mets at Diagnosis--Liver\" as 1 and \"Mets at Diagnosis--Other\" as 2.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:coding_instructions:e16",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other",
+      "Coding Instructions"
+    ],
+    "anchor": "L4453-L4515:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 2: Patient with colon cancer noted to have mets to the stomach and carcinomatosis. Code \"Mets at Diagnosis--Other\" as 2 for carcinomatosis.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:coding_instructions:i17",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other",
+      "Coding Instructions"
+    ],
+    "anchor": "L4453-L4515:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 8 (Not applicable) for the following i. Any case coded to primary site C420, C421, C423, or C424 ii. Plasma Cell Disorders 00822.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_other:coding_instructions:i18",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Other",
+      "Coding Instructions"
+    ],
+    "anchor": "L4453-L4515:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1117
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 9 when it cannot be determined whether the patient has metastases other than bone, brain, liver, lung, or distant lymph node(s).",
+    "codes": null,
+    "notes": null
+  }
+]

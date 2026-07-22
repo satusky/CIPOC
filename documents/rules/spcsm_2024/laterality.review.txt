@@ -1,0 +1,345 @@
+========================================================================
+RULE COMPILATION REVIEW REPORT
+========================================================================
+Source: documents/markdown/SPCSM_2024_MainDoc.md
+Units emitted: 25  |  accepted: 22  |  quarantined: 3
+
+Accepted units by kind:
+  code_table     1
+  definition     1
+  example        6
+  instruction    14
+
+Accepted fidelity: min 0.97  mean 1.00
+
+------------------------------------------------------------------------
+QUARANTINED (3)
+------------------------------------------------------------------------
+
+[spcsm_2024:laterality:sites_for_which_laterality:e6]
+  - Malformed site code or range: 'C73'.
+
+[spcsm_2024:laterality:sites_for_which_laterality:t8]
+  - code_table codes not in item 410 set: ['C079', 'C080', 'C081', 'C098', 'C099', 'C301', 'C310', 'C312', 'C341-C349', 'C384']
+
+[spcsm_2024:laterality:sites_for_which_laterality:t9]
+  - code_table codes not in item 410 set: ['C700', 'C710', 'C711', 'C712', 'C713', 'C714', 'C722', 'C723', 'C724', 'C725']
+
+------------------------------------------------------------------------
+SAMPLED ACCEPTED UNITS (source vs. compiled, up to 5)
+------------------------------------------------------------------------
+
+[spcsm_2024:laterality:laterality:d1]  kind=definition  items=[410]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Laterality
+
+    | #### Item Length: 1 NAACCR Item #: 410 NAACCR Name: Laterality XML NAACCR ID: laterality
+
+    | Laterality describes the side of a paired organ or side of the body on which the reportable tumor originated. Determine whether laterality should be coded for each primary.
+
+    | | Code | Description |
+    | |---|---|
+    | | 0 | Not a paired site |
+    | | 1 | Right: origin of primary |
+    | | 2 | Left: origin of primary |
+    | | 3 | Only one side involved, right or left origin unspecified |
+    | | 4 | Bilateral involvement at time of diagnosis, lateral origin unknown for a single primary; or both ovaries involved simultaneously, single histology; bilateral retinoblastomas; bilateral Wilms |
+
+    | tumors 5 Paired site: midline tumor (effective with 01/01/2010 dx) 9 Paired site, but no information concerning laterality
+
+  COMPILED TEXT:
+    > Laterality describes the side of a paired organ or side of the body on which the reportable tumor originated.
+
+[spcsm_2024:laterality:coding_instructions:i2]  kind=instruction  items=[410]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. Assign code 0 when
+
+    | | a. | The primary site is not a paired site |
+    | |---|---|
+    | | b. | Primary site is unknown (C809), or |
+    | | c. | Laterality is unknown for a death certificate only (DCO) case and the primary site is NOT one of the primary site codes listed in the table below (Sites for Which Laterality Codes Must Be Recorded) |
+
+    | 2. Code laterality using codes 1-9 for all sites listed in the table: Sites for Which Laterality Codes
+
+    | Must Be Recorded a. Laterality may be coded for sites other than those required; for example, thyroid
+
+    | 3. Code the side where the primary tumor originated
+
+    | a. Assign code 3 if the laterality is not known but the tumor is confined to a single side of
+
+    | the paired organ
+
+    | ***Example: Pathology report: Patient has a 2 cm carcinoma in the upper pole of the***
+
+    | kidney. Code laterality as 3 because there is documentation that the disease exists in only one kidney, but it is unknown if the disease originated in the right or left kidney.
+
+    | 4. Code 4 is seldom used EXCEPT for the following
+
+    | | a. | Both ovaries involved simultaneously with a single histology, or epithelial histologies (8000-8799) |
+    | |---|---|
+    | | b. | Diffuse bilateral lung nodules |
+    | | c. | Bilateral retinoblastomas |
+    | | d. | Bilateral Wilms tumors |
+    | | e. | Both breasts when inflammatory carcinoma is bilateral at diagnosis |
+
+    | **September 2023 Section IV: Description of this Neoplasm 108**
+
+    | -----
+
+    | f. Bilateral involvement at time of diagnosis and lateral origin unknown for a site listed in
+
+    | the table Sites for Which Laterality Must Be Recorded
+
+    | ***Example: Both arms are involved with Kaposi sarcoma and no other sites are involved.***
+
+    | It is not known on which arm the Kaposi sarcoma originated. Assign Laterality code 4. Skin of upper limb and shoulder is listed as a paired organ in the table Sites for Which *Laterality Must Be Recorded.*
+
+    | 5. Assign code 5 when the tumor originates in the midline of a site listed in 5.a
+
+    | a. C700, C710-C714, C722-C725, C443, C444, C445
+
+    | i. Do not assign code 5 to sites not listed in 5.a ***Example 1:*** Patient has an excision of a melanoma located just above the umbilicus (C445, laterality code 5).
+
+    | ***Example 2: Patient has a midline meningioma of the cerebral meninges (C700, laterality***
+
+    | code 5).
+
+    | 6. Assign code 9 when
+
+    | a. The neoplasm originated in a paired site and
+
+    | i. Laterality is unknown, AND ii. There is no statement that only one side of the paired organ is involved ***Example 1:*** Admitting history says patient was diagnosed with lung cancer based on positive sputum cytology. Patient is treated for painful bony metastases. There is no information about laterality in the diagnosis of this lung cancer. ***Example 2:*** Widely metastatic ovarian carcinoma surgically debulked. Ovaries could not be identified in the specimen. b. Laterality is unknown for a death certificate only (DCO) case with primary site code
+
+    | listed in the table below (Sites for Which Laterality Codes Must Be Recorded)
+
+    | 7. Document the laterality in a text field
+
+  COMPILED TEXT:
+    > 2. Code laterality using codes 1-9 for all sites listed in the table: Sites for Which Laterality Codes Must Be Recorded
+
+    > a. Laterality may be coded for sites other than those required; for example, thyroid
+
+[spcsm_2024:laterality:coding_instructions:e6]  kind=example  items=[410]  fidelity=1.00
+  applies_to: {'sites': ['C446'], 'histologies': ['9140'], 'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. Assign code 0 when
+
+    | | a. | The primary site is not a paired site |
+    | |---|---|
+    | | b. | Primary site is unknown (C809), or |
+    | | c. | Laterality is unknown for a death certificate only (DCO) case and the primary site is NOT one of the primary site codes listed in the table below (Sites for Which Laterality Codes Must Be Recorded) |
+
+    | 2. Code laterality using codes 1-9 for all sites listed in the table: Sites for Which Laterality Codes
+
+    | Must Be Recorded a. Laterality may be coded for sites other than those required; for example, thyroid
+
+    | 3. Code the side where the primary tumor originated
+
+    | a. Assign code 3 if the laterality is not known but the tumor is confined to a single side of
+
+    | the paired organ
+
+    | ***Example: Pathology report: Patient has a 2 cm carcinoma in the upper pole of the***
+
+    | kidney. Code laterality as 3 because there is documentation that the disease exists in only one kidney, but it is unknown if the disease originated in the right or left kidney.
+
+    | 4. Code 4 is seldom used EXCEPT for the following
+
+    | | a. | Both ovaries involved simultaneously with a single histology, or epithelial histologies (8000-8799) |
+    | |---|---|
+    | | b. | Diffuse bilateral lung nodules |
+    | | c. | Bilateral retinoblastomas |
+    | | d. | Bilateral Wilms tumors |
+    | | e. | Both breasts when inflammatory carcinoma is bilateral at diagnosis |
+
+    | **September 2023 Section IV: Description of this Neoplasm 108**
+
+    | -----
+
+    | f. Bilateral involvement at time of diagnosis and lateral origin unknown for a site listed in
+
+    | the table Sites for Which Laterality Must Be Recorded
+
+    | ***Example: Both arms are involved with Kaposi sarcoma and no other sites are involved.***
+
+    | It is not known on which arm the Kaposi sarcoma originated. Assign Laterality code 4. Skin of upper limb and shoulder is listed as a paired organ in the table Sites for Which *Laterality Must Be Recorded.*
+
+    | 5. Assign code 5 when the tumor originates in the midline of a site listed in 5.a
+
+    | a. C700, C710-C714, C722-C725, C443, C444, C445
+
+    | i. Do not assign code 5 to sites not listed in 5.a ***Example 1:*** Patient has an excision of a melanoma located just above the umbilicus (C445, laterality code 5).
+
+    | ***Example 2: Patient has a midline meningioma of the cerebral meninges (C700, laterality***
+
+    | code 5).
+
+    | 6. Assign code 9 when
+
+    | a. The neoplasm originated in a paired site and
+
+    | i. Laterality is unknown, AND ii. There is no statement that only one side of the paired organ is involved ***Example 1:*** Admitting history says patient was diagnosed with lung cancer based on positive sputum cytology. Patient is treated for painful bony metastases. There is no information about laterality in the diagnosis of this lung cancer. ***Example 2:*** Widely metastatic ovarian carcinoma surgically debulked. Ovaries could not be identified in the specimen. b. Laterality is unknown for a death certificate only (DCO) case with primary site code
+
+    | listed in the table below (Sites for Which Laterality Codes Must Be Recorded)
+
+    | 7. Document the laterality in a text field
+
+  COMPILED TEXT:
+    > Example: Both arms are involved with Kaposi sarcoma and no other sites are involved. It is not known on which arm the Kaposi sarcoma originated. Assign Laterality code 4. Skin of upper limb and shoulder is listed as a paired organ in the table Sites for Which Laterality Must Be Recorded.
+
+[spcsm_2024:laterality:coding_instructions:i10]  kind=instruction  items=[410]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. Assign code 0 when
+
+    | | a. | The primary site is not a paired site |
+    | |---|---|
+    | | b. | Primary site is unknown (C809), or |
+    | | c. | Laterality is unknown for a death certificate only (DCO) case and the primary site is NOT one of the primary site codes listed in the table below (Sites for Which Laterality Codes Must Be Recorded) |
+
+    | 2. Code laterality using codes 1-9 for all sites listed in the table: Sites for Which Laterality Codes
+
+    | Must Be Recorded a. Laterality may be coded for sites other than those required; for example, thyroid
+
+    | 3. Code the side where the primary tumor originated
+
+    | a. Assign code 3 if the laterality is not known but the tumor is confined to a single side of
+
+    | the paired organ
+
+    | ***Example: Pathology report: Patient has a 2 cm carcinoma in the upper pole of the***
+
+    | kidney. Code laterality as 3 because there is documentation that the disease exists in only one kidney, but it is unknown if the disease originated in the right or left kidney.
+
+    | 4. Code 4 is seldom used EXCEPT for the following
+
+    | | a. | Both ovaries involved simultaneously with a single histology, or epithelial histologies (8000-8799) |
+    | |---|---|
+    | | b. | Diffuse bilateral lung nodules |
+    | | c. | Bilateral retinoblastomas |
+    | | d. | Bilateral Wilms tumors |
+    | | e. | Both breasts when inflammatory carcinoma is bilateral at diagnosis |
+
+    | **September 2023 Section IV: Description of this Neoplasm 108**
+
+    | -----
+
+    | f. Bilateral involvement at time of diagnosis and lateral origin unknown for a site listed in
+
+    | the table Sites for Which Laterality Must Be Recorded
+
+    | ***Example: Both arms are involved with Kaposi sarcoma and no other sites are involved.***
+
+    | It is not known on which arm the Kaposi sarcoma originated. Assign Laterality code 4. Skin of upper limb and shoulder is listed as a paired organ in the table Sites for Which *Laterality Must Be Recorded.*
+
+    | 5. Assign code 5 when the tumor originates in the midline of a site listed in 5.a
+
+    | a. C700, C710-C714, C722-C725, C443, C444, C445
+
+    | i. Do not assign code 5 to sites not listed in 5.a ***Example 1:*** Patient has an excision of a melanoma located just above the umbilicus (C445, laterality code 5).
+
+    | ***Example 2: Patient has a midline meningioma of the cerebral meninges (C700, laterality***
+
+    | code 5).
+
+    | 6. Assign code 9 when
+
+    | a. The neoplasm originated in a paired site and
+
+    | i. Laterality is unknown, AND ii. There is no statement that only one side of the paired organ is involved ***Example 1:*** Admitting history says patient was diagnosed with lung cancer based on positive sputum cytology. Patient is treated for painful bony metastases. There is no information about laterality in the diagnosis of this lung cancer. ***Example 2:*** Widely metastatic ovarian carcinoma surgically debulked. Ovaries could not be identified in the specimen. b. Laterality is unknown for a death certificate only (DCO) case with primary site code
+
+    | listed in the table below (Sites for Which Laterality Codes Must Be Recorded)
+
+    | 7. Document the laterality in a text field
+
+  COMPILED TEXT:
+    > 6. Assign code 9 when
+
+    > a. The neoplasm originated in a paired site and
+
+    > i. Laterality is unknown, AND
+
+    > ii. There is no statement that only one side of the paired organ is involved
+
+    > b. Laterality is unknown for a death certificate only (DCO) case with primary site code listed in the table below (Sites for Which Laterality Codes Must Be Recorded)
+
+[spcsm_2024:laterality:sites_for_which_laterality:i1]  kind=instruction  items=[410]  fidelity=1.00
+  applies_to: {'sites': ['C700', 'C710-C714', 'C722-C725'], 'dx_date_min': '2004-01-01'}
+  SOURCE REGION:
+    | ### Sites for Which Laterality Codes Must Be Recorded
+
+    | Starting with cases diagnosed January 1, 2004 and later, laterality is coded for select invasive, benign, and borderline primary intracranial and CNS tumors. A laterality code other than 0 must be assigned for the sites listed in the table below. There is an effective date for assigning laterality for some of the sites. If the site is not listed on the table, code 0 may be assigned for laterality. Laterality may be coded for sites other than those required below. For example: Code 2 may be assigned for a tumor originating in the left lobe of thyroid. ***Note:*** Laterality will be automatically coded to 0 in SEER\*DMS for sites not listed in the table below.
+
+    | | ICD-O-3 Code | Site or Subsite |
+    | |---|---|
+    | | C079 | Parotid gland |
+    | | C080 | Submandibular gland |
+    | | C081 | Sublingual gland |
+    | | C098 | Overlapping lesion of tonsil |
+    | | C099 | Tonsil, NOS |
+    | | C301 | Middle ear |
+    | | C310 | Maxillary sinus |
+    | | C312 | Frontal sinus |
+
+    | **September 2023 Section IV: Description of this Neoplasm 109**
+
+    | -----
+
+    | | ICD-O-3 Code | Site or Subsite |
+    | |---|---|
+    | | C341-C349 | Lung |
+    | | C384 | Pleura |
+    | | C400 | Long bones of upper limb, scapula, and associated joints |
+    | | C401 | Short bones of upper limb and associated joints |
+    | | C402 | Long bones of lower limb and associated joints |
+    | | C403 | Short bones of lower limb and associated joints |
+    | | C441 | Skin of the eyelid |
+    | | C442 | Skin of the external ear |
+    | | C443 | Skin of other and unspecific parts of the face |
+    | | C444 | Skin of scalp and neck |
+    | | C445 | Skin of trunk |
+    | | C446 | Skin of upper limb and shoulder |
+    | | C447 | Skin of the lower limb and hip |
+    | | C471 | Peripheral nerves and autonomic nervous system of upper limb and shoulder |
+    | | C472 | Peripheral nerves and autonomic nervous system of the lower limb and hip |
+    | | C491 | Connective, subcutaneous, and other soft tissues of upper limb and shoulder |
+    | | C492 | Connective, subcutaneous, and other soft tissues of the lower limb and hip |
+    | | C500-C509 | Breast |
+    | | C569 | Ovary |
+    | | C570 | Fallopian tube |
+    | | C620-C629 | Testis |
+    | | C630 | Epididymis |
+    | | C631 | Spermatic cord |
+    | | C649 | Kidney, NOS |
+    | | C659 | Renal pelvis |
+    | | C669 | Ureter |
+    | | C690-C699 | Eye and adnexa |
+    | | C700 | Cerebral meninges, NOS (Effective with cases diagnosed 01/01/2004) |
+    | | C710 | Cerebrum (Effective with cases diagnosed 01/01/2004) |
+    | | C711 | Frontal lobe (Effective with cases diagnosed 01/01/2004) |
+    | | C712 | Temporal lobe (Effective with cases diagnosed 01/01/2004) |
+    | | C713 | Parietal lobe (Effective with cases diagnosed 01/01/2004) |
+    | | C714 | Occipital lobe (Effective with cases diagnosed 01/01/2004) |
+    | | C722 | Olfactory nerve (Effective with cases diagnosed 01/01/2004) |
+    | | C723 | Optic nerve (Effective with cases diagnosed 01/01/2004) |
+    | | C724 | Acoustic nerve (Effective with cases diagnosed 01/01/2004) |
+    | | C725 | Cranial nerve, NOS (Effective with cases diagnosed 01/01/2004) |
+    | | C740-C749 | Adrenal gland |
+    | | C754 | Carotid body |
+
+    | **September 2023 Section IV: Description of this Neoplasm 110**
+
+    | -----
+
+  COMPILED TEXT:
+    > Starting with cases diagnosed January 1, 2004 and later, laterality is coded for select invasive, benign, and borderline primary intracranial and CNS tumors.
+
+========================================================================

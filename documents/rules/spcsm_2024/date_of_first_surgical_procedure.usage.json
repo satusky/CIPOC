@@ -1,0 +1,21 @@
+{
+  "model_configured": "gpt-5.6-terra",
+  "sections_tagged": 2,
+  "usage_reported": true,
+  "input_tokens": 2704,
+  "output_tokens": 1653,
+  "total_tokens": 4357,
+  "by_model": {
+    "gpt-5.6-terra": {
+      "input_tokens": 2704,
+      "output_token_details": {
+        "reasoning": 1010
+      },
+      "output_tokens": 1653,
+      "total_tokens": 4357,
+      "input_token_details": {
+        "cache_read": 0
+      }
+    }
+  }
+}

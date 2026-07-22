@@ -1,0 +1,569 @@
+[
+  {
+    "rule_id": "spcsm_2024:laterality:laterality:d1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality"
+    ],
+    "anchor": "L3133-L3148:laterality",
+    "kind": "definition",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Laterality describes the side of a paired organ or side of the body on which the reportable tumor originated.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:laterality:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality"
+    ],
+    "anchor": "L3133-L3148:laterality",
+    "kind": "instruction",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Determine whether laterality should be coded for each primary.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:laterality:t3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality"
+    ],
+    "anchor": "L3133-L3148:laterality",
+    "kind": "code_table",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "| Code | Description |\n|---|---|\n| 0 | Not a paired site |\n| 1 | Right: origin of primary |\n| 2 | Left: origin of primary |\n| 3 | Only one side involved, right or left origin unspecified |\n| 4 | Bilateral involvement at time of diagnosis, lateral origin unknown for a single primary; or both ovaries involved simultaneously, single histology; bilateral retinoblastomas; bilateral Wilms tumors |\n| 5 | Paired site: midline tumor (effective with 01/01/2010 dx) |\n| 9 | Paired site, but no information concerning laterality |",
+    "codes": {
+      "0": "Not a paired site",
+      "1": "Right: origin of primary",
+      "2": "Left: origin of primary",
+      "3": "Only one side involved, right or left origin unspecified",
+      "4": "Bilateral involvement at time of diagnosis, lateral origin unknown for a single primary; or both ovaries involved simultaneously, single histology; bilateral retinoblastomas; bilateral Wilms tumors",
+      "5": "Paired site: midline tumor (effective with 01/01/2010 dx)",
+      "9": "Paired site, but no information concerning laterality"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:coding_instructions:i1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Coding Instructions"
+    ],
+    "anchor": "L3149-L3212:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "1. Assign code 0 when\n\na. The primary site is not a paired site\n\nb. Primary site is unknown (C809), or\n\nc. Laterality is unknown for a death certificate only (DCO) case and the primary site is NOT one of the primary site codes listed in the table below (Sites for Which Laterality Codes Must Be Recorded)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:coding_instructions:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Coding Instructions"
+    ],
+    "anchor": "L3149-L3212:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "2. Code laterality using codes 1-9 for all sites listed in the table: Sites for Which Laterality Codes Must Be Recorded\n\na. Laterality may be coded for sites other than those required; for example, thyroid",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:coding_instructions:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Coding Instructions"
+    ],
+    "anchor": "L3149-L3212:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "3. Code the side where the primary tumor originated\n\na. Assign code 3 if the laterality is not known but the tumor is confined to a single side of the paired organ",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:coding_instructions:e4",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Coding Instructions"
+    ],
+    "anchor": "L3149-L3212:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: Pathology report: Patient has a 2 cm carcinoma in the upper pole of the kidney. Code laterality as 3 because there is documentation that the disease exists in only one kidney, but it is unknown if the disease originated in the right or left kidney.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:coding_instructions:i5",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Coding Instructions"
+    ],
+    "anchor": "L3149-L3212:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "4. Code 4 is seldom used EXCEPT for the following\n\na. Both ovaries involved simultaneously with a single histology, or epithelial histologies (8000-8799)\n\nb. Diffuse bilateral lung nodules\n\nc. Bilateral retinoblastomas\n\nd. Bilateral Wilms tumors\n\ne. Both breasts when inflammatory carcinoma is bilateral at diagnosis\n\nf. Bilateral involvement at time of diagnosis and lateral origin unknown for a site listed in the table Sites for Which Laterality Must Be Recorded",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:coding_instructions:e6",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Coding Instructions"
+    ],
+    "anchor": "L3149-L3212:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": [
+        "C446"
+      ],
+      "histologies": [
+        "9140"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: Both arms are involved with Kaposi sarcoma and no other sites are involved. It is not known on which arm the Kaposi sarcoma originated. Assign Laterality code 4. Skin of upper limb and shoulder is listed as a paired organ in the table Sites for Which Laterality Must Be Recorded.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:coding_instructions:i7",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Coding Instructions"
+    ],
+    "anchor": "L3149-L3212:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "5. Assign code 5 when the tumor originates in the midline of a site listed in 5.a\n\na. C700, C710-C714, C722-C725, C443, C444, C445\n\ni. Do not assign code 5 to sites not listed in 5.a",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:coding_instructions:e8",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Coding Instructions"
+    ],
+    "anchor": "L3149-L3212:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": [
+        "C445"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 1: Patient has an excision of a melanoma located just above the umbilicus (C445, laterality code 5).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:coding_instructions:e9",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Coding Instructions"
+    ],
+    "anchor": "L3149-L3212:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": [
+        "C700"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 2: Patient has a midline meningioma of the cerebral meninges (C700, laterality code 5).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:coding_instructions:i10",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Coding Instructions"
+    ],
+    "anchor": "L3149-L3212:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "6. Assign code 9 when\n\na. The neoplasm originated in a paired site and\n\ni. Laterality is unknown, AND\n\nii. There is no statement that only one side of the paired organ is involved\n\nb. Laterality is unknown for a death certificate only (DCO) case with primary site code listed in the table below (Sites for Which Laterality Codes Must Be Recorded)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:coding_instructions:e11",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Coding Instructions"
+    ],
+    "anchor": "L3149-L3212:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 1: Admitting history says patient was diagnosed with lung cancer based on positive sputum cytology. Patient is treated for painful bony metastases. There is no information about laterality in the diagnosis of this lung cancer.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:coding_instructions:e12",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Coding Instructions"
+    ],
+    "anchor": "L3149-L3212:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 2: Widely metastatic ovarian carcinoma surgically debulked. Ovaries could not be identified in the specimen.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:coding_instructions:i13",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Coding Instructions"
+    ],
+    "anchor": "L3149-L3212:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "7. Document the laterality in a text field",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:sites_for_which_laterality:i1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Sites for Which Laterality Codes Must Be Recorded"
+    ],
+    "anchor": "L3213-L3277:sites-for-which-laterality-codes-must-be-recorded",
+    "kind": "instruction",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": [
+        "C700",
+        "C710-C714",
+        "C722-C725"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2004-01-01",
+      "dx_date_max": null
+    },
+    "text": "Starting with cases diagnosed January 1, 2004 and later, laterality is coded for select invasive, benign, and borderline primary intracranial and CNS tumors.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:sites_for_which_laterality:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Sites for Which Laterality Codes Must Be Recorded"
+    ],
+    "anchor": "L3213-L3277:sites-for-which-laterality-codes-must-be-recorded",
+    "kind": "instruction",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "A laterality code other than 0 must be assigned for the sites listed in the table below.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:sites_for_which_laterality:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Sites for Which Laterality Codes Must Be Recorded"
+    ],
+    "anchor": "L3213-L3277:sites-for-which-laterality-codes-must-be-recorded",
+    "kind": "instruction",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "There is an effective date for assigning laterality for some of the sites.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:sites_for_which_laterality:i4",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Sites for Which Laterality Codes Must Be Recorded"
+    ],
+    "anchor": "L3213-L3277:sites-for-which-laterality-codes-must-be-recorded",
+    "kind": "instruction",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "If the site is not listed on the table, code 0 may be assigned for laterality.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:sites_for_which_laterality:i5",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Sites for Which Laterality Codes Must Be Recorded"
+    ],
+    "anchor": "L3213-L3277:sites-for-which-laterality-codes-must-be-recorded",
+    "kind": "instruction",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Laterality may be coded for sites other than those required below.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:laterality:sites_for_which_laterality:i7",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Laterality",
+      "Sites for Which Laterality Codes Must Be Recorded"
+    ],
+    "anchor": "L3213-L3277:sites-for-which-laterality-codes-must-be-recorded",
+    "kind": "instruction",
+    "item_ids": [
+      410
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Laterality will be automatically coded to 0 in SEERDMS for sites not listed in the table below.",
+    "codes": null,
+    "notes": null
+  }
+]

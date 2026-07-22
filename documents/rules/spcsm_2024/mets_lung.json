@@ -1,0 +1,55 @@
+[
+  {
+    "rule_id": "spcsm_2024:mets_lung:mets_at_diagnosislung:d1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Lung"
+    ],
+    "anchor": "L4298-L4310:mets-at-diagnosislung",
+    "kind": "definition",
+    "item_ids": [
+      1116
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "This data item identifies whether lung is an involved metastatic site.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_lung:mets_at_diagnosislung:t2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Lung"
+    ],
+    "anchor": "L4298-L4310:mets-at-diagnosislung",
+    "kind": "code_table",
+    "item_ids": [
+      1116
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "| Code | Description |\n|---|---|\n| 0 | None; no lung metastases |\n| 1 | Yes; distant lung metastases |\n| 8 | Not applicable |\n| 9 | Unknown whether lung is involved metastatic site Not documented in patient record |",
+    "codes": {
+      "0": "None; no lung metastases",
+      "1": "Yes; distant lung metastases",
+      "8": "Not applicable",
+      "9": "Unknown whether lung is involved metastatic site Not documented in patient record"
+    },
+    "notes": null
+  }
+]

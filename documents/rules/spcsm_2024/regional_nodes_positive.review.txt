@@ -1,0 +1,593 @@
+========================================================================
+RULE COMPILATION REVIEW REPORT
+========================================================================
+Source: documents/markdown/SPCSM_2024_MainDoc.md
+Units emitted: 34  |  accepted: 34  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     1
+  definition     2
+  example        8
+  instruction    22
+  priority_rule  1
+
+Accepted fidelity: min 0.98  mean 1.00
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED ACCEPTED UNITS (source vs. compiled, up to 5)
+------------------------------------------------------------------------
+
+[spcsm_2024:regional_nodes_positive:description:d1]  kind=definition  items=[820]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Description
+
+    | *Regional Nodes Positive records the exact number of regional nodes examined by the pathologist and found* to contain metastasis. This data item must be collected on all cases.
+
+    | | Codes | Description |
+    | |---|---|
+    | | 00 | All nodes examined are negative |
+    | | 01-89 | 1-89 nodes are positive (code exact number of nodes positive) |
+    | | 90 | 90 or more nodes are positive |
+    | | 95 | Positive aspiration OR core biopsy of lymph node(s) was performed |
+    | | 97 | Positive nodes are documented, but the number is unspecified |
+    | | 98 | No nodes were examined |
+    | | 99 | It is unknown whether nodes are positive; not applicable; not stated in patient record |
+
+  COMPILED TEXT:
+    > Regional Nodes Positive records the exact number of regional nodes examined by the pathologist and found to contain metastasis.
+
+[spcsm_2024:regional_nodes_positive:coding_instructions:i4]  kind=instruction  items=[820]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Regional lymph nodes only. Record information only about regional lymph nodes in this data**
+
+    | item. a. Include lymph nodes that are regional in the current AJCC Staging Manual or EOD
+
+    | *Regional Nodes*
+
+    | 2. **This data item is based on pathological information only, including autopsy. This data item**
+
+    | is to be recorded regardless of whether the patient received neoadjuvant (preoperative) treatment. Information from the autopsy may be used to code Regional Nodes Positive. Use text fields to explain the situation.
+
+    | 3. True in situ cases cannot have positive lymph nodes, so the only allowable codes are 00
+
+    | (negative) or 98 (not examined). Codes 01-97 and 99 are not allowed.
+
+    | 4. **Nodes positive is cumulative. Record the total number of regional lymph nodes removed and**
+
+    | found to be positive by pathologic examination. Record lymph nodes removed and found to be positive during an autopsy for autopsy-only cases.
+
+    | | a. | The number of regional nodes positive is cumulative from all procedures that remove lymph nodes through the completion of surgeries in the first course of treatment |
+    | |---|---|
+    | | b. | Do not count a positive aspiration or core biopsy of a lymph node in the same lymph node chain removed at surgery as an additional node in Regional Nodes Positive when there are positive nodes in the resection. In other words, when there are positive regional lymph nodes in a lymph node dissection, do not count the core needle biopsy or the fine |
+
+    | needle aspiration if it is in the same chain. See also Use of Code 95 below. ***Example 1:*** Lung cancer patient has a mediastinoscopy and positive core biopsy of a hilar lymph node. Patient then undergoes right upper lobectomy that yields 3 hilar and 2 mediastinal nodes positive out of 11 nodes dissected. Code Regional Nodes Positive as
+
+    | #### 05 and Regional Nodes Examined as 11 because the core biopsy was of a lymph node in the same chain as the nodes dissected.
+
+    | **September 2023 Section VII: First Course of Therapy 187**
+
+    | -----
+
+    | ***Example 2:*** Positive right cervical lymph node aspiration followed by right cervical lymph node dissection showing 1 of 6 nodes positive. Code Regional Nodes Positive as
+
+    | **01 and Regional Nodes Examined as 06.**
+
+    | c. Include the node in the count of Regional Nodes Positive when the positive aspiration or
+
+    | core biopsy is from a node in a different node region ***Example:*** Breast cancer patient has a positive core biopsy of a supraclavicular node and an axillary dissection showing 3 of 8 nodes positive. Code Regional Nodes Positive as
+
+    | **04 and Regional Nodes Examined as 09 because the supraclavicular lymph node is in a different, but still regional, lymph node chain.**
+
+    | d. Assume the lymph node that is core-biopsied or aspirated is part of the lymph node chain
+
+    | surgically removed and do not include it in the count of Regional Nodes Positive when its location is not known ***Example:*** Patient record states that lymph node core biopsy was performed at another facility and 7/14 regional lymph nodes were positive at the time of resection. Code
+
+    | ***Regional Nodes Positive as 07 and Regional Nodes Examined as 14.***
+
+    | 5. **Priority of lymph node counts.** Use information in the following priority when there is a
+
+    | discrepancy regarding the number of positive lymph nodes
+
+    | | a. | Final diagnosis |
+    | |---|---|
+    | | b. | Synoptic report (also known as CAP protocol or pathology report checklist; the consolidated findings on the CAP protocol) |
+
+    | | c. | Microscopic description |
+    | |---|---|
+    | | d. | Gross description |
+
+    | #### 6. Positive nodes in multiple primaries in same organ
+
+    | a. Determine the histology of the metastases in the nodes and code the nodes as positive for
+
+    | the primary with that histology when there are multiple primary cancers with different histologic types in the same organ and the pathology report just states the number of nodes positive b. Code the nodes as positive for all primaries when no further information is available
+
+    | ***Example:*** A breast case is two separate primaries as determined by the SEER multiple primary rules. The pathology report states "3 of 11 lymph nodes positive for metastasis" with no further information available. Code Regional Nodes Positive as 03 and Regional
+
+    | ***Nodes Examined as 11 for both primaries.***
+
+    | #### 7. Isolated Tumor Cells (ITCs) in lymph nodes
+
+    | a. For all cases except cutaneous melanoma and Merkel cell carcinoma of skin
+
+    | i. Count only lymph nodes that contain micrometastases or larger (metastases greater
+
+    | than 0.2 millimeters in size) ii. Assume the metastases are larger than 0.2 mm and count the lymph node(s) as
+
+    | positive when the path report indicates that nodes are positive but the size of metastasis is not stated iii. Do not include in the count of lymph nodes positive any nodes that are identified
+
+    | as containing ITCs b. For cutaneous melanoma and Merkel cell carcinoma of skin
+
+    | i. Count nodes with ITCs as positive lymph nodes
+
+    | **September 2023 Section VII: First Course of Therapy 188**
+
+    | -----
+
+    | 8. Use code 95 when
+
+    | | a. | The only procedure for regional lymph nodes is a needle aspiration (cytology) or core biopsy (tissue) |
+    | |---|---|
+    | | b. | A positive lymph node is aspirated and there are no surgically resected lymph nodes Example: Patient with esophageal cancer. Enlarged mid-esophageal node found on CT scan, which is aspirated and found to be positive. Patient undergoes radiation therapy and no surgery. Code Regional Nodes Positive as 95 and Regional Nodes Examined as 95. |
+
+    | c. A positive lymph node is aspirated and surgically resected lymph nodes are negative
+
+    | ***Example:*** Lung cancer patient has aspiration of suspicious hilar mass that shows metastatic squamous carcinoma in lymph node tissue. Patient undergoes neoadjuvant (preoperative) radiation therapy followed by lobectomy showing 6 negative hilar lymph nodes. Code Regional Nodes Positive as 95 and Regional Nodes Examined as the 06
+
+    | **nodes surgically resected.**
+
+    | 9. Code 97. Use code 97 for any combination of positive aspirated, biopsied, sampled, or dissected
+
+    | lymph nodes when the number of involved nodes cannot be determined on the basis of cytology or histology. Code 97 includes positive lymph nodes diagnosed by either cytology or histology. ***Example:*** Patient with carcinoma of the pyriform sinus has a mass in the mid neck. Fine needle aspiration (FNA) of one node is positive. The patient has neoadjuvant (preoperative) chemotherapy, then resection of the primary tumor and a radical neck dissection. In the radical neck dissection, "several" of 10 nodes are positive; the remainder of the nodes show chemotherapy effect. Code Regional Nodes Positive as 97 because the total number of
+
+    | **positive nodes biopsied and removed is unknown, and code Regional Nodes Examined as** **10.** ***Note: If the aspirated node is the only one that is microscopically positive, use code 95.***
+
+    | 10. Use code 98 when
+
+    | | a. | The assessment of lymph nodes is clinical only |
+    | |---|---|
+    | | b. | No lymph nodes are removed and examined |
+    | | c. | A "dissection" of a lymph node drainage area is found to contain no lymph nodes at the time of pathologic examination |
+
+    | d. *Regional Nodes Positive is coded 98, Regional Nodes Examined is usually coded 00*
+
+    | 11. Use code 99 for
+
+    | | a. | Any case coded to primary site C420, C421, C423, C424, C589, C700-C709, C710- C729, C751-C753, C761-C768, C770-C779, or C809 |
+    | |---|---|
+    | | b. | Lymphoma 00790 |
+    | | c. | Lymphoma-CLL/SLL 00795 |
+    | | d. | Plasma Cell Disorders (excluding 9734/3) 00822 |
+    | | e. | HemeRetic 00830 |
+    | | f. | Ill-Defined/Other 99999 |
+    | | g. | Cases with no information about positive regional lymph nodes |
+    | | For more | information about schemas and schema IDs, go to the SSDI Manual, Appendix A. |
+
+    | **September 2023 Section VII: First Course of Therapy 189**
+
+    | -----
+
+  COMPILED TEXT:
+    > Nodes positive is cumulative. Record the total number of regional lymph nodes removed and found to be positive by pathologic examination. Record lymph nodes removed and found to be positive during an autopsy for autopsy-only cases.
+
+[spcsm_2024:regional_nodes_positive:coding_instructions:e10]  kind=example  items=[820, 830]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Regional lymph nodes only. Record information only about regional lymph nodes in this data**
+
+    | item. a. Include lymph nodes that are regional in the current AJCC Staging Manual or EOD
+
+    | *Regional Nodes*
+
+    | 2. **This data item is based on pathological information only, including autopsy. This data item**
+
+    | is to be recorded regardless of whether the patient received neoadjuvant (preoperative) treatment. Information from the autopsy may be used to code Regional Nodes Positive. Use text fields to explain the situation.
+
+    | 3. True in situ cases cannot have positive lymph nodes, so the only allowable codes are 00
+
+    | (negative) or 98 (not examined). Codes 01-97 and 99 are not allowed.
+
+    | 4. **Nodes positive is cumulative. Record the total number of regional lymph nodes removed and**
+
+    | found to be positive by pathologic examination. Record lymph nodes removed and found to be positive during an autopsy for autopsy-only cases.
+
+    | | a. | The number of regional nodes positive is cumulative from all procedures that remove lymph nodes through the completion of surgeries in the first course of treatment |
+    | |---|---|
+    | | b. | Do not count a positive aspiration or core biopsy of a lymph node in the same lymph node chain removed at surgery as an additional node in Regional Nodes Positive when there are positive nodes in the resection. In other words, when there are positive regional lymph nodes in a lymph node dissection, do not count the core needle biopsy or the fine |
+
+    | needle aspiration if it is in the same chain. See also Use of Code 95 below. ***Example 1:*** Lung cancer patient has a mediastinoscopy and positive core biopsy of a hilar lymph node. Patient then undergoes right upper lobectomy that yields 3 hilar and 2 mediastinal nodes positive out of 11 nodes dissected. Code Regional Nodes Positive as
+
+    | #### 05 and Regional Nodes Examined as 11 because the core biopsy was of a lymph node in the same chain as the nodes dissected.
+
+    | **September 2023 Section VII: First Course of Therapy 187**
+
+    | -----
+
+    | ***Example 2:*** Positive right cervical lymph node aspiration followed by right cervical lymph node dissection showing 1 of 6 nodes positive. Code Regional Nodes Positive as
+
+    | **01 and Regional Nodes Examined as 06.**
+
+    | c. Include the node in the count of Regional Nodes Positive when the positive aspiration or
+
+    | core biopsy is from a node in a different node region ***Example:*** Breast cancer patient has a positive core biopsy of a supraclavicular node and an axillary dissection showing 3 of 8 nodes positive. Code Regional Nodes Positive as
+
+    | **04 and Regional Nodes Examined as 09 because the supraclavicular lymph node is in a different, but still regional, lymph node chain.**
+
+    | d. Assume the lymph node that is core-biopsied or aspirated is part of the lymph node chain
+
+    | surgically removed and do not include it in the count of Regional Nodes Positive when its location is not known ***Example:*** Patient record states that lymph node core biopsy was performed at another facility and 7/14 regional lymph nodes were positive at the time of resection. Code
+
+    | ***Regional Nodes Positive as 07 and Regional Nodes Examined as 14.***
+
+    | 5. **Priority of lymph node counts.** Use information in the following priority when there is a
+
+    | discrepancy regarding the number of positive lymph nodes
+
+    | | a. | Final diagnosis |
+    | |---|---|
+    | | b. | Synoptic report (also known as CAP protocol or pathology report checklist; the consolidated findings on the CAP protocol) |
+
+    | | c. | Microscopic description |
+    | |---|---|
+    | | d. | Gross description |
+
+    | #### 6. Positive nodes in multiple primaries in same organ
+
+    | a. Determine the histology of the metastases in the nodes and code the nodes as positive for
+
+    | the primary with that histology when there are multiple primary cancers with different histologic types in the same organ and the pathology report just states the number of nodes positive b. Code the nodes as positive for all primaries when no further information is available
+
+    | ***Example:*** A breast case is two separate primaries as determined by the SEER multiple primary rules. The pathology report states "3 of 11 lymph nodes positive for metastasis" with no further information available. Code Regional Nodes Positive as 03 and Regional
+
+    | ***Nodes Examined as 11 for both primaries.***
+
+    | #### 7. Isolated Tumor Cells (ITCs) in lymph nodes
+
+    | a. For all cases except cutaneous melanoma and Merkel cell carcinoma of skin
+
+    | i. Count only lymph nodes that contain micrometastases or larger (metastases greater
+
+    | than 0.2 millimeters in size) ii. Assume the metastases are larger than 0.2 mm and count the lymph node(s) as
+
+    | positive when the path report indicates that nodes are positive but the size of metastasis is not stated iii. Do not include in the count of lymph nodes positive any nodes that are identified
+
+    | as containing ITCs b. For cutaneous melanoma and Merkel cell carcinoma of skin
+
+    | i. Count nodes with ITCs as positive lymph nodes
+
+    | **September 2023 Section VII: First Course of Therapy 188**
+
+    | -----
+
+    | 8. Use code 95 when
+
+    | | a. | The only procedure for regional lymph nodes is a needle aspiration (cytology) or core biopsy (tissue) |
+    | |---|---|
+    | | b. | A positive lymph node is aspirated and there are no surgically resected lymph nodes Example: Patient with esophageal cancer. Enlarged mid-esophageal node found on CT scan, which is aspirated and found to be positive. Patient undergoes radiation therapy and no surgery. Code Regional Nodes Positive as 95 and Regional Nodes Examined as 95. |
+
+    | c. A positive lymph node is aspirated and surgically resected lymph nodes are negative
+
+    | ***Example:*** Lung cancer patient has aspiration of suspicious hilar mass that shows metastatic squamous carcinoma in lymph node tissue. Patient undergoes neoadjuvant (preoperative) radiation therapy followed by lobectomy showing 6 negative hilar lymph nodes. Code Regional Nodes Positive as 95 and Regional Nodes Examined as the 06
+
+    | **nodes surgically resected.**
+
+    | 9. Code 97. Use code 97 for any combination of positive aspirated, biopsied, sampled, or dissected
+
+    | lymph nodes when the number of involved nodes cannot be determined on the basis of cytology or histology. Code 97 includes positive lymph nodes diagnosed by either cytology or histology. ***Example:*** Patient with carcinoma of the pyriform sinus has a mass in the mid neck. Fine needle aspiration (FNA) of one node is positive. The patient has neoadjuvant (preoperative) chemotherapy, then resection of the primary tumor and a radical neck dissection. In the radical neck dissection, "several" of 10 nodes are positive; the remainder of the nodes show chemotherapy effect. Code Regional Nodes Positive as 97 because the total number of
+
+    | **positive nodes biopsied and removed is unknown, and code Regional Nodes Examined as** **10.** ***Note: If the aspirated node is the only one that is microscopically positive, use code 95.***
+
+    | 10. Use code 98 when
+
+    | | a. | The assessment of lymph nodes is clinical only |
+    | |---|---|
+    | | b. | No lymph nodes are removed and examined |
+    | | c. | A "dissection" of a lymph node drainage area is found to contain no lymph nodes at the time of pathologic examination |
+
+    | d. *Regional Nodes Positive is coded 98, Regional Nodes Examined is usually coded 00*
+
+    | 11. Use code 99 for
+
+    | | a. | Any case coded to primary site C420, C421, C423, C424, C589, C700-C709, C710- C729, C751-C753, C761-C768, C770-C779, or C809 |
+    | |---|---|
+    | | b. | Lymphoma 00790 |
+    | | c. | Lymphoma-CLL/SLL 00795 |
+    | | d. | Plasma Cell Disorders (excluding 9734/3) 00822 |
+    | | e. | HemeRetic 00830 |
+    | | f. | Ill-Defined/Other 99999 |
+    | | g. | Cases with no information about positive regional lymph nodes |
+    | | For more | information about schemas and schema IDs, go to the SSDI Manual, Appendix A. |
+
+    | **September 2023 Section VII: First Course of Therapy 189**
+
+    | -----
+
+  COMPILED TEXT:
+    > Example: Breast cancer patient has a positive core biopsy of a supraclavicular node and an axillary dissection showing 3 of 8 nodes positive. Code Regional Nodes Positive as 04 and Regional Nodes Examined as 09 because the supraclavicular lymph node is in a different, but still regional, lymph node chain.
+
+[spcsm_2024:regional_nodes_positive:coding_instructions:e16]  kind=example  items=[820, 830]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Regional lymph nodes only. Record information only about regional lymph nodes in this data**
+
+    | item. a. Include lymph nodes that are regional in the current AJCC Staging Manual or EOD
+
+    | *Regional Nodes*
+
+    | 2. **This data item is based on pathological information only, including autopsy. This data item**
+
+    | is to be recorded regardless of whether the patient received neoadjuvant (preoperative) treatment. Information from the autopsy may be used to code Regional Nodes Positive. Use text fields to explain the situation.
+
+    | 3. True in situ cases cannot have positive lymph nodes, so the only allowable codes are 00
+
+    | (negative) or 98 (not examined). Codes 01-97 and 99 are not allowed.
+
+    | 4. **Nodes positive is cumulative. Record the total number of regional lymph nodes removed and**
+
+    | found to be positive by pathologic examination. Record lymph nodes removed and found to be positive during an autopsy for autopsy-only cases.
+
+    | | a. | The number of regional nodes positive is cumulative from all procedures that remove lymph nodes through the completion of surgeries in the first course of treatment |
+    | |---|---|
+    | | b. | Do not count a positive aspiration or core biopsy of a lymph node in the same lymph node chain removed at surgery as an additional node in Regional Nodes Positive when there are positive nodes in the resection. In other words, when there are positive regional lymph nodes in a lymph node dissection, do not count the core needle biopsy or the fine |
+
+    | needle aspiration if it is in the same chain. See also Use of Code 95 below. ***Example 1:*** Lung cancer patient has a mediastinoscopy and positive core biopsy of a hilar lymph node. Patient then undergoes right upper lobectomy that yields 3 hilar and 2 mediastinal nodes positive out of 11 nodes dissected. Code Regional Nodes Positive as
+
+    | #### 05 and Regional Nodes Examined as 11 because the core biopsy was of a lymph node in the same chain as the nodes dissected.
+
+    | **September 2023 Section VII: First Course of Therapy 187**
+
+    | -----
+
+    | ***Example 2:*** Positive right cervical lymph node aspiration followed by right cervical lymph node dissection showing 1 of 6 nodes positive. Code Regional Nodes Positive as
+
+    | **01 and Regional Nodes Examined as 06.**
+
+    | c. Include the node in the count of Regional Nodes Positive when the positive aspiration or
+
+    | core biopsy is from a node in a different node region ***Example:*** Breast cancer patient has a positive core biopsy of a supraclavicular node and an axillary dissection showing 3 of 8 nodes positive. Code Regional Nodes Positive as
+
+    | **04 and Regional Nodes Examined as 09 because the supraclavicular lymph node is in a different, but still regional, lymph node chain.**
+
+    | d. Assume the lymph node that is core-biopsied or aspirated is part of the lymph node chain
+
+    | surgically removed and do not include it in the count of Regional Nodes Positive when its location is not known ***Example:*** Patient record states that lymph node core biopsy was performed at another facility and 7/14 regional lymph nodes were positive at the time of resection. Code
+
+    | ***Regional Nodes Positive as 07 and Regional Nodes Examined as 14.***
+
+    | 5. **Priority of lymph node counts.** Use information in the following priority when there is a
+
+    | discrepancy regarding the number of positive lymph nodes
+
+    | | a. | Final diagnosis |
+    | |---|---|
+    | | b. | Synoptic report (also known as CAP protocol or pathology report checklist; the consolidated findings on the CAP protocol) |
+
+    | | c. | Microscopic description |
+    | |---|---|
+    | | d. | Gross description |
+
+    | #### 6. Positive nodes in multiple primaries in same organ
+
+    | a. Determine the histology of the metastases in the nodes and code the nodes as positive for
+
+    | the primary with that histology when there are multiple primary cancers with different histologic types in the same organ and the pathology report just states the number of nodes positive b. Code the nodes as positive for all primaries when no further information is available
+
+    | ***Example:*** A breast case is two separate primaries as determined by the SEER multiple primary rules. The pathology report states "3 of 11 lymph nodes positive for metastasis" with no further information available. Code Regional Nodes Positive as 03 and Regional
+
+    | ***Nodes Examined as 11 for both primaries.***
+
+    | #### 7. Isolated Tumor Cells (ITCs) in lymph nodes
+
+    | a. For all cases except cutaneous melanoma and Merkel cell carcinoma of skin
+
+    | i. Count only lymph nodes that contain micrometastases or larger (metastases greater
+
+    | than 0.2 millimeters in size) ii. Assume the metastases are larger than 0.2 mm and count the lymph node(s) as
+
+    | positive when the path report indicates that nodes are positive but the size of metastasis is not stated iii. Do not include in the count of lymph nodes positive any nodes that are identified
+
+    | as containing ITCs b. For cutaneous melanoma and Merkel cell carcinoma of skin
+
+    | i. Count nodes with ITCs as positive lymph nodes
+
+    | **September 2023 Section VII: First Course of Therapy 188**
+
+    | -----
+
+    | 8. Use code 95 when
+
+    | | a. | The only procedure for regional lymph nodes is a needle aspiration (cytology) or core biopsy (tissue) |
+    | |---|---|
+    | | b. | A positive lymph node is aspirated and there are no surgically resected lymph nodes Example: Patient with esophageal cancer. Enlarged mid-esophageal node found on CT scan, which is aspirated and found to be positive. Patient undergoes radiation therapy and no surgery. Code Regional Nodes Positive as 95 and Regional Nodes Examined as 95. |
+
+    | c. A positive lymph node is aspirated and surgically resected lymph nodes are negative
+
+    | ***Example:*** Lung cancer patient has aspiration of suspicious hilar mass that shows metastatic squamous carcinoma in lymph node tissue. Patient undergoes neoadjuvant (preoperative) radiation therapy followed by lobectomy showing 6 negative hilar lymph nodes. Code Regional Nodes Positive as 95 and Regional Nodes Examined as the 06
+
+    | **nodes surgically resected.**
+
+    | 9. Code 97. Use code 97 for any combination of positive aspirated, biopsied, sampled, or dissected
+
+    | lymph nodes when the number of involved nodes cannot be determined on the basis of cytology or histology. Code 97 includes positive lymph nodes diagnosed by either cytology or histology. ***Example:*** Patient with carcinoma of the pyriform sinus has a mass in the mid neck. Fine needle aspiration (FNA) of one node is positive. The patient has neoadjuvant (preoperative) chemotherapy, then resection of the primary tumor and a radical neck dissection. In the radical neck dissection, "several" of 10 nodes are positive; the remainder of the nodes show chemotherapy effect. Code Regional Nodes Positive as 97 because the total number of
+
+    | **positive nodes biopsied and removed is unknown, and code Regional Nodes Examined as** **10.** ***Note: If the aspirated node is the only one that is microscopically positive, use code 95.***
+
+    | 10. Use code 98 when
+
+    | | a. | The assessment of lymph nodes is clinical only |
+    | |---|---|
+    | | b. | No lymph nodes are removed and examined |
+    | | c. | A "dissection" of a lymph node drainage area is found to contain no lymph nodes at the time of pathologic examination |
+
+    | d. *Regional Nodes Positive is coded 98, Regional Nodes Examined is usually coded 00*
+
+    | 11. Use code 99 for
+
+    | | a. | Any case coded to primary site C420, C421, C423, C424, C589, C700-C709, C710- C729, C751-C753, C761-C768, C770-C779, or C809 |
+    | |---|---|
+    | | b. | Lymphoma 00790 |
+    | | c. | Lymphoma-CLL/SLL 00795 |
+    | | d. | Plasma Cell Disorders (excluding 9734/3) 00822 |
+    | | e. | HemeRetic 00830 |
+    | | f. | Ill-Defined/Other 99999 |
+    | | g. | Cases with no information about positive regional lymph nodes |
+    | | For more | information about schemas and schema IDs, go to the SSDI Manual, Appendix A. |
+
+    | **September 2023 Section VII: First Course of Therapy 189**
+
+    | -----
+
+  COMPILED TEXT:
+    > Example: A breast case is two separate primaries as determined by the SEER multiple primary rules. The pathology report states "3 of 11 lymph nodes positive for metastasis" with no further information available. Code Regional Nodes Positive as 03 and Regional Nodes Examined as 11 for both primaries.
+
+[spcsm_2024:regional_nodes_positive:coding_instructions:i22]  kind=instruction  items=[820]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Regional lymph nodes only. Record information only about regional lymph nodes in this data**
+
+    | item. a. Include lymph nodes that are regional in the current AJCC Staging Manual or EOD
+
+    | *Regional Nodes*
+
+    | 2. **This data item is based on pathological information only, including autopsy. This data item**
+
+    | is to be recorded regardless of whether the patient received neoadjuvant (preoperative) treatment. Information from the autopsy may be used to code Regional Nodes Positive. Use text fields to explain the situation.
+
+    | 3. True in situ cases cannot have positive lymph nodes, so the only allowable codes are 00
+
+    | (negative) or 98 (not examined). Codes 01-97 and 99 are not allowed.
+
+    | 4. **Nodes positive is cumulative. Record the total number of regional lymph nodes removed and**
+
+    | found to be positive by pathologic examination. Record lymph nodes removed and found to be positive during an autopsy for autopsy-only cases.
+
+    | | a. | The number of regional nodes positive is cumulative from all procedures that remove lymph nodes through the completion of surgeries in the first course of treatment |
+    | |---|---|
+    | | b. | Do not count a positive aspiration or core biopsy of a lymph node in the same lymph node chain removed at surgery as an additional node in Regional Nodes Positive when there are positive nodes in the resection. In other words, when there are positive regional lymph nodes in a lymph node dissection, do not count the core needle biopsy or the fine |
+
+    | needle aspiration if it is in the same chain. See also Use of Code 95 below. ***Example 1:*** Lung cancer patient has a mediastinoscopy and positive core biopsy of a hilar lymph node. Patient then undergoes right upper lobectomy that yields 3 hilar and 2 mediastinal nodes positive out of 11 nodes dissected. Code Regional Nodes Positive as
+
+    | #### 05 and Regional Nodes Examined as 11 because the core biopsy was of a lymph node in the same chain as the nodes dissected.
+
+    | **September 2023 Section VII: First Course of Therapy 187**
+
+    | -----
+
+    | ***Example 2:*** Positive right cervical lymph node aspiration followed by right cervical lymph node dissection showing 1 of 6 nodes positive. Code Regional Nodes Positive as
+
+    | **01 and Regional Nodes Examined as 06.**
+
+    | c. Include the node in the count of Regional Nodes Positive when the positive aspiration or
+
+    | core biopsy is from a node in a different node region ***Example:*** Breast cancer patient has a positive core biopsy of a supraclavicular node and an axillary dissection showing 3 of 8 nodes positive. Code Regional Nodes Positive as
+
+    | **04 and Regional Nodes Examined as 09 because the supraclavicular lymph node is in a different, but still regional, lymph node chain.**
+
+    | d. Assume the lymph node that is core-biopsied or aspirated is part of the lymph node chain
+
+    | surgically removed and do not include it in the count of Regional Nodes Positive when its location is not known ***Example:*** Patient record states that lymph node core biopsy was performed at another facility and 7/14 regional lymph nodes were positive at the time of resection. Code
+
+    | ***Regional Nodes Positive as 07 and Regional Nodes Examined as 14.***
+
+    | 5. **Priority of lymph node counts.** Use information in the following priority when there is a
+
+    | discrepancy regarding the number of positive lymph nodes
+
+    | | a. | Final diagnosis |
+    | |---|---|
+    | | b. | Synoptic report (also known as CAP protocol or pathology report checklist; the consolidated findings on the CAP protocol) |
+
+    | | c. | Microscopic description |
+    | |---|---|
+    | | d. | Gross description |
+
+    | #### 6. Positive nodes in multiple primaries in same organ
+
+    | a. Determine the histology of the metastases in the nodes and code the nodes as positive for
+
+    | the primary with that histology when there are multiple primary cancers with different histologic types in the same organ and the pathology report just states the number of nodes positive b. Code the nodes as positive for all primaries when no further information is available
+
+    | ***Example:*** A breast case is two separate primaries as determined by the SEER multiple primary rules. The pathology report states "3 of 11 lymph nodes positive for metastasis" with no further information available. Code Regional Nodes Positive as 03 and Regional
+
+    | ***Nodes Examined as 11 for both primaries.***
+
+    | #### 7. Isolated Tumor Cells (ITCs) in lymph nodes
+
+    | a. For all cases except cutaneous melanoma and Merkel cell carcinoma of skin
+
+    | i. Count only lymph nodes that contain micrometastases or larger (metastases greater
+
+    | than 0.2 millimeters in size) ii. Assume the metastases are larger than 0.2 mm and count the lymph node(s) as
+
+    | positive when the path report indicates that nodes are positive but the size of metastasis is not stated iii. Do not include in the count of lymph nodes positive any nodes that are identified
+
+    | as containing ITCs b. For cutaneous melanoma and Merkel cell carcinoma of skin
+
+    | i. Count nodes with ITCs as positive lymph nodes
+
+    | **September 2023 Section VII: First Course of Therapy 188**
+
+    | -----
+
+    | 8. Use code 95 when
+
+    | | a. | The only procedure for regional lymph nodes is a needle aspiration (cytology) or core biopsy (tissue) |
+    | |---|---|
+    | | b. | A positive lymph node is aspirated and there are no surgically resected lymph nodes Example: Patient with esophageal cancer. Enlarged mid-esophageal node found on CT scan, which is aspirated and found to be positive. Patient undergoes radiation therapy and no surgery. Code Regional Nodes Positive as 95 and Regional Nodes Examined as 95. |
+
+    | c. A positive lymph node is aspirated and surgically resected lymph nodes are negative
+
+    | ***Example:*** Lung cancer patient has aspiration of suspicious hilar mass that shows metastatic squamous carcinoma in lymph node tissue. Patient undergoes neoadjuvant (preoperative) radiation therapy followed by lobectomy showing 6 negative hilar lymph nodes. Code Regional Nodes Positive as 95 and Regional Nodes Examined as the 06
+
+    | **nodes surgically resected.**
+
+    | 9. Code 97. Use code 97 for any combination of positive aspirated, biopsied, sampled, or dissected
+
+    | lymph nodes when the number of involved nodes cannot be determined on the basis of cytology or histology. Code 97 includes positive lymph nodes diagnosed by either cytology or histology. ***Example:*** Patient with carcinoma of the pyriform sinus has a mass in the mid neck. Fine needle aspiration (FNA) of one node is positive. The patient has neoadjuvant (preoperative) chemotherapy, then resection of the primary tumor and a radical neck dissection. In the radical neck dissection, "several" of 10 nodes are positive; the remainder of the nodes show chemotherapy effect. Code Regional Nodes Positive as 97 because the total number of
+
+    | **positive nodes biopsied and removed is unknown, and code Regional Nodes Examined as** **10.** ***Note: If the aspirated node is the only one that is microscopically positive, use code 95.***
+
+    | 10. Use code 98 when
+
+    | | a. | The assessment of lymph nodes is clinical only |
+    | |---|---|
+    | | b. | No lymph nodes are removed and examined |
+    | | c. | A "dissection" of a lymph node drainage area is found to contain no lymph nodes at the time of pathologic examination |
+
+    | d. *Regional Nodes Positive is coded 98, Regional Nodes Examined is usually coded 00*
+
+    | 11. Use code 99 for
+
+    | | a. | Any case coded to primary site C420, C421, C423, C424, C589, C700-C709, C710- C729, C751-C753, C761-C768, C770-C779, or C809 |
+    | |---|---|
+    | | b. | Lymphoma 00790 |
+    | | c. | Lymphoma-CLL/SLL 00795 |
+    | | d. | Plasma Cell Disorders (excluding 9734/3) 00822 |
+    | | e. | HemeRetic 00830 |
+    | | f. | Ill-Defined/Other 99999 |
+    | | g. | Cases with no information about positive regional lymph nodes |
+    | | For more | information about schemas and schema IDs, go to the SSDI Manual, Appendix A. |
+
+    | **September 2023 Section VII: First Course of Therapy 189**
+
+    | -----
+
+  COMPILED TEXT:
+    > Use code 95 when a positive lymph node is aspirated and there are no surgically resected lymph nodes.
+
+========================================================================

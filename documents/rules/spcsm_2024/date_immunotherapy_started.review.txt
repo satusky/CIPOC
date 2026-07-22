@@ -1,0 +1,102 @@
+========================================================================
+RULE COMPILATION REVIEW REPORT
+========================================================================
+Source: documents/markdown/SPCSM_2024_MainDoc.md
+Units emitted: 6  |  accepted: 6  |  quarantined: 0
+
+Accepted units by kind:
+  definition     1
+  instruction    5
+
+Accepted fidelity: min 1.00  mean 1.00
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED ACCEPTED UNITS (source vs. compiled, up to 5)
+------------------------------------------------------------------------
+
+[spcsm_2024:date_immunotherapy_started:date_immunotherapy_started:d1]  kind=definition  items=[1240]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Date Immunotherapy Started
+
+    | #### Item Length: 8 NAACCR Item #: 1240 NAACCR Name: RX Date BRM XML NAACCR ID: rxDateBrm
+
+    | *Date Immunotherapy Started is the date when immunotherapy began as part of the first course of therapy.* *Date Immunotherapy Started must be transmitted in the YYYYMMDD format. Date Immunotherapy Started* may be recorded in the transmission format, or recorded in the traditional format (MMDDYYYY) and converted electronically to the transmission format. SEER Central Registries: Collect when available from CoC reporting facilities.
+
+  COMPILED TEXT:
+    > Date Immunotherapy Started is the date when immunotherapy began as part of the first course of therapy.
+
+[spcsm_2024:date_immunotherapy_started:date_immunotherapy_started:i2]  kind=instruction  items=[1240]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Date Immunotherapy Started
+
+    | #### Item Length: 8 NAACCR Item #: 1240 NAACCR Name: RX Date BRM XML NAACCR ID: rxDateBrm
+
+    | *Date Immunotherapy Started is the date when immunotherapy began as part of the first course of therapy.* *Date Immunotherapy Started must be transmitted in the YYYYMMDD format. Date Immunotherapy Started* may be recorded in the transmission format, or recorded in the traditional format (MMDDYYYY) and converted electronically to the transmission format. SEER Central Registries: Collect when available from CoC reporting facilities.
+
+  COMPILED TEXT:
+    > Date Immunotherapy Started must be transmitted in the YYYYMMDD format. Date Immunotherapy Started may be recorded in the transmission format, or recorded in the traditional format (MMDDYYYY) and converted electronically to the transmission format.
+
+[spcsm_2024:date_immunotherapy_started:date_immunotherapy_started:i3]  kind=instruction  items=[1240]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Date Immunotherapy Started
+
+    | #### Item Length: 8 NAACCR Item #: 1240 NAACCR Name: RX Date BRM XML NAACCR ID: rxDateBrm
+
+    | *Date Immunotherapy Started is the date when immunotherapy began as part of the first course of therapy.* *Date Immunotherapy Started must be transmitted in the YYYYMMDD format. Date Immunotherapy Started* may be recorded in the transmission format, or recorded in the traditional format (MMDDYYYY) and converted electronically to the transmission format. SEER Central Registries: Collect when available from CoC reporting facilities.
+
+  COMPILED TEXT:
+    > SEER Central Registries: Collect when available from CoC reporting facilities.
+
+[spcsm_2024:date_immunotherapy_started:coding_instructions:i1]  kind=instruction  items=[1240]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. Record the date of the first/earliest immunotherapy if immunotherapy was given and recorded
+
+    | as part of the first course of therapy a. Code the date that the prescription was written if date administered unknown
+
+    | 2. Immunotherapy date should be the same as the Date Therapy Initiated when immunotherapy is
+
+    | the only treatment administered
+
+    | 3. Transmit date data items in the year, month, day format (YYYYMMDD)
+
+    | **September 2023 Section VII: First Course of Therapy 218**
+
+    | -----
+
+  COMPILED TEXT:
+    > 1. Record the date of the first/earliest immunotherapy if immunotherapy was given and recorded as part of the first course of therapy a. Code the date that the prescription was written if date administered unknown
+
+[spcsm_2024:date_immunotherapy_started:coding_instructions:i2]  kind=instruction  items=[1240]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. Record the date of the first/earliest immunotherapy if immunotherapy was given and recorded
+
+    | as part of the first course of therapy a. Code the date that the prescription was written if date administered unknown
+
+    | 2. Immunotherapy date should be the same as the Date Therapy Initiated when immunotherapy is
+
+    | the only treatment administered
+
+    | 3. Transmit date data items in the year, month, day format (YYYYMMDD)
+
+    | **September 2023 Section VII: First Course of Therapy 218**
+
+    | -----
+
+  COMPILED TEXT:
+    > 2. Immunotherapy date should be the same as the Date Therapy Initiated when immunotherapy is the only treatment administered
+
+========================================================================

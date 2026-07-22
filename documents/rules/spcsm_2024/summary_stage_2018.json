@@ -1,0 +1,83 @@
+[
+  {
+    "rule_id": "spcsm_2024:summary_stage_2018:summary_stage_2018:i1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section V Stage of Disease at Diagnosis",
+      "Summary Stage 2018"
+    ],
+    "anchor": "L3891-L3913:summary-stage-2018",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018 stores directly assigned Summary Stage 2018. This data item is effective for cases diagnosed 01/01/2018 and later.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:summary_stage_2018:summary_stage_2018:t2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section V Stage of Disease at Diagnosis",
+      "Summary Stage 2018"
+    ],
+    "anchor": "L3891-L3913:summary-stage-2018",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "| Code | Description |\n|---|---|\n| 0 | In situ |\n| 1 | Localized only |\n| 2 | Regional by direct extension only |\n| 3 | Regional lymph nodes only |\n| 4 | Regional by BOTH direct extension AND regional lymph nodes |\n| 7 | Distant site(s)/node(s) involved |\n| 8 | Benign, borderline |\n| 9 | Unknown if extension or metastasis (unstaged, unknown, or unspecified) Death certificate only (DCO) case |",
+    "codes": {
+      "0": "In situ",
+      "1": "Localized only",
+      "2": "Regional by direct extension only",
+      "3": "Regional lymph nodes only",
+      "4": "Regional by BOTH direct extension AND regional lymph nodes",
+      "7": "Distant site(s)/node(s) involved",
+      "8": "Benign, borderline*",
+      "9": "Unknown if extension or metastasis (unstaged, unknown, or unspecified) Death certificate only (DCO) case"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:summary_stage_2018:summary_stage_2018:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section V Stage of Disease at Diagnosis",
+      "Summary Stage 2018"
+    ],
+    "anchor": "L3891-L3913:summary-stage-2018",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Applicable for the following Summary Stage 2018 chapters: Brain, CNS Other, Intracranial Gland, Medulloblastoma.",
+    "codes": null,
+    "notes": null
+  }
+]

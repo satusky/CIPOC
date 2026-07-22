@@ -1,0 +1,118 @@
+========================================================================
+RULE COMPILATION REVIEW REPORT
+========================================================================
+Source: documents/markdown/SPCSM_2024_MainDoc.md
+Units emitted: 3  |  accepted: 3  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     1
+  instruction    2
+
+Accepted fidelity: min 1.00  mean 1.00
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED ACCEPTED UNITS (source vs. compiled, up to 5)
+------------------------------------------------------------------------
+
+[spcsm_2024:summary_stage_2018:summary_stage_2018:i1]  kind=instruction  items=[764]  fidelity=1.00
+  applies_to: {'dx_date_min': '2018-01-01'}
+  SOURCE REGION:
+    | ## Summary Stage 2018
+
+    | #### Item Length: 1 NAACCR Item #: 764 NAACCR Name: Summary Stage 2018 XML NAACCR ID: summaryStage2018
+
+    | *Summary Stage 2018 stores directly assigned Summary Stage 2018. This data item is effective for cases* diagnosed 01/01/2018 and later. Refer to SEER\*RSA for additional information.
+
+    | | Code | Description |
+    | |---|---|
+    | | 0 | In situ |
+    | | 1 | Localized only |
+    | | 2 | Regional by direct extension only |
+    | | 3 | Regional lymph nodes only |
+    | | 4 | Regional by BOTH direct extension AND regional lymph nodes |
+    | | 7 | Distant site(s)/node(s) involved |
+    | | 8 | Benign, borderline* |
+    | | 9 | Unknown if extension or metastasis (unstaged, unknown, or unspecified) Death certificate only (DCO) case |
+
+    | \*Applicable for the following Summary Stage 2018 chapters: Brain, CNS Other, Intracranial Gland, Medulloblastoma.
+
+    | **September 2023 Section V: Stage of Disease at Diagnosis 136**
+
+    | -----
+
+  COMPILED TEXT:
+    > Summary Stage 2018 stores directly assigned Summary Stage 2018. This data item is effective for cases diagnosed 01/01/2018 and later.
+
+[spcsm_2024:summary_stage_2018:summary_stage_2018:t2]  kind=code_table  items=[764]  fidelity=1.00
+  applies_to: {'dx_date_min': '2018-01-01'}
+  SOURCE REGION:
+    | ## Summary Stage 2018
+
+    | #### Item Length: 1 NAACCR Item #: 764 NAACCR Name: Summary Stage 2018 XML NAACCR ID: summaryStage2018
+
+    | *Summary Stage 2018 stores directly assigned Summary Stage 2018. This data item is effective for cases* diagnosed 01/01/2018 and later. Refer to SEER\*RSA for additional information.
+
+    | | Code | Description |
+    | |---|---|
+    | | 0 | In situ |
+    | | 1 | Localized only |
+    | | 2 | Regional by direct extension only |
+    | | 3 | Regional lymph nodes only |
+    | | 4 | Regional by BOTH direct extension AND regional lymph nodes |
+    | | 7 | Distant site(s)/node(s) involved |
+    | | 8 | Benign, borderline* |
+    | | 9 | Unknown if extension or metastasis (unstaged, unknown, or unspecified) Death certificate only (DCO) case |
+
+    | \*Applicable for the following Summary Stage 2018 chapters: Brain, CNS Other, Intracranial Gland, Medulloblastoma.
+
+    | **September 2023 Section V: Stage of Disease at Diagnosis 136**
+
+    | -----
+
+  COMPILED TEXT:
+    > | Code | Description |
+    > |---|---|
+    > | 0 | In situ |
+    > | 1 | Localized only |
+    > | 2 | Regional by direct extension only |
+    > | 3 | Regional lymph nodes only |
+    > | 4 | Regional by BOTH direct extension AND regional lymph nodes |
+    > | 7 | Distant site(s)/node(s) involved |
+    > | 8 | Benign, borderline |
+    > | 9 | Unknown if extension or metastasis (unstaged, unknown, or unspecified) Death certificate only (DCO) case |
+
+[spcsm_2024:summary_stage_2018:summary_stage_2018:i3]  kind=instruction  items=[764]  fidelity=1.00
+  applies_to: {'dx_date_min': '2018-01-01'}
+  SOURCE REGION:
+    | ## Summary Stage 2018
+
+    | #### Item Length: 1 NAACCR Item #: 764 NAACCR Name: Summary Stage 2018 XML NAACCR ID: summaryStage2018
+
+    | *Summary Stage 2018 stores directly assigned Summary Stage 2018. This data item is effective for cases* diagnosed 01/01/2018 and later. Refer to SEER\*RSA for additional information.
+
+    | | Code | Description |
+    | |---|---|
+    | | 0 | In situ |
+    | | 1 | Localized only |
+    | | 2 | Regional by direct extension only |
+    | | 3 | Regional lymph nodes only |
+    | | 4 | Regional by BOTH direct extension AND regional lymph nodes |
+    | | 7 | Distant site(s)/node(s) involved |
+    | | 8 | Benign, borderline* |
+    | | 9 | Unknown if extension or metastasis (unstaged, unknown, or unspecified) Death certificate only (DCO) case |
+
+    | \*Applicable for the following Summary Stage 2018 chapters: Brain, CNS Other, Intracranial Gland, Medulloblastoma.
+
+    | **September 2023 Section V: Stage of Disease at Diagnosis 136**
+
+    | -----
+
+  COMPILED TEXT:
+    > Applicable for the following Summary Stage 2018 chapters: Brain, CNS Other, Intracranial Gland, Medulloblastoma.
+
+========================================================================

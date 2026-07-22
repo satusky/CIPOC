@@ -1,0 +1,716 @@
+========================================================================
+RULE COMPILATION REVIEW REPORT
+========================================================================
+Source: documents/markdown/SPCSM_2024_MainDoc.md
+Units emitted: 70  |  accepted: 70  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     7
+  definition     2
+  example        18
+  instruction    37
+  priority_rule  6
+
+Accepted fidelity: min 1.00  mean 1.00
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED ACCEPTED UNITS (source vs. compiled, up to 5)
+------------------------------------------------------------------------
+
+[spcsm_2024:tumor_size_summary:tumor_size_summary:d1]  kind=definition  items=[756]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Tumor Size Summary
+
+    | #### Item Length: 3 NAACCR Item #: 756 NAACCR Name: Tumor Size Summary XML NAACCR ID: tumorSizeSummary
+
+    | *Tumor Size Summary is the most accurate measurement of a solid primary tumor, usually measured on the* surgical resection specimen. Tumor size is one indication of the extent of disease. As such, it is used by both clinicians and researchers. Tumor size that is independent of stage is also useful for quality assurance efforts.
+
+    | | Code | Description |
+    | |---|---|
+    | | 000 | No mass/tumor found |
+    | | 001 | 1 mm or described as less than 1 mm (0.1 cm or less than 0.1 cm) |
+    | | 002-988 | Exact size in millimeters (2 mm-988 mm) (0.2 cm to 98.8 cm) |
+    | | 989 | 989 millimeters or larger (98.9 cm or larger) |
+    | | 990 | Microscopic focus or foci only and no size of focus is given |
+    | | 998 | Alternate descriptions of tumor size for specific sites: |
+
+    | Familial/multiple polyposis: -Rectosigmoid and rectum (C19.9, C20.9) -Colon (C18.0, C18.2-C18.9) If no size is documented: Circumferential: -Esophagus (C15.0-C15.5, C15.8, C15.9) Diffuse; widespread: 3/4s or more; linitis plastica: -Stomach and Esophagus GE Junction (C16.0-C16.6, C16.8, C16.9) Diffuse, entire lung or NOS: -Lung and main stem bronchus (C34.0-C34.3, C34.8, C34.9) Diffuse: -Breast (C50.0-C50.6, C50.8, C50.9) 999 Unknown; size not stated; Not documented in patient record; Size of tumor cannot be assessed;
+
+    | No excisional biopsy or tumor resection done; The only measurement(s) describes pieces or chips; Not applicable
+
+    | **Note: All measurements should be in millimeters (mm).**
+
+  COMPILED TEXT:
+    > Tumor Size Summary is the most accurate measurement of a solid primary tumor, usually measured on the surgical resection specimen.
+
+[spcsm_2024:tumor_size_summary:coding_instructions:e6]  kind=example  items=[756]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. Record the size in the specified order
+
+    | a. Size measured on the surgical resection specimen, when surgery is administered as the
+
+    | first definitive treatment, i.e., no pre-surgical treatment administered. i. If there is a discrepancy among tumor size measurements in the various sections of
+
+    | the pathology report, code the size from the synoptic report (also known as CAP protocol or pathology report checklist).
+
+    | **September 2023 Section IV: Description of this Neoplasm 124**
+
+    | -----
+
+    | ii. If only a text report is available, use: final diagnosis, microscopic, or gross
+
+    | examination, in that order. ***Example 1:*** Chest x-ray shows 3.5 cm mass; the pathology report from the surgery states that the same mass is malignant and measures 2.8 cm. Record tumor size as 028 (28 mm). ***Example 2:*** Pathology report states lung carcinoma is 2.1 cm x 3.2 cm x 1.4 cm. Record tumor size as 032 (32 mm). b. If neoadjuvant therapy followed by surgery, do not record the size from the pathologic
+
+    | specimen. Code the largest size of tumor prior to neoadjuvant treatment; if unknown code size as 999.
+
+    | ***Example: Patient has a 2.2 cm mass in the oropharynx; find needle aspiration of mass***
+
+    | confirms squamous cell carcinoma. Patient receives a course of neoadjuvant combination chemotherapy. Pathologic size after total resection is 2.8 cm. Record tumor size as 022 (22 mm).
+
+    | | c. | If no surgical resection, then largest measurement of the tumor from the imaging, physical exam, or other diagnostic procedures in this order of priority prior to any other form of treatment. |
+    | |---|---|
+    | | d. | If a, b, and c do not apply, the largest size from all information available within four months of the date of diagnosis, in the absence of disease progression. |
+
+    | 2. Tumor size is the diameter of the tumor, not the depth or thickness of the tumor.
+    | 3. Record tumor size stated less than or greater than as follows
+
+    | a. If tumor size is reported as less than x mm or less than x cm, the reported tumor size
+
+    | should be 1 mm less ***Examples:*** Tumor size is stated as: < 1 cm, code as 009; < 2 cm, code as 019, < 3 cm, code as 029; < 4 cm, code as 039; < 5 cm is coded as 049. If stated as less than 1 mm, use code 001. b. If tumor size is reported as more than or greater than x mm or more than x cm, code size
+
+    | as 1 mm more ***Examples:*** Tumor size is stated as: >10 mm or >1 cm, code as 011; > 2 cm, code as 021; > 3 cm, code as 031; > 4 cm, code as 041; > 5 cm, code as 051. If described as anything greater than 989 mm (98.9 cm), code as 989. c. If tumor size is reported to be between two sizes, record tumor size as the midpoint
+
+    | between the two: i.e., add the two sizes together and then divide by two ***Examples:*** Tumor size is between 2 and 3 cm, code as 025. Code size as 025 since 2 + 3 =5 divided by 2 = 2.5 cm (or 025 mm).
+
+    | 4. Record the higher tumor size when stated as a range
+
+    | ***Example: Tumor size is 8-10 mm or tumor size is 8 to 10 mm.*** Code size as 010 since 10 mm is the higher of the values in the range.
+
+    | 5. Round the tumor size only if it is described in fractions of millimeters
+
+    | | a. | When tumor size is greater than 1 millimeter, round tenths of millimeters in the 1-4 range down to the nearest whole millimeter and round tenths of millimeters in the 5-9 range up to the nearest whole millimeter. See Exception for breast cancer. |
+    | |---|---|
+    | | b. | Do not round tumor size expressed in centimeters to the nearest whole centimeter; rather, convert the measurement to millimeters by moving the decimal point one space to the right |
+
+    | **September 2023 Section IV: Description of this Neoplasm 125**
+
+    | -----
+
+    | ***Note 1:*** Record tumor size as 001 (do not round down to 000) when the largest dimension of a tumor is less than 1 millimeter (between 0.1 and 0.9 mm). ***Note 2:*** Code 001 when tumor size is 1 mm. ***Exception to rounding rules for BREAST primaries:*** Round tumor sizes greater than 1.0 mm and up to 2.4 mm to 2 mm (002). The purpose of this exception is so that the size recorded in the Tumor Size data item will derive the correct AJCC TNM Primary Tumor (T) category for breast primaries. Do not apply this instruction to any other site.
+
+    | #### Examples:
+
+    | Breast cancer described as 6.5 millimeters in size. Round up to 7 mm and code as 007. Breast cancer described as 1.3 mm in size. Round up to 2 mm and code as 002. 2.3 millimeters cancer in a polyp. Round down to 2 mm and code 002. Hypopharynx: Focus of cancer described as 1.4 mm in size. Round down to 1 mm and code as 001. 5.2 cm breast cancer. Convert to millimeters and code 052. 2.5 cm rectal cancer. Do not round, record as 025 millimeters.
+
+    | 6. Priority of imaging/radiographic technique
+
+    | | a. | Use information on size from imaging/radiographic techniques to code the tumor size when there is no more specific size information from pathology or operative report. It should be taken as a lower priority, but over a physical exam. |
+    | |---|---|
+    | | b. | Record the largest size in the record when there are tumor size discrepancies among imaging and radiographic reports, regardless of the imaging technique reports unless the physician specifies which imaging is most accurate |
+
+    | 7. Code the size of the primary tumor, not the size of the polyp, ulcer, cyst, or distant metastasis.
+
+    | However, if the tumor is described as a "cystic mass" and only the size of the entire mass is given, code the size of the entire mass, since the cysts are part of the tumor itself.
+
+    | 8. Record the size of the invasive component, if given.
+
+    | a. If both an in situ and an invasive component are present and the invasive component is
+
+    | measured, record the size of the invasive component even if it is smaller
+
+    | ***Example: Tumor is mixed in situ and invasive adenocarcinoma, total 3.7 cm in size, of***
+
+    | which 1.4 cm is invasive. Record tumor size as 014 (14 mm)
+
+    | b. If the size of the invasive component is not given, record the size of the entire tumor from
+
+    | the surgical report, pathology report, radiology report, or clinical examination. ***Example 1:*** A breast tumor with infiltrating duct carcinoma with extensive in situ component; total size 2.3 cm. Record tumor size as 023 (23 mm). ***Example 2:*** Duct carcinoma in situ measuring 1.9 cm with an area of invasive ductal carcinoma. Record tumor size as 019 (19 mm)
+
+    | 9. Record the largest dimension or diameter of tumor, whether it is from an excisional biopsy
+
+    | specimen or the complete resection of the primary tumor ***Example 1:*** Tumor is described as 2.4 x 5.1 x 1.8 cm in size. Record tumor size as 051 (51 mm). ***Example 2:*** Anal canal tumor is 2.5 cm from proximal to distal (3.5 cm in circumference). Record tumor size as 035. The circumferential measurement is the largest measurement in this example. In this case, the pathologist usually cuts the anus and rectum open like a tube; the circumference is measured flat.
+
+    | **September 2023 Section IV: Description of this Neoplasm 126**
+
+    | -----
+
+    | 10. Record the size as stated for purely in situ lesions
+    | 11. Multifocal/multicentric tumors: Code the size of the largest invasive tumor, or the largest in
+
+    | situ tumor if all tumors are in situ, when the tumor is multi-focal or when multiple tumors are reported as a single primary.
+
+    | 12. Assign code 000 when
+
+    | a. No residual tumor is found
+
+    | i. Neoadjuvant therapy has been administered and the resection shows no residual
+
+    | **tumor**
+
+    | | b. | Schema is Cervical Lymph Nodes and Unknown Primary 00060 |
+    | |---|---|
+    | | c. | EOD Primary Tumor is coded 800 (No evidence of primary tumor) for any schema except for those listed in Coding Instruction 14 |
+
+    | 13. Assign tumor size for benign and borderline tumors in the schemas Brain, CNS Other,
+
+    | Intracranial Gland, and Medulloblastoma when provided; do not default to 999
+
+    | 14. Assign code 999 when
+
+    | a. Size is unknown and for the following sites and schemas/schema IDs
+
+    | i. Any case coded to primary site C420, C421, C423, C424, C770-C779, or C809 ii. HemeRetic 00830
+
+    | 1. Excluding Spleen (C422) iii. Kaposi Sarcoma 00458 iv. Lymphoma 00790 v. Lymphoma-CLL/SLL 00795 vi. Melanoma Choroid and Ciliary Body 00672 vii. Melanoma Iris 00671 viii. Plasma Cell Disorders 00822 ix. Plasma Cell Myeloma 00821 b. The only measurement describes pieces or chips in a pathology report. Do not add the
+
+    | size of pieces or chips together to create a whole; they may not be from the same location, or they may represent only a very small portion of a large tumor. However, when the pathologist states an aggregate or composite size (determined by fitting the tumor pieces together and measuring the total size), record that size.
+
+    | | c. | The only measurement is for calcifications that span given distance or a cluster of microcalcifications. Do not record the size of calcifications as tumor size. If there is no measurement of the mass or tumor, record 999. |
+    | |---|---|
+    | | d. | Neoadjuvant therapy has been administered and resection was performed. Do not use a post-neoadjuvant size to code pathologic tumor size; however, you may use the clinical tumor size if available. |
+
+    | 15. Document the information to support coded tumor size in the appropriate text data item of the
+
+    | abstract
+
+    | **September 2023 Section IV: Description of this Neoplasm 127**
+
+    | -----
+
+    | Tumor size is important for staging of tumors in the following table of schemas. For more information about schemas and schema IDs, go to the SSDI Manual, Appendix A.
+
+    | **Table. Schemas for which Tumor Size Affects Staging**
+
+    | #### Schema Schema ID
+
+    | Adrenal Gland 00760
+
+    | Anus 00210
+
+    | Bile Duct Distal 00260 Bile Ducts Intrahepatic 00230 Bone Appendicular Skeleton 00381 Bone Pelvis 00383 Breast 00480 Buccal Mucosa 00076 Cervix 00520 Conjunctiva 00650 Corpus Sarcoma 00541 Cutaneous Carcinoma of Head and Neck 00150 Floor of Mouth 00074
+
+    | GIST 00430 Gum 00073
+
+    | Hypopharynx 00112 Kidney Parenchyma 00600 Lacrimal Gland 00690
+
+    | Lip 00071 Liver 00220 Lung 00360
+
+    | Major Salivary Glands 00080 Merkel Cell Skin 00460 Mouth Other 00077 NET Adrenal Gland 00770 NET Appendix 00320 NET Colon and Rectum 00330 NET Pancreas 00340 NET Stomach 00290 Orbital Sarcoma 00700 Oropharynx (p16-) 00111 Oropharynx HPV-Mediated (p16+) 00100 Palate Hard 00075 Pancreas 00280 Primary Cutaneous Lymphomas (excluding MF and SS) 00812 Retroperitoneum 00440 Skin Eyelid 00640 Soft Tissue Head and Neck 00400 Soft Tissue Trunk and Extremities 00410 Thyroid 00730 Thyroid Medullary 00740 Tongue Anterior 00072 Vagina 00510
+
+    | Vulva 00500
+
+    | **September 2023 Section IV: Description of this Neoplasm 128**
+
+    | -----
+
+  COMPILED TEXT:
+    > Example 2: Pathology report states lung carcinoma is 2.1 cm x 3.2 cm x 1.4 cm. Record tumor size as 032 (32 mm).
+
+[spcsm_2024:tumor_size_summary:coding_instructions:i20]  kind=instruction  items=[756]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. Record the size in the specified order
+
+    | a. Size measured on the surgical resection specimen, when surgery is administered as the
+
+    | first definitive treatment, i.e., no pre-surgical treatment administered. i. If there is a discrepancy among tumor size measurements in the various sections of
+
+    | the pathology report, code the size from the synoptic report (also known as CAP protocol or pathology report checklist).
+
+    | **September 2023 Section IV: Description of this Neoplasm 124**
+
+    | -----
+
+    | ii. If only a text report is available, use: final diagnosis, microscopic, or gross
+
+    | examination, in that order. ***Example 1:*** Chest x-ray shows 3.5 cm mass; the pathology report from the surgery states that the same mass is malignant and measures 2.8 cm. Record tumor size as 028 (28 mm). ***Example 2:*** Pathology report states lung carcinoma is 2.1 cm x 3.2 cm x 1.4 cm. Record tumor size as 032 (32 mm). b. If neoadjuvant therapy followed by surgery, do not record the size from the pathologic
+
+    | specimen. Code the largest size of tumor prior to neoadjuvant treatment; if unknown code size as 999.
+
+    | ***Example: Patient has a 2.2 cm mass in the oropharynx; find needle aspiration of mass***
+
+    | confirms squamous cell carcinoma. Patient receives a course of neoadjuvant combination chemotherapy. Pathologic size after total resection is 2.8 cm. Record tumor size as 022 (22 mm).
+
+    | | c. | If no surgical resection, then largest measurement of the tumor from the imaging, physical exam, or other diagnostic procedures in this order of priority prior to any other form of treatment. |
+    | |---|---|
+    | | d. | If a, b, and c do not apply, the largest size from all information available within four months of the date of diagnosis, in the absence of disease progression. |
+
+    | 2. Tumor size is the diameter of the tumor, not the depth or thickness of the tumor.
+    | 3. Record tumor size stated less than or greater than as follows
+
+    | a. If tumor size is reported as less than x mm or less than x cm, the reported tumor size
+
+    | should be 1 mm less ***Examples:*** Tumor size is stated as: < 1 cm, code as 009; < 2 cm, code as 019, < 3 cm, code as 029; < 4 cm, code as 039; < 5 cm is coded as 049. If stated as less than 1 mm, use code 001. b. If tumor size is reported as more than or greater than x mm or more than x cm, code size
+
+    | as 1 mm more ***Examples:*** Tumor size is stated as: >10 mm or >1 cm, code as 011; > 2 cm, code as 021; > 3 cm, code as 031; > 4 cm, code as 041; > 5 cm, code as 051. If described as anything greater than 989 mm (98.9 cm), code as 989. c. If tumor size is reported to be between two sizes, record tumor size as the midpoint
+
+    | between the two: i.e., add the two sizes together and then divide by two ***Examples:*** Tumor size is between 2 and 3 cm, code as 025. Code size as 025 since 2 + 3 =5 divided by 2 = 2.5 cm (or 025 mm).
+
+    | 4. Record the higher tumor size when stated as a range
+
+    | ***Example: Tumor size is 8-10 mm or tumor size is 8 to 10 mm.*** Code size as 010 since 10 mm is the higher of the values in the range.
+
+    | 5. Round the tumor size only if it is described in fractions of millimeters
+
+    | | a. | When tumor size is greater than 1 millimeter, round tenths of millimeters in the 1-4 range down to the nearest whole millimeter and round tenths of millimeters in the 5-9 range up to the nearest whole millimeter. See Exception for breast cancer. |
+    | |---|---|
+    | | b. | Do not round tumor size expressed in centimeters to the nearest whole centimeter; rather, convert the measurement to millimeters by moving the decimal point one space to the right |
+
+    | **September 2023 Section IV: Description of this Neoplasm 125**
+
+    | -----
+
+    | ***Note 1:*** Record tumor size as 001 (do not round down to 000) when the largest dimension of a tumor is less than 1 millimeter (between 0.1 and 0.9 mm). ***Note 2:*** Code 001 when tumor size is 1 mm. ***Exception to rounding rules for BREAST primaries:*** Round tumor sizes greater than 1.0 mm and up to 2.4 mm to 2 mm (002). The purpose of this exception is so that the size recorded in the Tumor Size data item will derive the correct AJCC TNM Primary Tumor (T) category for breast primaries. Do not apply this instruction to any other site.
+
+    | #### Examples:
+
+    | Breast cancer described as 6.5 millimeters in size. Round up to 7 mm and code as 007. Breast cancer described as 1.3 mm in size. Round up to 2 mm and code as 002. 2.3 millimeters cancer in a polyp. Round down to 2 mm and code 002. Hypopharynx: Focus of cancer described as 1.4 mm in size. Round down to 1 mm and code as 001. 5.2 cm breast cancer. Convert to millimeters and code 052. 2.5 cm rectal cancer. Do not round, record as 025 millimeters.
+
+    | 6. Priority of imaging/radiographic technique
+
+    | | a. | Use information on size from imaging/radiographic techniques to code the tumor size when there is no more specific size information from pathology or operative report. It should be taken as a lower priority, but over a physical exam. |
+    | |---|---|
+    | | b. | Record the largest size in the record when there are tumor size discrepancies among imaging and radiographic reports, regardless of the imaging technique reports unless the physician specifies which imaging is most accurate |
+
+    | 7. Code the size of the primary tumor, not the size of the polyp, ulcer, cyst, or distant metastasis.
+
+    | However, if the tumor is described as a "cystic mass" and only the size of the entire mass is given, code the size of the entire mass, since the cysts are part of the tumor itself.
+
+    | 8. Record the size of the invasive component, if given.
+
+    | a. If both an in situ and an invasive component are present and the invasive component is
+
+    | measured, record the size of the invasive component even if it is smaller
+
+    | ***Example: Tumor is mixed in situ and invasive adenocarcinoma, total 3.7 cm in size, of***
+
+    | which 1.4 cm is invasive. Record tumor size as 014 (14 mm)
+
+    | b. If the size of the invasive component is not given, record the size of the entire tumor from
+
+    | the surgical report, pathology report, radiology report, or clinical examination. ***Example 1:*** A breast tumor with infiltrating duct carcinoma with extensive in situ component; total size 2.3 cm. Record tumor size as 023 (23 mm). ***Example 2:*** Duct carcinoma in situ measuring 1.9 cm with an area of invasive ductal carcinoma. Record tumor size as 019 (19 mm)
+
+    | 9. Record the largest dimension or diameter of tumor, whether it is from an excisional biopsy
+
+    | specimen or the complete resection of the primary tumor ***Example 1:*** Tumor is described as 2.4 x 5.1 x 1.8 cm in size. Record tumor size as 051 (51 mm). ***Example 2:*** Anal canal tumor is 2.5 cm from proximal to distal (3.5 cm in circumference). Record tumor size as 035. The circumferential measurement is the largest measurement in this example. In this case, the pathologist usually cuts the anus and rectum open like a tube; the circumference is measured flat.
+
+    | **September 2023 Section IV: Description of this Neoplasm 126**
+
+    | -----
+
+    | 10. Record the size as stated for purely in situ lesions
+    | 11. Multifocal/multicentric tumors: Code the size of the largest invasive tumor, or the largest in
+
+    | situ tumor if all tumors are in situ, when the tumor is multi-focal or when multiple tumors are reported as a single primary.
+
+    | 12. Assign code 000 when
+
+    | a. No residual tumor is found
+
+    | i. Neoadjuvant therapy has been administered and the resection shows no residual
+
+    | **tumor**
+
+    | | b. | Schema is Cervical Lymph Nodes and Unknown Primary 00060 |
+    | |---|---|
+    | | c. | EOD Primary Tumor is coded 800 (No evidence of primary tumor) for any schema except for those listed in Coding Instruction 14 |
+
+    | 13. Assign tumor size for benign and borderline tumors in the schemas Brain, CNS Other,
+
+    | Intracranial Gland, and Medulloblastoma when provided; do not default to 999
+
+    | 14. Assign code 999 when
+
+    | a. Size is unknown and for the following sites and schemas/schema IDs
+
+    | i. Any case coded to primary site C420, C421, C423, C424, C770-C779, or C809 ii. HemeRetic 00830
+
+    | 1. Excluding Spleen (C422) iii. Kaposi Sarcoma 00458 iv. Lymphoma 00790 v. Lymphoma-CLL/SLL 00795 vi. Melanoma Choroid and Ciliary Body 00672 vii. Melanoma Iris 00671 viii. Plasma Cell Disorders 00822 ix. Plasma Cell Myeloma 00821 b. The only measurement describes pieces or chips in a pathology report. Do not add the
+
+    | size of pieces or chips together to create a whole; they may not be from the same location, or they may represent only a very small portion of a large tumor. However, when the pathologist states an aggregate or composite size (determined by fitting the tumor pieces together and measuring the total size), record that size.
+
+    | | c. | The only measurement is for calcifications that span given distance or a cluster of microcalcifications. Do not record the size of calcifications as tumor size. If there is no measurement of the mass or tumor, record 999. |
+    | |---|---|
+    | | d. | Neoadjuvant therapy has been administered and resection was performed. Do not use a post-neoadjuvant size to code pathologic tumor size; however, you may use the clinical tumor size if available. |
+
+    | 15. Document the information to support coded tumor size in the appropriate text data item of the
+
+    | abstract
+
+    | **September 2023 Section IV: Description of this Neoplasm 127**
+
+    | -----
+
+    | Tumor size is important for staging of tumors in the following table of schemas. For more information about schemas and schema IDs, go to the SSDI Manual, Appendix A.
+
+    | **Table. Schemas for which Tumor Size Affects Staging**
+
+    | #### Schema Schema ID
+
+    | Adrenal Gland 00760
+
+    | Anus 00210
+
+    | Bile Duct Distal 00260 Bile Ducts Intrahepatic 00230 Bone Appendicular Skeleton 00381 Bone Pelvis 00383 Breast 00480 Buccal Mucosa 00076 Cervix 00520 Conjunctiva 00650 Corpus Sarcoma 00541 Cutaneous Carcinoma of Head and Neck 00150 Floor of Mouth 00074
+
+    | GIST 00430 Gum 00073
+
+    | Hypopharynx 00112 Kidney Parenchyma 00600 Lacrimal Gland 00690
+
+    | Lip 00071 Liver 00220 Lung 00360
+
+    | Major Salivary Glands 00080 Merkel Cell Skin 00460 Mouth Other 00077 NET Adrenal Gland 00770 NET Appendix 00320 NET Colon and Rectum 00330 NET Pancreas 00340 NET Stomach 00290 Orbital Sarcoma 00700 Oropharynx (p16-) 00111 Oropharynx HPV-Mediated (p16+) 00100 Palate Hard 00075 Pancreas 00280 Primary Cutaneous Lymphomas (excluding MF and SS) 00812 Retroperitoneum 00440 Skin Eyelid 00640 Soft Tissue Head and Neck 00400 Soft Tissue Trunk and Extremities 00410 Thyroid 00730 Thyroid Medullary 00740 Tongue Anterior 00072 Vagina 00510
+
+    | Vulva 00500
+
+    | **September 2023 Section IV: Description of this Neoplasm 128**
+
+    | -----
+
+  COMPILED TEXT:
+    > 5. Round the tumor size only if it is described in fractions of millimeters
+
+[spcsm_2024:tumor_size_summary:coding_instructions:p34]  kind=priority_rule  items=[756]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. Record the size in the specified order
+
+    | a. Size measured on the surgical resection specimen, when surgery is administered as the
+
+    | first definitive treatment, i.e., no pre-surgical treatment administered. i. If there is a discrepancy among tumor size measurements in the various sections of
+
+    | the pathology report, code the size from the synoptic report (also known as CAP protocol or pathology report checklist).
+
+    | **September 2023 Section IV: Description of this Neoplasm 124**
+
+    | -----
+
+    | ii. If only a text report is available, use: final diagnosis, microscopic, or gross
+
+    | examination, in that order. ***Example 1:*** Chest x-ray shows 3.5 cm mass; the pathology report from the surgery states that the same mass is malignant and measures 2.8 cm. Record tumor size as 028 (28 mm). ***Example 2:*** Pathology report states lung carcinoma is 2.1 cm x 3.2 cm x 1.4 cm. Record tumor size as 032 (32 mm). b. If neoadjuvant therapy followed by surgery, do not record the size from the pathologic
+
+    | specimen. Code the largest size of tumor prior to neoadjuvant treatment; if unknown code size as 999.
+
+    | ***Example: Patient has a 2.2 cm mass in the oropharynx; find needle aspiration of mass***
+
+    | confirms squamous cell carcinoma. Patient receives a course of neoadjuvant combination chemotherapy. Pathologic size after total resection is 2.8 cm. Record tumor size as 022 (22 mm).
+
+    | | c. | If no surgical resection, then largest measurement of the tumor from the imaging, physical exam, or other diagnostic procedures in this order of priority prior to any other form of treatment. |
+    | |---|---|
+    | | d. | If a, b, and c do not apply, the largest size from all information available within four months of the date of diagnosis, in the absence of disease progression. |
+
+    | 2. Tumor size is the diameter of the tumor, not the depth or thickness of the tumor.
+    | 3. Record tumor size stated less than or greater than as follows
+
+    | a. If tumor size is reported as less than x mm or less than x cm, the reported tumor size
+
+    | should be 1 mm less ***Examples:*** Tumor size is stated as: < 1 cm, code as 009; < 2 cm, code as 019, < 3 cm, code as 029; < 4 cm, code as 039; < 5 cm is coded as 049. If stated as less than 1 mm, use code 001. b. If tumor size is reported as more than or greater than x mm or more than x cm, code size
+
+    | as 1 mm more ***Examples:*** Tumor size is stated as: >10 mm or >1 cm, code as 011; > 2 cm, code as 021; > 3 cm, code as 031; > 4 cm, code as 041; > 5 cm, code as 051. If described as anything greater than 989 mm (98.9 cm), code as 989. c. If tumor size is reported to be between two sizes, record tumor size as the midpoint
+
+    | between the two: i.e., add the two sizes together and then divide by two ***Examples:*** Tumor size is between 2 and 3 cm, code as 025. Code size as 025 since 2 + 3 =5 divided by 2 = 2.5 cm (or 025 mm).
+
+    | 4. Record the higher tumor size when stated as a range
+
+    | ***Example: Tumor size is 8-10 mm or tumor size is 8 to 10 mm.*** Code size as 010 since 10 mm is the higher of the values in the range.
+
+    | 5. Round the tumor size only if it is described in fractions of millimeters
+
+    | | a. | When tumor size is greater than 1 millimeter, round tenths of millimeters in the 1-4 range down to the nearest whole millimeter and round tenths of millimeters in the 5-9 range up to the nearest whole millimeter. See Exception for breast cancer. |
+    | |---|---|
+    | | b. | Do not round tumor size expressed in centimeters to the nearest whole centimeter; rather, convert the measurement to millimeters by moving the decimal point one space to the right |
+
+    | **September 2023 Section IV: Description of this Neoplasm 125**
+
+    | -----
+
+    | ***Note 1:*** Record tumor size as 001 (do not round down to 000) when the largest dimension of a tumor is less than 1 millimeter (between 0.1 and 0.9 mm). ***Note 2:*** Code 001 when tumor size is 1 mm. ***Exception to rounding rules for BREAST primaries:*** Round tumor sizes greater than 1.0 mm and up to 2.4 mm to 2 mm (002). The purpose of this exception is so that the size recorded in the Tumor Size data item will derive the correct AJCC TNM Primary Tumor (T) category for breast primaries. Do not apply this instruction to any other site.
+
+    | #### Examples:
+
+    | Breast cancer described as 6.5 millimeters in size. Round up to 7 mm and code as 007. Breast cancer described as 1.3 mm in size. Round up to 2 mm and code as 002. 2.3 millimeters cancer in a polyp. Round down to 2 mm and code 002. Hypopharynx: Focus of cancer described as 1.4 mm in size. Round down to 1 mm and code as 001. 5.2 cm breast cancer. Convert to millimeters and code 052. 2.5 cm rectal cancer. Do not round, record as 025 millimeters.
+
+    | 6. Priority of imaging/radiographic technique
+
+    | | a. | Use information on size from imaging/radiographic techniques to code the tumor size when there is no more specific size information from pathology or operative report. It should be taken as a lower priority, but over a physical exam. |
+    | |---|---|
+    | | b. | Record the largest size in the record when there are tumor size discrepancies among imaging and radiographic reports, regardless of the imaging technique reports unless the physician specifies which imaging is most accurate |
+
+    | 7. Code the size of the primary tumor, not the size of the polyp, ulcer, cyst, or distant metastasis.
+
+    | However, if the tumor is described as a "cystic mass" and only the size of the entire mass is given, code the size of the entire mass, since the cysts are part of the tumor itself.
+
+    | 8. Record the size of the invasive component, if given.
+
+    | a. If both an in situ and an invasive component are present and the invasive component is
+
+    | measured, record the size of the invasive component even if it is smaller
+
+    | ***Example: Tumor is mixed in situ and invasive adenocarcinoma, total 3.7 cm in size, of***
+
+    | which 1.4 cm is invasive. Record tumor size as 014 (14 mm)
+
+    | b. If the size of the invasive component is not given, record the size of the entire tumor from
+
+    | the surgical report, pathology report, radiology report, or clinical examination. ***Example 1:*** A breast tumor with infiltrating duct carcinoma with extensive in situ component; total size 2.3 cm. Record tumor size as 023 (23 mm). ***Example 2:*** Duct carcinoma in situ measuring 1.9 cm with an area of invasive ductal carcinoma. Record tumor size as 019 (19 mm)
+
+    | 9. Record the largest dimension or diameter of tumor, whether it is from an excisional biopsy
+
+    | specimen or the complete resection of the primary tumor ***Example 1:*** Tumor is described as 2.4 x 5.1 x 1.8 cm in size. Record tumor size as 051 (51 mm). ***Example 2:*** Anal canal tumor is 2.5 cm from proximal to distal (3.5 cm in circumference). Record tumor size as 035. The circumferential measurement is the largest measurement in this example. In this case, the pathologist usually cuts the anus and rectum open like a tube; the circumference is measured flat.
+
+    | **September 2023 Section IV: Description of this Neoplasm 126**
+
+    | -----
+
+    | 10. Record the size as stated for purely in situ lesions
+    | 11. Multifocal/multicentric tumors: Code the size of the largest invasive tumor, or the largest in
+
+    | situ tumor if all tumors are in situ, when the tumor is multi-focal or when multiple tumors are reported as a single primary.
+
+    | 12. Assign code 000 when
+
+    | a. No residual tumor is found
+
+    | i. Neoadjuvant therapy has been administered and the resection shows no residual
+
+    | **tumor**
+
+    | | b. | Schema is Cervical Lymph Nodes and Unknown Primary 00060 |
+    | |---|---|
+    | | c. | EOD Primary Tumor is coded 800 (No evidence of primary tumor) for any schema except for those listed in Coding Instruction 14 |
+
+    | 13. Assign tumor size for benign and borderline tumors in the schemas Brain, CNS Other,
+
+    | Intracranial Gland, and Medulloblastoma when provided; do not default to 999
+
+    | 14. Assign code 999 when
+
+    | a. Size is unknown and for the following sites and schemas/schema IDs
+
+    | i. Any case coded to primary site C420, C421, C423, C424, C770-C779, or C809 ii. HemeRetic 00830
+
+    | 1. Excluding Spleen (C422) iii. Kaposi Sarcoma 00458 iv. Lymphoma 00790 v. Lymphoma-CLL/SLL 00795 vi. Melanoma Choroid and Ciliary Body 00672 vii. Melanoma Iris 00671 viii. Plasma Cell Disorders 00822 ix. Plasma Cell Myeloma 00821 b. The only measurement describes pieces or chips in a pathology report. Do not add the
+
+    | size of pieces or chips together to create a whole; they may not be from the same location, or they may represent only a very small portion of a large tumor. However, when the pathologist states an aggregate or composite size (determined by fitting the tumor pieces together and measuring the total size), record that size.
+
+    | | c. | The only measurement is for calcifications that span given distance or a cluster of microcalcifications. Do not record the size of calcifications as tumor size. If there is no measurement of the mass or tumor, record 999. |
+    | |---|---|
+    | | d. | Neoadjuvant therapy has been administered and resection was performed. Do not use a post-neoadjuvant size to code pathologic tumor size; however, you may use the clinical tumor size if available. |
+
+    | 15. Document the information to support coded tumor size in the appropriate text data item of the
+
+    | abstract
+
+    | **September 2023 Section IV: Description of this Neoplasm 127**
+
+    | -----
+
+    | Tumor size is important for staging of tumors in the following table of schemas. For more information about schemas and schema IDs, go to the SSDI Manual, Appendix A.
+
+    | **Table. Schemas for which Tumor Size Affects Staging**
+
+    | #### Schema Schema ID
+
+    | Adrenal Gland 00760
+
+    | Anus 00210
+
+    | Bile Duct Distal 00260 Bile Ducts Intrahepatic 00230 Bone Appendicular Skeleton 00381 Bone Pelvis 00383 Breast 00480 Buccal Mucosa 00076 Cervix 00520 Conjunctiva 00650 Corpus Sarcoma 00541 Cutaneous Carcinoma of Head and Neck 00150 Floor of Mouth 00074
+
+    | GIST 00430 Gum 00073
+
+    | Hypopharynx 00112 Kidney Parenchyma 00600 Lacrimal Gland 00690
+
+    | Lip 00071 Liver 00220 Lung 00360
+
+    | Major Salivary Glands 00080 Merkel Cell Skin 00460 Mouth Other 00077 NET Adrenal Gland 00770 NET Appendix 00320 NET Colon and Rectum 00330 NET Pancreas 00340 NET Stomach 00290 Orbital Sarcoma 00700 Oropharynx (p16-) 00111 Oropharynx HPV-Mediated (p16+) 00100 Palate Hard 00075 Pancreas 00280 Primary Cutaneous Lymphomas (excluding MF and SS) 00812 Retroperitoneum 00440 Skin Eyelid 00640 Soft Tissue Head and Neck 00400 Soft Tissue Trunk and Extremities 00410 Thyroid 00730 Thyroid Medullary 00740 Tongue Anterior 00072 Vagina 00510
+
+    | Vulva 00500
+
+    | **September 2023 Section IV: Description of this Neoplasm 128**
+
+    | -----
+
+  COMPILED TEXT:
+    > b. Record the largest size in the record when there are tumor size discrepancies among imaging and radiographic reports, regardless of the imaging technique reports unless the physician specifies which imaging is most accurate
+
+[spcsm_2024:tumor_size_summary:coding_instructions:i48]  kind=instruction  items=[756]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. Record the size in the specified order
+
+    | a. Size measured on the surgical resection specimen, when surgery is administered as the
+
+    | first definitive treatment, i.e., no pre-surgical treatment administered. i. If there is a discrepancy among tumor size measurements in the various sections of
+
+    | the pathology report, code the size from the synoptic report (also known as CAP protocol or pathology report checklist).
+
+    | **September 2023 Section IV: Description of this Neoplasm 124**
+
+    | -----
+
+    | ii. If only a text report is available, use: final diagnosis, microscopic, or gross
+
+    | examination, in that order. ***Example 1:*** Chest x-ray shows 3.5 cm mass; the pathology report from the surgery states that the same mass is malignant and measures 2.8 cm. Record tumor size as 028 (28 mm). ***Example 2:*** Pathology report states lung carcinoma is 2.1 cm x 3.2 cm x 1.4 cm. Record tumor size as 032 (32 mm). b. If neoadjuvant therapy followed by surgery, do not record the size from the pathologic
+
+    | specimen. Code the largest size of tumor prior to neoadjuvant treatment; if unknown code size as 999.
+
+    | ***Example: Patient has a 2.2 cm mass in the oropharynx; find needle aspiration of mass***
+
+    | confirms squamous cell carcinoma. Patient receives a course of neoadjuvant combination chemotherapy. Pathologic size after total resection is 2.8 cm. Record tumor size as 022 (22 mm).
+
+    | | c. | If no surgical resection, then largest measurement of the tumor from the imaging, physical exam, or other diagnostic procedures in this order of priority prior to any other form of treatment. |
+    | |---|---|
+    | | d. | If a, b, and c do not apply, the largest size from all information available within four months of the date of diagnosis, in the absence of disease progression. |
+
+    | 2. Tumor size is the diameter of the tumor, not the depth or thickness of the tumor.
+    | 3. Record tumor size stated less than or greater than as follows
+
+    | a. If tumor size is reported as less than x mm or less than x cm, the reported tumor size
+
+    | should be 1 mm less ***Examples:*** Tumor size is stated as: < 1 cm, code as 009; < 2 cm, code as 019, < 3 cm, code as 029; < 4 cm, code as 039; < 5 cm is coded as 049. If stated as less than 1 mm, use code 001. b. If tumor size is reported as more than or greater than x mm or more than x cm, code size
+
+    | as 1 mm more ***Examples:*** Tumor size is stated as: >10 mm or >1 cm, code as 011; > 2 cm, code as 021; > 3 cm, code as 031; > 4 cm, code as 041; > 5 cm, code as 051. If described as anything greater than 989 mm (98.9 cm), code as 989. c. If tumor size is reported to be between two sizes, record tumor size as the midpoint
+
+    | between the two: i.e., add the two sizes together and then divide by two ***Examples:*** Tumor size is between 2 and 3 cm, code as 025. Code size as 025 since 2 + 3 =5 divided by 2 = 2.5 cm (or 025 mm).
+
+    | 4. Record the higher tumor size when stated as a range
+
+    | ***Example: Tumor size is 8-10 mm or tumor size is 8 to 10 mm.*** Code size as 010 since 10 mm is the higher of the values in the range.
+
+    | 5. Round the tumor size only if it is described in fractions of millimeters
+
+    | | a. | When tumor size is greater than 1 millimeter, round tenths of millimeters in the 1-4 range down to the nearest whole millimeter and round tenths of millimeters in the 5-9 range up to the nearest whole millimeter. See Exception for breast cancer. |
+    | |---|---|
+    | | b. | Do not round tumor size expressed in centimeters to the nearest whole centimeter; rather, convert the measurement to millimeters by moving the decimal point one space to the right |
+
+    | **September 2023 Section IV: Description of this Neoplasm 125**
+
+    | -----
+
+    | ***Note 1:*** Record tumor size as 001 (do not round down to 000) when the largest dimension of a tumor is less than 1 millimeter (between 0.1 and 0.9 mm). ***Note 2:*** Code 001 when tumor size is 1 mm. ***Exception to rounding rules for BREAST primaries:*** Round tumor sizes greater than 1.0 mm and up to 2.4 mm to 2 mm (002). The purpose of this exception is so that the size recorded in the Tumor Size data item will derive the correct AJCC TNM Primary Tumor (T) category for breast primaries. Do not apply this instruction to any other site.
+
+    | #### Examples:
+
+    | Breast cancer described as 6.5 millimeters in size. Round up to 7 mm and code as 007. Breast cancer described as 1.3 mm in size. Round up to 2 mm and code as 002. 2.3 millimeters cancer in a polyp. Round down to 2 mm and code 002. Hypopharynx: Focus of cancer described as 1.4 mm in size. Round down to 1 mm and code as 001. 5.2 cm breast cancer. Convert to millimeters and code 052. 2.5 cm rectal cancer. Do not round, record as 025 millimeters.
+
+    | 6. Priority of imaging/radiographic technique
+
+    | | a. | Use information on size from imaging/radiographic techniques to code the tumor size when there is no more specific size information from pathology or operative report. It should be taken as a lower priority, but over a physical exam. |
+    | |---|---|
+    | | b. | Record the largest size in the record when there are tumor size discrepancies among imaging and radiographic reports, regardless of the imaging technique reports unless the physician specifies which imaging is most accurate |
+
+    | 7. Code the size of the primary tumor, not the size of the polyp, ulcer, cyst, or distant metastasis.
+
+    | However, if the tumor is described as a "cystic mass" and only the size of the entire mass is given, code the size of the entire mass, since the cysts are part of the tumor itself.
+
+    | 8. Record the size of the invasive component, if given.
+
+    | a. If both an in situ and an invasive component are present and the invasive component is
+
+    | measured, record the size of the invasive component even if it is smaller
+
+    | ***Example: Tumor is mixed in situ and invasive adenocarcinoma, total 3.7 cm in size, of***
+
+    | which 1.4 cm is invasive. Record tumor size as 014 (14 mm)
+
+    | b. If the size of the invasive component is not given, record the size of the entire tumor from
+
+    | the surgical report, pathology report, radiology report, or clinical examination. ***Example 1:*** A breast tumor with infiltrating duct carcinoma with extensive in situ component; total size 2.3 cm. Record tumor size as 023 (23 mm). ***Example 2:*** Duct carcinoma in situ measuring 1.9 cm with an area of invasive ductal carcinoma. Record tumor size as 019 (19 mm)
+
+    | 9. Record the largest dimension or diameter of tumor, whether it is from an excisional biopsy
+
+    | specimen or the complete resection of the primary tumor ***Example 1:*** Tumor is described as 2.4 x 5.1 x 1.8 cm in size. Record tumor size as 051 (51 mm). ***Example 2:*** Anal canal tumor is 2.5 cm from proximal to distal (3.5 cm in circumference). Record tumor size as 035. The circumferential measurement is the largest measurement in this example. In this case, the pathologist usually cuts the anus and rectum open like a tube; the circumference is measured flat.
+
+    | **September 2023 Section IV: Description of this Neoplasm 126**
+
+    | -----
+
+    | 10. Record the size as stated for purely in situ lesions
+    | 11. Multifocal/multicentric tumors: Code the size of the largest invasive tumor, or the largest in
+
+    | situ tumor if all tumors are in situ, when the tumor is multi-focal or when multiple tumors are reported as a single primary.
+
+    | 12. Assign code 000 when
+
+    | a. No residual tumor is found
+
+    | i. Neoadjuvant therapy has been administered and the resection shows no residual
+
+    | **tumor**
+
+    | | b. | Schema is Cervical Lymph Nodes and Unknown Primary 00060 |
+    | |---|---|
+    | | c. | EOD Primary Tumor is coded 800 (No evidence of primary tumor) for any schema except for those listed in Coding Instruction 14 |
+
+    | 13. Assign tumor size for benign and borderline tumors in the schemas Brain, CNS Other,
+
+    | Intracranial Gland, and Medulloblastoma when provided; do not default to 999
+
+    | 14. Assign code 999 when
+
+    | a. Size is unknown and for the following sites and schemas/schema IDs
+
+    | i. Any case coded to primary site C420, C421, C423, C424, C770-C779, or C809 ii. HemeRetic 00830
+
+    | 1. Excluding Spleen (C422) iii. Kaposi Sarcoma 00458 iv. Lymphoma 00790 v. Lymphoma-CLL/SLL 00795 vi. Melanoma Choroid and Ciliary Body 00672 vii. Melanoma Iris 00671 viii. Plasma Cell Disorders 00822 ix. Plasma Cell Myeloma 00821 b. The only measurement describes pieces or chips in a pathology report. Do not add the
+
+    | size of pieces or chips together to create a whole; they may not be from the same location, or they may represent only a very small portion of a large tumor. However, when the pathologist states an aggregate or composite size (determined by fitting the tumor pieces together and measuring the total size), record that size.
+
+    | | c. | The only measurement is for calcifications that span given distance or a cluster of microcalcifications. Do not record the size of calcifications as tumor size. If there is no measurement of the mass or tumor, record 999. |
+    | |---|---|
+    | | d. | Neoadjuvant therapy has been administered and resection was performed. Do not use a post-neoadjuvant size to code pathologic tumor size; however, you may use the clinical tumor size if available. |
+
+    | 15. Document the information to support coded tumor size in the appropriate text data item of the
+
+    | abstract
+
+    | **September 2023 Section IV: Description of this Neoplasm 127**
+
+    | -----
+
+    | Tumor size is important for staging of tumors in the following table of schemas. For more information about schemas and schema IDs, go to the SSDI Manual, Appendix A.
+
+    | **Table. Schemas for which Tumor Size Affects Staging**
+
+    | #### Schema Schema ID
+
+    | Adrenal Gland 00760
+
+    | Anus 00210
+
+    | Bile Duct Distal 00260 Bile Ducts Intrahepatic 00230 Bone Appendicular Skeleton 00381 Bone Pelvis 00383 Breast 00480 Buccal Mucosa 00076 Cervix 00520 Conjunctiva 00650 Corpus Sarcoma 00541 Cutaneous Carcinoma of Head and Neck 00150 Floor of Mouth 00074
+
+    | GIST 00430 Gum 00073
+
+    | Hypopharynx 00112 Kidney Parenchyma 00600 Lacrimal Gland 00690
+
+    | Lip 00071 Liver 00220 Lung 00360
+
+    | Major Salivary Glands 00080 Merkel Cell Skin 00460 Mouth Other 00077 NET Adrenal Gland 00770 NET Appendix 00320 NET Colon and Rectum 00330 NET Pancreas 00340 NET Stomach 00290 Orbital Sarcoma 00700 Oropharynx (p16-) 00111 Oropharynx HPV-Mediated (p16+) 00100 Palate Hard 00075 Pancreas 00280 Primary Cutaneous Lymphomas (excluding MF and SS) 00812 Retroperitoneum 00440 Skin Eyelid 00640 Soft Tissue Head and Neck 00400 Soft Tissue Trunk and Extremities 00410 Thyroid 00730 Thyroid Medullary 00740 Tongue Anterior 00072 Vagina 00510
+
+    | Vulva 00500
+
+    | **September 2023 Section IV: Description of this Neoplasm 128**
+
+    | -----
+
+  COMPILED TEXT:
+    > 12. Assign code 000 when
+
+========================================================================

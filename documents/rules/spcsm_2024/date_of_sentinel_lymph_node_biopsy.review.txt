@@ -1,0 +1,132 @@
+========================================================================
+RULE COMPILATION REVIEW REPORT
+========================================================================
+Source: documents/markdown/SPCSM_2024_MainDoc.md
+Units emitted: 11  |  accepted: 10  |  quarantined: 1
+
+Accepted units by kind:
+  definition     1
+  instruction    9
+
+Accepted fidelity: min 1.00  mean 1.00
+
+------------------------------------------------------------------------
+QUARANTINED (1)
+------------------------------------------------------------------------
+
+[spcsm_2024:date_of_sentinel_lymph_node_biopsy:coding_instructions:i5]
+  - item_id 632 not found in the data dictionary.
+
+------------------------------------------------------------------------
+SAMPLED ACCEPTED UNITS (source vs. compiled, up to 5)
+------------------------------------------------------------------------
+
+[spcsm_2024:date_of_sentinel_lymph_node_biopsy:date_of_sentinel_lymph:d1]  kind=definition  items=[832]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Date of Sentinel Lymph Node Biopsy
+
+    | #### Item Length: 8 NAACCR Item #: 832 NAACCR Name: Date of Sentinel Lymph Node Biopsy XML NAACCR ID: dateSentinelLymphNodeBiopsy
+
+    | *Date of Sentinel Lymph Node Biopsy, effective 01/01/2018, records the date of the sentinel lymph node* biopsy procedure. This data item is required for breast and cutaneous melanoma cases only. *Date of Sentinel Lymph Node Biopsy must be transmitted in the YYYYMMDD format. Date of Sentinel* *Lymph Node Biopsy may be recorded in the transmission format, or recorded in the traditional format* (MMDDYYYY) and converted electronically to the transmission format. SEER Central Registries: Collect when available.
+
+  COMPILED TEXT:
+    > Date of Sentinel Lymph Node Biopsy, effective 01/01/2018, records the date of the sentinel lymph node biopsy procedure.
+
+[spcsm_2024:date_of_sentinel_lymph_node_biopsy:date_of_sentinel_lymph:i3]  kind=instruction  items=[832]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Date of Sentinel Lymph Node Biopsy
+
+    | #### Item Length: 8 NAACCR Item #: 832 NAACCR Name: Date of Sentinel Lymph Node Biopsy XML NAACCR ID: dateSentinelLymphNodeBiopsy
+
+    | *Date of Sentinel Lymph Node Biopsy, effective 01/01/2018, records the date of the sentinel lymph node* biopsy procedure. This data item is required for breast and cutaneous melanoma cases only. *Date of Sentinel Lymph Node Biopsy must be transmitted in the YYYYMMDD format. Date of Sentinel* *Lymph Node Biopsy may be recorded in the transmission format, or recorded in the traditional format* (MMDDYYYY) and converted electronically to the transmission format. SEER Central Registries: Collect when available.
+
+  COMPILED TEXT:
+    > Date of Sentinel Lymph Node Biopsy must be transmitted in the YYYYMMDD format.
+
+[spcsm_2024:date_of_sentinel_lymph_node_biopsy:date_of_sentinel_lymph:i5]  kind=instruction  items=[832]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Date of Sentinel Lymph Node Biopsy
+
+    | #### Item Length: 8 NAACCR Item #: 832 NAACCR Name: Date of Sentinel Lymph Node Biopsy XML NAACCR ID: dateSentinelLymphNodeBiopsy
+
+    | *Date of Sentinel Lymph Node Biopsy, effective 01/01/2018, records the date of the sentinel lymph node* biopsy procedure. This data item is required for breast and cutaneous melanoma cases only. *Date of Sentinel Lymph Node Biopsy must be transmitted in the YYYYMMDD format. Date of Sentinel* *Lymph Node Biopsy may be recorded in the transmission format, or recorded in the traditional format* (MMDDYYYY) and converted electronically to the transmission format. SEER Central Registries: Collect when available.
+
+  COMPILED TEXT:
+    > SEER Central Registries: Collect when available.
+
+[spcsm_2024:date_of_sentinel_lymph_node_biopsy:coding_instructions:i2]  kind=instruction  items=[834]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. Record the date of the sentinel lymph node biopsy procedure documented in the Sentinel Lymph
+
+    | *Nodes Examined data item [NAACCR Item #834]*
+
+    | 2. This data item documents the date of sentinel node biopsy. Do not record the date of lymph
+
+    | node aspiration, fine needle aspiration, fine needle aspiration biopsy, core needle biopsy, or core biopsy.
+
+    | 3. Record the date documented in this data item in the Date of First Surgical Procedure data item
+
+    | [NAACCR Item #1200] when the sentinel lymph node biopsy is the first or only surgical procedure performed
+
+    | 4. Record the date of the sentinel lymph node biopsy in this data item and record the date the
+
+    | subsequent regional node dissection was performed in the Date of Regional Lymph Node *Dissection data item [NAACCR Item #682] when both a sentinel node biopsy procedure and a* subsequent regional node dissection procedure are performed
+
+    | 5. Record the date of the procedure in both this data item and in the Date of Regional Lymph Node
+
+    | *Dissection data item [NAACCR Item #632] when a sentinel lymph node biopsy is performed in* the same procedure as the regional node dissection. The dates should be the same.
+
+    | 6. Leave this date blank when sentinel lymph node biopsy was attempted, but unsuccessful (e.g.
+
+    | failed to map). Leave this date blank for cases other than breast and cutaneous melanoma.
+
+    | **September 2023 Section VII: First Course of Therapy 182**
+
+    | -----
+
+  COMPILED TEXT:
+    > This data item documents the date of sentinel node biopsy. Do not record the date of lymph node aspiration, fine needle aspiration, fine needle aspiration biopsy, core needle biopsy, or core biopsy.
+
+[spcsm_2024:date_of_sentinel_lymph_node_biopsy:coding_instructions:i4]  kind=instruction  items=[834, 682]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. Record the date of the sentinel lymph node biopsy procedure documented in the Sentinel Lymph
+
+    | *Nodes Examined data item [NAACCR Item #834]*
+
+    | 2. This data item documents the date of sentinel node biopsy. Do not record the date of lymph
+
+    | node aspiration, fine needle aspiration, fine needle aspiration biopsy, core needle biopsy, or core biopsy.
+
+    | 3. Record the date documented in this data item in the Date of First Surgical Procedure data item
+
+    | [NAACCR Item #1200] when the sentinel lymph node biopsy is the first or only surgical procedure performed
+
+    | 4. Record the date of the sentinel lymph node biopsy in this data item and record the date the
+
+    | subsequent regional node dissection was performed in the Date of Regional Lymph Node *Dissection data item [NAACCR Item #682] when both a sentinel node biopsy procedure and a* subsequent regional node dissection procedure are performed
+
+    | 5. Record the date of the procedure in both this data item and in the Date of Regional Lymph Node
+
+    | *Dissection data item [NAACCR Item #632] when a sentinel lymph node biopsy is performed in* the same procedure as the regional node dissection. The dates should be the same.
+
+    | 6. Leave this date blank when sentinel lymph node biopsy was attempted, but unsuccessful (e.g.
+
+    | failed to map). Leave this date blank for cases other than breast and cutaneous melanoma.
+
+    | **September 2023 Section VII: First Course of Therapy 182**
+
+    | -----
+
+  COMPILED TEXT:
+    > Record the date of the sentinel lymph node biopsy in this data item and record the date the subsequent regional node dissection was performed in the Date of Regional Lymph Node Dissection data item [NAACCR Item #682] when both a sentinel node biopsy procedure and a subsequent regional node dissection procedure are performed.
+
+========================================================================

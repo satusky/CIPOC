@@ -1,0 +1,357 @@
+[
+  {
+    "rule_id": "spcsm_2024:lymphovascular_invasion:lymphovascular_invasion:d1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Lymphovascular Invasion"
+    ],
+    "anchor": "L3949-L3970:lymphovascular-invasion",
+    "kind": "definition",
+    "item_ids": [
+      1182
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Lymphovascular Invasion indicates whether lymphatic duct or blood vessel invasion is identified in the pathology report.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:lymphovascular_invasion:lymphovascular_invasion:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Lymphovascular Invasion"
+    ],
+    "anchor": "L3949-L3970:lymphovascular-invasion",
+    "kind": "instruction",
+    "item_ids": [
+      1182
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "SEER requires Lymphovascular Invasion (LVI) for penis and testis cases only. SEER registries may submit LVI for other sites when available. State/central cancer registries may require LVI for sites other than penis and testis. Record 8 for sites other than penis or testis when LVI is not required. LVI is always coded 8 for certain sites (see Coding Instruction #9).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:lymphovascular_invasion:lymphovascular_invasion:t3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Lymphovascular Invasion"
+    ],
+    "anchor": "L3949-L3970:lymphovascular-invasion",
+    "kind": "code_table",
+    "item_ids": [
+      1182
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "| Code | Description |\n|---|---|\n| 0 | Lymphovascular Invasion stated as Not Present |\n| 1 | Lymphovascular Invasion Present/Identified (NOT used for thyroid and adrenal) |\n| 2 | Lymphatic and small vessel invasion only (L) OR Lymphatic invasion only (thyroid and adrenal only) |\n| 3 | Venous (large vessel) invasion only (V) OR Angioinvasion (thyroid and adrenal only) |\n| 4 | BOTH lymphatic and small vessel AND venous (large vessel) invasion OR BOTH lymphatic AND angioinvasion (thyroid and adrenal only) |\n| 8 | Not applicable |\n| 9 | Unknown/Indeterminate/not mentioned in path report |",
+    "codes": {
+      "0": "Lymphovascular Invasion stated as Not Present",
+      "1": "Lymphovascular Invasion Present/Identified (NOT used for thyroid and adrenal)",
+      "2": "Lymphatic and small vessel invasion only (L) OR Lymphatic invasion only (thyroid and adrenal only)",
+      "3": "Venous (large vessel) invasion only (V) OR Angioinvasion (thyroid and adrenal only)",
+      "4": "BOTH lymphatic and small vessel AND venous (large vessel) invasion OR BOTH lymphatic AND angioinvasion (thyroid and adrenal only)",
+      "8": "Not applicable",
+      "9": "Unknown/Indeterminate/not mentioned in path report"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:lymphovascular_invasion:coding_instructions:i1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Lymphovascular Invasion",
+      "Coding Instructions"
+    ],
+    "anchor": "L3971-L4069:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1182
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code from pathology report(s). If not available, code the absence or presence of lymphovascular invasion as described in the medical record. The primary source of information about lymphovascular invasion is the pathology check list (synoptic report) developed by the College of American Pathologists. If the case does not have a checklist or synoptic report, code from other sections of the pathology report or a physician's statement, in that order.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:lymphovascular_invasion:coding_instructions:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Lymphovascular Invasion",
+      "Coding Instructions"
+    ],
+    "anchor": "L3971-L4069:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1182
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code lymphovascular invasion to 0, 2, 3, 4, or 9 for the following Schema IDs: Thyroid 00730, Thyroid Medullary 00740, Adrenal Gland 00760.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:lymphovascular_invasion:coding_instructions:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Lymphovascular Invasion",
+      "Coding Instructions"
+    ],
+    "anchor": "L3971-L4069:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1182
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Do not code perineural invasion in this data item.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:lymphovascular_invasion:coding_instructions:i4",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Lymphovascular Invasion",
+      "Coding Instructions"
+    ],
+    "anchor": "L3971-L4069:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1182
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use the pathology report for any specimen from the primary site to code this data item (biopsy or resection).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:lymphovascular_invasion:coding_instructions:i5",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Lymphovascular Invasion",
+      "Coding Instructions"
+    ],
+    "anchor": "L3971-L4069:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1182
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code as present/identified when lymphovascular invasion is identified in any primary tumor specimen.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:lymphovascular_invasion:coding_instructions:i6",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Lymphovascular Invasion",
+      "Coding Instructions"
+    ],
+    "anchor": "L3971-L4069:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1182
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use the table below for cases treated with neoadjuvant (preoperative) therapy. Code lymphovascular invasion based on the documentation in the medical record when documentation in the medical record conflicts with this table.\n\n| LVI on pathology report PRIOR to neoadjuvant (preoperative) therapy | LVI on pathology report AFTER neoadjuvant (preoperative) therapy |\n|---|---|\n| 0 - Not present/Not identified | 0 - Not present/Not identified |\n| 0 - Not present/Not identified | 1 - Present/Identified |\n| 0 - Not present/Not identified | 9 - Unknown/Indeterminate |\n| 1 - Present/Identified | 0 - Not present/Not identified |\n| 1 - Present/Identified | 1 - Present/Identified |\n| 1 - Present/Identified | 9 - Unknown/Indeterminate |\n| 9 - Unknown/Indeterminate | 0 - Not present/Not identified |\n| 9 - Unknown/Indeterminate | 1 - Present/Identified |\n| 9 - Unknown/Indeterminate | 9 - Unknown/Indeterminate |",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:lymphovascular_invasion:coding_instructions:i7",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Lymphovascular Invasion",
+      "Coding Instructions"
+    ],
+    "anchor": "L3971-L4069:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1182
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 0\n\na. When the pathology report indicates that there is no lymphovascular invasion\n\nb. For in situ cases\n\nc. When there is no residual tumor found after neoadjuvant treatment and there is no LVI on biopsy",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:lymphovascular_invasion:coding_instructions:i8",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Lymphovascular Invasion",
+      "Coding Instructions"
+    ],
+    "anchor": "L3971-L4069:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1182
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 1 when the pathology report or a physician's statement indicates that lymphovascular invasion (or one of its synonyms) is present in the specimen. Synonyms include, but are not limited to:\n\ni. Angiolymphatic invasion\nii. Blood vessel invasion\niii. Lymph vascular emboli\niv. Lymphatic invasion\nv. Lymphvascular invasion\nvi. Vascular invasion\nvii. Lymphovascular space invasion",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:lymphovascular_invasion:coding_instructions:i9",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Lymphovascular Invasion",
+      "Coding Instructions"
+    ],
+    "anchor": "L3971-L4069:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1182
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 8\n\na. For the following Schemas/Schema IDs: GIST 00430, HemeRetic 00830, Lymphoma 00790, Lymphoma-CLL/SLL 00795, Lymphoma Ocular Adnexa 00710, Mycosis Fungoides (MF) 00811, Plasma Cell Disorder 00822, Plasma Cell Myeloma 00821, Primary Cutaneous Lymphoma (excluding MF and SS) 00812\n\nb. For non-malignant brain (intracranial) and CNS tumors\n\nc. When standard-setter does not require this item and state/central registry is not collecting it",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:lymphovascular_invasion:coding_instructions:i10",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Lymphovascular Invasion",
+      "Coding Instructions"
+    ],
+    "anchor": "L3971-L4069:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1182
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 9 when\n\na. There is no microscopic examination of a primary tissue specimen\n\nb. The primary site specimen is cytology only or a fine needle aspiration\n\nc. The biopsy is only a very small tissue sample\n\nd. It is not possible to determine whether lymphovascular invasion is present\n\ne. The pathologist indicates the specimen is insufficient to determine lymphovascular invasion\n\nf. Lymphovascular invasion is not mentioned in the pathology report\n\ng. There is no information/documentation from the pathology report or other sources\n\nh. Primary site is unknown\n\ni. Ambiguous terminology is used",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:lymphovascular_invasion:coding_instructions:e11",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Lymphovascular Invasion",
+      "Coding Instructions"
+    ],
+    "anchor": "L3971-L4069:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      1182
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Assign code 9 for \"suspicious LVI.\"",
+    "codes": null,
+    "notes": null
+  }
+]

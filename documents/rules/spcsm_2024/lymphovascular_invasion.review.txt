@@ -1,0 +1,415 @@
+========================================================================
+RULE COMPILATION REVIEW REPORT
+========================================================================
+Source: documents/markdown/SPCSM_2024_MainDoc.md
+Units emitted: 14  |  accepted: 14  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     1
+  definition     1
+  example        1
+  instruction    11
+
+Accepted fidelity: min 0.87  mean 0.98
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED ACCEPTED UNITS (source vs. compiled, up to 5)
+------------------------------------------------------------------------
+
+[spcsm_2024:lymphovascular_invasion:lymphovascular_invasion:d1]  kind=definition  items=[1182]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Lymphovascular Invasion
+
+    | #### Item Length: 1 NAACCR Item #: 1182 NAACCR Name: Lymphovascular Invasion XML NAACCR ID: lymphVascularInvasion
+
+    | *Lymphovascular Invasion indicates whether lymphatic duct or blood vessel invasion is identified in the* pathology report.
+
+    | ***Note: SEER requires Lymphovascular Invasion (LVI) for penis and testis cases only. SEER registries***
+
+    | may submit LVI for other sites when available. State/central cancer registries may require LVI for sites other than penis and testis. Record 8 for sites other than penis or testis when LVI is not required. LVI is always coded 8 for certain sites (see Coding Instruction #9).
+
+    | | Code | Description |
+    | |---|---|
+    | | 0 | Lymphovascular Invasion stated as Not Present |
+    | | 1 | Lymphovascular Invasion Present/Identified (NOT used for thyroid and adrenal) |
+    | | 2 | Lymphatic and small vessel invasion only (L) OR |
+
+    | Lymphatic invasion only (thyroid and adrenal only) 3 Venous (large vessel) invasion only (V)
+
+    | OR Angioinvasion (thyroid and adrenal only) 4 BOTH lymphatic and small vessel AND venous (large vessel) invasion
+
+    | OR BOTH lymphatic AND angioinvasion (thyroid and adrenal only) 8 Not applicable 9 Unknown/Indeterminate/not mentioned in path report
+
+  COMPILED TEXT:
+    > Lymphovascular Invasion indicates whether lymphatic duct or blood vessel invasion is identified in the pathology report.
+
+[spcsm_2024:lymphovascular_invasion:lymphovascular_invasion:t3]  kind=code_table  items=[1182]  fidelity=0.96
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Lymphovascular Invasion
+
+    | #### Item Length: 1 NAACCR Item #: 1182 NAACCR Name: Lymphovascular Invasion XML NAACCR ID: lymphVascularInvasion
+
+    | *Lymphovascular Invasion indicates whether lymphatic duct or blood vessel invasion is identified in the* pathology report.
+
+    | ***Note: SEER requires Lymphovascular Invasion (LVI) for penis and testis cases only. SEER registries***
+
+    | may submit LVI for other sites when available. State/central cancer registries may require LVI for sites other than penis and testis. Record 8 for sites other than penis or testis when LVI is not required. LVI is always coded 8 for certain sites (see Coding Instruction #9).
+
+    | | Code | Description |
+    | |---|---|
+    | | 0 | Lymphovascular Invasion stated as Not Present |
+    | | 1 | Lymphovascular Invasion Present/Identified (NOT used for thyroid and adrenal) |
+    | | 2 | Lymphatic and small vessel invasion only (L) OR |
+
+    | Lymphatic invasion only (thyroid and adrenal only) 3 Venous (large vessel) invasion only (V)
+
+    | OR Angioinvasion (thyroid and adrenal only) 4 BOTH lymphatic and small vessel AND venous (large vessel) invasion
+
+    | OR BOTH lymphatic AND angioinvasion (thyroid and adrenal only) 8 Not applicable 9 Unknown/Indeterminate/not mentioned in path report
+
+  COMPILED TEXT:
+    > | Code | Description |
+    > |---|---|
+    > | 0 | Lymphovascular Invasion stated as Not Present |
+    > | 1 | Lymphovascular Invasion Present/Identified (NOT used for thyroid and adrenal) |
+    > | 2 | Lymphatic and small vessel invasion only (L) OR Lymphatic invasion only (thyroid and adrenal only) |
+    > | 3 | Venous (large vessel) invasion only (V) OR Angioinvasion (thyroid and adrenal only) |
+    > | 4 | BOTH lymphatic and small vessel AND venous (large vessel) invasion OR BOTH lymphatic AND angioinvasion (thyroid and adrenal only) |
+    > | 8 | Not applicable |
+    > | 9 | Unknown/Indeterminate/not mentioned in path report |
+
+[spcsm_2024:lymphovascular_invasion:coding_instructions:i2]  kind=instruction  items=[1182]  fidelity=0.98
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | #### 1. Code from pathology report(s). If not available, code the absence or presence of
+
+    | lymphovascular invasion as described in the medical record. a. The primary source of information about lymphovascular invasion is the pathology check
+
+    | list (synoptic report) developed by the College of American Pathologists. If the case does not have a checklist or synoptic report, code from other sections of the pathology report or a physician's statement, in that order.
+
+    | 2. Code lymphovascular invasion to 0, 2, 3, 4, or 9 for the following Schema IDs
+
+    | Thyroid 00730 Thyroid Medullary 00740 Adrenal Gland 00760
+
+    | 3. Do not code perineural invasion in this data item
+    | 4. Use the pathology report for any specimen from the primary site to code this data item (biopsy
+
+    | or resection)
+
+    | 5. Code as present/identified when lymphovascular invasion is identified in any primary tumor
+
+    | specimen
+
+    | **September 2023 Section VI: Stage-related Data Items 140**
+
+    | -----
+
+    | 6. Use the table below for cases treated with neoadjuvant (preoperative) therapy. Code
+
+    | lymphovascular invasion based on the documentation in the medical record when documentation in the medical record conflicts with this table.
+
+    | | LVI on pathology report | LVI on pathology report |
+    | |---|---|
+    | | PRIOR to neoadjuvant | AFTER neoadjuvant |
+    | | (preoperative) therapy | (preoperative) therapy |
+
+    | 0 - Not present/Not identified 0 - Not present/Not identified 0 - Not present/Not identified 1 - Present/Identified 0 - Not present/Not identified 9 - Unknown/Indeterminate
+
+    | | 1 - Present/Identified | 0 - Not present/Not identified |
+    | |---|---|
+    | | 1 - Present/Identified | 1 - Present/Identified |
+    | | 1 - Present/Identified | 9 - Unknown/Indeterminate |
+    | | 9 - Unknown/Indeterminate | 0 - Not present/Not identified |
+    | | 9 - Unknown/Indeterminate | 1 - Present/Identified |
+    | | 9 - Unknown/Indeterminate | 9 - Unknown/Indeterminate |
+
+    | 7. Use code 0
+
+    | | a. | When the pathology report indicates that there is no lymphovascular invasion |
+    | |---|---|
+    | | b. | For in situ cases |
+    | | c. | When there is no residual tumor found after neoadjuvant treatment and there is no LVI on biopsy |
+
+    | 8. Use code 1 when the pathology report or a physician's statement indicates that lymphovascular
+
+    | invasion (or one of its synonyms) is present in the specimen a. **Synonyms include, but are not limited to**
+
+    | i. Angiolymphatic invasion ii. Blood vessel invasion iii. Lymph vascular emboli iv. Lymphatic invasion v. Lymphvascular invasion vi. Vascular invasion vii. Lymphovascular space invasion
+
+    | 9. Use code 8
+
+    | a. For the following Schemas/Schema IDs
+
+    | GIST 00430 HemeRetic 00830 Lymphoma 00790 Lymphoma-CLL/SLL 00795 Lymphoma Ocular Adnexa 00710 Mycosis Fungoides (MF) 00811 Plasma Cell Disorder 00822 Plasma Cell Myeloma 00821
+
+    | **September 2023 Section VI: Stage-related Data Items**
+
+    | #### Code LVI to
+
+    | 0 - Not present/Not identified 1 - Present/Identified 9 - Unknown/Indeterminate 1 - Present/Identified 1 - Present/Identified 1 - Present/Identified 9 - Unknown/Indeterminate 1 - Present/Identified 9 - Unknown/Indeterminate
+
+    | **141**
+
+    | -----
+
+    | Primary Cutaneous Lymphoma (excluding MF and SS) 00812 For more information about schemas and schema IDs, go to the SSDI Manual, Appendix [A.](https://apps.naaccr.org/ssdi/list/)
+
+    | | b. | For non-malignant brain (intracranial) and CNS tumors |
+    | |---|---|
+    | | c. | When standard-setter does not require this item and state/central registry is not collecting it |
+
+    | 10. Use code 9 when
+
+    | | a. | There is no microscopic examination of a primary tissue specimen |
+    | |---|---|
+    | | b. | The primary site specimen is cytology only or a fine needle aspiration |
+    | | c. | The biopsy is only a very small tissue sample |
+    | | d. | It is not possible to determine whether lymphovascular invasion is present |
+    | | e. | The pathologist indicates the specimen is insufficient to determine lymphovascular invasion |
+    | | f. | Lymphovascular invasion is not mentioned in the pathology report |
+    | | g. | There is no information/documentation from the pathology report or other sources |
+    | | h. | Primary site is unknown |
+
+    | i. Ambiguous terminology is used
+
+    | ***Example:*** Assign code 9 for "suspicious LVI."
+
+    | **September 2023 Section VI: Stage-related Data Items 142**
+
+    | -----
+
+  COMPILED TEXT:
+    > Code lymphovascular invasion to 0, 2, 3, 4, or 9 for the following Schema IDs: Thyroid 00730, Thyroid Medullary 00740, Adrenal Gland 00760.
+
+[spcsm_2024:lymphovascular_invasion:coding_instructions:i4]  kind=instruction  items=[1182]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | #### 1. Code from pathology report(s). If not available, code the absence or presence of
+
+    | lymphovascular invasion as described in the medical record. a. The primary source of information about lymphovascular invasion is the pathology check
+
+    | list (synoptic report) developed by the College of American Pathologists. If the case does not have a checklist or synoptic report, code from other sections of the pathology report or a physician's statement, in that order.
+
+    | 2. Code lymphovascular invasion to 0, 2, 3, 4, or 9 for the following Schema IDs
+
+    | Thyroid 00730 Thyroid Medullary 00740 Adrenal Gland 00760
+
+    | 3. Do not code perineural invasion in this data item
+    | 4. Use the pathology report for any specimen from the primary site to code this data item (biopsy
+
+    | or resection)
+
+    | 5. Code as present/identified when lymphovascular invasion is identified in any primary tumor
+
+    | specimen
+
+    | **September 2023 Section VI: Stage-related Data Items 140**
+
+    | -----
+
+    | 6. Use the table below for cases treated with neoadjuvant (preoperative) therapy. Code
+
+    | lymphovascular invasion based on the documentation in the medical record when documentation in the medical record conflicts with this table.
+
+    | | LVI on pathology report | LVI on pathology report |
+    | |---|---|
+    | | PRIOR to neoadjuvant | AFTER neoadjuvant |
+    | | (preoperative) therapy | (preoperative) therapy |
+
+    | 0 - Not present/Not identified 0 - Not present/Not identified 0 - Not present/Not identified 1 - Present/Identified 0 - Not present/Not identified 9 - Unknown/Indeterminate
+
+    | | 1 - Present/Identified | 0 - Not present/Not identified |
+    | |---|---|
+    | | 1 - Present/Identified | 1 - Present/Identified |
+    | | 1 - Present/Identified | 9 - Unknown/Indeterminate |
+    | | 9 - Unknown/Indeterminate | 0 - Not present/Not identified |
+    | | 9 - Unknown/Indeterminate | 1 - Present/Identified |
+    | | 9 - Unknown/Indeterminate | 9 - Unknown/Indeterminate |
+
+    | 7. Use code 0
+
+    | | a. | When the pathology report indicates that there is no lymphovascular invasion |
+    | |---|---|
+    | | b. | For in situ cases |
+    | | c. | When there is no residual tumor found after neoadjuvant treatment and there is no LVI on biopsy |
+
+    | 8. Use code 1 when the pathology report or a physician's statement indicates that lymphovascular
+
+    | invasion (or one of its synonyms) is present in the specimen a. **Synonyms include, but are not limited to**
+
+    | i. Angiolymphatic invasion ii. Blood vessel invasion iii. Lymph vascular emboli iv. Lymphatic invasion v. Lymphvascular invasion vi. Vascular invasion vii. Lymphovascular space invasion
+
+    | 9. Use code 8
+
+    | a. For the following Schemas/Schema IDs
+
+    | GIST 00430 HemeRetic 00830 Lymphoma 00790 Lymphoma-CLL/SLL 00795 Lymphoma Ocular Adnexa 00710 Mycosis Fungoides (MF) 00811 Plasma Cell Disorder 00822 Plasma Cell Myeloma 00821
+
+    | **September 2023 Section VI: Stage-related Data Items**
+
+    | #### Code LVI to
+
+    | 0 - Not present/Not identified 1 - Present/Identified 9 - Unknown/Indeterminate 1 - Present/Identified 1 - Present/Identified 1 - Present/Identified 9 - Unknown/Indeterminate 1 - Present/Identified 9 - Unknown/Indeterminate
+
+    | **141**
+
+    | -----
+
+    | Primary Cutaneous Lymphoma (excluding MF and SS) 00812 For more information about schemas and schema IDs, go to the SSDI Manual, Appendix [A.](https://apps.naaccr.org/ssdi/list/)
+
+    | | b. | For non-malignant brain (intracranial) and CNS tumors |
+    | |---|---|
+    | | c. | When standard-setter does not require this item and state/central registry is not collecting it |
+
+    | 10. Use code 9 when
+
+    | | a. | There is no microscopic examination of a primary tissue specimen |
+    | |---|---|
+    | | b. | The primary site specimen is cytology only or a fine needle aspiration |
+    | | c. | The biopsy is only a very small tissue sample |
+    | | d. | It is not possible to determine whether lymphovascular invasion is present |
+    | | e. | The pathologist indicates the specimen is insufficient to determine lymphovascular invasion |
+    | | f. | Lymphovascular invasion is not mentioned in the pathology report |
+    | | g. | There is no information/documentation from the pathology report or other sources |
+    | | h. | Primary site is unknown |
+
+    | i. Ambiguous terminology is used
+
+    | ***Example:*** Assign code 9 for "suspicious LVI."
+
+    | **September 2023 Section VI: Stage-related Data Items 142**
+
+    | -----
+
+  COMPILED TEXT:
+    > Use the pathology report for any specimen from the primary site to code this data item (biopsy or resection).
+
+[spcsm_2024:lymphovascular_invasion:coding_instructions:i6]  kind=instruction  items=[1182]  fidelity=0.87
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | #### 1. Code from pathology report(s). If not available, code the absence or presence of
+
+    | lymphovascular invasion as described in the medical record. a. The primary source of information about lymphovascular invasion is the pathology check
+
+    | list (synoptic report) developed by the College of American Pathologists. If the case does not have a checklist or synoptic report, code from other sections of the pathology report or a physician's statement, in that order.
+
+    | 2. Code lymphovascular invasion to 0, 2, 3, 4, or 9 for the following Schema IDs
+
+    | Thyroid 00730 Thyroid Medullary 00740 Adrenal Gland 00760
+
+    | 3. Do not code perineural invasion in this data item
+    | 4. Use the pathology report for any specimen from the primary site to code this data item (biopsy
+
+    | or resection)
+
+    | 5. Code as present/identified when lymphovascular invasion is identified in any primary tumor
+
+    | specimen
+
+    | **September 2023 Section VI: Stage-related Data Items 140**
+
+    | -----
+
+    | 6. Use the table below for cases treated with neoadjuvant (preoperative) therapy. Code
+
+    | lymphovascular invasion based on the documentation in the medical record when documentation in the medical record conflicts with this table.
+
+    | | LVI on pathology report | LVI on pathology report |
+    | |---|---|
+    | | PRIOR to neoadjuvant | AFTER neoadjuvant |
+    | | (preoperative) therapy | (preoperative) therapy |
+
+    | 0 - Not present/Not identified 0 - Not present/Not identified 0 - Not present/Not identified 1 - Present/Identified 0 - Not present/Not identified 9 - Unknown/Indeterminate
+
+    | | 1 - Present/Identified | 0 - Not present/Not identified |
+    | |---|---|
+    | | 1 - Present/Identified | 1 - Present/Identified |
+    | | 1 - Present/Identified | 9 - Unknown/Indeterminate |
+    | | 9 - Unknown/Indeterminate | 0 - Not present/Not identified |
+    | | 9 - Unknown/Indeterminate | 1 - Present/Identified |
+    | | 9 - Unknown/Indeterminate | 9 - Unknown/Indeterminate |
+
+    | 7. Use code 0
+
+    | | a. | When the pathology report indicates that there is no lymphovascular invasion |
+    | |---|---|
+    | | b. | For in situ cases |
+    | | c. | When there is no residual tumor found after neoadjuvant treatment and there is no LVI on biopsy |
+
+    | 8. Use code 1 when the pathology report or a physician's statement indicates that lymphovascular
+
+    | invasion (or one of its synonyms) is present in the specimen a. **Synonyms include, but are not limited to**
+
+    | i. Angiolymphatic invasion ii. Blood vessel invasion iii. Lymph vascular emboli iv. Lymphatic invasion v. Lymphvascular invasion vi. Vascular invasion vii. Lymphovascular space invasion
+
+    | 9. Use code 8
+
+    | a. For the following Schemas/Schema IDs
+
+    | GIST 00430 HemeRetic 00830 Lymphoma 00790 Lymphoma-CLL/SLL 00795 Lymphoma Ocular Adnexa 00710 Mycosis Fungoides (MF) 00811 Plasma Cell Disorder 00822 Plasma Cell Myeloma 00821
+
+    | **September 2023 Section VI: Stage-related Data Items**
+
+    | #### Code LVI to
+
+    | 0 - Not present/Not identified 1 - Present/Identified 9 - Unknown/Indeterminate 1 - Present/Identified 1 - Present/Identified 1 - Present/Identified 9 - Unknown/Indeterminate 1 - Present/Identified 9 - Unknown/Indeterminate
+
+    | **141**
+
+    | -----
+
+    | Primary Cutaneous Lymphoma (excluding MF and SS) 00812 For more information about schemas and schema IDs, go to the SSDI Manual, Appendix [A.](https://apps.naaccr.org/ssdi/list/)
+
+    | | b. | For non-malignant brain (intracranial) and CNS tumors |
+    | |---|---|
+    | | c. | When standard-setter does not require this item and state/central registry is not collecting it |
+
+    | 10. Use code 9 when
+
+    | | a. | There is no microscopic examination of a primary tissue specimen |
+    | |---|---|
+    | | b. | The primary site specimen is cytology only or a fine needle aspiration |
+    | | c. | The biopsy is only a very small tissue sample |
+    | | d. | It is not possible to determine whether lymphovascular invasion is present |
+    | | e. | The pathologist indicates the specimen is insufficient to determine lymphovascular invasion |
+    | | f. | Lymphovascular invasion is not mentioned in the pathology report |
+    | | g. | There is no information/documentation from the pathology report or other sources |
+    | | h. | Primary site is unknown |
+
+    | i. Ambiguous terminology is used
+
+    | ***Example:*** Assign code 9 for "suspicious LVI."
+
+    | **September 2023 Section VI: Stage-related Data Items 142**
+
+    | -----
+
+  COMPILED TEXT:
+    > Use the table below for cases treated with neoadjuvant (preoperative) therapy. Code lymphovascular invasion based on the documentation in the medical record when documentation in the medical record conflicts with this table.
+
+    > | LVI on pathology report PRIOR to neoadjuvant (preoperative) therapy | LVI on pathology report AFTER neoadjuvant (preoperative) therapy |
+    > |---|---|
+    > | 0 - Not present/Not identified | 0 - Not present/Not identified |
+    > | 0 - Not present/Not identified | 1 - Present/Identified |
+    > | 0 - Not present/Not identified | 9 - Unknown/Indeterminate |
+    > | 1 - Present/Identified | 0 - Not present/Not identified |
+    > | 1 - Present/Identified | 1 - Present/Identified |
+    > | 1 - Present/Identified | 9 - Unknown/Indeterminate |
+    > | 9 - Unknown/Indeterminate | 0 - Not present/Not identified |
+    > | 9 - Unknown/Indeterminate | 1 - Present/Identified |
+    > | 9 - Unknown/Indeterminate | 9 - Unknown/Indeterminate |
+
+========================================================================

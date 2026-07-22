@@ -1,0 +1,103 @@
+========================================================================
+RULE COMPILATION REVIEW REPORT
+========================================================================
+Source: documents/markdown/SPCSM_2024_MainDoc.md
+Units emitted: 15  |  accepted: 2  |  quarantined: 13
+
+Accepted units by kind:
+  code_table     1
+  definition     1
+
+Accepted fidelity: min 1.00  mean 1.00
+
+------------------------------------------------------------------------
+QUARANTINED (13)
+------------------------------------------------------------------------
+
+[spcsm_2024:mets_lung:coding_instructions:i1]
+  - item_id 1110 not found in the data dictionary.
+
+[spcsm_2024:mets_lung:coding_instructions:i2]
+  - item_id 1110 not found in the data dictionary.
+
+[spcsm_2024:mets_lung:coding_instructions:i3]
+  - item_id 1110 not found in the data dictionary.
+
+[spcsm_2024:mets_lung:coding_instructions:i4]
+  - item_id 1110 not found in the data dictionary.
+
+[spcsm_2024:mets_lung:coding_instructions:i5]
+  - item_id 1110 not found in the data dictionary.
+
+[spcsm_2024:mets_lung:coding_instructions:p6]
+  - item_id 1110 not found in the data dictionary.
+
+[spcsm_2024:mets_lung:coding_instructions:i7]
+  - item_id 1110 not found in the data dictionary.
+
+[spcsm_2024:mets_lung:coding_instructions:i8]
+  - item_id 1110 not found in the data dictionary.
+
+[spcsm_2024:mets_lung:coding_instructions:e9]
+  - item_id 1110 not found in the data dictionary.
+
+[spcsm_2024:mets_lung:coding_instructions:i10]
+  - item_id 1110 not found in the data dictionary.
+
+[spcsm_2024:mets_lung:coding_instructions:i11]
+  - item_id 1110 not found in the data dictionary.
+
+[spcsm_2024:mets_lung:coding_instructions:i12]
+  - item_id 1110 not found in the data dictionary.
+
+[spcsm_2024:mets_lung:coding_instructions:i13]
+  - item_id 1110 not found in the data dictionary.
+
+------------------------------------------------------------------------
+SAMPLED ACCEPTED UNITS (source vs. compiled, up to 5)
+------------------------------------------------------------------------
+
+[spcsm_2024:mets_lung:mets_at_diagnosislung:d1]  kind=definition  items=[1116]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Mets at Diagnosis--Lung
+
+    | #### Item Length: 1 NAACCR Item #: 1116 NAACCR Name: Mets at DX-Lung XML NAACCR ID: metsAtDxLung
+
+    | This data item identifies whether lung is an involved metastatic site. The six Mets at Diagnosis-metastatic sites data items provide information on specific metastatic sites for data analysis.
+
+    | | Code | Description |
+    | |---|---|
+    | | 0 | None; no lung metastases |
+    | | 1 | Yes; distant lung metastases |
+    | | 8 | Not applicable |
+    | | 9 | Unknown whether lung is involved metastatic site Not documented in patient record |
+
+  COMPILED TEXT:
+    > This data item identifies whether lung is an involved metastatic site.
+
+[spcsm_2024:mets_lung:mets_at_diagnosislung:t2]  kind=code_table  items=[1116]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Mets at Diagnosis--Lung
+
+    | #### Item Length: 1 NAACCR Item #: 1116 NAACCR Name: Mets at DX-Lung XML NAACCR ID: metsAtDxLung
+
+    | This data item identifies whether lung is an involved metastatic site. The six Mets at Diagnosis-metastatic sites data items provide information on specific metastatic sites for data analysis.
+
+    | | Code | Description |
+    | |---|---|
+    | | 0 | None; no lung metastases |
+    | | 1 | Yes; distant lung metastases |
+    | | 8 | Not applicable |
+    | | 9 | Unknown whether lung is involved metastatic site Not documented in patient record |
+
+  COMPILED TEXT:
+    > | Code | Description |
+    > |---|---|
+    > | 0 | None; no lung metastases |
+    > | 1 | Yes; distant lung metastases |
+    > | 8 | Not applicable |
+    > | 9 | Unknown whether lung is involved metastatic site Not documented in patient record |
+
+========================================================================

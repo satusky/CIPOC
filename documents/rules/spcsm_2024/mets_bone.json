@@ -1,0 +1,387 @@
+[
+  {
+    "rule_id": "spcsm_2024:mets_bone:mets_at_diagnosisbone:d1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Bone"
+    ],
+    "anchor": "L4110-L4122:mets-at-diagnosisbone",
+    "kind": "definition",
+    "item_ids": [
+      1112
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "This data item identifies whether bone is an involved metastatic site.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_bone:mets_at_diagnosisbone:t2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Bone"
+    ],
+    "anchor": "L4110-L4122:mets-at-diagnosisbone",
+    "kind": "code_table",
+    "item_ids": [
+      1112
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "| Code | Description |\n|---|---|\n| 0 | None; no bone metastases |\n| 1 | Yes; distant bone metastases |\n| 8 | Not applicable |\n| 9 | Unknown whether bone is an involved metastatic site Not documented in patient record |",
+    "codes": {
+      "0": "None; no bone metastases",
+      "1": "Yes; distant bone metastases",
+      "8": "Not applicable",
+      "9": "Unknown whether bone is an involved metastatic site Not documented in patient record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_bone:coding_instructions:i1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Bone",
+      "Coding Instructions"
+    ],
+    "anchor": "L4123-L4175:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1112
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code information about bone metastases only (discontinuous or distant metastases to bone) identified at the time of diagnosis. Do not code bone marrow involvement in this data item. Do not record contiguous bone invasion by primary tumor in this data item. Note: See code 1 in \"Mets at Diagnosis--Other\" for bone marrow involvement.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_bone:coding_instructions:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Bone",
+      "Coding Instructions"
+    ],
+    "anchor": "L4123-L4175:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1112
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Bone involvement may be single or multiple.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_bone:coding_instructions:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Bone",
+      "Coding Instructions"
+    ],
+    "anchor": "L4123-L4175:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1112
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Information about bone involvement may be clinical or pathological.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_bone:coding_instructions:i4",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Bone",
+      "Coding Instructions"
+    ],
+    "anchor": "L4123-L4175:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1112
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code this data item for bone metastases even if the patient had neoadjuvant (preoperative) systemic therapy unless determined to be disease progression.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_bone:coding_instructions:i5",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Bone",
+      "Coding Instructions"
+    ],
+    "anchor": "L4123-L4175:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1112
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code this data item for all solid tumor schemas (including Kaposi Sarcoma and Ill-Defined Other [includes unknown primary site]) and the following Hematopoietic schemas except as noted in 2.c. and 2.d. i. Lymphoma Ocular Adnexa 00710 ii. Lymphoma 00790 iii. Lymphoma-CLL/SLL 00795 iv. Mycosis Fungoides (MF) 00811 v. Primary Cutaneous Lymphoma (excluding MF and SS) 00812 vi. HemeRetic 00830 (excluding primary sites C420, C421, C423, C424)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_bone:coding_instructions:i6",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Bone",
+      "Coding Instructions"
+    ],
+    "anchor": "L4123-L4175:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1112
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use of codes: Assign the code that best describes whether the case has bone metastases at diagnosis.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_bone:coding_instructions:i7",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Bone",
+      "Coding Instructions"
+    ],
+    "anchor": "L4123-L4175:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1112
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 0 when the medical record i. Indicates that there are no distant (discontinuous) metastases at all ii. Confirms the tumor is benign (/0), borderline (/1), or in situ (/2) iii. Includes a clinical or pathologic statement that there are no bone metastases iv. Includes imaging reports that are negative for bone metastases v. Indicates that the patient has distant (discontinuous) metastases but bone is not mentioned as an involved site.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_bone:coding_instructions:e8",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Bone",
+      "Coding Instructions"
+    ],
+    "anchor": "L4123-L4175:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      1112
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: Use code 0 when the patient has metastasis to lung and liver but not bone.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_bone:coding_instructions:i9",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Bone",
+      "Coding Instructions"
+    ],
+    "anchor": "L4123-L4175:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1112
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 1 when the medical record i. Indicates that the patient has distant (discontinuous) metastases and bone is mentioned as an involved site ii. Indicates that bone is the primary site and there are metastases in a different bone or bones iii. Indicates that the patient is diagnosed with an unknown primary (C80.9) and bone is mentioned as a distant metastatic site.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_bone:coding_instructions:i10",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Bone",
+      "Coding Instructions"
+    ],
+    "anchor": "L4123-L4175:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1112
+    ],
+    "applies_to": {
+      "sites": [
+        "C400-C419"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Do not assign code 1 for a bone primary with multifocal bone involvement of the same bone.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_bone:coding_instructions:i11",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Bone",
+      "Coding Instructions"
+    ],
+    "anchor": "L4123-L4175:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1112
+    ],
+    "applies_to": {
+      "sites": [
+        "C420",
+        "C421",
+        "C423",
+        "C424"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 8 (Not applicable) for the following i. Any case coded to primary site C420, C421, C423, or C424.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_bone:coding_instructions:i12",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Bone",
+      "Coding Instructions"
+    ],
+    "anchor": "L4123-L4175:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1112
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 8 (Not applicable) for the following ii. Plasma Cell Disorders 00822.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_bone:coding_instructions:i13",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Bone",
+      "Coding Instructions"
+    ],
+    "anchor": "L4123-L4175:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1112
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 9 when it cannot be determined whether the patient specifically has bone metastases. In other words, use code 9 when there are known distant metastases but it is not known whether the distant metastases include bone.",
+    "codes": null,
+    "notes": null
+  }
+]

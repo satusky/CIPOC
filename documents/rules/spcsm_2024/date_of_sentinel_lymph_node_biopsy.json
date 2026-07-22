@@ -1,0 +1,252 @@
+[
+  {
+    "rule_id": "spcsm_2024:date_of_sentinel_lymph_node_biopsy:date_of_sentinel_lymph:d1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Sentinel Lymph Node Biopsy"
+    ],
+    "anchor": "L5489-L5494:date-of-sentinel-lymph-node-biopsy",
+    "kind": "definition",
+    "item_ids": [
+      832
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Date of Sentinel Lymph Node Biopsy, effective 01/01/2018, records the date of the sentinel lymph node biopsy procedure.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_sentinel_lymph_node_biopsy:date_of_sentinel_lymph:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Sentinel Lymph Node Biopsy"
+    ],
+    "anchor": "L5489-L5494:date-of-sentinel-lymph-node-biopsy",
+    "kind": "instruction",
+    "item_ids": [
+      832
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509",
+        "C440-C449"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "This data item is required for breast and cutaneous melanoma cases only.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_sentinel_lymph_node_biopsy:date_of_sentinel_lymph:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Sentinel Lymph Node Biopsy"
+    ],
+    "anchor": "L5489-L5494:date-of-sentinel-lymph-node-biopsy",
+    "kind": "instruction",
+    "item_ids": [
+      832
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Date of Sentinel Lymph Node Biopsy must be transmitted in the YYYYMMDD format.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_sentinel_lymph_node_biopsy:date_of_sentinel_lymph:i4",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Sentinel Lymph Node Biopsy"
+    ],
+    "anchor": "L5489-L5494:date-of-sentinel-lymph-node-biopsy",
+    "kind": "instruction",
+    "item_ids": [
+      832
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Date of Sentinel Lymph Node Biopsy may be recorded in the transmission format, or recorded in the traditional format (MMDDYYYY) and converted electronically to the transmission format.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_sentinel_lymph_node_biopsy:date_of_sentinel_lymph:i5",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Sentinel Lymph Node Biopsy"
+    ],
+    "anchor": "L5489-L5494:date-of-sentinel-lymph-node-biopsy",
+    "kind": "instruction",
+    "item_ids": [
+      832
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "SEER Central Registries: Collect when available.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_sentinel_lymph_node_biopsy:coding_instructions:i1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Sentinel Lymph Node Biopsy",
+      "Coding Instructions"
+    ],
+    "anchor": "L5495-L5524:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      834
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Record the date of the sentinel lymph node biopsy procedure documented in the Sentinel Lymph Nodes Examined data item [NAACCR Item #834].",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_sentinel_lymph_node_biopsy:coding_instructions:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Sentinel Lymph Node Biopsy",
+      "Coding Instructions"
+    ],
+    "anchor": "L5495-L5524:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      834
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "This data item documents the date of sentinel node biopsy. Do not record the date of lymph node aspiration, fine needle aspiration, fine needle aspiration biopsy, core needle biopsy, or core biopsy.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_sentinel_lymph_node_biopsy:coding_instructions:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Sentinel Lymph Node Biopsy",
+      "Coding Instructions"
+    ],
+    "anchor": "L5495-L5524:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      834,
+      1200
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Record the date documented in this data item in the Date of First Surgical Procedure data item [NAACCR Item #1200] when the sentinel lymph node biopsy is the first or only surgical procedure performed.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_sentinel_lymph_node_biopsy:coding_instructions:i4",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Sentinel Lymph Node Biopsy",
+      "Coding Instructions"
+    ],
+    "anchor": "L5495-L5524:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      834,
+      682
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Record the date of the sentinel lymph node biopsy in this data item and record the date the subsequent regional node dissection was performed in the Date of Regional Lymph Node Dissection data item [NAACCR Item #682] when both a sentinel node biopsy procedure and a subsequent regional node dissection procedure are performed.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_sentinel_lymph_node_biopsy:coding_instructions:i6",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Sentinel Lymph Node Biopsy",
+      "Coding Instructions"
+    ],
+    "anchor": "L5495-L5524:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      834
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Leave this date blank when sentinel lymph node biopsy was attempted, but unsuccessful (e.g. failed to map). Leave this date blank for cases other than breast and cutaneous melanoma.",
+    "codes": null,
+    "notes": null
+  }
+]

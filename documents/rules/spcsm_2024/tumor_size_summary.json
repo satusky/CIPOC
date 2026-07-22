@@ -1,0 +1,1799 @@
+[
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:tumor_size_summary:d1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary"
+    ],
+    "anchor": "L3593-L3613:tumor-size-summary",
+    "kind": "definition",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary is the most accurate measurement of a solid primary tumor, usually measured on the surgical resection specimen.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:tumor_size_summary:t2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary"
+    ],
+    "anchor": "L3593-L3613:tumor-size-summary",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "| Code | Description |\n|---|---|\n| 000 | No mass/tumor found |\n| 001 | 1 mm or described as less than 1 mm (0.1 cm or less than 0.1 cm) |\n| 002-988 | Exact size in millimeters (2 mm-988 mm) (0.2 cm to 98.8 cm) |\n| 989 | 989 millimeters or larger (98.9 cm or larger) |\n| 990 | Microscopic focus or foci only and no size of focus is given |",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm (0.1 cm or less than 0.1 cm)",
+      "002-988": "Exact size in millimeters (2 mm-988 mm) (0.2 cm to 98.8 cm)",
+      "989": "989 millimeters or larger (98.9 cm or larger)",
+      "990": "Microscopic focus or foci only and no size of focus is given"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:tumor_size_summary:t3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary"
+    ],
+    "anchor": "L3593-L3613:tumor-size-summary",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C199",
+        "C209",
+        "C180",
+        "C182-C189"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "998 | Alternate descriptions of tumor size for specific sites: |\n\nFamilial/multiple polyposis: -Rectosigmoid and rectum (C19.9, C20.9) -Colon (C18.0, C18.2-C18.9)",
+    "codes": {
+      "998": "Familial/multiple polyposis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:tumor_size_summary:t4",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary"
+    ],
+    "anchor": "L3593-L3613:tumor-size-summary",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C150-C155",
+        "C158",
+        "C159"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "998 | Alternate descriptions of tumor size for specific sites: |\n\nIf no size is documented: Circumferential: -Esophagus (C15.0-C15.5, C15.8, C15.9)",
+    "codes": {
+      "998": "If no size is documented: Circumferential"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:tumor_size_summary:t5",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary"
+    ],
+    "anchor": "L3593-L3613:tumor-size-summary",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C160-C166",
+        "C168",
+        "C169"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "998 | Alternate descriptions of tumor size for specific sites: |\n\nDiffuse; widespread: 3/4s or more; linitis plastica: -Stomach and Esophagus GE Junction (C16.0-C16.6, C16.8, C16.9)",
+    "codes": {
+      "998": "Diffuse; widespread: 3/4s or more; linitis plastica"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:tumor_size_summary:t6",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary"
+    ],
+    "anchor": "L3593-L3613:tumor-size-summary",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C343",
+        "C348",
+        "C349"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "998 | Alternate descriptions of tumor size for specific sites: |\n\nDiffuse, entire lung or NOS: -Lung and main stem bronchus (C34.0-C34.3, C34.8, C34.9)",
+    "codes": {
+      "998": "Diffuse, entire lung or NOS"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:tumor_size_summary:t7",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary"
+    ],
+    "anchor": "L3593-L3613:tumor-size-summary",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C506",
+        "C508",
+        "C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "998 | Alternate descriptions of tumor size for specific sites: |\n\nDiffuse: -Breast (C50.0-C50.6, C50.8, C50.9)",
+    "codes": {
+      "998": "Diffuse"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:tumor_size_summary:t8",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary"
+    ],
+    "anchor": "L3593-L3613:tumor-size-summary",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "999 Unknown; size not stated; Not documented in patient record; Size of tumor cannot be assessed;\n\nNo excisional biopsy or tumor resection done; The only measurement(s) describes pieces or chips; Not applicable",
+    "codes": {
+      "999": "Unknown; size not stated; Not documented in patient record; Size of tumor cannot be assessed; No excisional biopsy or tumor resection done; The only measurement(s) describes pieces or chips; Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:tumor_size_summary:i9",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary"
+    ],
+    "anchor": "L3593-L3613:tumor-size-summary",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note: All measurements should be in millimeters (mm).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:p1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "priority_rule",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "1. Record the size in the specified order",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "a. Size measured on the surgical resection specimen, when surgery is administered as the first definitive treatment, i.e., no pre-surgical treatment administered.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:p3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "priority_rule",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "i. If there is a discrepancy among tumor size measurements in the various sections of the pathology report, code the size from the synoptic report (also known as CAP protocol or pathology report checklist).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:p4",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "priority_rule",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "ii. If only a text report is available, use: final diagnosis, microscopic, or gross examination, in that order.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:e5",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 1: Chest x-ray shows 3.5 cm mass; the pathology report from the surgery states that the same mass is malignant and measures 2.8 cm. Record tumor size as 028 (28 mm).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:e6",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 2: Pathology report states lung carcinoma is 2.1 cm x 3.2 cm x 1.4 cm. Record tumor size as 032 (32 mm).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i7",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "b. If neoadjuvant therapy followed by surgery, do not record the size from the pathologic specimen. Code the largest size of tumor prior to neoadjuvant treatment; if unknown code size as 999.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:e8",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: Patient has a 2.2 cm mass in the oropharynx; find needle aspiration of mass confirms squamous cell carcinoma. Patient receives a course of neoadjuvant combination chemotherapy. Pathologic size after total resection is 2.8 cm. Record tumor size as 022 (22 mm).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:p9",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "priority_rule",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "c. If no surgical resection, then largest measurement of the tumor from the imaging, physical exam, or other diagnostic procedures in this order of priority prior to any other form of treatment.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i10",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "d. If a, b, and c do not apply, the largest size from all information available within four months of the date of diagnosis, in the absence of disease progression.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:d11",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "definition",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "2. Tumor size is the diameter of the tumor, not the depth or thickness of the tumor.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i12",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "a. If tumor size is reported as less than x mm or less than x cm, the reported tumor size should be 1 mm less",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:e13",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Examples: Tumor size is stated as: < 1 cm, code as 009; < 2 cm, code as 019, < 3 cm, code as 029; < 4 cm, code as 039; < 5 cm is coded as 049. If stated as less than 1 mm, use code 001.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i14",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "b. If tumor size is reported as more than or greater than x mm or more than x cm, code size as 1 mm more",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:e15",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Examples: Tumor size is stated as: >10 mm or >1 cm, code as 011; > 2 cm, code as 021; > 3 cm, code as 031; > 4 cm, code as 041; > 5 cm, code as 051. If described as anything greater than 989 mm (98.9 cm), code as 989.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i16",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "c. If tumor size is reported to be between two sizes, record tumor size as the midpoint between the two: i.e., add the two sizes together and then divide by two",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:e17",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Examples: Tumor size is between 2 and 3 cm, code as 025. Code size as 025 since 2 + 3 =5 divided by 2 = 2.5 cm (or 025 mm).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i18",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "4. Record the higher tumor size when stated as a range",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:e19",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: Tumor size is 8-10 mm or tumor size is 8 to 10 mm. Code size as 010 since 10 mm is the higher of the values in the range.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i20",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "5. Round the tumor size only if it is described in fractions of millimeters",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i21",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "a. When tumor size is greater than 1 millimeter, round tenths of millimeters in the 1-4 range down to the nearest whole millimeter and round tenths of millimeters in the 5-9 range up to the nearest whole millimeter. See Exception for breast cancer.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i22",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "b. Do not round tumor size expressed in centimeters to the nearest whole centimeter; rather, convert the measurement to millimeters by moving the decimal point one space to the right",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i23",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note 1: Record tumor size as 001 (do not round down to 000) when the largest dimension of a tumor is less than 1 millimeter (between 0.1 and 0.9 mm).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i24",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Note 2: Code 001 when tumor size is 1 mm.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i25",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Exception to rounding rules for BREAST primaries: Round tumor sizes greater than 1.0 mm and up to 2.4 mm to 2 mm (002). The purpose of this exception is so that the size recorded in the Tumor Size data item will derive the correct AJCC TNM Primary Tumor (T) category for breast primaries. Do not apply this instruction to any other site.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:e26",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Breast cancer described as 6.5 millimeters in size. Round up to 7 mm and code as 007.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:e27",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Breast cancer described as 1.3 mm in size. Round up to 2 mm and code as 002.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:e28",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "2.3 millimeters cancer in a polyp. Round down to 2 mm and code 002.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:e29",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Hypopharynx: Focus of cancer described as 1.4 mm in size. Round down to 1 mm and code as 001.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:e30",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "5.2 cm breast cancer. Convert to millimeters and code 052.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:e31",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "2.5 cm rectal cancer. Do not round, record as 025 millimeters.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:p32",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "priority_rule",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "6. Priority of imaging/radiographic technique",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i33",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "a. Use information on size from imaging/radiographic techniques to code the tumor size when there is no more specific size information from pathology or operative report. It should be taken as a lower priority, but over a physical exam.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:p34",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "priority_rule",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "b. Record the largest size in the record when there are tumor size discrepancies among imaging and radiographic reports, regardless of the imaging technique reports unless the physician specifies which imaging is most accurate",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i35",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "7. Code the size of the primary tumor, not the size of the polyp, ulcer, cyst, or distant metastasis.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i36",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "However, if the tumor is described as a \"cystic mass\" and only the size of the entire mass is given, code the size of the entire mass, since the cysts are part of the tumor itself.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i37",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "8. Record the size of the invasive component, if given.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i38",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "a. If both an in situ and an invasive component are present and the invasive component is measured, record the size of the invasive component even if it is smaller",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:e39",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: Tumor is mixed in situ and invasive adenocarcinoma, total 3.7 cm in size, of which 1.4 cm is invasive. Record tumor size as 014 (14 mm)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i40",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "b. If the size of the invasive component is not given, record the size of the entire tumor from the surgical report, pathology report, radiology report, or clinical examination.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:e41",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 1: A breast tumor with infiltrating duct carcinoma with extensive in situ component; total size 2.3 cm. Record tumor size as 023 (23 mm).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:e42",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 2: Duct carcinoma in situ measuring 1.9 cm with an area of invasive ductal carcinoma. Record tumor size as 019 (19 mm)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i43",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "9. Record the largest dimension or diameter of tumor, whether it is from an excisional biopsy specimen or the complete resection of the primary tumor",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:e44",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 1: Tumor is described as 2.4 x 5.1 x 1.8 cm in size. Record tumor size as 051 (51 mm).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:e45",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example 2: Anal canal tumor is 2.5 cm from proximal to distal (3.5 cm in circumference). Record tumor size as 035. The circumferential measurement is the largest measurement in this example. In this case, the pathologist usually cuts the anus and rectum open like a tube; the circumference is measured flat.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i46",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "10. Record the size as stated for purely in situ lesions",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i47",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "11. Multifocal/multicentric tumors: Code the size of the largest invasive tumor, or the largest in situ tumor if all tumors are in situ, when the tumor is multi-focal or when multiple tumors are reported as a single primary.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i48",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "12. Assign code 000 when",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i49",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "a. No residual tumor is found",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i50",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "i. Neoadjuvant therapy has been administered and the resection shows no residual tumor",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i51",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "b. Schema is Cervical Lymph Nodes and Unknown Primary 00060",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i52",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "c. EOD Primary Tumor is coded 800 (No evidence of primary tumor) for any schema except for those listed in Coding Instruction 14",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i53",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "13. Assign tumor size for benign and borderline tumors in the schemas Brain, CNS Other, Intracranial Gland, and Medulloblastoma when provided; do not default to 999",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i54",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "14. Assign code 999 when",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i55",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "a. Size is unknown and for the following sites and schemas/schema IDs",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i56",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C420",
+        "C421",
+        "C423",
+        "C424",
+        "C770-C779",
+        "C809"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "i. Any case coded to primary site C420, C421, C423, C424, C770-C779, or C809",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i57",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "ii. HemeRetic 00830\n1. Excluding Spleen (C422)\niii. Kaposi Sarcoma 00458\niv. Lymphoma 00790\nv. Lymphoma-CLL/SLL 00795\nvi. Melanoma Choroid and Ciliary Body 00672\nvii. Melanoma Iris 00671\nviii. Plasma Cell Disorders 00822\nix. Plasma Cell Myeloma 00821",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i58",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "b. The only measurement describes pieces or chips in a pathology report. Do not add the size of pieces or chips together to create a whole; they may not be from the same location, or they may represent only a very small portion of a large tumor. However, when the pathologist states an aggregate or composite size (determined by fitting the tumor pieces together and measuring the total size), record that size.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i59",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "c. The only measurement is for calcifications that span given distance or a cluster of microcalcifications. Do not record the size of calcifications as tumor size. If there is no measurement of the mass or tumor, record 999.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i60",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "d. Neoadjuvant therapy has been administered and resection was performed. Do not use a post-neoadjuvant size to code pathologic tumor size; however, you may use the clinical tumor size if available.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:tumor_size_summary:coding_instructions:i61",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section IV Description of this Neoplasm",
+      "Tumor Size Summary",
+      "Coding Instructions"
+    ],
+    "anchor": "L3614-L3773:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "15. Document the information to support coded tumor size in the appropriate text data item of the abstract",
+    "codes": null,
+    "notes": null
+  }
+]

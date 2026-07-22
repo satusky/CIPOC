@@ -1,0 +1,463 @@
+[
+  {
+    "rule_id": "spcsm_2024:mets_distant_lymph_node_s:mets_at_diagnosisdistant_lymph:d1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Distant Lymph Node(s)"
+    ],
+    "anchor": "L4368-L4380:mets-at-diagnosisdistant-lymph-nodes",
+    "kind": "definition",
+    "item_ids": [
+      1114
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "This data item identifies whether distant lymph node(s) are an involved metastatic site.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_distant_lymph_node_s:mets_at_diagnosisdistant_lymph:t2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Distant Lymph Node(s)"
+    ],
+    "anchor": "L4368-L4380:mets-at-diagnosisdistant-lymph-nodes",
+    "kind": "code_table",
+    "item_ids": [
+      1114
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "| Code | Description |\n|---|---|\n| 0 | None; no distant lymph node metastases |\n| 1 | Yes; distant lymph node metastases |\n| 8 | Not applicable |\n| 9 | Unknown whether distant lymph node(s) are involved metastatic site Not documented in patient record |",
+    "codes": {
+      "0": "None; no distant lymph node metastases",
+      "1": "Yes; distant lymph node metastases",
+      "8": "Not applicable",
+      "9": "Unknown whether distant lymph node(s) are involved metastatic site Not documented in patient record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_distant_lymph_node_s:coding_instructions:i1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Distant Lymph Node(s)",
+      "Coding Instructions"
+    ],
+    "anchor": "L4381-L4433:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1170
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use AJCC TNM to determine regional versus distant lymph nodes.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_distant_lymph_node_s:coding_instructions:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Distant Lymph Node(s)",
+      "Coding Instructions"
+    ],
+    "anchor": "L4381-L4433:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1170
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Assign code 0 (None) for unknown primaries, unless involved lymph nodes are stated to be distant lymph nodes.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_distant_lymph_node_s:coding_instructions:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Distant Lymph Node(s)",
+      "Coding Instructions"
+    ],
+    "anchor": "L4381-L4433:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1170
+    ],
+    "applies_to": {
+      "sites": [
+        "C589"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Placental lymph node involvement for placental primaries is classified as distant lymph node involvement (M1) and recorded in this data item.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_distant_lymph_node_s:coding_instructions:i4",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Distant Lymph Node(s)",
+      "Coding Instructions"
+    ],
+    "anchor": "L4381-L4433:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1170
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code information about distant lymph node(s) metastases only (metastases to distant lymph nodes) identified at the time of diagnosis.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_distant_lymph_node_s:coding_instructions:i5",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Distant Lymph Node(s)",
+      "Coding Instructions"
+    ],
+    "anchor": "L4381-L4433:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1170
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Distant lymph node involvement may be single or multiple.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_distant_lymph_node_s:coding_instructions:i6",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Distant Lymph Node(s)",
+      "Coding Instructions"
+    ],
+    "anchor": "L4381-L4433:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1170
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Information about distant lymph node involvement may be clinical or pathological.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_distant_lymph_node_s:coding_instructions:i7",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Distant Lymph Node(s)",
+      "Coding Instructions"
+    ],
+    "anchor": "L4381-L4433:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1170
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code this data item whether or not the patient had neoadjuvant (preoperative) systemic therapy unless determined to be disease progression.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_distant_lymph_node_s:coding_instructions:i8",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Distant Lymph Node(s)",
+      "Coding Instructions"
+    ],
+    "anchor": "L4381-L4433:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1170
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Do not code this data item for regional lymph node involvement.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_distant_lymph_node_s:coding_instructions:i9",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Distant Lymph Node(s)",
+      "Coding Instructions"
+    ],
+    "anchor": "L4381-L4433:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1170
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code this data item for all solid tumor schemas (including Kaposi Sarcoma and Ill- Defined Other [includes unknown primary site]) and the following Hematopoietic schemas except as noted in 2.c. and i. Lymphoma Ocular Adnexa 00710 ii. Lymphoma 00790 (excluding primary sites C770-C779; see 2.c.) iii. Lymphoma-CLL/SLL 00795 (excluding primary sites C770-C779; see 2.c.) iv. Mycosis Fungoides (MF) 00811 v. Primary Cutaneous Lymphoma (excluding MF and SS) 00812 vi. HemeRetic 00830 (excluding primary sites C420, C421, C423, C424, see 2.c.)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_distant_lymph_node_s:coding_instructions:i10",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Distant Lymph Node(s)",
+      "Coding Instructions"
+    ],
+    "anchor": "L4381-L4433:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1170
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Assign the code that best describes whether the case has distant lymph node metastases at diagnosis.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_distant_lymph_node_s:coding_instructions:i11",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Distant Lymph Node(s)",
+      "Coding Instructions"
+    ],
+    "anchor": "L4381-L4433:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1170
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 0 when the medical record i. Indicates that there are no distant (discontinuous) metastases at all ii. Confirms the tumor is benign (/0), borderline (/1), or in situ (/2) iii. Includes a clinical or pathologic statement that there are no distant lymph node metastases iv. Includes imaging reports that are negative for distant lymph node metastases v. Indicates lymph nodes are involved, but there is no indication whether they are regional or distant vi. Indicates that the patient has distant (discontinuous) metastases but distant lymph node(s) are not mentioned as an involved site.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_distant_lymph_node_s:coding_instructions:e12",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Distant Lymph Node(s)",
+      "Coding Instructions"
+    ],
+    "anchor": "L4381-L4433:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      1170
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 0 when the patient has metastasis to lung and liver but not distant lymph node(s).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_distant_lymph_node_s:coding_instructions:i13",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Distant Lymph Node(s)",
+      "Coding Instructions"
+    ],
+    "anchor": "L4381-L4433:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1170
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 1 when the medical record indicates that the patient has distant (discontinuous) metastases and distant lymph node(s) are mentioned as an involved site.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_distant_lymph_node_s:coding_instructions:i14",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Distant Lymph Node(s)",
+      "Coding Instructions"
+    ],
+    "anchor": "L4381-L4433:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1170
+    ],
+    "applies_to": {
+      "sites": [
+        "C420",
+        "C421",
+        "C423",
+        "C424",
+        "C770-C779"
+      ],
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 8 (Not applicable) for the following: Any case coded to primary site C420, C421, C423, C424, or C770-C779.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_distant_lymph_node_s:coding_instructions:i15",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Distant Lymph Node(s)",
+      "Coding Instructions"
+    ],
+    "anchor": "L4381-L4433:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1170
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 8 (Not applicable) for the following: Plasma Cell Disorders 00822.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:mets_distant_lymph_node_s:coding_instructions:i16",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VI Stage-related Data Items",
+      "Mets at Diagnosis--Distant Lymph Node(s)",
+      "Coding Instructions"
+    ],
+    "anchor": "L4381-L4433:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1170
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 9 when it cannot be determined whether the patient specifically has distant lymph node metastases. In other words, use code 9 when there are known distant metastases but it is not known whether the distant metastases include distant lymph node(s).",
+    "codes": null,
+    "notes": null
+  }
+]

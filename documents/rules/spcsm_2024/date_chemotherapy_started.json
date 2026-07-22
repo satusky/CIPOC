@@ -1,0 +1,150 @@
+[
+  {
+    "rule_id": "spcsm_2024:date_chemotherapy_started:date_chemotherapy_started:d1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Chemotherapy Started"
+    ],
+    "anchor": "L6458-L6463:date-chemotherapy-started",
+    "kind": "definition",
+    "item_ids": [
+      1220
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Date Chemotherapy Started is the date when chemotherapy began as part of the first course of therapy.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_chemotherapy_started:date_chemotherapy_started:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Chemotherapy Started"
+    ],
+    "anchor": "L6458-L6463:date-chemotherapy-started",
+    "kind": "instruction",
+    "item_ids": [
+      1220
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Date Chemotherapy Started must be transmitted in the YYYYMMDD format. Date Chemotherapy Started may be recorded in the transmission format, or recorded in the traditional format (MMDDYYYY) and converted electronically to the transmission format.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_chemotherapy_started:date_chemotherapy_started:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Chemotherapy Started"
+    ],
+    "anchor": "L6458-L6463:date-chemotherapy-started",
+    "kind": "instruction",
+    "item_ids": [
+      1220
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "SEER Central Registries: Collect when available from CoC reporting facilities.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_chemotherapy_started:coding_instructions:i1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Chemotherapy Started",
+      "Coding Instructions"
+    ],
+    "anchor": "L6464-L6481:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1220
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "1. Record the date of the first/earliest chemotherapy if chemotherapy was given and recorded as part of the first course of therapy a. Code the date that the prescription or physician order was written if date administered unknown",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_chemotherapy_started:coding_instructions:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Chemotherapy Started",
+      "Coding Instructions"
+    ],
+    "anchor": "L6464-L6481:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1220,
+      1230
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "2. Chemotherapy date should be the same as the Date Therapy Initiated when chemotherapy is the only treatment administered",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_chemotherapy_started:coding_instructions:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Chemotherapy Started",
+      "Coding Instructions"
+    ],
+    "anchor": "L6464-L6481:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1220
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "3. Transmit date data items in the year, month, day format (YYYYMMDD)",
+    "codes": null,
+    "notes": null
+  }
+]

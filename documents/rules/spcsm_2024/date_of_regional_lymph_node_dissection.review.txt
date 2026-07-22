@@ -1,0 +1,154 @@
+========================================================================
+RULE COMPILATION REVIEW REPORT
+========================================================================
+Source: documents/markdown/SPCSM_2024_MainDoc.md
+Units emitted: 10  |  accepted: 10  |  quarantined: 0
+
+Accepted units by kind:
+  definition     1
+  instruction    9
+
+Accepted fidelity: min 1.00  mean 1.00
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED ACCEPTED UNITS (source vs. compiled, up to 5)
+------------------------------------------------------------------------
+
+[spcsm_2024:date_of_regional_lymph_node_dissection:date_of_regional_lymph:d1]  kind=definition  items=[682]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Date of Regional Lymph Node Dissection
+
+    | #### Item Length: 8 NAACCR Item #: 682 NAACCR Name: Date Regional Lymph Node Dissection XML NAACCR ID: dateRegionalLNDissection
+
+    | *Date of Regional Lymph Node Dissection records the date non-sentinel regional node dissection was* performed. *Date of Regional Lymph Node Dissection must be transmitted in the YYYYMMDD format. Date of* *Regional Lymph Node Dissection may be recorded in the transmission format, or recorded in the traditional* format (MMDDYYYY) and converted electronically to the transmission format. SEER Central Registries: Collect when available from CoC reporting facilities.
+
+  COMPILED TEXT:
+    > Date of Regional Lymph Node Dissection records the date non-sentinel regional node dissection was performed.
+
+[spcsm_2024:date_of_regional_lymph_node_dissection:date_of_regional_lymph:i3]  kind=instruction  items=[682]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Date of Regional Lymph Node Dissection
+
+    | #### Item Length: 8 NAACCR Item #: 682 NAACCR Name: Date Regional Lymph Node Dissection XML NAACCR ID: dateRegionalLNDissection
+
+    | *Date of Regional Lymph Node Dissection records the date non-sentinel regional node dissection was* performed. *Date of Regional Lymph Node Dissection must be transmitted in the YYYYMMDD format. Date of* *Regional Lymph Node Dissection may be recorded in the transmission format, or recorded in the traditional* format (MMDDYYYY) and converted electronically to the transmission format. SEER Central Registries: Collect when available from CoC reporting facilities.
+
+  COMPILED TEXT:
+    > Date of Regional Lymph Node Dissection may be recorded in the transmission format, or recorded in the traditional format (MMDDYYYY) and converted electronically to the transmission format.
+
+[spcsm_2024:date_of_regional_lymph_node_dissection:coding_instructions:i1]  kind=instruction  items=[830]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. Record the date of regional lymph node dissection documented in the Regional Nodes
+
+    | *Examined data item [NAACCR Item #830]*
+
+    | 2. Record the date of the regional lymph node dissection in this data item and record the date of
+
+    | the sentinel lymph node biopsy procedure in the Date of Sentinel Lymph Node Biopsy data item [NAACCR Item #832] for breast and cutaneous melanoma cases when
+
+    | | a. | Both a sentinel lymph node biopsy procedure and a separate regional lymph node dissection procedure are performed OR |
+    | |---|---|
+    | | b. | A sentinel lymph node biopsy is performed in the same procedure as the regional lymph node dissection. In this case, the dates should be the same. |
+
+    | 3. Record the date of the regional lymph node dissection in this data item for all other cases (in
+
+    | addition to breast and cutaneous melanoma cases) a. If a sentinel lymph node biopsy procedure is also performed, record the procedure in the
+
+    | *Date of Sentinel Lymph Node Biopsy data item [NAACCR Item #832]* i. If the sentinel lymph node biopsy is performed in the same procedure as the
+
+    | regional lymph node dissection, the dates should be the same
+
+    | 4. Leave Date of Regional Lymph Node Dissection blank when only a sentinel lymph node biopsy
+
+    | is performed
+
+    | **September 2023 Section VII: First Course of Therapy 186**
+
+    | -----
+
+  COMPILED TEXT:
+    > 1. Record the date of regional lymph node dissection documented in the Regional Nodes Examined data item [NAACCR Item #830]
+
+[spcsm_2024:date_of_regional_lymph_node_dissection:coding_instructions:i3]  kind=instruction  items=[830]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. Record the date of regional lymph node dissection documented in the Regional Nodes
+
+    | *Examined data item [NAACCR Item #830]*
+
+    | 2. Record the date of the regional lymph node dissection in this data item and record the date of
+
+    | the sentinel lymph node biopsy procedure in the Date of Sentinel Lymph Node Biopsy data item [NAACCR Item #832] for breast and cutaneous melanoma cases when
+
+    | | a. | Both a sentinel lymph node biopsy procedure and a separate regional lymph node dissection procedure are performed OR |
+    | |---|---|
+    | | b. | A sentinel lymph node biopsy is performed in the same procedure as the regional lymph node dissection. In this case, the dates should be the same. |
+
+    | 3. Record the date of the regional lymph node dissection in this data item for all other cases (in
+
+    | addition to breast and cutaneous melanoma cases) a. If a sentinel lymph node biopsy procedure is also performed, record the procedure in the
+
+    | *Date of Sentinel Lymph Node Biopsy data item [NAACCR Item #832]* i. If the sentinel lymph node biopsy is performed in the same procedure as the
+
+    | regional lymph node dissection, the dates should be the same
+
+    | 4. Leave Date of Regional Lymph Node Dissection blank when only a sentinel lymph node biopsy
+
+    | is performed
+
+    | **September 2023 Section VII: First Course of Therapy 186**
+
+    | -----
+
+  COMPILED TEXT:
+    > 3. Record the date of the regional lymph node dissection in this data item for all other cases (in addition to breast and cutaneous melanoma cases)
+
+[spcsm_2024:date_of_regional_lymph_node_dissection:coding_instructions:i5]  kind=instruction  items=[830, 832]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. Record the date of regional lymph node dissection documented in the Regional Nodes
+
+    | *Examined data item [NAACCR Item #830]*
+
+    | 2. Record the date of the regional lymph node dissection in this data item and record the date of
+
+    | the sentinel lymph node biopsy procedure in the Date of Sentinel Lymph Node Biopsy data item [NAACCR Item #832] for breast and cutaneous melanoma cases when
+
+    | | a. | Both a sentinel lymph node biopsy procedure and a separate regional lymph node dissection procedure are performed OR |
+    | |---|---|
+    | | b. | A sentinel lymph node biopsy is performed in the same procedure as the regional lymph node dissection. In this case, the dates should be the same. |
+
+    | 3. Record the date of the regional lymph node dissection in this data item for all other cases (in
+
+    | addition to breast and cutaneous melanoma cases) a. If a sentinel lymph node biopsy procedure is also performed, record the procedure in the
+
+    | *Date of Sentinel Lymph Node Biopsy data item [NAACCR Item #832]* i. If the sentinel lymph node biopsy is performed in the same procedure as the
+
+    | regional lymph node dissection, the dates should be the same
+
+    | 4. Leave Date of Regional Lymph Node Dissection blank when only a sentinel lymph node biopsy
+
+    | is performed
+
+    | **September 2023 Section VII: First Course of Therapy 186**
+
+    | -----
+
+  COMPILED TEXT:
+    > i. If the sentinel lymph node biopsy is performed in the same procedure as the regional lymph node dissection, the dates should be the same
+
+========================================================================

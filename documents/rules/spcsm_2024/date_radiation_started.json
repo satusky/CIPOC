@@ -1,0 +1,200 @@
+[
+  {
+    "rule_id": "spcsm_2024:date_radiation_started:date_radiation_started:d1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Radiation Started"
+    ],
+    "anchor": "L6142-L6147:date-radiation-started",
+    "kind": "definition",
+    "item_ids": [
+      1210
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Date Radiation Started is the date when radiation therapy began as part of the first course of therapy.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_radiation_started:date_radiation_started:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Radiation Started"
+    ],
+    "anchor": "L6142-L6147:date-radiation-started",
+    "kind": "instruction",
+    "item_ids": [
+      1210
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Date Radiation Started must be transmitted in the YYYYMMDD format. Date Radiation Started may be recorded in the transmission format, or recorded in the traditional format (MMDDYYYY) and converted electronically to the transmission format.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_radiation_started:date_radiation_started:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Radiation Started"
+    ],
+    "anchor": "L6142-L6147:date-radiation-started",
+    "kind": "instruction",
+    "item_ids": [
+      1210
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "SEER Central Registries: Collect when available from CoC reporting facilities.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_radiation_started:coding_instructions:i1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Radiation Started",
+      "Coding Instructions"
+    ],
+    "anchor": "L6148-L6167:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1210
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Record the date of the first/earliest radiation treatment if radiation was given and recorded as part of the first course of therapy",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_radiation_started:coding_instructions:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Radiation Started",
+      "Coding Instructions"
+    ],
+    "anchor": "L6148-L6167:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1210
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Do not record the date of the initial radiation planning session",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_radiation_started:coding_instructions:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Radiation Started",
+      "Coding Instructions"
+    ],
+    "anchor": "L6148-L6167:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1210,
+      1230
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Radiation date should be the same as the Date Therapy Initiated when radiation is the only treatment administered",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_radiation_started:coding_instructions:i4",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Radiation Started",
+      "Coding Instructions"
+    ],
+    "anchor": "L6148-L6167:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1210
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "There may be times when the first course of treatment information is incomplete. Therefore, it is important to continue follow-up efforts to be certain the complete treatment information is collected.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_radiation_started:coding_instructions:i5",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date Radiation Started",
+      "Coding Instructions"
+    ],
+    "anchor": "L6148-L6167:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1210
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Transmit date data items in the year, month, day format (YYYYMMDD)",
+    "codes": null,
+    "notes": null
+  }
+]

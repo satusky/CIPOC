@@ -1,0 +1,255 @@
+========================================================================
+RULE COMPILATION REVIEW REPORT
+========================================================================
+Source: documents/markdown/SPCSM_2024_MainDoc.md
+Units emitted: 13  |  accepted: 13  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     1
+  definition     1
+  example        1
+  instruction    10
+
+Accepted fidelity: min 1.00  mean 1.00
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED ACCEPTED UNITS (source vs. compiled, up to 5)
+------------------------------------------------------------------------
+
+[spcsm_2024:mets_liver:mets_at_diagnosisliver:d1]  kind=definition  items=[1115]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Mets at Diagnosis--Liver
+
+    | #### Item Length: 1 NAACCR Item #: 1115 NAACCR Name: Mets at DX-Liver XML NAACCR ID: metsAtDxLiver
+
+    | This data item identifies whether liver is an involved metastatic site. The six Mets at Diagnosis-metastatic sites data items provide information on specific metastatic sites for data analysis.
+
+    | | Code | Description |
+    | |---|---|
+    | | 0 | None; no liver metastases |
+    | | 1 | Yes; distant liver metastases |
+    | | 8 | Not applicable |
+    | | 9 | Unknown whether liver is involved metastatic site Not documented in patient record |
+
+  COMPILED TEXT:
+    > This data item identifies whether liver is an involved metastatic site.
+
+[spcsm_2024:mets_liver:coding_instructions:i1]  kind=instruction  items=[1114]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Code information about liver metastases only (discontinuous or distant metastases to liver)**
+
+    | identified at the time of diagnosis. Do not record contiguous involvement of liver by primary
+
+    | **tumor in this data item.**
+
+    | | a. | Liver involvement may be single or multiple |
+    | |---|---|
+    | | b. | Information about liver involvement may be clinical or pathological |
+    | | c. | Code this data item whether or not the patient had neoadjuvant (preoperative) systemic therapy unless determined to be disease progression |
+
+    | d. Code this data item for all solid tumor schemas (including Kaposi Sarcoma and Ill-
+
+    | Defined Other [includes unknown primary site]) and the following Hematopoietic schemas except as noted in 2.c. and 2.d . i. Lymphoma Ocular Adnexa 00710 ii. Lymphoma 00790 iii. Lymphoma-CLL/SLL 00795 iv. Mycosis Fungoides (MF) 00811 v. Primary Cutaneous Lymphoma (excluding MF and SS) 00812 vi. HemeRetic 00830 (excluding primary sites C420, C421, C423, C424)
+
+    | 2. **Use of codes: Assign the code that best describes whether the case has liver metastases at**
+
+    | diagnosis. a. Use code 0 when the medical record
+
+    | i. Indicates that there are no distant (discontinuous) metastases at all ii. Confirms the tumor is benign (0/), borderline (/1), or in situ (/2) iii. Includes a clinical or pathologic statement that there are no liver metastases iv. Includes imaging reports that are negative for liver metastases v. Indicates that the patient has distant (discontinuous) metastases but liver is not
+
+    | mentioned as an involved site
+
+    | **September 2023 Section VI: Stage-related Data Items 148**
+
+    | -----
+
+    | ***Example:*** **Use code 0 when the patient has metastasis to lung and brain but not liver.**
+
+    | b. Use code 1 when the medical record
+
+    | i. Indicates that the patient has distant (discontinuous) metastases and liver is
+
+    | mentioned as an involved site ii. Indicates that the patient is diagnosed with an unknown primary (C80.9) and liver
+
+    | is mentioned as a distant metastatic site c. Use code 8 (Not applicable) for the following
+
+    | i. Any case coded to primary site C420, C421, C423, or C424 ii. Plasma Cell Disorders 00822 d. Use code 9 when it cannot be determined whether the patient specifically has liver
+
+    | metastases. In other words, use code 9 when there are known distant metastases but it is not known whether the distant metastases include liver. For more information about schemas and schema IDs, go to the SSDI Manual, Appendix A.
+
+    | **September 2023 Section VI: Stage-related Data Items 149**
+
+    | -----
+
+  COMPILED TEXT:
+    > Code information about liver metastases only (discontinuous or distant metastases to liver) identified at the time of diagnosis. Do not record contiguous involvement of liver by primary tumor in this data item.
+
+[spcsm_2024:mets_liver:coding_instructions:i3]  kind=instruction  items=[1114]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Code information about liver metastases only (discontinuous or distant metastases to liver)**
+
+    | identified at the time of diagnosis. Do not record contiguous involvement of liver by primary
+
+    | **tumor in this data item.**
+
+    | | a. | Liver involvement may be single or multiple |
+    | |---|---|
+    | | b. | Information about liver involvement may be clinical or pathological |
+    | | c. | Code this data item whether or not the patient had neoadjuvant (preoperative) systemic therapy unless determined to be disease progression |
+
+    | d. Code this data item for all solid tumor schemas (including Kaposi Sarcoma and Ill-
+
+    | Defined Other [includes unknown primary site]) and the following Hematopoietic schemas except as noted in 2.c. and 2.d . i. Lymphoma Ocular Adnexa 00710 ii. Lymphoma 00790 iii. Lymphoma-CLL/SLL 00795 iv. Mycosis Fungoides (MF) 00811 v. Primary Cutaneous Lymphoma (excluding MF and SS) 00812 vi. HemeRetic 00830 (excluding primary sites C420, C421, C423, C424)
+
+    | 2. **Use of codes: Assign the code that best describes whether the case has liver metastases at**
+
+    | diagnosis. a. Use code 0 when the medical record
+
+    | i. Indicates that there are no distant (discontinuous) metastases at all ii. Confirms the tumor is benign (0/), borderline (/1), or in situ (/2) iii. Includes a clinical or pathologic statement that there are no liver metastases iv. Includes imaging reports that are negative for liver metastases v. Indicates that the patient has distant (discontinuous) metastases but liver is not
+
+    | mentioned as an involved site
+
+    | **September 2023 Section VI: Stage-related Data Items 148**
+
+    | -----
+
+    | ***Example:*** **Use code 0 when the patient has metastasis to lung and brain but not liver.**
+
+    | b. Use code 1 when the medical record
+
+    | i. Indicates that the patient has distant (discontinuous) metastases and liver is
+
+    | mentioned as an involved site ii. Indicates that the patient is diagnosed with an unknown primary (C80.9) and liver
+
+    | is mentioned as a distant metastatic site c. Use code 8 (Not applicable) for the following
+
+    | i. Any case coded to primary site C420, C421, C423, or C424 ii. Plasma Cell Disorders 00822 d. Use code 9 when it cannot be determined whether the patient specifically has liver
+
+    | metastases. In other words, use code 9 when there are known distant metastases but it is not known whether the distant metastases include liver. For more information about schemas and schema IDs, go to the SSDI Manual, Appendix A.
+
+    | **September 2023 Section VI: Stage-related Data Items 149**
+
+    | -----
+
+  COMPILED TEXT:
+    > Information about liver involvement may be clinical or pathological.
+
+[spcsm_2024:mets_liver:coding_instructions:i5]  kind=instruction  items=[1114]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Code information about liver metastases only (discontinuous or distant metastases to liver)**
+
+    | identified at the time of diagnosis. Do not record contiguous involvement of liver by primary
+
+    | **tumor in this data item.**
+
+    | | a. | Liver involvement may be single or multiple |
+    | |---|---|
+    | | b. | Information about liver involvement may be clinical or pathological |
+    | | c. | Code this data item whether or not the patient had neoadjuvant (preoperative) systemic therapy unless determined to be disease progression |
+
+    | d. Code this data item for all solid tumor schemas (including Kaposi Sarcoma and Ill-
+
+    | Defined Other [includes unknown primary site]) and the following Hematopoietic schemas except as noted in 2.c. and 2.d . i. Lymphoma Ocular Adnexa 00710 ii. Lymphoma 00790 iii. Lymphoma-CLL/SLL 00795 iv. Mycosis Fungoides (MF) 00811 v. Primary Cutaneous Lymphoma (excluding MF and SS) 00812 vi. HemeRetic 00830 (excluding primary sites C420, C421, C423, C424)
+
+    | 2. **Use of codes: Assign the code that best describes whether the case has liver metastases at**
+
+    | diagnosis. a. Use code 0 when the medical record
+
+    | i. Indicates that there are no distant (discontinuous) metastases at all ii. Confirms the tumor is benign (0/), borderline (/1), or in situ (/2) iii. Includes a clinical or pathologic statement that there are no liver metastases iv. Includes imaging reports that are negative for liver metastases v. Indicates that the patient has distant (discontinuous) metastases but liver is not
+
+    | mentioned as an involved site
+
+    | **September 2023 Section VI: Stage-related Data Items 148**
+
+    | -----
+
+    | ***Example:*** **Use code 0 when the patient has metastasis to lung and brain but not liver.**
+
+    | b. Use code 1 when the medical record
+
+    | i. Indicates that the patient has distant (discontinuous) metastases and liver is
+
+    | mentioned as an involved site ii. Indicates that the patient is diagnosed with an unknown primary (C80.9) and liver
+
+    | is mentioned as a distant metastatic site c. Use code 8 (Not applicable) for the following
+
+    | i. Any case coded to primary site C420, C421, C423, or C424 ii. Plasma Cell Disorders 00822 d. Use code 9 when it cannot be determined whether the patient specifically has liver
+
+    | metastases. In other words, use code 9 when there are known distant metastases but it is not known whether the distant metastases include liver. For more information about schemas and schema IDs, go to the SSDI Manual, Appendix A.
+
+    | **September 2023 Section VI: Stage-related Data Items 149**
+
+    | -----
+
+  COMPILED TEXT:
+    > Code this data item for all solid tumor schemas (including Kaposi Sarcoma and Ill-Defined Other [includes unknown primary site]) and the following Hematopoietic schemas except as noted in 2.c. and 2.d . i. Lymphoma Ocular Adnexa 00710 ii. Lymphoma 00790 iii. Lymphoma-CLL/SLL 00795 iv. Mycosis Fungoides (MF) 00811 v. Primary Cutaneous Lymphoma (excluding MF and SS) 00812 vi. HemeRetic 00830 (excluding primary sites C420, C421, C423, C424)
+
+[spcsm_2024:mets_liver:coding_instructions:i7]  kind=instruction  items=[1114]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Code information about liver metastases only (discontinuous or distant metastases to liver)**
+
+    | identified at the time of diagnosis. Do not record contiguous involvement of liver by primary
+
+    | **tumor in this data item.**
+
+    | | a. | Liver involvement may be single or multiple |
+    | |---|---|
+    | | b. | Information about liver involvement may be clinical or pathological |
+    | | c. | Code this data item whether or not the patient had neoadjuvant (preoperative) systemic therapy unless determined to be disease progression |
+
+    | d. Code this data item for all solid tumor schemas (including Kaposi Sarcoma and Ill-
+
+    | Defined Other [includes unknown primary site]) and the following Hematopoietic schemas except as noted in 2.c. and 2.d . i. Lymphoma Ocular Adnexa 00710 ii. Lymphoma 00790 iii. Lymphoma-CLL/SLL 00795 iv. Mycosis Fungoides (MF) 00811 v. Primary Cutaneous Lymphoma (excluding MF and SS) 00812 vi. HemeRetic 00830 (excluding primary sites C420, C421, C423, C424)
+
+    | 2. **Use of codes: Assign the code that best describes whether the case has liver metastases at**
+
+    | diagnosis. a. Use code 0 when the medical record
+
+    | i. Indicates that there are no distant (discontinuous) metastases at all ii. Confirms the tumor is benign (0/), borderline (/1), or in situ (/2) iii. Includes a clinical or pathologic statement that there are no liver metastases iv. Includes imaging reports that are negative for liver metastases v. Indicates that the patient has distant (discontinuous) metastases but liver is not
+
+    | mentioned as an involved site
+
+    | **September 2023 Section VI: Stage-related Data Items 148**
+
+    | -----
+
+    | ***Example:*** **Use code 0 when the patient has metastasis to lung and brain but not liver.**
+
+    | b. Use code 1 when the medical record
+
+    | i. Indicates that the patient has distant (discontinuous) metastases and liver is
+
+    | mentioned as an involved site ii. Indicates that the patient is diagnosed with an unknown primary (C80.9) and liver
+
+    | is mentioned as a distant metastatic site c. Use code 8 (Not applicable) for the following
+
+    | i. Any case coded to primary site C420, C421, C423, or C424 ii. Plasma Cell Disorders 00822 d. Use code 9 when it cannot be determined whether the patient specifically has liver
+
+    | metastases. In other words, use code 9 when there are known distant metastases but it is not known whether the distant metastases include liver. For more information about schemas and schema IDs, go to the SSDI Manual, Appendix A.
+
+    | **September 2023 Section VI: Stage-related Data Items 149**
+
+    | -----
+
+  COMPILED TEXT:
+    > Use code 0 when the medical record i. Indicates that there are no distant (discontinuous) metastases at all ii. Confirms the tumor is benign (0/), borderline (/1), or in situ (/2) iii. Includes a clinical or pathologic statement that there are no liver metastases iv. Includes imaging reports that are negative for liver metastases v. Indicates that the patient has distant (discontinuous) metastases but liver is not mentioned as an involved site
+
+========================================================================

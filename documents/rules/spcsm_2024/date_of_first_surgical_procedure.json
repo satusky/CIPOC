@@ -1,0 +1,273 @@
+[
+  {
+    "rule_id": "spcsm_2024:date_of_first_surgical_procedure:date_of_first_surgical:d1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of First Surgical Procedure"
+    ],
+    "anchor": "L5047-L5052:date-of-first-surgical-procedure",
+    "kind": "definition",
+    "item_ids": [
+      1200
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Date of First Surgical Procedure is the date the first surgery was performed as part of first course of therapy.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_first_surgical_procedure:date_of_first_surgical:p2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of First Surgical Procedure"
+    ],
+    "anchor": "L5047-L5052:date-of-first-surgical-procedure",
+    "kind": "priority_rule",
+    "item_ids": [
+      1200
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "This is either the date of the Surgery of Primary Site 2023, Sentinel Lymph Node Biopsy, Scope of Regional Lymph Node Surgery (codes 2-7), or Surgical Procedure of Other Site, whichever is earliest.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_first_surgical_procedure:date_of_first_surgical:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of First Surgical Procedure"
+    ],
+    "anchor": "L5047-L5052:date-of-first-surgical-procedure",
+    "kind": "instruction",
+    "item_ids": [
+      1200
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Date of First Surgical Procedure must be transmitted in the YYYYMMDD format.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_first_surgical_procedure:date_of_first_surgical:i4",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of First Surgical Procedure"
+    ],
+    "anchor": "L5047-L5052:date-of-first-surgical-procedure",
+    "kind": "instruction",
+    "item_ids": [
+      1200
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Date of First Surgical Procedure may be recorded in the transmission format, or recorded in the traditional format (MMDDYYYY) and converted electronically to the transmission format.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_first_surgical_procedure:date_of_first_surgical:i5",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of First Surgical Procedure"
+    ],
+    "anchor": "L5047-L5052:date-of-first-surgical-procedure",
+    "kind": "instruction",
+    "item_ids": [
+      1200
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "SEER Central Registries: Collect when available from CoC reporting facilities.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_first_surgical_procedure:coding_instructions:i1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of First Surgical Procedure",
+      "Coding Instructions"
+    ],
+    "anchor": "L5053-L5075:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1200
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "1. Record the date of the first/earliest surgery if Surgery of Primary Site 2023, Sentinel Lymph Node Biopsy, Scope of Regional Lymph Node Surgery (excluding cases coded to 1), or Surgical Procedure of Other Site was recorded as part of the first course of therapy",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_first_surgical_procedure:coding_instructions:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of First Surgical Procedure",
+      "Coding Instructions"
+    ],
+    "anchor": "L5053-L5075:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1200,
+      1230
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "2. Surgery date should be the same as the Date Therapy Initiated when surgery is the only treatment administered",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_first_surgical_procedure:coding_instructions:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of First Surgical Procedure",
+      "Coding Instructions"
+    ],
+    "anchor": "L5053-L5075:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1200
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "3. Transmit date data items in the year, month, day format (YYYYMMDD)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_first_surgical_procedure:coding_instructions:i4",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of First Surgical Procedure",
+      "Coding Instructions"
+    ],
+    "anchor": "L5053-L5075:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1200
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "4. Record the polypectomy date as the date of first surgical procedure when a surgical procedure to remove polyps is performed without removing the entire tumor, and a subsequent surgery is performed.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_first_surgical_procedure:coding_instructions:d5",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of First Surgical Procedure",
+      "Coding Instructions"
+    ],
+    "anchor": "L5053-L5075:coding-instructions",
+    "kind": "definition",
+    "item_ids": [
+      1200
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "When reportable tumor is found in the specimen, polypectomies are surgery for the purposes of cancer registry data collection regardless of whether or not there is residual tumor after the polypectomy",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_first_surgical_procedure:coding_instructions:i6",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of First Surgical Procedure",
+      "Coding Instructions"
+    ],
+    "anchor": "L5053-L5075:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1200
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "5. Leave date blank when there is no surgery performed",
+    "codes": null,
+    "notes": null
+  }
+]

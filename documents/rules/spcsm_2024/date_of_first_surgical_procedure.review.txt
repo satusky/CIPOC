@@ -1,0 +1,117 @@
+========================================================================
+RULE COMPILATION REVIEW REPORT
+========================================================================
+Source: documents/markdown/SPCSM_2024_MainDoc.md
+Units emitted: 11  |  accepted: 11  |  quarantined: 0
+
+Accepted units by kind:
+  definition     2
+  instruction    8
+  priority_rule  1
+
+Accepted fidelity: min 1.00  mean 1.00
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED ACCEPTED UNITS (source vs. compiled, up to 5)
+------------------------------------------------------------------------
+
+[spcsm_2024:date_of_first_surgical_procedure:date_of_first_surgical:d1]  kind=definition  items=[1200]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Date of First Surgical Procedure
+
+    | #### Item Length: 8 NAACCR Item #: 1200 NAACCR Name: RX Date Surgery XML NAACCR ID: rxDateSurgery
+
+    | *Date of First Surgical Procedure is the date the first surgery was performed as part of first course of therapy.* This is either the date of the Surgery of Primary Site 2023, Sentinel Lymph Node Biopsy, Scope of Regional *Lymph Node Surgery (codes 2-7), or Surgical Procedure of Other Site, whichever is earliest.* *Date of First Surgical Procedure must be transmitted in the YYYYMMDD format. Date of First Surgical* *Procedure may be recorded in the transmission format, or recorded in the traditional format (MMDDYYYY)* and converted electronically to the transmission format. SEER Central Registries: Collect when available from CoC reporting facilities.
+
+  COMPILED TEXT:
+    > Date of First Surgical Procedure is the date the first surgery was performed as part of first course of therapy.
+
+[spcsm_2024:date_of_first_surgical_procedure:date_of_first_surgical:i3]  kind=instruction  items=[1200]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Date of First Surgical Procedure
+
+    | #### Item Length: 8 NAACCR Item #: 1200 NAACCR Name: RX Date Surgery XML NAACCR ID: rxDateSurgery
+
+    | *Date of First Surgical Procedure is the date the first surgery was performed as part of first course of therapy.* This is either the date of the Surgery of Primary Site 2023, Sentinel Lymph Node Biopsy, Scope of Regional *Lymph Node Surgery (codes 2-7), or Surgical Procedure of Other Site, whichever is earliest.* *Date of First Surgical Procedure must be transmitted in the YYYYMMDD format. Date of First Surgical* *Procedure may be recorded in the transmission format, or recorded in the traditional format (MMDDYYYY)* and converted electronically to the transmission format. SEER Central Registries: Collect when available from CoC reporting facilities.
+
+  COMPILED TEXT:
+    > Date of First Surgical Procedure must be transmitted in the YYYYMMDD format.
+
+[spcsm_2024:date_of_first_surgical_procedure:date_of_first_surgical:i5]  kind=instruction  items=[1200]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Date of First Surgical Procedure
+
+    | #### Item Length: 8 NAACCR Item #: 1200 NAACCR Name: RX Date Surgery XML NAACCR ID: rxDateSurgery
+
+    | *Date of First Surgical Procedure is the date the first surgery was performed as part of first course of therapy.* This is either the date of the Surgery of Primary Site 2023, Sentinel Lymph Node Biopsy, Scope of Regional *Lymph Node Surgery (codes 2-7), or Surgical Procedure of Other Site, whichever is earliest.* *Date of First Surgical Procedure must be transmitted in the YYYYMMDD format. Date of First Surgical* *Procedure may be recorded in the transmission format, or recorded in the traditional format (MMDDYYYY)* and converted electronically to the transmission format. SEER Central Registries: Collect when available from CoC reporting facilities.
+
+  COMPILED TEXT:
+    > SEER Central Registries: Collect when available from CoC reporting facilities.
+
+[spcsm_2024:date_of_first_surgical_procedure:coding_instructions:i2]  kind=instruction  items=[1200, 1230]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. Record the date of the first/earliest surgery if Surgery of Primary Site 2023, Sentinel Lymph
+
+    | *Node Biopsy, Scope of Regional Lymph Node Surgery (excluding cases coded to 1), or Surgical Procedure of Other Site was recorded as part of the first course of therapy*
+
+    | 2. Surgery date should be the same as the Date Therapy Initiated when surgery is the only
+
+    | treatment administered
+
+    | 3. Transmit date data items in the year, month, day format (YYYYMMDD)
+    | 4. Record the polypectomy date as the date of first surgical procedure when a surgical procedure
+
+    | to remove polyps is performed without removing the entire tumor, and a subsequent surgery is performed a. When reportable tumor is found in the specimen, polypectomies are surgery for the
+
+    | purposes of cancer registry data collection regardless of whether or not there is residual tumor after the polypectomy
+
+    | 5. Leave date blank when there is no surgery performed
+
+    | **September 2023 Section VII: First Course of Therapy 171**
+
+    | -----
+
+  COMPILED TEXT:
+    > 2. Surgery date should be the same as the Date Therapy Initiated when surgery is the only treatment administered
+
+[spcsm_2024:date_of_first_surgical_procedure:coding_instructions:i4]  kind=instruction  items=[1200]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. Record the date of the first/earliest surgery if Surgery of Primary Site 2023, Sentinel Lymph
+
+    | *Node Biopsy, Scope of Regional Lymph Node Surgery (excluding cases coded to 1), or Surgical Procedure of Other Site was recorded as part of the first course of therapy*
+
+    | 2. Surgery date should be the same as the Date Therapy Initiated when surgery is the only
+
+    | treatment administered
+
+    | 3. Transmit date data items in the year, month, day format (YYYYMMDD)
+    | 4. Record the polypectomy date as the date of first surgical procedure when a surgical procedure
+
+    | to remove polyps is performed without removing the entire tumor, and a subsequent surgery is performed a. When reportable tumor is found in the specimen, polypectomies are surgery for the
+
+    | purposes of cancer registry data collection regardless of whether or not there is residual tumor after the polypectomy
+
+    | 5. Leave date blank when there is no surgery performed
+
+    | **September 2023 Section VII: First Course of Therapy 171**
+
+    | -----
+
+  COMPILED TEXT:
+    > 4. Record the polypectomy date as the date of first surgical procedure when a surgical procedure to remove polyps is performed without removing the entire tumor, and a subsequent surgery is performed.
+
+========================================================================

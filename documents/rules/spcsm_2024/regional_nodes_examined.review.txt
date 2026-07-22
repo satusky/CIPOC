@@ -1,0 +1,508 @@
+========================================================================
+RULE COMPILATION REVIEW REPORT
+========================================================================
+Source: documents/markdown/SPCSM_2024_MainDoc.md
+Units emitted: 26  |  accepted: 23  |  quarantined: 3
+
+Accepted units by kind:
+  definition     3
+  example        4
+  instruction    15
+  priority_rule  1
+
+Accepted fidelity: min 1.00  mean 1.00
+
+------------------------------------------------------------------------
+QUARANTINED (3)
+------------------------------------------------------------------------
+
+[spcsm_2024:regional_nodes_examined:description:t3]
+  - code_table codes not in item 1292 set: ['00', '01-89', '90', '95', '96', '97', '98', '99']
+
+[spcsm_2024:regional_nodes_examined:coding_instructions:t4]
+  - code_table codes not in item 1292 set: ['00']
+
+[spcsm_2024:regional_nodes_examined:coding_instructions:t23]
+  - code_table codes not in item 1292 set: ['99']
+
+------------------------------------------------------------------------
+SAMPLED ACCEPTED UNITS (source vs. compiled, up to 5)
+------------------------------------------------------------------------
+
+[spcsm_2024:regional_nodes_examined:description:d1]  kind=definition  items=[1292]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Description
+
+    | *Regional Nodes Examined records the total number of regional lymph nodes that were removed and* examined by the pathologist. This data item must be collected on all cases.
+
+    | | Code | Description |
+    | |---|---|
+    | | 00 | No nodes were examined |
+    | | 01-89 | 1-89 nodes are examined (code exact number of nodes examined) |
+    | | 90 | 90 or more nodes were examined |
+    | | 95 | No regional nodes were removed, but aspiration OR core biopsy regional nodes was performed |
+    | | 96 | Regional lymph node removal was documented as a sampling, and the number of nodes is unknown/not stated |
+
+    | 97 Regional lymph node removal was documented as a dissection, and the number of nodes is
+
+    | unknown/not stated 98 Regional lymph nodes were surgically removed, but the number of lymph nodes is unknown/not
+
+    | stated and not documented as a sampling or dissection; nodes were examined, but the number is unknown 99 It is unknown whether nodes are examined; not stated in patient record
+
+  COMPILED TEXT:
+    > Regional Nodes Examined records the total number of regional lymph nodes that were removed and examined by the pathologist.
+
+[spcsm_2024:regional_nodes_examined:coding_instructions:i3]  kind=instruction  items=[1292]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Regional lymph nodes only. Record information only about regional lymph nodes in this data**
+
+    | item. a. Include lymph nodes that are regional in the current AJCC Staging Manual or EOD
+
+    | Regional Lymph Nodes 2018
+
+    | 2. **This data item is based on pathologic information only, including autopsy. This data item is**
+
+    | to be recorded regardless of whether the patient received neoadjuvant (preoperative) treatment. Information from the autopsy may be used to code Regional Nodes Examined. Use text fields to explain the situation.
+
+    | 3. Use code 00 when
+
+    | | a. | The assessment of lymph nodes is clinical |
+    | |---|---|
+    | | b. | No lymph nodes are removed and examined |
+    | | c. | A "dissection" of a lymph node drainage area is found to contain no lymph nodes at the time of pathologic examination |
+
+    | ***Note:*** When Regional Nodes Examined is coded 00, Regional Nodes Positive is coded 98.
+
+    | 4. Nodes removed and examined is cumulative. Record the total number of regional lymph nodes
+
+    | removed and examined by the pathologist. Record lymph nodes removed during an autopsy for autopsy-only cases. a. The number of regional lymph nodes examined is cumulative from all procedures that
+
+    | removed lymph nodes through the completion of surgeries in the first course of treatment
+
+    | **September 2023 Section VII: First Course of Therapy 190**
+
+    | -----
+
+    | b. Do not count an aspiration or core biopsy of a lymph node in the same lymph node chain
+
+    | removed at surgery as an additional node in Regional Nodes Examined ***Example:*** Lung cancer patient has a mediastinoscopy and positive core biopsy of a hilar lymph node. Patient then undergoes right upper lobectomy that yields 3 hilar and 2 mediastinal nodes positive out of 11 nodes dissected. Code Regional Nodes Positive as
+
+    | #### 05 and Regional Nodes Examined as 11 because the core biopsy was of a lymph node in the same chain as the nodes dissected.
+
+    | c. Include the node in the count of Regional Nodes Examined when the aspiration or core
+
+    | biopsy is from a node in a different node region ***Example:*** Breast cancer patient has a positive core biopsy of a supraclavicular node and an axillary dissection showing 3 of 8 nodes positive. Code Regional Nodes Positive as
+
+    | **04 and Regional Nodes Examined as 09 because the supraclavicular lymph node is in a different, but still regional, lymph node chain.**
+
+    | d. Assume the lymph node that is aspirated or core-biopsied is part of the lymph node chain
+
+    | surgically removed and do not include it in the count of Regional Nodes Examined when its location is not known ***Example:*** Patient record states that lymph node core biopsy was performed at another facility and 7/14 regional lymph nodes were positive at the time of resection. Code
+
+    | ***Regional Nodes Positive as 07 and Regional Nodes Examined as 14.***
+
+    | 5. **Priority of lymph node counts. Use information in the following priority when there is a**
+
+    | discrepancy regarding the number of lymph nodes examined
+
+    | | a. | Final diagnosis |
+    | |---|---|
+    | | b. | Synoptic report (also known as CAP protocol or pathology report checklist; the consolidated findings on the CAP protocol) |
+
+    | | c. | Microscopic description |
+    | |---|---|
+    | | d. | Gross description |
+
+    | 6. Code 95. Use code 95 when the only procedure for regional lymph nodes is a needle aspiration
+
+    | (cytology) or core biopsy (tissue). ***Example:*** Patient with esophageal cancer. Enlarged mid-esophageal node found on CT scan, which is aspirated and found to be positive. Patient undergoes radiation therapy and no surgery.
+
+    | **Code Regional Nodes Positive as 95 and Regional Nodes Examined as 95.**
+
+    | 7. **Lymph node excision biopsy. If a lymph node excision biopsy was performed, code the**
+
+    | number of nodes removed, if known.
+
+    | 8. Definition of "sampling" (code 96). A lymph node "sampling" is removal of a limited number
+
+    | of lymph nodes. Other terms for removal of a limited number of nodes include lymph node biopsy, berry picking, sentinel lymph node procedure, sentinel node biopsy and, selective dissection. Use code 96 when a limited number of nodes are removed but the number is unknown.
+
+    | 9. Definition of "dissection" (code 97). A lymph node "dissection" is removal of most or all of
+
+    | the nodes in the lymph node chain(s) that drain the area around the primary tumor. Other terms include lymphadenectomy, radical node dissection, and lymph node stripping. Removal of lymph nodes during autopsy is a dissection. Use code 97 when more than a limited number of lymph nodes are removed and the number is unknown.
+
+    | 10. **Multiple lymph node procedures. Use code 97 when both a lymph node sampling and a**
+
+    | lymph node dissection are performed and the total number of lymph nodes examined is unknown.
+
+    | **September 2023 Section VII: First Course of Therapy 191**
+
+    | -----
+
+    | 11. Use code 98 when neither the type of lymph node removal procedure nor the number of lymph
+
+    | nodes examined is known
+
+    | 12. Use code 99 for
+
+    | | a. | Any case coded to primary site C420, C421, C423-C424, C589, C700-C709, C710-C729, C751-C753, C761-C768, C770-C779, or C809 |
+    | |---|---|
+    | | b. | Lymphoma 00790 |
+    | | c. | Lymphoma-CLL/SLL 00795 |
+    | | d. | Plasma Cell Disorders (excluding 9734/3) 00822 |
+    | | e. | HemeRetic 00830 |
+    | | f. | Ill-Defined/Other 99999 |
+    | | g. | Cases with no information about the examination of regional lymph nodes |
+    | | For more | information about schemas and schema IDs, go to the SSDI Manual, Appendix A. |
+
+    | **September 2023 Section VII: First Course of Therapy 192**
+
+    | -----
+
+  COMPILED TEXT:
+    > This data item is based on pathologic information only, including autopsy. This data item is to be recorded regardless of whether the patient received neoadjuvant (preoperative) treatment. Information from the autopsy may be used to code Regional Nodes Examined. Use text fields to explain the situation.
+
+[spcsm_2024:regional_nodes_examined:coding_instructions:e8]  kind=example  items=[1290, 1292]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Regional lymph nodes only. Record information only about regional lymph nodes in this data**
+
+    | item. a. Include lymph nodes that are regional in the current AJCC Staging Manual or EOD
+
+    | Regional Lymph Nodes 2018
+
+    | 2. **This data item is based on pathologic information only, including autopsy. This data item is**
+
+    | to be recorded regardless of whether the patient received neoadjuvant (preoperative) treatment. Information from the autopsy may be used to code Regional Nodes Examined. Use text fields to explain the situation.
+
+    | 3. Use code 00 when
+
+    | | a. | The assessment of lymph nodes is clinical |
+    | |---|---|
+    | | b. | No lymph nodes are removed and examined |
+    | | c. | A "dissection" of a lymph node drainage area is found to contain no lymph nodes at the time of pathologic examination |
+
+    | ***Note:*** When Regional Nodes Examined is coded 00, Regional Nodes Positive is coded 98.
+
+    | 4. Nodes removed and examined is cumulative. Record the total number of regional lymph nodes
+
+    | removed and examined by the pathologist. Record lymph nodes removed during an autopsy for autopsy-only cases. a. The number of regional lymph nodes examined is cumulative from all procedures that
+
+    | removed lymph nodes through the completion of surgeries in the first course of treatment
+
+    | **September 2023 Section VII: First Course of Therapy 190**
+
+    | -----
+
+    | b. Do not count an aspiration or core biopsy of a lymph node in the same lymph node chain
+
+    | removed at surgery as an additional node in Regional Nodes Examined ***Example:*** Lung cancer patient has a mediastinoscopy and positive core biopsy of a hilar lymph node. Patient then undergoes right upper lobectomy that yields 3 hilar and 2 mediastinal nodes positive out of 11 nodes dissected. Code Regional Nodes Positive as
+
+    | #### 05 and Regional Nodes Examined as 11 because the core biopsy was of a lymph node in the same chain as the nodes dissected.
+
+    | c. Include the node in the count of Regional Nodes Examined when the aspiration or core
+
+    | biopsy is from a node in a different node region ***Example:*** Breast cancer patient has a positive core biopsy of a supraclavicular node and an axillary dissection showing 3 of 8 nodes positive. Code Regional Nodes Positive as
+
+    | **04 and Regional Nodes Examined as 09 because the supraclavicular lymph node is in a different, but still regional, lymph node chain.**
+
+    | d. Assume the lymph node that is aspirated or core-biopsied is part of the lymph node chain
+
+    | surgically removed and do not include it in the count of Regional Nodes Examined when its location is not known ***Example:*** Patient record states that lymph node core biopsy was performed at another facility and 7/14 regional lymph nodes were positive at the time of resection. Code
+
+    | ***Regional Nodes Positive as 07 and Regional Nodes Examined as 14.***
+
+    | 5. **Priority of lymph node counts. Use information in the following priority when there is a**
+
+    | discrepancy regarding the number of lymph nodes examined
+
+    | | a. | Final diagnosis |
+    | |---|---|
+    | | b. | Synoptic report (also known as CAP protocol or pathology report checklist; the consolidated findings on the CAP protocol) |
+
+    | | c. | Microscopic description |
+    | |---|---|
+    | | d. | Gross description |
+
+    | 6. Code 95. Use code 95 when the only procedure for regional lymph nodes is a needle aspiration
+
+    | (cytology) or core biopsy (tissue). ***Example:*** Patient with esophageal cancer. Enlarged mid-esophageal node found on CT scan, which is aspirated and found to be positive. Patient undergoes radiation therapy and no surgery.
+
+    | **Code Regional Nodes Positive as 95 and Regional Nodes Examined as 95.**
+
+    | 7. **Lymph node excision biopsy. If a lymph node excision biopsy was performed, code the**
+
+    | number of nodes removed, if known.
+
+    | 8. Definition of "sampling" (code 96). A lymph node "sampling" is removal of a limited number
+
+    | of lymph nodes. Other terms for removal of a limited number of nodes include lymph node biopsy, berry picking, sentinel lymph node procedure, sentinel node biopsy and, selective dissection. Use code 96 when a limited number of nodes are removed but the number is unknown.
+
+    | 9. Definition of "dissection" (code 97). A lymph node "dissection" is removal of most or all of
+
+    | the nodes in the lymph node chain(s) that drain the area around the primary tumor. Other terms include lymphadenectomy, radical node dissection, and lymph node stripping. Removal of lymph nodes during autopsy is a dissection. Use code 97 when more than a limited number of lymph nodes are removed and the number is unknown.
+
+    | 10. **Multiple lymph node procedures. Use code 97 when both a lymph node sampling and a**
+
+    | lymph node dissection are performed and the total number of lymph nodes examined is unknown.
+
+    | **September 2023 Section VII: First Course of Therapy 191**
+
+    | -----
+
+    | 11. Use code 98 when neither the type of lymph node removal procedure nor the number of lymph
+
+    | nodes examined is known
+
+    | 12. Use code 99 for
+
+    | | a. | Any case coded to primary site C420, C421, C423-C424, C589, C700-C709, C710-C729, C751-C753, C761-C768, C770-C779, or C809 |
+    | |---|---|
+    | | b. | Lymphoma 00790 |
+    | | c. | Lymphoma-CLL/SLL 00795 |
+    | | d. | Plasma Cell Disorders (excluding 9734/3) 00822 |
+    | | e. | HemeRetic 00830 |
+    | | f. | Ill-Defined/Other 99999 |
+    | | g. | Cases with no information about the examination of regional lymph nodes |
+    | | For more | information about schemas and schema IDs, go to the SSDI Manual, Appendix A. |
+
+    | **September 2023 Section VII: First Course of Therapy 192**
+
+    | -----
+
+  COMPILED TEXT:
+    > Example: Lung cancer patient has a mediastinoscopy and positive core biopsy of a hilar lymph node. Patient then undergoes right upper lobectomy that yields 3 hilar and 2 mediastinal nodes positive out of 11 nodes dissected. Code Regional Nodes Positive as 05 and Regional Nodes Examined as 11 because the core biopsy was of a lymph node in the same chain as the nodes dissected.
+
+[spcsm_2024:regional_nodes_examined:coding_instructions:e12]  kind=example  items=[1290, 1292]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Regional lymph nodes only. Record information only about regional lymph nodes in this data**
+
+    | item. a. Include lymph nodes that are regional in the current AJCC Staging Manual or EOD
+
+    | Regional Lymph Nodes 2018
+
+    | 2. **This data item is based on pathologic information only, including autopsy. This data item is**
+
+    | to be recorded regardless of whether the patient received neoadjuvant (preoperative) treatment. Information from the autopsy may be used to code Regional Nodes Examined. Use text fields to explain the situation.
+
+    | 3. Use code 00 when
+
+    | | a. | The assessment of lymph nodes is clinical |
+    | |---|---|
+    | | b. | No lymph nodes are removed and examined |
+    | | c. | A "dissection" of a lymph node drainage area is found to contain no lymph nodes at the time of pathologic examination |
+
+    | ***Note:*** When Regional Nodes Examined is coded 00, Regional Nodes Positive is coded 98.
+
+    | 4. Nodes removed and examined is cumulative. Record the total number of regional lymph nodes
+
+    | removed and examined by the pathologist. Record lymph nodes removed during an autopsy for autopsy-only cases. a. The number of regional lymph nodes examined is cumulative from all procedures that
+
+    | removed lymph nodes through the completion of surgeries in the first course of treatment
+
+    | **September 2023 Section VII: First Course of Therapy 190**
+
+    | -----
+
+    | b. Do not count an aspiration or core biopsy of a lymph node in the same lymph node chain
+
+    | removed at surgery as an additional node in Regional Nodes Examined ***Example:*** Lung cancer patient has a mediastinoscopy and positive core biopsy of a hilar lymph node. Patient then undergoes right upper lobectomy that yields 3 hilar and 2 mediastinal nodes positive out of 11 nodes dissected. Code Regional Nodes Positive as
+
+    | #### 05 and Regional Nodes Examined as 11 because the core biopsy was of a lymph node in the same chain as the nodes dissected.
+
+    | c. Include the node in the count of Regional Nodes Examined when the aspiration or core
+
+    | biopsy is from a node in a different node region ***Example:*** Breast cancer patient has a positive core biopsy of a supraclavicular node and an axillary dissection showing 3 of 8 nodes positive. Code Regional Nodes Positive as
+
+    | **04 and Regional Nodes Examined as 09 because the supraclavicular lymph node is in a different, but still regional, lymph node chain.**
+
+    | d. Assume the lymph node that is aspirated or core-biopsied is part of the lymph node chain
+
+    | surgically removed and do not include it in the count of Regional Nodes Examined when its location is not known ***Example:*** Patient record states that lymph node core biopsy was performed at another facility and 7/14 regional lymph nodes were positive at the time of resection. Code
+
+    | ***Regional Nodes Positive as 07 and Regional Nodes Examined as 14.***
+
+    | 5. **Priority of lymph node counts. Use information in the following priority when there is a**
+
+    | discrepancy regarding the number of lymph nodes examined
+
+    | | a. | Final diagnosis |
+    | |---|---|
+    | | b. | Synoptic report (also known as CAP protocol or pathology report checklist; the consolidated findings on the CAP protocol) |
+
+    | | c. | Microscopic description |
+    | |---|---|
+    | | d. | Gross description |
+
+    | 6. Code 95. Use code 95 when the only procedure for regional lymph nodes is a needle aspiration
+
+    | (cytology) or core biopsy (tissue). ***Example:*** Patient with esophageal cancer. Enlarged mid-esophageal node found on CT scan, which is aspirated and found to be positive. Patient undergoes radiation therapy and no surgery.
+
+    | **Code Regional Nodes Positive as 95 and Regional Nodes Examined as 95.**
+
+    | 7. **Lymph node excision biopsy. If a lymph node excision biopsy was performed, code the**
+
+    | number of nodes removed, if known.
+
+    | 8. Definition of "sampling" (code 96). A lymph node "sampling" is removal of a limited number
+
+    | of lymph nodes. Other terms for removal of a limited number of nodes include lymph node biopsy, berry picking, sentinel lymph node procedure, sentinel node biopsy and, selective dissection. Use code 96 when a limited number of nodes are removed but the number is unknown.
+
+    | 9. Definition of "dissection" (code 97). A lymph node "dissection" is removal of most or all of
+
+    | the nodes in the lymph node chain(s) that drain the area around the primary tumor. Other terms include lymphadenectomy, radical node dissection, and lymph node stripping. Removal of lymph nodes during autopsy is a dissection. Use code 97 when more than a limited number of lymph nodes are removed and the number is unknown.
+
+    | 10. **Multiple lymph node procedures. Use code 97 when both a lymph node sampling and a**
+
+    | lymph node dissection are performed and the total number of lymph nodes examined is unknown.
+
+    | **September 2023 Section VII: First Course of Therapy 191**
+
+    | -----
+
+    | 11. Use code 98 when neither the type of lymph node removal procedure nor the number of lymph
+
+    | nodes examined is known
+
+    | 12. Use code 99 for
+
+    | | a. | Any case coded to primary site C420, C421, C423-C424, C589, C700-C709, C710-C729, C751-C753, C761-C768, C770-C779, or C809 |
+    | |---|---|
+    | | b. | Lymphoma 00790 |
+    | | c. | Lymphoma-CLL/SLL 00795 |
+    | | d. | Plasma Cell Disorders (excluding 9734/3) 00822 |
+    | | e. | HemeRetic 00830 |
+    | | f. | Ill-Defined/Other 99999 |
+    | | g. | Cases with no information about the examination of regional lymph nodes |
+    | | For more | information about schemas and schema IDs, go to the SSDI Manual, Appendix A. |
+
+    | **September 2023 Section VII: First Course of Therapy 192**
+
+    | -----
+
+  COMPILED TEXT:
+    > Example: Patient record states that lymph node core biopsy was performed at another facility and 7/14 regional lymph nodes were positive at the time of resection. Code Regional Nodes Positive as 07 and Regional Nodes Examined as 14.
+
+[spcsm_2024:regional_nodes_examined:coding_instructions:i16]  kind=instruction  items=[1292]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Regional lymph nodes only. Record information only about regional lymph nodes in this data**
+
+    | item. a. Include lymph nodes that are regional in the current AJCC Staging Manual or EOD
+
+    | Regional Lymph Nodes 2018
+
+    | 2. **This data item is based on pathologic information only, including autopsy. This data item is**
+
+    | to be recorded regardless of whether the patient received neoadjuvant (preoperative) treatment. Information from the autopsy may be used to code Regional Nodes Examined. Use text fields to explain the situation.
+
+    | 3. Use code 00 when
+
+    | | a. | The assessment of lymph nodes is clinical |
+    | |---|---|
+    | | b. | No lymph nodes are removed and examined |
+    | | c. | A "dissection" of a lymph node drainage area is found to contain no lymph nodes at the time of pathologic examination |
+
+    | ***Note:*** When Regional Nodes Examined is coded 00, Regional Nodes Positive is coded 98.
+
+    | 4. Nodes removed and examined is cumulative. Record the total number of regional lymph nodes
+
+    | removed and examined by the pathologist. Record lymph nodes removed during an autopsy for autopsy-only cases. a. The number of regional lymph nodes examined is cumulative from all procedures that
+
+    | removed lymph nodes through the completion of surgeries in the first course of treatment
+
+    | **September 2023 Section VII: First Course of Therapy 190**
+
+    | -----
+
+    | b. Do not count an aspiration or core biopsy of a lymph node in the same lymph node chain
+
+    | removed at surgery as an additional node in Regional Nodes Examined ***Example:*** Lung cancer patient has a mediastinoscopy and positive core biopsy of a hilar lymph node. Patient then undergoes right upper lobectomy that yields 3 hilar and 2 mediastinal nodes positive out of 11 nodes dissected. Code Regional Nodes Positive as
+
+    | #### 05 and Regional Nodes Examined as 11 because the core biopsy was of a lymph node in the same chain as the nodes dissected.
+
+    | c. Include the node in the count of Regional Nodes Examined when the aspiration or core
+
+    | biopsy is from a node in a different node region ***Example:*** Breast cancer patient has a positive core biopsy of a supraclavicular node and an axillary dissection showing 3 of 8 nodes positive. Code Regional Nodes Positive as
+
+    | **04 and Regional Nodes Examined as 09 because the supraclavicular lymph node is in a different, but still regional, lymph node chain.**
+
+    | d. Assume the lymph node that is aspirated or core-biopsied is part of the lymph node chain
+
+    | surgically removed and do not include it in the count of Regional Nodes Examined when its location is not known ***Example:*** Patient record states that lymph node core biopsy was performed at another facility and 7/14 regional lymph nodes were positive at the time of resection. Code
+
+    | ***Regional Nodes Positive as 07 and Regional Nodes Examined as 14.***
+
+    | 5. **Priority of lymph node counts. Use information in the following priority when there is a**
+
+    | discrepancy regarding the number of lymph nodes examined
+
+    | | a. | Final diagnosis |
+    | |---|---|
+    | | b. | Synoptic report (also known as CAP protocol or pathology report checklist; the consolidated findings on the CAP protocol) |
+
+    | | c. | Microscopic description |
+    | |---|---|
+    | | d. | Gross description |
+
+    | 6. Code 95. Use code 95 when the only procedure for regional lymph nodes is a needle aspiration
+
+    | (cytology) or core biopsy (tissue). ***Example:*** Patient with esophageal cancer. Enlarged mid-esophageal node found on CT scan, which is aspirated and found to be positive. Patient undergoes radiation therapy and no surgery.
+
+    | **Code Regional Nodes Positive as 95 and Regional Nodes Examined as 95.**
+
+    | 7. **Lymph node excision biopsy. If a lymph node excision biopsy was performed, code the**
+
+    | number of nodes removed, if known.
+
+    | 8. Definition of "sampling" (code 96). A lymph node "sampling" is removal of a limited number
+
+    | of lymph nodes. Other terms for removal of a limited number of nodes include lymph node biopsy, berry picking, sentinel lymph node procedure, sentinel node biopsy and, selective dissection. Use code 96 when a limited number of nodes are removed but the number is unknown.
+
+    | 9. Definition of "dissection" (code 97). A lymph node "dissection" is removal of most or all of
+
+    | the nodes in the lymph node chain(s) that drain the area around the primary tumor. Other terms include lymphadenectomy, radical node dissection, and lymph node stripping. Removal of lymph nodes during autopsy is a dissection. Use code 97 when more than a limited number of lymph nodes are removed and the number is unknown.
+
+    | 10. **Multiple lymph node procedures. Use code 97 when both a lymph node sampling and a**
+
+    | lymph node dissection are performed and the total number of lymph nodes examined is unknown.
+
+    | **September 2023 Section VII: First Course of Therapy 191**
+
+    | -----
+
+    | 11. Use code 98 when neither the type of lymph node removal procedure nor the number of lymph
+
+    | nodes examined is known
+
+    | 12. Use code 99 for
+
+    | | a. | Any case coded to primary site C420, C421, C423-C424, C589, C700-C709, C710-C729, C751-C753, C761-C768, C770-C779, or C809 |
+    | |---|---|
+    | | b. | Lymphoma 00790 |
+    | | c. | Lymphoma-CLL/SLL 00795 |
+    | | d. | Plasma Cell Disorders (excluding 9734/3) 00822 |
+    | | e. | HemeRetic 00830 |
+    | | f. | Ill-Defined/Other 99999 |
+    | | g. | Cases with no information about the examination of regional lymph nodes |
+    | | For more | information about schemas and schema IDs, go to the SSDI Manual, Appendix A. |
+
+    | **September 2023 Section VII: First Course of Therapy 192**
+
+    | -----
+
+  COMPILED TEXT:
+    > Lymph node excision biopsy. If a lymph node excision biopsy was performed, code the number of nodes removed, if known.
+
+========================================================================

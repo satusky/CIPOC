@@ -1,0 +1,326 @@
+========================================================================
+RULE COMPILATION REVIEW REPORT
+========================================================================
+Source: documents/markdown/SPCSM_2024_MainDoc.md
+Units emitted: 20  |  accepted: 20  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     1
+  definition     2
+  example        3
+  instruction    13
+  priority_rule  1
+
+Accepted fidelity: min 1.00  mean 1.00
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED ACCEPTED UNITS (source vs. compiled, up to 5)
+------------------------------------------------------------------------
+
+[spcsm_2024:mets_other:mets_at_diagnosisother:d1]  kind=definition  items=[1117]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Mets at Diagnosis--Other
+
+    | #### Item Length: 1 NAACCR Item #: 1117 NAACCR Name: Mets at DX-Other XML NAACCR ID: metsAtDxOther
+
+    | The six Mets at Diagnosis-metastatic sites data items provide information on metastases for data analysis. This data item identifies any type of distant involvement not captured in the Mets at Diagnosis--Bone, Mets
+
+    | ***at Diagnosis--Brain, Mets at Diagnosis--Liver, Mets at Diagnosis--Lung, and Mets at Diagnosis--Distant*** ***Lymph Nodes data items. It includes involvement of other specific sites and more generalized*** **metastases such as carcinomatosis. Some examples include but are not limited to the adrenal gland, bone**
+
+    | marrow, pleura, malignant pleural effusion, peritoneum, and skin.
+
+    | | Code | Description |
+    | |---|---|
+    | | 0 | None; no other metastases |
+    | | 1 | Yes; distant metastases in known site(s) other than bone, brain, liver, lung, or distant lymph nodes |
+
+    | ***Note:*** includes bone marrow involvement for lymphomas 2 Generalized metastases such as carcinomatosis 8 Not applicable 9 Unknown whether any other metastatic site or generalized metastases
+
+    | Not documented in patient record
+
+  COMPILED TEXT:
+    > The six Mets at Diagnosis-metastatic sites data items provide information on metastases for data analysis. This data item identifies any type of distant involvement not captured in the Mets at Diagnosis--Bone, Mets at Diagnosis--Brain, Mets at Diagnosis--Liver, Mets at Diagnosis--Lung, and Mets at Diagnosis--Distant Lymph Nodes data items. It includes involvement of other specific sites and more generalized metastases such as carcinomatosis. Some examples include but are not limited to the adrenal gland, bone marrow, pleura, malignant pleural effusion, peritoneum, and skin.
+
+[spcsm_2024:mets_other:coding_instructions:i3]  kind=instruction  items=[1117]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Code information about other metastases only (discontinuous or distant metastases)**
+
+    | identified at the time of diagnosis. This data item should not be coded for bone, brain, liver, lung, or distant lymph node metastases.
+
+    | | a. | Other involvement may be single or multiple |
+    | |---|---|
+    | | b. | Information about other involvement may be clinical or pathological |
+    | | c. | Code this data item whether or not the patient had any preoperative (neoadjuvant) systemic therapy unless determined to be disease progression |
+
+    | d. Code this data item for all solid tumor schemas (including Kaposi Sarcoma and Ill-
+
+    | Defined Other [includes unknown primary site]) and the following Hematopoietic schemas except as noted in 2.d. and 2.e . i. Lymphoma Ocular Adnexa 00710 ii. Lymphoma 00790 (see 2.d.) iii. Lymphoma-CLL/SLL 00795 (see 2.d.) iv. Mycosis Fungoides (MF) 00811 v. Primary Cutaneous Lymphoma (excluding MF and SS) 00812 vi. HemeRetic 00830 (excluding primary sites C420, C421, C423, C424, see 2.d.) ***Note:*** Do not code spleen involvement for Hodgkin lymphoma in Mets at Diagnosis-- *Other. Spleen involvement is not classified as distant mets for Hodgkin lymphoma in* most staging systems.
+
+    | **September 2023 Section VI: Stage-related Data Items 154**
+
+    | -----
+
+    | 2.
+
+    | a.
+
+    | b.
+
+    | c.
+
+    | d.
+
+    | e.
+
+    | **Use of codes: Assign the code that best describes whether the case has other metastases at**
+
+    | diagnosis
+
+    | Use code 0 when the medical record i. Indicates that there are no distant (discontinuous) metastases at all ii. Confirms the tumor is benign (/0), borderline (/1), or in situ (/2) iii. Includes a clinical or pathologic statement that there are no other metastases iv. Includes imaging reports that are negative for other metastases v. Indicates that the patient has distant (discontinuous) metastases but other sites are
+
+    | not mentioned as involved
+
+    | ***Example:*** **Use code 0 when the patient has metastasis to lung and liver only.**
+
+    | Use code 1 when the medical record indicates i. Distant (discontinuous) metastases in any site(s) other than bone, brain, liver, lung,
+
+    | or distant lymph node(s)
+
+    | 1. Includes, but not limited to, the adrenal gland, bone marrow, pleura,
+
+    | malignant pleural effusion, peritoneum, and skin ii. Lymphomas with bone marrow involvement (Stage IV disease)
+
+    | ***Note:*** Does not include lymphomas or lymphoma/leukemias where primary site is C421 (bone marrow). Use code 2 when the medical record i. Indicates that the patient has carcinomatosis
+
+    | 1. Carcinomatosis is a condition in which cancer is spread widely throughout
+
+    | the body, or, in some cases, to a relatively large region of the body
+
+    | ***Note: It is possible to have metastatic disease to a specific organ AND also have***
+
+    | carcinomatosis. If a patient has metastatic disease to bone, brain, liver, lung or distant nodes AND carcinomatosis, use code 1 for the appropriate data item (bone, brain, liver, lung, or distant nodes) and use code 2 for carcinomatosis. If a patient has metastatic disease to a site other than bone, brain, liver, lung or distant nodes AND carcinomatosis, assign code 2 for carcinomatosis. Code 2 for carcinomatosis takes priority. ***Example 1:*** Patient with breast cancer noted to have mets to the liver and carcinomatosis. Code "Mets at Diagnosis--Liver" as 1 and "Mets at Diagnosis-- *Other" as 2.* ***Example 2:*** Patient with colon cancer noted to have mets to the stomach and carcinomatosis. Code "Mets at Diagnosis--Other" as 2 for carcinomatosis. Use code 8 (Not applicable) for the following i. Any case coded to primary site C420, C421, C423, or C424 ii. Plasma Cell Disorders 00822 Use code 9 when it cannot be determined whether the patient has metastases other than bone, brain, liver, lung, or distant lymph node(s) For more information about schemas and schema IDs, go to the SSDI Manual, Appendix A.
+
+    | **September 2023 Section VI: Stage-related Data Items 155**
+
+    | -----
+
+  COMPILED TEXT:
+    > Information about other involvement may be clinical or pathological.
+
+[spcsm_2024:mets_other:coding_instructions:i7]  kind=instruction  items=[1117]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Code information about other metastases only (discontinuous or distant metastases)**
+
+    | identified at the time of diagnosis. This data item should not be coded for bone, brain, liver, lung, or distant lymph node metastases.
+
+    | | a. | Other involvement may be single or multiple |
+    | |---|---|
+    | | b. | Information about other involvement may be clinical or pathological |
+    | | c. | Code this data item whether or not the patient had any preoperative (neoadjuvant) systemic therapy unless determined to be disease progression |
+
+    | d. Code this data item for all solid tumor schemas (including Kaposi Sarcoma and Ill-
+
+    | Defined Other [includes unknown primary site]) and the following Hematopoietic schemas except as noted in 2.d. and 2.e . i. Lymphoma Ocular Adnexa 00710 ii. Lymphoma 00790 (see 2.d.) iii. Lymphoma-CLL/SLL 00795 (see 2.d.) iv. Mycosis Fungoides (MF) 00811 v. Primary Cutaneous Lymphoma (excluding MF and SS) 00812 vi. HemeRetic 00830 (excluding primary sites C420, C421, C423, C424, see 2.d.) ***Note:*** Do not code spleen involvement for Hodgkin lymphoma in Mets at Diagnosis-- *Other. Spleen involvement is not classified as distant mets for Hodgkin lymphoma in* most staging systems.
+
+    | **September 2023 Section VI: Stage-related Data Items 154**
+
+    | -----
+
+    | 2.
+
+    | a.
+
+    | b.
+
+    | c.
+
+    | d.
+
+    | e.
+
+    | **Use of codes: Assign the code that best describes whether the case has other metastases at**
+
+    | diagnosis
+
+    | Use code 0 when the medical record i. Indicates that there are no distant (discontinuous) metastases at all ii. Confirms the tumor is benign (/0), borderline (/1), or in situ (/2) iii. Includes a clinical or pathologic statement that there are no other metastases iv. Includes imaging reports that are negative for other metastases v. Indicates that the patient has distant (discontinuous) metastases but other sites are
+
+    | not mentioned as involved
+
+    | ***Example:*** **Use code 0 when the patient has metastasis to lung and liver only.**
+
+    | Use code 1 when the medical record indicates i. Distant (discontinuous) metastases in any site(s) other than bone, brain, liver, lung,
+
+    | or distant lymph node(s)
+
+    | 1. Includes, but not limited to, the adrenal gland, bone marrow, pleura,
+
+    | malignant pleural effusion, peritoneum, and skin ii. Lymphomas with bone marrow involvement (Stage IV disease)
+
+    | ***Note:*** Does not include lymphomas or lymphoma/leukemias where primary site is C421 (bone marrow). Use code 2 when the medical record i. Indicates that the patient has carcinomatosis
+
+    | 1. Carcinomatosis is a condition in which cancer is spread widely throughout
+
+    | the body, or, in some cases, to a relatively large region of the body
+
+    | ***Note: It is possible to have metastatic disease to a specific organ AND also have***
+
+    | carcinomatosis. If a patient has metastatic disease to bone, brain, liver, lung or distant nodes AND carcinomatosis, use code 1 for the appropriate data item (bone, brain, liver, lung, or distant nodes) and use code 2 for carcinomatosis. If a patient has metastatic disease to a site other than bone, brain, liver, lung or distant nodes AND carcinomatosis, assign code 2 for carcinomatosis. Code 2 for carcinomatosis takes priority. ***Example 1:*** Patient with breast cancer noted to have mets to the liver and carcinomatosis. Code "Mets at Diagnosis--Liver" as 1 and "Mets at Diagnosis-- *Other" as 2.* ***Example 2:*** Patient with colon cancer noted to have mets to the stomach and carcinomatosis. Code "Mets at Diagnosis--Other" as 2 for carcinomatosis. Use code 8 (Not applicable) for the following i. Any case coded to primary site C420, C421, C423, or C424 ii. Plasma Cell Disorders 00822 Use code 9 when it cannot be determined whether the patient has metastases other than bone, brain, liver, lung, or distant lymph node(s) For more information about schemas and schema IDs, go to the SSDI Manual, Appendix A.
+
+    | **September 2023 Section VI: Stage-related Data Items 155**
+
+    | -----
+
+  COMPILED TEXT:
+    > Use of codes: Assign the code that best describes whether the case has other metastases at diagnosis.
+
+[spcsm_2024:mets_other:coding_instructions:i11]  kind=instruction  items=[1117]  fidelity=1.00
+  applies_to: {'sites': ['C421'], 'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Code information about other metastases only (discontinuous or distant metastases)**
+
+    | identified at the time of diagnosis. This data item should not be coded for bone, brain, liver, lung, or distant lymph node metastases.
+
+    | | a. | Other involvement may be single or multiple |
+    | |---|---|
+    | | b. | Information about other involvement may be clinical or pathological |
+    | | c. | Code this data item whether or not the patient had any preoperative (neoadjuvant) systemic therapy unless determined to be disease progression |
+
+    | d. Code this data item for all solid tumor schemas (including Kaposi Sarcoma and Ill-
+
+    | Defined Other [includes unknown primary site]) and the following Hematopoietic schemas except as noted in 2.d. and 2.e . i. Lymphoma Ocular Adnexa 00710 ii. Lymphoma 00790 (see 2.d.) iii. Lymphoma-CLL/SLL 00795 (see 2.d.) iv. Mycosis Fungoides (MF) 00811 v. Primary Cutaneous Lymphoma (excluding MF and SS) 00812 vi. HemeRetic 00830 (excluding primary sites C420, C421, C423, C424, see 2.d.) ***Note:*** Do not code spleen involvement for Hodgkin lymphoma in Mets at Diagnosis-- *Other. Spleen involvement is not classified as distant mets for Hodgkin lymphoma in* most staging systems.
+
+    | **September 2023 Section VI: Stage-related Data Items 154**
+
+    | -----
+
+    | 2.
+
+    | a.
+
+    | b.
+
+    | c.
+
+    | d.
+
+    | e.
+
+    | **Use of codes: Assign the code that best describes whether the case has other metastases at**
+
+    | diagnosis
+
+    | Use code 0 when the medical record i. Indicates that there are no distant (discontinuous) metastases at all ii. Confirms the tumor is benign (/0), borderline (/1), or in situ (/2) iii. Includes a clinical or pathologic statement that there are no other metastases iv. Includes imaging reports that are negative for other metastases v. Indicates that the patient has distant (discontinuous) metastases but other sites are
+
+    | not mentioned as involved
+
+    | ***Example:*** **Use code 0 when the patient has metastasis to lung and liver only.**
+
+    | Use code 1 when the medical record indicates i. Distant (discontinuous) metastases in any site(s) other than bone, brain, liver, lung,
+
+    | or distant lymph node(s)
+
+    | 1. Includes, but not limited to, the adrenal gland, bone marrow, pleura,
+
+    | malignant pleural effusion, peritoneum, and skin ii. Lymphomas with bone marrow involvement (Stage IV disease)
+
+    | ***Note:*** Does not include lymphomas or lymphoma/leukemias where primary site is C421 (bone marrow). Use code 2 when the medical record i. Indicates that the patient has carcinomatosis
+
+    | 1. Carcinomatosis is a condition in which cancer is spread widely throughout
+
+    | the body, or, in some cases, to a relatively large region of the body
+
+    | ***Note: It is possible to have metastatic disease to a specific organ AND also have***
+
+    | carcinomatosis. If a patient has metastatic disease to bone, brain, liver, lung or distant nodes AND carcinomatosis, use code 1 for the appropriate data item (bone, brain, liver, lung, or distant nodes) and use code 2 for carcinomatosis. If a patient has metastatic disease to a site other than bone, brain, liver, lung or distant nodes AND carcinomatosis, assign code 2 for carcinomatosis. Code 2 for carcinomatosis takes priority. ***Example 1:*** Patient with breast cancer noted to have mets to the liver and carcinomatosis. Code "Mets at Diagnosis--Liver" as 1 and "Mets at Diagnosis-- *Other" as 2.* ***Example 2:*** Patient with colon cancer noted to have mets to the stomach and carcinomatosis. Code "Mets at Diagnosis--Other" as 2 for carcinomatosis. Use code 8 (Not applicable) for the following i. Any case coded to primary site C420, C421, C423, or C424 ii. Plasma Cell Disorders 00822 Use code 9 when it cannot be determined whether the patient has metastases other than bone, brain, liver, lung, or distant lymph node(s) For more information about schemas and schema IDs, go to the SSDI Manual, Appendix A.
+
+    | **September 2023 Section VI: Stage-related Data Items 155**
+
+    | -----
+
+  COMPILED TEXT:
+    > Does not include lymphomas or lymphoma/leukemias where primary site is C421 (bone marrow).
+
+[spcsm_2024:mets_other:coding_instructions:e15]  kind=example  items=[1114, 1117]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Code information about other metastases only (discontinuous or distant metastases)**
+
+    | identified at the time of diagnosis. This data item should not be coded for bone, brain, liver, lung, or distant lymph node metastases.
+
+    | | a. | Other involvement may be single or multiple |
+    | |---|---|
+    | | b. | Information about other involvement may be clinical or pathological |
+    | | c. | Code this data item whether or not the patient had any preoperative (neoadjuvant) systemic therapy unless determined to be disease progression |
+
+    | d. Code this data item for all solid tumor schemas (including Kaposi Sarcoma and Ill-
+
+    | Defined Other [includes unknown primary site]) and the following Hematopoietic schemas except as noted in 2.d. and 2.e . i. Lymphoma Ocular Adnexa 00710 ii. Lymphoma 00790 (see 2.d.) iii. Lymphoma-CLL/SLL 00795 (see 2.d.) iv. Mycosis Fungoides (MF) 00811 v. Primary Cutaneous Lymphoma (excluding MF and SS) 00812 vi. HemeRetic 00830 (excluding primary sites C420, C421, C423, C424, see 2.d.) ***Note:*** Do not code spleen involvement for Hodgkin lymphoma in Mets at Diagnosis-- *Other. Spleen involvement is not classified as distant mets for Hodgkin lymphoma in* most staging systems.
+
+    | **September 2023 Section VI: Stage-related Data Items 154**
+
+    | -----
+
+    | 2.
+
+    | a.
+
+    | b.
+
+    | c.
+
+    | d.
+
+    | e.
+
+    | **Use of codes: Assign the code that best describes whether the case has other metastases at**
+
+    | diagnosis
+
+    | Use code 0 when the medical record i. Indicates that there are no distant (discontinuous) metastases at all ii. Confirms the tumor is benign (/0), borderline (/1), or in situ (/2) iii. Includes a clinical or pathologic statement that there are no other metastases iv. Includes imaging reports that are negative for other metastases v. Indicates that the patient has distant (discontinuous) metastases but other sites are
+
+    | not mentioned as involved
+
+    | ***Example:*** **Use code 0 when the patient has metastasis to lung and liver only.**
+
+    | Use code 1 when the medical record indicates i. Distant (discontinuous) metastases in any site(s) other than bone, brain, liver, lung,
+
+    | or distant lymph node(s)
+
+    | 1. Includes, but not limited to, the adrenal gland, bone marrow, pleura,
+
+    | malignant pleural effusion, peritoneum, and skin ii. Lymphomas with bone marrow involvement (Stage IV disease)
+
+    | ***Note:*** Does not include lymphomas or lymphoma/leukemias where primary site is C421 (bone marrow). Use code 2 when the medical record i. Indicates that the patient has carcinomatosis
+
+    | 1. Carcinomatosis is a condition in which cancer is spread widely throughout
+
+    | the body, or, in some cases, to a relatively large region of the body
+
+    | ***Note: It is possible to have metastatic disease to a specific organ AND also have***
+
+    | carcinomatosis. If a patient has metastatic disease to bone, brain, liver, lung or distant nodes AND carcinomatosis, use code 1 for the appropriate data item (bone, brain, liver, lung, or distant nodes) and use code 2 for carcinomatosis. If a patient has metastatic disease to a site other than bone, brain, liver, lung or distant nodes AND carcinomatosis, assign code 2 for carcinomatosis. Code 2 for carcinomatosis takes priority. ***Example 1:*** Patient with breast cancer noted to have mets to the liver and carcinomatosis. Code "Mets at Diagnosis--Liver" as 1 and "Mets at Diagnosis-- *Other" as 2.* ***Example 2:*** Patient with colon cancer noted to have mets to the stomach and carcinomatosis. Code "Mets at Diagnosis--Other" as 2 for carcinomatosis. Use code 8 (Not applicable) for the following i. Any case coded to primary site C420, C421, C423, or C424 ii. Plasma Cell Disorders 00822 Use code 9 when it cannot be determined whether the patient has metastases other than bone, brain, liver, lung, or distant lymph node(s) For more information about schemas and schema IDs, go to the SSDI Manual, Appendix A.
+
+    | **September 2023 Section VI: Stage-related Data Items 155**
+
+    | -----
+
+  COMPILED TEXT:
+    > Example 1: Patient with breast cancer noted to have mets to the liver and carcinomatosis. Code "Mets at Diagnosis--Liver" as 1 and "Mets at Diagnosis--Other" as 2.
+
+========================================================================

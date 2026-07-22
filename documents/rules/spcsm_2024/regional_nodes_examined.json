@@ -1,0 +1,582 @@
+[
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:description:d1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Description"
+    ],
+    "anchor": "L5837-L5854:description",
+    "kind": "definition",
+    "item_ids": [
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined records the total number of regional lymph nodes that were removed and examined by the pathologist.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:description:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Description"
+    ],
+    "anchor": "L5837-L5854:description",
+    "kind": "instruction",
+    "item_ids": [
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "This data item must be collected on all cases.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:i1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional lymph nodes only. Record information only about regional lymph nodes in this data item.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Include lymph nodes that are regional in the current AJCC Staging Manual or EOD Regional Lymph Nodes 2018.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "This data item is based on pathologic information only, including autopsy. This data item is to be recorded regardless of whether the patient received neoadjuvant (preoperative) treatment. Information from the autopsy may be used to code Regional Nodes Examined. Use text fields to explain the situation.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:i5",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1292,
+      1290
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "When Regional Nodes Examined is coded 00, Regional Nodes Positive is coded 98.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:i6",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Nodes removed and examined is cumulative. Record the total number of regional lymph nodes removed and examined by the pathologist. Record lymph nodes removed during an autopsy for autopsy-only cases. The number of regional lymph nodes examined is cumulative from all procedures that removed lymph nodes through the completion of surgeries in the first course of treatment.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:i7",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Do not count an aspiration or core biopsy of a lymph node in the same lymph node chain removed at surgery as an additional node in Regional Nodes Examined.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:e8",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      1290,
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: Lung cancer patient has a mediastinoscopy and positive core biopsy of a hilar lymph node. Patient then undergoes right upper lobectomy that yields 3 hilar and 2 mediastinal nodes positive out of 11 nodes dissected. Code Regional Nodes Positive as 05 and Regional Nodes Examined as 11 because the core biopsy was of a lymph node in the same chain as the nodes dissected.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:i9",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Include the node in the count of Regional Nodes Examined when the aspiration or core biopsy is from a node in a different node region.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:e10",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      1290,
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: Breast cancer patient has a positive core biopsy of a supraclavicular node and an axillary dissection showing 3 of 8 nodes positive. Code Regional Nodes Positive as 04 and Regional Nodes Examined as 09 because the supraclavicular lymph node is in a different, but still regional, lymph node chain.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:i11",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Assume the lymph node that is aspirated or core-biopsied is part of the lymph node chain surgically removed and do not include it in the count of Regional Nodes Examined when its location is not known.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:e12",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      1290,
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: Patient record states that lymph node core biopsy was performed at another facility and 7/14 regional lymph nodes were positive at the time of resection. Code Regional Nodes Positive as 07 and Regional Nodes Examined as 14.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:p13",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "priority_rule",
+    "item_ids": [
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Priority of lymph node counts. Use information in the following priority when there is a discrepancy regarding the number of lymph nodes examined:\n\na. Final diagnosis\nb. Synoptic report (also known as CAP protocol or pathology report checklist; the consolidated findings on the CAP protocol)\nc. Microscopic description\nd. Gross description",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:i14",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Code 95. Use code 95 when the only procedure for regional lymph nodes is a needle aspiration (cytology) or core biopsy (tissue).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:e15",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "example",
+    "item_ids": [
+      1290,
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Example: Patient with esophageal cancer. Enlarged mid-esophageal node found on CT scan, which is aspirated and found to be positive. Patient undergoes radiation therapy and no surgery. Code Regional Nodes Positive as 95 and Regional Nodes Examined as 95.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:i16",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Lymph node excision biopsy. If a lymph node excision biopsy was performed, code the number of nodes removed, if known.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:d17",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "definition",
+    "item_ids": [
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Definition of \"sampling\" (code 96). A lymph node \"sampling\" is removal of a limited number of lymph nodes. Other terms for removal of a limited number of nodes include lymph node biopsy, berry picking, sentinel lymph node procedure, sentinel node biopsy and, selective dissection.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:i18",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 96 when a limited number of nodes are removed but the number is unknown.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:d19",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "definition",
+    "item_ids": [
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Definition of \"dissection\" (code 97). A lymph node \"dissection\" is removal of most or all of the nodes in the lymph node chain(s) that drain the area around the primary tumor. Other terms include lymphadenectomy, radical node dissection, and lymph node stripping. Removal of lymph nodes during autopsy is a dissection.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:i20",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 97 when more than a limited number of lymph nodes are removed and the number is unknown.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:i21",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Multiple lymph node procedures. Use code 97 when both a lymph node sampling and a lymph node dissection are performed and the total number of lymph nodes examined is unknown.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:regional_nodes_examined:coding_instructions:i22",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Regional Nodes Examined",
+      "Coding Instructions"
+    ],
+    "anchor": "L5855-L5961:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      1292
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Use code 98 when neither the type of lymph node removal procedure nor the number of lymph nodes examined is known.",
+    "codes": null,
+    "notes": null
+  }
+]

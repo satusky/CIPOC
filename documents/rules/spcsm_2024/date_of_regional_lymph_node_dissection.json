@@ -1,0 +1,254 @@
+[
+  {
+    "rule_id": "spcsm_2024:date_of_regional_lymph_node_dissection:date_of_regional_lymph:d1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Regional Lymph Node Dissection"
+    ],
+    "anchor": "L5648-L5653:date-of-regional-lymph-node-dissection",
+    "kind": "definition",
+    "item_ids": [
+      682
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Date of Regional Lymph Node Dissection records the date non-sentinel regional node dissection was performed.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_regional_lymph_node_dissection:date_of_regional_lymph:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Regional Lymph Node Dissection"
+    ],
+    "anchor": "L5648-L5653:date-of-regional-lymph-node-dissection",
+    "kind": "instruction",
+    "item_ids": [
+      682
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Date of Regional Lymph Node Dissection must be transmitted in the YYYYMMDD format.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_regional_lymph_node_dissection:date_of_regional_lymph:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Regional Lymph Node Dissection"
+    ],
+    "anchor": "L5648-L5653:date-of-regional-lymph-node-dissection",
+    "kind": "instruction",
+    "item_ids": [
+      682
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "Date of Regional Lymph Node Dissection may be recorded in the transmission format, or recorded in the traditional format (MMDDYYYY) and converted electronically to the transmission format.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_regional_lymph_node_dissection:date_of_regional_lymph:i4",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Regional Lymph Node Dissection"
+    ],
+    "anchor": "L5648-L5653:date-of-regional-lymph-node-dissection",
+    "kind": "instruction",
+    "item_ids": [
+      682
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "SEER Central Registries: Collect when available from CoC reporting facilities.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_regional_lymph_node_dissection:coding_instructions:i1",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Regional Lymph Node Dissection",
+      "Coding Instructions"
+    ],
+    "anchor": "L5654-L5683:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "1. Record the date of regional lymph node dissection documented in the Regional Nodes Examined data item [NAACCR Item #830]",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_regional_lymph_node_dissection:coding_instructions:i2",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Regional Lymph Node Dissection",
+      "Coding Instructions"
+    ],
+    "anchor": "L5654-L5683:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      830,
+      832
+    ],
+    "applies_to": {
+      "sites": [
+        "C500-C509"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "2. Record the date of the regional lymph node dissection in this data item and record the date of the sentinel lymph node biopsy procedure in the Date of Sentinel Lymph Node Biopsy data item [NAACCR Item #832] for breast and cutaneous melanoma cases when\na. Both a sentinel lymph node biopsy procedure and a separate regional lymph node dissection procedure are performed OR\nb. A sentinel lymph node biopsy is performed in the same procedure as the regional lymph node dissection. In this case, the dates should be the same.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_regional_lymph_node_dissection:coding_instructions:i3",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Regional Lymph Node Dissection",
+      "Coding Instructions"
+    ],
+    "anchor": "L5654-L5683:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "3. Record the date of the regional lymph node dissection in this data item for all other cases (in addition to breast and cutaneous melanoma cases)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_regional_lymph_node_dissection:coding_instructions:i4",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Regional Lymph Node Dissection",
+      "Coding Instructions"
+    ],
+    "anchor": "L5654-L5683:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      832
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "a. If a sentinel lymph node biopsy procedure is also performed, record the procedure in the Date of Sentinel Lymph Node Biopsy data item [NAACCR Item #832]",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_regional_lymph_node_dissection:coding_instructions:i5",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Regional Lymph Node Dissection",
+      "Coding Instructions"
+    ],
+    "anchor": "L5654-L5683:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      830,
+      832
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "i. If the sentinel lymph node biopsy is performed in the same procedure as the regional lymph node dissection, the dates should be the same",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "spcsm_2024:date_of_regional_lymph_node_dissection:coding_instructions:i6",
+    "source_doc": "spcsm_2024",
+    "section_path": [
+      "Section VII First Course of Therapy",
+      "Date of Regional Lymph Node Dissection",
+      "Coding Instructions"
+    ],
+    "anchor": "L5654-L5683:coding-instructions",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": null,
+      "histologies": null,
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2000-01-01",
+      "dx_date_max": null
+    },
+    "text": "4. Leave Date of Regional Lymph Node Dissection blank when only a sentinel lymph node biopsy is performed",
+    "codes": null,
+    "notes": null
+  }
+]

@@ -1,0 +1,264 @@
+========================================================================
+RULE COMPILATION REVIEW REPORT
+========================================================================
+Source: documents/markdown/SPCSM_2024_MainDoc.md
+Units emitted: 15  |  accepted: 15  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     1
+  definition     1
+  example        1
+  instruction    11
+  priority_rule  1
+
+Accepted fidelity: min 0.99  mean 1.00
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED ACCEPTED UNITS (source vs. compiled, up to 5)
+------------------------------------------------------------------------
+
+[spcsm_2024:mets_brain:mets_at_diagnosisbrain:d1]  kind=definition  items=[1113]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ## Mets at Diagnosis--Brain
+
+    | #### Item Length: 1 NAACCR Item #: 1113 NAACCR Name: Mets at DX-Brain XML NAACCR ID: metsAtDxBrain
+
+    | This data item identifies whether brain is an involved metastatic site. The six Mets at Diagnosis-metastatic sites data items provide information on specific metastatic sites for data analysis.
+
+    | | Code | Description |
+    | |---|---|
+    | | 0 | None; no brain metastases |
+    | | 1 | Yes; distant brain metastases |
+    | | 8 | Not applicable |
+    | | 9 | Unknown whether brain is involved metastatic site Not documented in patient record |
+
+  COMPILED TEXT:
+    > This data item identifies whether brain is an involved metastatic site.
+
+[spcsm_2024:mets_brain:coding_instructions:i2]  kind=instruction  items=[1120]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Code information about brain metastases only (discontinuous or distant metastases to brain)**
+
+    | identified at the time of diagnosis. Do not code involvement of spinal cord or other parts of the central nervous system in this data item.
+
+    | ***Note: See code 1 in "Mets at Diagnosis--Other" for mets to spinal cord or other parts of the***
+
+    | central nervous system.
+
+    | | a. | Brain involvement may be single or multiple |
+    | |---|---|
+    | | b. | Information about brain involvement may be clinical or pathological |
+    | | c. | Code this data item whether or not the patient had neoadjuvant (preoperative) systemic therapy unless determined to be disease progression |
+
+    | d. Code this data item for all solid tumor schemas (including Kaposi Sarcoma and Ill-
+
+    | Defined Other [includes unknown primary site]) and the following Hematopoietic schemas except as noted in 2.c. and i. Lymphoma Ocular Adnexa 00710 ii. Lymphoma 00790 iii. Lymphoma-CLL/SLL 00795 iv. Mycosis Fungoides (MF) 00811 v. Primary Cutaneous Lymphoma (excluding MF and SS) 00812 vi. HemeRetic 00830 (excluding primary sites C420, C421, C423, C424)
+
+    | 2. **Use of codes. Assign the code that best describes whether the case has brain metastases at**
+
+    | diagnosis. a. Use code 0 when the medical record
+
+    | i. Indicates that there are no distant (discontinuous) metastases at all ii. Confirms the tumor is benign (/0), borderline (/1), or in situ (/2) iii. Includes a clinical or pathologic statement that there are no brain metastases iv. Includes imaging reports that are negative for brain metastases
+
+    | **September 2023 Section VI: Stage-related Data Items 146**
+
+    | -----
+
+    | v. Indicates that the patient has distant (discontinuous) metastases but brain is not
+
+    | mentioned as an involved site
+
+    | ***Example:*** **Use code 0 when the patient has metastasis to lung and liver but not**
+
+    | brain. b. Use code 1 when the medical record
+
+    | i. Indicates that the patient has distant (discontinuous) metastases and brain is
+
+    | mentioned as an involved site ii. Indicates that the patient is diagnosed with an unknown primary (C809) and brain
+
+    | is mentioned as a distant metastatic site c. Use code 8 (Not applicable) for the following
+
+    | i. Any case coded to primary site C420, C421, C423, or C424 ii. Plasma Cell Disorders 00822 d. Use code 9 when it cannot be determined whether the patient specifically has brain metastases. In other words, use code 9 when there are known distant metastases but it is not known whether the distant metastases include brain. For more information about schemas and schema IDs, go to the SSDI Manual, Appendix A.
+
+    | **September 2023 Section VI: Stage-related Data Items 147**
+
+    | -----
+
+  COMPILED TEXT:
+    > Note: See code 1 in "Mets at Diagnosis--Other" for mets to spinal cord or other parts of the central nervous system.
+
+[spcsm_2024:mets_brain:coding_instructions:i5]  kind=instruction  items=[1120]  fidelity=1.00
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Code information about brain metastases only (discontinuous or distant metastases to brain)**
+
+    | identified at the time of diagnosis. Do not code involvement of spinal cord or other parts of the central nervous system in this data item.
+
+    | ***Note: See code 1 in "Mets at Diagnosis--Other" for mets to spinal cord or other parts of the***
+
+    | central nervous system.
+
+    | | a. | Brain involvement may be single or multiple |
+    | |---|---|
+    | | b. | Information about brain involvement may be clinical or pathological |
+    | | c. | Code this data item whether or not the patient had neoadjuvant (preoperative) systemic therapy unless determined to be disease progression |
+
+    | d. Code this data item for all solid tumor schemas (including Kaposi Sarcoma and Ill-
+
+    | Defined Other [includes unknown primary site]) and the following Hematopoietic schemas except as noted in 2.c. and i. Lymphoma Ocular Adnexa 00710 ii. Lymphoma 00790 iii. Lymphoma-CLL/SLL 00795 iv. Mycosis Fungoides (MF) 00811 v. Primary Cutaneous Lymphoma (excluding MF and SS) 00812 vi. HemeRetic 00830 (excluding primary sites C420, C421, C423, C424)
+
+    | 2. **Use of codes. Assign the code that best describes whether the case has brain metastases at**
+
+    | diagnosis. a. Use code 0 when the medical record
+
+    | i. Indicates that there are no distant (discontinuous) metastases at all ii. Confirms the tumor is benign (/0), borderline (/1), or in situ (/2) iii. Includes a clinical or pathologic statement that there are no brain metastases iv. Includes imaging reports that are negative for brain metastases
+
+    | **September 2023 Section VI: Stage-related Data Items 146**
+
+    | -----
+
+    | v. Indicates that the patient has distant (discontinuous) metastases but brain is not
+
+    | mentioned as an involved site
+
+    | ***Example:*** **Use code 0 when the patient has metastasis to lung and liver but not**
+
+    | brain. b. Use code 1 when the medical record
+
+    | i. Indicates that the patient has distant (discontinuous) metastases and brain is
+
+    | mentioned as an involved site ii. Indicates that the patient is diagnosed with an unknown primary (C809) and brain
+
+    | is mentioned as a distant metastatic site c. Use code 8 (Not applicable) for the following
+
+    | i. Any case coded to primary site C420, C421, C423, or C424 ii. Plasma Cell Disorders 00822 d. Use code 9 when it cannot be determined whether the patient specifically has brain metastases. In other words, use code 9 when there are known distant metastases but it is not known whether the distant metastases include brain. For more information about schemas and schema IDs, go to the SSDI Manual, Appendix A.
+
+    | **September 2023 Section VI: Stage-related Data Items 147**
+
+    | -----
+
+  COMPILED TEXT:
+    > Code this data item whether or not the patient had neoadjuvant (preoperative) systemic therapy unless determined to be disease progression.
+
+[spcsm_2024:mets_brain:coding_instructions:i8]  kind=instruction  items=[1120]  fidelity=0.99
+  applies_to: {'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Code information about brain metastases only (discontinuous or distant metastases to brain)**
+
+    | identified at the time of diagnosis. Do not code involvement of spinal cord or other parts of the central nervous system in this data item.
+
+    | ***Note: See code 1 in "Mets at Diagnosis--Other" for mets to spinal cord or other parts of the***
+
+    | central nervous system.
+
+    | | a. | Brain involvement may be single or multiple |
+    | |---|---|
+    | | b. | Information about brain involvement may be clinical or pathological |
+    | | c. | Code this data item whether or not the patient had neoadjuvant (preoperative) systemic therapy unless determined to be disease progression |
+
+    | d. Code this data item for all solid tumor schemas (including Kaposi Sarcoma and Ill-
+
+    | Defined Other [includes unknown primary site]) and the following Hematopoietic schemas except as noted in 2.c. and i. Lymphoma Ocular Adnexa 00710 ii. Lymphoma 00790 iii. Lymphoma-CLL/SLL 00795 iv. Mycosis Fungoides (MF) 00811 v. Primary Cutaneous Lymphoma (excluding MF and SS) 00812 vi. HemeRetic 00830 (excluding primary sites C420, C421, C423, C424)
+
+    | 2. **Use of codes. Assign the code that best describes whether the case has brain metastases at**
+
+    | diagnosis. a. Use code 0 when the medical record
+
+    | i. Indicates that there are no distant (discontinuous) metastases at all ii. Confirms the tumor is benign (/0), borderline (/1), or in situ (/2) iii. Includes a clinical or pathologic statement that there are no brain metastases iv. Includes imaging reports that are negative for brain metastases
+
+    | **September 2023 Section VI: Stage-related Data Items 146**
+
+    | -----
+
+    | v. Indicates that the patient has distant (discontinuous) metastases but brain is not
+
+    | mentioned as an involved site
+
+    | ***Example:*** **Use code 0 when the patient has metastasis to lung and liver but not**
+
+    | brain. b. Use code 1 when the medical record
+
+    | i. Indicates that the patient has distant (discontinuous) metastases and brain is
+
+    | mentioned as an involved site ii. Indicates that the patient is diagnosed with an unknown primary (C809) and brain
+
+    | is mentioned as a distant metastatic site c. Use code 8 (Not applicable) for the following
+
+    | i. Any case coded to primary site C420, C421, C423, or C424 ii. Plasma Cell Disorders 00822 d. Use code 9 when it cannot be determined whether the patient specifically has brain metastases. In other words, use code 9 when there are known distant metastases but it is not known whether the distant metastases include brain. For more information about schemas and schema IDs, go to the SSDI Manual, Appendix A.
+
+    | **September 2023 Section VI: Stage-related Data Items 147**
+
+    | -----
+
+  COMPILED TEXT:
+    > Use code 0 when the medical record indicates that there are no distant (discontinuous) metastases at all; confirms the tumor is benign (/0), borderline (/1), or in situ (/2); includes a clinical or pathologic statement that there are no brain metastases; includes imaging reports that are negative for brain metastases; or indicates that the patient has distant (discontinuous) metastases but brain is not mentioned as an involved site.
+
+[spcsm_2024:mets_brain:coding_instructions:i11]  kind=instruction  items=[1120]  fidelity=0.99
+  applies_to: {'sites': ['C420', 'C421', 'C423', 'C424'], 'dx_date_min': '2000-01-01'}
+  SOURCE REGION:
+    | ### Coding Instructions
+
+    | 1. **Code information about brain metastases only (discontinuous or distant metastases to brain)**
+
+    | identified at the time of diagnosis. Do not code involvement of spinal cord or other parts of the central nervous system in this data item.
+
+    | ***Note: See code 1 in "Mets at Diagnosis--Other" for mets to spinal cord or other parts of the***
+
+    | central nervous system.
+
+    | | a. | Brain involvement may be single or multiple |
+    | |---|---|
+    | | b. | Information about brain involvement may be clinical or pathological |
+    | | c. | Code this data item whether or not the patient had neoadjuvant (preoperative) systemic therapy unless determined to be disease progression |
+
+    | d. Code this data item for all solid tumor schemas (including Kaposi Sarcoma and Ill-
+
+    | Defined Other [includes unknown primary site]) and the following Hematopoietic schemas except as noted in 2.c. and i. Lymphoma Ocular Adnexa 00710 ii. Lymphoma 00790 iii. Lymphoma-CLL/SLL 00795 iv. Mycosis Fungoides (MF) 00811 v. Primary Cutaneous Lymphoma (excluding MF and SS) 00812 vi. HemeRetic 00830 (excluding primary sites C420, C421, C423, C424)
+
+    | 2. **Use of codes. Assign the code that best describes whether the case has brain metastases at**
+
+    | diagnosis. a. Use code 0 when the medical record
+
+    | i. Indicates that there are no distant (discontinuous) metastases at all ii. Confirms the tumor is benign (/0), borderline (/1), or in situ (/2) iii. Includes a clinical or pathologic statement that there are no brain metastases iv. Includes imaging reports that are negative for brain metastases
+
+    | **September 2023 Section VI: Stage-related Data Items 146**
+
+    | -----
+
+    | v. Indicates that the patient has distant (discontinuous) metastases but brain is not
+
+    | mentioned as an involved site
+
+    | ***Example:*** **Use code 0 when the patient has metastasis to lung and liver but not**
+
+    | brain. b. Use code 1 when the medical record
+
+    | i. Indicates that the patient has distant (discontinuous) metastases and brain is
+
+    | mentioned as an involved site ii. Indicates that the patient is diagnosed with an unknown primary (C809) and brain
+
+    | is mentioned as a distant metastatic site c. Use code 8 (Not applicable) for the following
+
+    | i. Any case coded to primary site C420, C421, C423, or C424 ii. Plasma Cell Disorders 00822 d. Use code 9 when it cannot be determined whether the patient specifically has brain metastases. In other words, use code 9 when there are known distant metastases but it is not known whether the distant metastases include brain. For more information about schemas and schema IDs, go to the SSDI Manual, Appendix A.
+
+    | **September 2023 Section VI: Stage-related Data Items 147**
+
+    | -----
+
+  COMPILED TEXT:
+    > Use code 8 (Not applicable) for the following: Any case coded to primary site C420, C421, C423, or C424.
+
+========================================================================
