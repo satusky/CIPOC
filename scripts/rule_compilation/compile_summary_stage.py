@@ -52,7 +52,7 @@ from .summary_stage_index import (
 MANUAL = "summary_stage_2018"
 SOURCE = Path("documents/markdown/Summary-Stage_v3.3.md")
 RULES_DIR = Path("documents/rules")
-DATA_DICTIONARY = Path("documents/naaccr_data_dictionary_v25.json")
+DATA_DICTIONARY = Path("documents/manuals/naaccr_data_dictionary_v25.json")
 
 # The site-agnostic chapters (stage-code definitions, general coding instructions,
 # ambiguous terminology) compile into one group under this stem rather than 16

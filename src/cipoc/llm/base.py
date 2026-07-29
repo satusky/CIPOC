@@ -1,3 +1,4 @@
+import asyncio
 from abc import ABC, abstractmethod
 from threading import Semaphore
 
@@ -28,6 +29,10 @@ class BaseAgentModel(ABC):
         self._tools = kwargs.pop("tools") if "tools" in kwargs else self._config.tools
         self._model = self._initialize_model(**kwargs)
         self._semaphore = Semaphore(self._config.max_concurrency) if self._config.max_concurrency else None
+        # Built on first async use rather than here: an asyncio.Semaphore binds to
+        # the loop it is first awaited on, and the model is constructed off-loop.
+        self._async_semaphore: asyncio.Semaphore | None = None
+        self._async_loop: asyncio.AbstractEventLoop | None = None
 
     @property
     def model(self) -> BaseChatModel:
@@ -43,6 +48,23 @@ class BaseAgentModel(ABC):
     @abstractmethod
     def _initialize_model(self, **kwargs) -> BaseChatModel:
         ...
+
+    def _aguard(self) -> asyncio.Semaphore | None:
+        """The endpoint permit for the async path, created on the running loop.
+
+        Cached per loop rather than once: a semaphore is bound to the loop it is
+        first awaited on, and a process can run ``asyncio.run`` more than once —
+        a notebook cell re-run would otherwise await a semaphore tied to a closed
+        loop. Falsy ``max_concurrency`` means unbounded, matching the sync path
+        (an ``asyncio.Semaphore(0)`` would deadlock rather than run unbounded).
+        """
+        if not self._config.max_concurrency:
+            return None
+        loop = asyncio.get_running_loop()
+        if self._async_semaphore is None or self._async_loop is not loop:
+            self._async_semaphore = asyncio.Semaphore(self._config.max_concurrency)
+            self._async_loop = loop
+        return self._async_semaphore
 
     def invoke(self, messages, *, config=None, stop=None, **kwargs):
         if self._semaphore is None:
@@ -62,12 +84,22 @@ class BaseAgentModel(ABC):
             )
 
     async def ainvoke(self, messages, *, config=None, stop=None, **kwargs):
-        return await self.model.ainvoke(
-            messages,
-            config,
-            stop=stop,
-            **kwargs
-        )
+        guard = self._aguard()
+        if guard is None:
+            return await self.model.ainvoke(
+                messages,
+                config,
+                stop=stop,
+                **kwargs
+            )
+
+        async with guard:
+            return await self.model.ainvoke(
+                messages,
+                config,
+                stop=stop,
+                **kwargs
+            )
 
     def structured(self, schema, messages, **kwargs):
         """Invoke the model with structured output under the concurrency guard.
@@ -85,16 +117,20 @@ class BaseAgentModel(ABC):
             return runnable.invoke(messages, **kwargs)
 
     async def astructured(self, schema, messages, **kwargs):
-        """Async sibling of :meth:`structured` — currently an unguarded passthrough.
+        """Async sibling of :meth:`structured`, bounded by :meth:`_aguard`.
 
-        The concurrency guard is intentionally omitted: acquiring the
-        ``threading.Semaphore`` across an ``await`` would block the event loop
-        whenever it had to wait for a permit. To bound the async path, swap
-        ``self._semaphore`` to an ``asyncio.Semaphore`` and guard with
-        ``async with self._semaphore:`` here. Until then the sync
-        :meth:`structured` path is the bounded one.
+        Guards with an ``asyncio.Semaphore`` rather than the sync one: acquiring
+        a ``threading.Semaphore`` across an ``await`` would block the whole event
+        loop whenever it had to wait for a permit. Otherwise the contract is the
+        same — one permit held for the duration of the call, and node call sites
+        should route through this rather than
+        ``self.model.with_structured_output(...).ainvoke(...)``, which bypasses it.
         """
         runnable = self.model.with_structured_output(schema)
-        return await runnable.ainvoke(messages, **kwargs)
+        guard = self._aguard()
+        if guard is None:
+            return await runnable.ainvoke(messages, **kwargs)
+        async with guard:
+            return await runnable.ainvoke(messages, **kwargs)
 
 

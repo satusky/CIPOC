@@ -390,13 +390,17 @@ class ProgressModel:
     # --- Ingest -----------------------------------------------------------
 
     def ingest(self, event: ProgressEvent, now: float) -> None:
+        """Fold one event in. ``updates`` events are deliberately ignored: they
+        carry a node's own write, which is redundant with — and less trustworthy
+        than — the root ``values`` this model treats as authoritative. They ride
+        the same stream only because ``astream_results`` consumes them.
+        """
         if event.kind == "values":
             if event.is_root:
                 self._ingest_values(event.payload)
-            return
-        if event.kind == "task_start":
+        elif event.kind == "task_start":
             self._ingest_start(event, now)
-        else:
+        elif event.kind == "task_end":
             self._ingest_end(event, now)
 
     def _ingest_start(self, event: ProgressEvent, now: float) -> None:

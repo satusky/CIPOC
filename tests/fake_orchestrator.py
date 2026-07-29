@@ -14,7 +14,9 @@ real Pydantic model of the same type a live run would emit.
 
 from __future__ import annotations
 
+import asyncio
 import json
+import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -98,28 +100,84 @@ class Script:
     retrieved: dict[str, int] = field(default_factory=dict)
     default_outcome: Outcome = field(default_factory=Outcome)
     delay: float = 0.0
+    # Pause instrumentation. ``paused`` totals the simulated endpoint calls, so
+    # ``paused * delay`` is what the run would have cost strictly serially;
+    # ``peak_in_flight`` is the only direct evidence a run actually overlapped.
+    paused: int = 0
+    in_flight: int = 0
+    peak_in_flight: int = 0
+    _lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
 
     def outcome(self, item_id: int) -> Outcome:
         return self.outcomes.get(item_id, self.default_outcome)
 
+    def _enter(self) -> None:
+        # Locked because the sync fan-out runs on LangGraph's thread pool. The
+        # async twins never preempt inside this, but they share the accounting.
+        with self._lock:
+            self.paused += 1
+            self.in_flight += 1
+            self.peak_in_flight = max(self.peak_in_flight, self.in_flight)
+
+    def _exit(self) -> None:
+        with self._lock:
+            self.in_flight -= 1
+
     def pause(self, scale: float = 1.0) -> None:
-        if self.delay:
-            time.sleep(self.delay * scale)
+        self._enter()
+        try:
+            if self.delay:
+                time.sleep(self.delay * scale)
+        finally:
+            self._exit()
+
+    async def apause(self, scale: float = 1.0) -> None:
+        """The async twin's stand-in for endpoint latency.
+
+        ``asyncio.sleep``, not ``time.sleep``: a fake that blocked the loop would
+        serialize the fan-out and hide exactly the overlap these fakes exist to
+        measure.
+        """
+        self._enter()
+        try:
+            if self.delay:
+                await asyncio.sleep(self.delay * scale)
+        finally:
+            self._exit()
 
 
 # --- Fake subagents (compiled graphs mirroring the real node names) ---
 
 
-class FakeNoteScanner:
+class _FakeAgent:
+    """Sync/async node selection, mirroring ``BaseAgent._node``.
+
+    The fakes carry async twins for exactly the nodes the real agents do — the
+    ones that would issue an LLM request — so a fake run exercises the same
+    wiring decision a live one makes, and ``arun`` on the orchestrator's nodes
+    finds an awaitable on the other side.
+    """
+
+    def __init__(self, script: Script, use_async: bool = False):
+        self._script = script
+        self._async = use_async
+
+    def _node(self, name: str):
+        if self._async:
+            return getattr(self, f"a{name}", getattr(self, name))
+        return getattr(self, name)
+
+
+class FakeNoteScanner(_FakeAgent):
     """Scanner shape: initialize -> summarize_note -> detect_concepts -> gate."""
 
-    def __init__(self, script: Script):
-        self._script = script
+    def __init__(self, script: Script, use_async: bool = False):
+        super().__init__(script, use_async)
         graph = StateGraph(ScannerState, input_schema=ScannerInput, output_schema=ScannerOutput)
         graph.add_node("initialize", self.initialize)
-        graph.add_node("summarize_note", self.summarize_note)
-        graph.add_node("detect_concepts", self.detect_concepts)
-        graph.add_node("get_cancer_mentions", self.get_cancer_mentions)
+        graph.add_node("summarize_note", self._node("summarize_note"))
+        graph.add_node("detect_concepts", self._node("detect_concepts"))
+        graph.add_node("get_cancer_mentions", self._node("get_cancer_mentions"))
         graph.add_edge(START, "initialize")
         graph.add_edge("initialize", "summarize_note")
         graph.add_edge("summarize_note", "detect_concepts")
@@ -132,15 +190,22 @@ class FakeNoteScanner:
     def initialize(self, state: ScannerState) -> dict:
         return {}
 
-    def summarize_note(self, state: ScannerState) -> dict:
-        self._script.pause()
+    @staticmethod
+    def _summary(state: ScannerState) -> dict:
         return {
             "summary": f"{state.note.type} recorded {state.note.date}.",
             "flags": ["metasta", "therapy", "lymph node", state.note.type.split()[0].lower()],
         }
 
-    def detect_concepts(self, state: ScannerState) -> dict:
+    def summarize_note(self, state: ScannerState) -> dict:
         self._script.pause()
+        return self._summary(state)
+
+    async def asummarize_note(self, state: ScannerState) -> dict:
+        await self._script.apause()
+        return self._summary(state)
+
+    def _concepts(self) -> dict:
         concepts = build_concept_presence_dict(with_evidence=True)
         for name, present in self._script.concepts.items():
             if name in concepts:
@@ -149,13 +214,20 @@ class FakeNoteScanner:
                 )
         return {"concepts": concepts}
 
+    def detect_concepts(self, state: ScannerState) -> dict:
+        self._script.pause()
+        return self._concepts()
+
+    async def adetect_concepts(self, state: ScannerState) -> dict:
+        await self._script.apause()
+        return self._concepts()
+
     @staticmethod
     def cancer_gate(state: ScannerState) -> str:
         cancer = (state.concepts or {}).get("cancer")
         return "get_cancer_mentions" if cancer and cancer.presence else END
 
-    def get_cancer_mentions(self, state: ScannerState) -> dict:
-        self._script.pause()
+    def _mentions(self) -> dict:
         mention = CancerMention(
             presence=True,
             confidence=ConfidenceLevel.HIGH,
@@ -165,21 +237,33 @@ class FakeNoteScanner:
         )
         return {"cancer_mentions": [mention], "cancer_status": {"current"}}
 
+    def get_cancer_mentions(self, state: ScannerState) -> dict:
+        self._script.pause()
+        return self._mentions()
+
+    async def aget_cancer_mentions(self, state: ScannerState) -> dict:
+        await self._script.apause()
+        return self._mentions()
+
     def run(self, note: ClinicalNote, *, progress: bool = True) -> ProcessedClinicalNote:
         result = self._graph.invoke({"note": note})
         return ProcessedClinicalNote(**note.model_dump(), **result)
 
+    async def arun(self, note: ClinicalNote, *, progress: bool = False) -> ProcessedClinicalNote:
+        result = await self._graph.ainvoke({"note": note})
+        return ProcessedClinicalNote(**note.model_dump(), **result)
 
-class FakeNoteRetriever:
+
+class FakeNoteRetriever(_FakeAgent):
     """Retriever shape: initialize -> identify_relevant_notes."""
 
-    def __init__(self, script: Script):
-        self._script = script
+    def __init__(self, script: Script, use_async: bool = False):
+        super().__init__(script, use_async)
         graph = StateGraph(
             RetrieverState, input_schema=RetrieverInput, output_schema=RetrieverOutput
         )
         graph.add_node("initialize", self.initialize)
-        graph.add_node("identify_relevant_notes", self.identify_relevant_notes)
+        graph.add_node("identify_relevant_notes", self._node("identify_relevant_notes"))
         graph.add_edge(START, "initialize")
         graph.add_edge("initialize", "identify_relevant_notes")
         graph.add_edge("identify_relevant_notes", END)
@@ -188,26 +272,37 @@ class FakeNoteRetriever:
     def initialize(self, state: RetrieverState) -> dict:
         return {}
 
-    def identify_relevant_notes(self, state: RetrieverState) -> dict:
-        self._script.pause()
+    def _selection(self, state: RetrieverState) -> dict:
         note_ids = sorted(state.available_digests)
         keep = self._script.retrieved.get(state.requested_variables.group_id or "", len(note_ids))
         selected = note_ids[:keep]
         return {"relevant_note_ids": selected or None}
 
+    def identify_relevant_notes(self, state: RetrieverState) -> dict:
+        self._script.pause()
+        return self._selection(state)
+
+    async def aidentify_relevant_notes(self, state: RetrieverState) -> dict:
+        await self._script.apause()
+        return self._selection(state)
+
     def run(self, retriever_input: Any, *, progress: bool = True) -> list[int] | None:
         return self._graph.invoke(retriever_input)["relevant_note_ids"]
 
+    async def arun(self, retriever_input: Any, *, progress: bool = False) -> list[int] | None:
+        result = await self._graph.ainvoke(retriever_input)
+        return result["relevant_note_ids"]
 
-class FakeExtractor:
+
+class FakeExtractor(_FakeAgent):
     """Extractor shape, including the per-variable branch and its repair loop."""
 
-    def __init__(self, script: Script):
-        self._script = script
+    def __init__(self, script: Script, use_async: bool = False):
+        super().__init__(script, use_async)
         branch = StateGraph(VariableBranchState, output_schema=VariableBranchOutput)
-        branch.add_node("extract_individual_value", self.extract_individual_value)
+        branch.add_node("extract_individual_value", self._node("extract_individual_value"))
         branch.add_node("validate_extraction", self.validate_extraction)
-        branch.add_node("repair_invalid_extraction", self.repair_invalid_extraction)
+        branch.add_node("repair_invalid_extraction", self._node("repair_invalid_extraction"))
         branch.add_node("complete_variable", self.complete_variable)
         branch.add_conditional_edges(
             START,
@@ -225,7 +320,9 @@ class FakeExtractor:
         graph.add_node("initialize", self.initialize)
         graph.add_node("load_notes", self.load_notes)
         graph.add_node(
-            "extract_group_values", self.extract_group_values, destinations=("variable_branch",)
+            "extract_group_values",
+            self._node("extract_group_values"),
+            destinations=("variable_branch",),
         )
         graph.add_node("variable_branch", branch.compile())
         graph.add_node("merge_variable_results", self.merge_variable_results)
@@ -266,6 +363,13 @@ class FakeExtractor:
 
     def extract_group_values(self, state: ExtractorState) -> Command:
         self._script.pause(2)
+        return self._group_command(state)
+
+    async def aextract_group_values(self, state: ExtractorState) -> Command:
+        await self._script.apause(2)
+        return self._group_command(state)
+
+    def _group_command(self, state: ExtractorState) -> Command:
         return Command(
             goto=[
                 Send(
@@ -318,8 +422,8 @@ class FakeExtractor:
             return "extract_individual_value"
         return "validate_extraction"
 
-    def extract_individual_value(self, state: VariableBranchState) -> dict:
-        self._script.pause()
+    def _accept_candidate(self, state: VariableBranchState) -> dict:
+        """Shared by the first extraction and every repair, as in the real agent."""
         return {
             "task": state.task.model_copy(
                 update={
@@ -330,6 +434,14 @@ class FakeExtractor:
                 }
             )
         }
+
+    def extract_individual_value(self, state: VariableBranchState) -> dict:
+        self._script.pause()
+        return self._accept_candidate(state)
+
+    async def aextract_individual_value(self, state: VariableBranchState) -> dict:
+        await self._script.apause()
+        return self._accept_candidate(state)
 
     def validate_extraction(self, state: VariableBranchState) -> dict:
         outcome = self._script.outcome(state.task.variable.item_id)
@@ -348,16 +460,11 @@ class FakeExtractor:
 
     def repair_invalid_extraction(self, state: VariableBranchState) -> dict:
         self._script.pause()
-        return {
-            "task": state.task.model_copy(
-                update={
-                    "candidate": self._candidate(state.task.variable.item_id, state.notes),
-                    "validation_errors": [],
-                    "extraction_attempts": state.task.extraction_attempts + 1,
-                    "is_valid": False,
-                }
-            )
-        }
+        return self._accept_candidate(state)
+
+    async def arepair_invalid_extraction(self, state: VariableBranchState) -> dict:
+        await self._script.apause()
+        return self._accept_candidate(state)
 
     def complete_variable(self, state: VariableBranchState) -> dict:
         candidate = state.task.candidate
@@ -375,24 +482,36 @@ class FakeExtractor:
     def run(self, extractor_input: Any, *, progress: bool = True) -> ExtractorOutput:
         return ExtractorOutput(**self._graph.invoke(extractor_input))
 
+    async def arun(self, extractor_input: Any, *, progress: bool = False) -> ExtractorOutput:
+        result = await self._graph.ainvoke(extractor_input)
+        return ExtractorOutput(**result)
+
 
 # --- The orchestrator itself ---
 
 
-def build_fake_orchestrator(script: Script | None = None) -> OrchestratorAgent:
+def build_fake_orchestrator(
+    script: Script | None = None,
+    *,
+    use_async: bool = False,
+) -> OrchestratorAgent:
     """The real orchestrator with fake subagents and no LLM/config dependency.
 
     ``_scope_group`` is stubbed to a pass-through so the 2 MB data dictionary is
     never read: it only fills variable metadata the dashboard does not display,
     and skipping it keeps the fixture fast and hermetic.
+
+    ``use_async`` wires the orchestrator's async node twins and the matching fake
+    subagents; drive the result with ``arun`` rather than ``run``.
     """
     script = script or Script()
     agent = object.__new__(OrchestratorAgent)
     agent._config = CipocConfig({"documents": {"variable_groups_path": str(VARIABLE_GROUPS)}})
+    agent._async = use_async
     agent._value_validator = None
-    agent._scanner = FakeNoteScanner(script)
-    agent._retriever = FakeNoteRetriever(script)
-    agent._extractor = FakeExtractor(script)
+    agent._scanner = FakeNoteScanner(script, use_async)
+    agent._retriever = FakeNoteRetriever(script, use_async)
+    agent._extractor = FakeExtractor(script, use_async)
     agent._target_variables = load_variable_groups(VARIABLE_GROUPS)
     agent._target_group_hierarchy = load_group_hierarchy(VARIABLE_GROUPS)
     agent._data_dictionary_path = None

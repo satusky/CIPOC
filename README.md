@@ -208,7 +208,7 @@ src/cipoc/
 │   └── coding_context.py  # Rule store loading + case-scoped coding instructions
 └── utils/
     ├── utils.py           # YAML config loader + CipocConfig
-    ├── progress_tracking.py  # run_with_progress graph runner
+    ├── progress/          # live progress dashboard (run_with_progress / arun_with_progress and renderers)
     └── databricks_utils.py
 
 config/          # config.yaml + variable_groups.json

@@ -103,8 +103,12 @@ class CipocConfig:
             raw = yaml.safe_load(f) or {}
         return cls(_expand_env(raw))
 
-    def agent_settings(self, agent: str) -> dict:
-        """Return the merged settings dict for ``agent`` (defaults + overrides)."""
+    def agent_settings(self, agent: str | None = None) -> dict:
+        """Return the merged settings dict for ``agent`` (defaults + overrides).
+
+        ``None`` yields the defaults alone, matching :meth:`llm_config` and
+        :meth:`retry_policy`.
+        """
         override = self.agents.get(agent) or {}
         return _deep_merge(self.defaults, override)
 
@@ -115,6 +119,9 @@ class CipocConfig:
         # `retry` configures the graph, not the model client. OpenAIConfig allows
         # extra fields, so leaving it in would forward it to ChatOpenAI.
         settings.pop("retry", None)
+        # Same for `async_mode`: it picks which node callables an agent wires, and
+        # the model wrapper exposes both call verbs regardless.
+        settings.pop("async_mode", None)
         return config_for(settings.get("provider", "openai"))(**settings)
 
     def retry_policy(self, agent: str | None = None) -> RetryPolicy:

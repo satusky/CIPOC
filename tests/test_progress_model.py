@@ -86,7 +86,33 @@ class ProgressEventTests(unittest.TestCase):
         self.assertEqual(root_values, ProgressEvent(kind="values", namespace=(), payload={"answer": 1}))
 
     def test_ignores_unrequested_stream_modes(self):
-        self.assertIsNone(normalize(((), "updates", {}), subgraphs=True))
+        # "custom" especially: a graph that requests it builds its own writer
+        # instead of inheriting the parent's, which breaks nested-subagent events.
+        self.assertIsNone(normalize(((), "custom", {}), subgraphs=True))
+        self.assertIsNone(normalize(((), "debug", {}), subgraphs=True))
+        self.assertIsNone(normalize(((), "updates", "not a mapping"), subgraphs=True))
+
+    def test_normalizes_updates_into_node_writes(self):
+        event = normalize(
+            (GROUP_SCOPE, "updates", {"extract": {"variable_results": {390: {}}}}),
+            subgraphs=True,
+        )
+        self.assertEqual(event.kind, "updates")
+        self.assertEqual(event.node, "extract")
+        self.assertEqual(event.writes, (("extract", {"variable_results": {390: {}}}),))
+        # Only "updates" carries writes; every other kind reads as empty.
+        self.assertEqual(normalize(("values", {}), subgraphs=False).writes, ())
+
+    def test_the_model_ignores_updates_rather_than_mistaking_them_for_task_ends(self):
+        """They ride the same stream only because astream_results consumes them;
+        the dashboard's authority is the root `values` payload."""
+        model = ProgressModel("Orchestrator", 10.0, target_groups=[GROUP])
+        before = model.snapshot()
+        model.ingest(
+            normalize(((), "updates", {"extract": {"variable_results": {}}}), subgraphs=True),
+            10.1,
+        )
+        self.assertEqual(model.snapshot(), before)
 
 
 class ProgressModelTests(unittest.TestCase):

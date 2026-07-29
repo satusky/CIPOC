@@ -8,13 +8,13 @@ import shutil
 import sys
 import threading
 import time
-from typing import Any, Callable, Iterable, Mapping, TextIO
+from typing import Any, AsyncIterator, Callable, Iterable, Mapping, Sequence, TextIO
 
 from langgraph.graph.state import CompiledStateGraph
 
 from cipoc.tools import GroupNode
 
-from .events import normalize
+from .events import ProgressEvent, normalize
 from .layout import build_rows, render_lines
 from .model import ProgressModel, Snapshot, TaskKind
 from .renderers import AnsiAltScreen, NotebookDisplay, PlainLog, Renderer
@@ -23,6 +23,11 @@ from .renderers import AnsiAltScreen, NotebookDisplay, PlainLog, Renderer
 _MIN_TTY_HEIGHT = 12
 _PLAIN_POLL_INTERVAL = 0.05
 _REPAINT_JOIN_TIMEOUT = 1.0
+
+#: What the dashboard itself needs: durable state plus task lifecycle. Callers
+#: wanting per-node writes (``astream_results``) add "updates" on top; the model
+#: ignores that kind, so widening the request never changes what is painted.
+DEFAULT_STREAM_MODE = ("values", "tasks")
 
 
 def _notebook_kernel_present() -> bool:
@@ -224,11 +229,109 @@ def _finalize_renderer(
     return interrupted
 
 
+class _ProgressSession:
+    """Per-run dashboard bookkeeping: the model, the renderer, the painter thread.
+
+    Exists so the sync and async runners differ in exactly one thing — whether
+    items are pulled with ``for`` over ``graph.stream`` or ``async for`` over
+    ``graph.astream``. Everything else (event normalization, ingestion, snapshot
+    publication, teardown ordering, which interrupt wins) is shared, so the two
+    paths cannot drift.
+
+    The painter stays a thread in both modes. It never touches the event loop,
+    and it is what advances ``tick`` for the spinner; a task doing blocking
+    terminal writes on the loop would be strictly worse.
+    """
+
+    def __init__(
+        self,
+        graph_input: Any,
+        *,
+        subgraphs: bool = False,
+        stream_mode: Sequence[str] | None = None,
+        description: str = "Agent",
+        node_kinds: Mapping[str, TaskKind] | None = None,
+        show_branches: bool = False,
+        target_groups: Any = None,
+        group_hierarchy: Iterable[GroupNode] | None = None,
+        show_note_counts: bool = False,
+    ):
+        self.subgraphs = subgraphs
+        self.stream_mode = list(stream_mode or DEFAULT_STREAM_MODE)
+        self.model = ProgressModel(
+            description,
+            time.monotonic(),
+            target_groups=target_groups,
+            group_hierarchy=group_hierarchy,
+            graph_input=graph_input,
+            node_kinds=node_kinds,
+            show_note_counts=show_note_counts,
+            include_input_group=show_branches,
+        )
+        self.renderer = _select_renderer(sys.stdout)
+        self.painter = _RepaintLoop(self.renderer, self.model.snapshot())
+        self.final_result: Any = None
+
+    def start(self) -> None:
+        try:
+            self.painter.start()
+        except Exception as error:
+            # Progress is optional. A thread creation failure must not prevent
+            # the graph itself from running; the caller will render teardown.
+            self.painter.error = error
+
+    def handle(self, raw_item: Any) -> ProgressEvent | None:
+        """Ingest one raw stream item and repaint. Returns the normalized event
+        so a streaming caller can consume it, or ``None`` when unusable."""
+        event = normalize(raw_item, subgraphs=self.subgraphs)
+        if event is None:
+            return None
+        self.model.ingest(event, time.monotonic())
+        if event.kind == "values" and event.is_root:
+            self.final_result = event.payload
+        self.painter.publish(self.model.snapshot())
+        return event
+
+    def finish(self) -> Any:
+        """Close out a successful run and return its last root state."""
+        if self.final_result is None:
+            raise RuntimeError("Graph produced no final state.")
+        self.model.finish()
+        self.painter.publish(self.model.snapshot())
+        return self.final_result
+
+    def fail(self, error: BaseException) -> None:
+        self.model.fail(error)
+        self.painter.publish(self.model.snapshot())
+
+    def teardown(self, run_error: BaseException | None) -> None:
+        """Stop the painter and restore the terminal. A cleanup interrupt is only
+        raised when the run itself succeeded — a real graph error outranks it."""
+        cleanup_interrupt: BaseException | None = None
+        try:
+            cleanup_interrupt = self.painter.stop()
+        except (KeyboardInterrupt, SystemExit) as error:
+            cleanup_interrupt = error
+        except Exception:
+            pass
+        if not self.painter.started:
+            cleanup_interrupt = cleanup_interrupt or _finalize_renderer(
+                self.renderer,
+                self.model.snapshot(),
+                self.painter.tick,
+            )
+        elif not self.painter.is_alive:
+            cleanup_interrupt = cleanup_interrupt or self.painter.cleanup_interrupt
+        if run_error is None and cleanup_interrupt is not None:
+            raise cleanup_interrupt
+
+
 def run_with_progress(
     graph: CompiledStateGraph,
     graph_input: Any,
     *,
     subgraphs: bool = False,
+    stream_mode: Sequence[str] | None = None,
     description: str = "Agent",
     node_kinds: Mapping[str, TaskKind] | None = None,
     show_branches: bool = False,
@@ -243,70 +346,123 @@ def run_with_progress(
     ``graph_input`` by :class:`ProgressModel`. ``group_hierarchy`` optionally
     restores nesting lost by the orchestrator's flattened planning groups.
     """
-    started_at = time.monotonic()
-    model = ProgressModel(
-        description,
-        started_at,
+    session = _ProgressSession(
+        graph_input,
+        subgraphs=subgraphs,
+        stream_mode=stream_mode,
+        description=description,
+        node_kinds=node_kinds,
+        show_branches=show_branches,
         target_groups=target_groups,
         group_hierarchy=group_hierarchy,
-        graph_input=graph_input,
-        node_kinds=node_kinds,
         show_note_counts=show_note_counts,
-        include_input_group=show_branches,
     )
-    renderer = _select_renderer(sys.stdout)
-    painter = _RepaintLoop(renderer, model.snapshot())
-    final_result: Any = None
     run_error: BaseException | None = None
-
     try:
-        try:
-            painter.start()
-        except Exception as error:
-            # Progress is optional. A thread creation failure must not prevent
-            # the graph itself from running; the caller will render teardown.
-            painter.error = error
+        session.start()
         for raw_item in graph.stream(
             graph_input,
-            stream_mode=["values", "tasks"],
+            stream_mode=session.stream_mode,
             subgraphs=subgraphs,
         ):
-            event = normalize(raw_item, subgraphs=subgraphs)
-            if event is None:
-                continue
-            model.ingest(event, time.monotonic())
-            if event.kind == "values" and event.is_root:
-                final_result = event.payload
-            painter.publish(model.snapshot())
-
-        if final_result is None:
-            raise RuntimeError("Graph produced no final state.")
-        model.finish()
-        painter.publish(model.snapshot())
-        return final_result
+            session.handle(raw_item)
+        return session.finish()
     except BaseException as error:
         run_error = error
-        model.fail(error)
-        painter.publish(model.snapshot())
+        session.fail(error)
         raise
     finally:
-        cleanup_interrupt: BaseException | None = None
-        try:
-            cleanup_interrupt = painter.stop()
-        except (KeyboardInterrupt, SystemExit) as error:
-            cleanup_interrupt = error
-        except Exception:
-            pass
-        if not painter.started:
-            cleanup_interrupt = cleanup_interrupt or _finalize_renderer(
-                renderer,
-                model.snapshot(),
-                painter.tick,
-            )
-        elif not painter.is_alive:
-            cleanup_interrupt = cleanup_interrupt or painter.cleanup_interrupt
-        if run_error is None and cleanup_interrupt is not None:
-            raise cleanup_interrupt
+        session.teardown(run_error)
 
 
-__all__ = ["run_with_progress"]
+async def astream_with_progress(
+    graph: CompiledStateGraph,
+    graph_input: Any,
+    *,
+    subgraphs: bool = False,
+    stream_mode: Sequence[str] | None = None,
+    description: str = "Agent",
+    node_kinds: Mapping[str, TaskKind] | None = None,
+    show_branches: bool = False,
+    target_groups: Any = None,
+    group_hierarchy: Iterable[GroupNode] | None = None,
+    show_note_counts: bool = False,
+) -> AsyncIterator[ProgressEvent]:
+    """Drive ``graph.astream`` with live progress, yielding each normalized event.
+
+    The dashboard is painted as a side effect, exactly as in the sync runner; the
+    yielded events are what lets a caller act on results before the run ends.
+    Drain it with :func:`arun_with_progress` when only the final state is wanted.
+    """
+    session = _ProgressSession(
+        graph_input,
+        subgraphs=subgraphs,
+        stream_mode=stream_mode,
+        description=description,
+        node_kinds=node_kinds,
+        show_branches=show_branches,
+        target_groups=target_groups,
+        group_hierarchy=group_hierarchy,
+        show_note_counts=show_note_counts,
+    )
+    run_error: BaseException | None = None
+    try:
+        session.start()
+        async for raw_item in graph.astream(
+            graph_input,
+            stream_mode=session.stream_mode,
+            subgraphs=subgraphs,
+        ):
+            event = session.handle(raw_item)
+            if event is not None:
+                yield event
+        session.finish()
+    except BaseException as error:
+        run_error = error
+        session.fail(error)
+        raise
+    finally:
+        session.teardown(run_error)
+
+
+async def astream_events(
+    graph: CompiledStateGraph,
+    graph_input: Any,
+    *,
+    subgraphs: bool = False,
+    stream_mode: Sequence[str] | None = None,
+) -> AsyncIterator[ProgressEvent]:
+    """Normalized events from ``graph.astream``, with no dashboard attached.
+
+    The progress-free half of :func:`astream_with_progress`, so a caller that
+    wants incremental results inside a notebook cell (or a test) is not forced to
+    paint a terminal display to get them.
+    """
+    async for raw_item in graph.astream(
+        graph_input,
+        stream_mode=list(stream_mode or DEFAULT_STREAM_MODE),
+        subgraphs=subgraphs,
+    ):
+        event = normalize(raw_item, subgraphs=subgraphs)
+        if event is not None:
+            yield event
+
+
+async def arun_with_progress(graph: CompiledStateGraph, graph_input: Any, **kwargs) -> Any:
+    """Async twin of :func:`run_with_progress`: run to completion, return the last
+    root state. A coroutine with no ``asyncio.run`` inside, so the caller owns the
+    loop."""
+    final_result: Any = None
+    async for event in astream_with_progress(graph, graph_input, **kwargs):
+        if event.kind == "values" and event.is_root:
+            final_result = event.payload
+    return final_result
+
+
+__all__ = [
+    "DEFAULT_STREAM_MODE",
+    "arun_with_progress",
+    "astream_events",
+    "astream_with_progress",
+    "run_with_progress",
+]

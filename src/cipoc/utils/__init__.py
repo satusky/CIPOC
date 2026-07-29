@@ -5,7 +5,13 @@ explicitly from ``cipoc.utils.databricks_utils`` when running in Databricks.
 """
 
 from .utils import CipocConfig, DocumentsConfig, DEFAULT_CONFIG_PATH, load_config
-from .progress import run_with_progress
+from .progress import (
+    ProgressEvent,
+    arun_with_progress,
+    astream_events,
+    astream_with_progress,
+    run_with_progress,
+)
 
 
 __all__ = [
@@ -13,5 +19,9 @@ __all__ = [
     "DocumentsConfig",
     "DEFAULT_CONFIG_PATH",
     "load_config",
+    "ProgressEvent",
+    "arun_with_progress",
+    "astream_events",
+    "astream_with_progress",
     "run_with_progress",
 ]

@@ -119,19 +119,34 @@ class ExtractorAgent(BaseAgent):
             for variable in variables
         ]
 
+    # Each LLM node is a prompt builder plus a result folder, shared by the sync
+    # node and its async twin so only the call verb differs.
+    @staticmethod
+    def _group_messages(state: ExtractorState) -> list[AnyMessage]:
+        return state.messages + [
+            HumanMessage(
+                "Variables to extract:\n"
+                + state.requested_variables.model_dump_json()
+            ),
+            HumanMessage(EXTRACT_GROUP_VALUES_PROMPT),
+        ]
+
     def extract_group_values(self, state: ExtractorState) -> Command[Literal["variable_branch"]]:
-        group_output = self.agent.structured(
-            VariableGroupOutput,
-            state.messages
-            + [
-                HumanMessage(
-                    "Variables to extract:\n"
-                    + state.requested_variables.model_dump_json()
-                ),
-                HumanMessage(EXTRACT_GROUP_VALUES_PROMPT),
-            ],
+        return self._group_sends(
+            state, self.agent.structured(VariableGroupOutput, self._group_messages(state))
         )
 
+    async def aextract_group_values(self, state: ExtractorState) -> Command[Literal["variable_branch"]]:
+        return self._group_sends(
+            state, await self.agent.astructured(VariableGroupOutput, self._group_messages(state))
+        )
+
+    def _group_sends(
+        self, state: ExtractorState, group_output: VariableGroupOutput
+    ) -> Command[Literal["variable_branch"]]:
+        """Fan the group's single extraction out to one validate/repair branch per
+        requested variable, seeding each with its candidate value — or with the
+        omission/duplication error that stands in for one."""
         output_counts = Counter(output.item_id for output in group_output.variables)
         outputs_by_id = {
             output.item_id: output
@@ -195,26 +210,42 @@ class ExtractorAgent(BaseAgent):
             return "extract_individual_value"
         return "validate_extraction"
 
-    def extract_individual_value(self, state: VariableBranchState) -> dict:
-        """Extract one variable from the clinical notes."""
-        extracted_value = self.agent.structured(
-            VariableOutput,
-            state.messages
-            + [
-                HumanMessage("Variable to extract:\n" + state.task.variable.model_dump_json()),
-                HumanMessage(EXTRACT_VARIABLE_VALUE_PROMPT),
-            ],
-        )
+    @staticmethod
+    def _individual_messages(state: VariableBranchState) -> list[AnyMessage]:
+        return state.messages + [
+            HumanMessage("Variable to extract:\n" + state.task.variable.model_dump_json()),
+            HumanMessage(EXTRACT_VARIABLE_VALUE_PROMPT),
+        ]
+
+    @staticmethod
+    def _accept_candidate(state: VariableBranchState, candidate: VariableOutput) -> dict:
+        """Record a fresh candidate for validation, spending one attempt.
+
+        Shared by the initial extraction and the repair loop: both replace the
+        candidate, clear the errors that prompted it, and leave ``is_valid`` False
+        for ``validate_extraction`` to decide.
+        """
         return {
             "task": state.task.model_copy(
                 update={
-                    "candidate": extracted_value,
+                    "candidate": candidate,
                     "validation_errors": [],
                     "extraction_attempts": state.task.extraction_attempts + 1,
                     "is_valid": False,
                 }
             )
         }
+
+    def extract_individual_value(self, state: VariableBranchState) -> dict:
+        """Extract one variable from the clinical notes."""
+        return self._accept_candidate(
+            state, self.agent.structured(VariableOutput, self._individual_messages(state))
+        )
+
+    async def aextract_individual_value(self, state: VariableBranchState) -> dict:
+        return self._accept_candidate(
+            state, await self.agent.astructured(VariableOutput, self._individual_messages(state))
+        )
 
     def validate_extraction(self, state: VariableBranchState) -> dict:
         errors = list(state.task.validation_errors)
@@ -273,7 +304,8 @@ class ExtractorAgent(BaseAgent):
 
         return "repair_invalid_extraction"
 
-    def repair_invalid_extraction(self, state: VariableBranchState) -> dict:
+    @staticmethod
+    def _repair_messages(state: VariableBranchState) -> list[AnyMessage]:
         repair_context = {
             "variable": state.task.variable.model_dump(),
             "invalid_candidate": (
@@ -288,21 +320,23 @@ class ExtractorAgent(BaseAgent):
                 else None
             ),
         }
-        repaired_value = self.agent.structured(
-            VariableOutput,
-            state.messages + [HumanMessage(REPAIR_VARIABLE_VALUE_PROMPT + "\nRepair context:\n" + json.dumps(repair_context))],
+        return state.messages + [
+            HumanMessage(
+                REPAIR_VARIABLE_VALUE_PROMPT
+                + "\nRepair context:\n"
+                + json.dumps(repair_context)
+            )
+        ]
+
+    def repair_invalid_extraction(self, state: VariableBranchState) -> dict:
+        return self._accept_candidate(
+            state, self.agent.structured(VariableOutput, self._repair_messages(state))
         )
 
-        return {
-            "task": state.task.model_copy(
-                update={
-                    "candidate": repaired_value,
-                    "validation_errors": [],
-                    "extraction_attempts": state.task.extraction_attempts + 1,
-                    "is_valid": False,
-                }
-            )
-        }
+    async def arepair_invalid_extraction(self, state: VariableBranchState) -> dict:
+        return self._accept_candidate(
+            state, await self.agent.astructured(VariableOutput, self._repair_messages(state))
+        )
 
     def complete_variable(self, state: VariableBranchState) -> dict:
         candidate = state.task.candidate or VariableOutput(
@@ -324,12 +358,16 @@ class ExtractorAgent(BaseAgent):
     def _build_variable_branch(self):
         branch = StateGraph(VariableBranchState, output_schema=VariableBranchOutput)
         branch.add_node(
-            "extract_individual_value", self.extract_individual_value, retry_policy=self.retry_policy
+            "extract_individual_value",
+            self._node("extract_individual_value"),
+            retry_policy=self.retry_policy,
         )
         # validate_extraction is deterministic (data-dictionary lookup) — no retry.
         branch.add_node("validate_extraction", self.validate_extraction)
         branch.add_node(
-            "repair_invalid_extraction", self.repair_invalid_extraction, retry_policy=self.retry_policy
+            "repair_invalid_extraction",
+            self._node("repair_invalid_extraction"),
+            retry_policy=self.retry_policy,
         )
         branch.add_node("complete_variable", self.complete_variable)
 
@@ -353,7 +391,7 @@ class ExtractorAgent(BaseAgent):
         workflow.add_node("load_notes", self.load_notes)
         workflow.add_node(
             "extract_group_values",
-            self.extract_group_values,
+            self._node("extract_group_values"),
             destinations=("variable_branch",),
             retry_policy=self.retry_policy,
         )
@@ -384,6 +422,7 @@ class ExtractorAgent(BaseAgent):
         (already selected upstream) are supplied via ``ExtractorInput``; this
         agent no longer looks up the data dictionary or retrieves notes itself.
         """
+        self._require_mode(False)
         result = (
             run_with_progress(
                 self._graph,
@@ -394,6 +433,22 @@ class ExtractorAgent(BaseAgent):
             )
             if progress
             else self._graph.invoke(extractor_input)
+        )
+        return ExtractorOutput(**result)
+
+    async def arun(
+        self,
+        extractor_input: ExtractorInput | dict,
+        *,
+        progress: bool = False,
+    ) -> ExtractorOutput:
+        """Async twin of :meth:`run`; requires an agent built with ``use_async=True``."""
+        result = await self._arun_graph(
+            extractor_input,
+            progress=progress,
+            subgraphs=True,
+            description="Extractor",
+            show_branches=True,
         )
         return ExtractorOutput(**result)
 

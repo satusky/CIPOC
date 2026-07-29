@@ -12,6 +12,13 @@ namespace is ``parent_namespace + (f"{node}:{task_id}",)``, so the segment a
 task-start contributes identifies every event nested beneath it. That holds even
 for compiled graphs invoked with a bare ``.invoke()`` inside a node body, because
 such a graph inherits the parent's stream.
+
+``updates`` is normalized too, for consumers that need a node's own state write
+the moment it happens rather than at the next root ``values`` — the orchestrator's
+incremental result stream is the one caller. Its payload is the raw
+``{node: state_update}`` mapping LangGraph emits. ``custom`` is deliberately not
+supported: a graph that requests it builds its own writer instead of inheriting
+the parent's, which breaks nested-subagent events entirely.
 """
 
 from __future__ import annotations
@@ -20,7 +27,7 @@ from dataclasses import dataclass
 from typing import Any, Literal, Mapping
 
 
-EventKind = Literal["task_start", "task_end", "values"]
+EventKind = Literal["task_start", "task_end", "values", "updates"]
 
 
 @dataclass(frozen=True)
@@ -43,6 +50,18 @@ class ProgressEvent:
     def is_root(self) -> bool:
         return not self.namespace
 
+    @property
+    def writes(self) -> tuple[tuple[str, Any], ...]:
+        """``(node, state_update)`` pairs carried by an ``updates`` event.
+
+        Empty for every other kind, so a consumer can iterate unconditionally.
+        LangGraph emits one node per item in practice, but the payload is a
+        mapping and nothing guarantees that, so this yields all of them.
+        """
+        if self.kind != "updates" or not isinstance(self.payload, Mapping):
+            return ()
+        return tuple(self.payload.items())
+
 
 def normalize(item: Any, *, subgraphs: bool) -> ProgressEvent | None:
     """Turn one raw stream item into a ``ProgressEvent`` (``None`` if unusable)."""
@@ -55,6 +74,18 @@ def normalize(item: Any, *, subgraphs: bool) -> ProgressEvent | None:
 
     if mode == "values":
         return ProgressEvent(kind="values", namespace=namespace, payload=payload)
+    if mode == "updates":
+        if not isinstance(payload, Mapping):
+            return None
+        nodes = list(payload)
+        return ProgressEvent(
+            kind="updates",
+            namespace=namespace,
+            # A convenience for the common single-node item; read ``writes`` when
+            # the mapping may carry more than one.
+            node=str(nodes[0]) if len(nodes) == 1 else "",
+            payload=payload,
+        )
     if mode != "tasks" or not isinstance(payload, Mapping):
         return None
 

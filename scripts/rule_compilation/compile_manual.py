@@ -250,7 +250,7 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--boundary-heading", default=None, help="Marker that bounds the site group (e.g. 'Equivalent Terms and Definitions').")
     parser.add_argument("--root-level", type=int, default=None, help="Require the root heading to be at exactly this level (e.g. 2 for '##'). Use when a deeper heading quotes the chapter title and would otherwise match first.")
     parser.add_argument("--source", required=True, type=Path, help="Source markdown path.")
-    parser.add_argument("--data-dictionary", type=Path, default=Path("documents/naaccr_data_dictionary_v25.json"))
+    parser.add_argument("--data-dictionary", type=Path, default=Path("documents/manuals/naaccr_data_dictionary_v25.json"))
     parser.add_argument("--rules-dir", type=Path, default=Path("documents/rules"))
     parser.add_argument("--sites", nargs="*", default=None, help="Default applies_to sites, e.g. C500-C509.")
     parser.add_argument(

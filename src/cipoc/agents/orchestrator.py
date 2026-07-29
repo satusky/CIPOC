@@ -1,5 +1,7 @@
 import json
 from collections import Counter
+from collections.abc import AsyncIterator, Iterator, Mapping
+from contextlib import aclosing
 from pathlib import Path
 
 from operator import add
@@ -14,7 +16,7 @@ from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
 from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_rule_store, load_variable_groups, prefilter_notes, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report
-from cipoc.utils import CipocConfig, run_with_progress
+from cipoc.utils import CipocConfig, ProgressEvent, astream_events, astream_with_progress, run_with_progress
 from cipoc.models import (
     Case,
     CaseFacts,
@@ -161,12 +163,26 @@ class OrchestratorAgent(BaseAgent):
     _input_schema = OrchestratorInput
     _output_schema = OrchestratorOutput
 
+    #: Subagents built by this orchestrator, in the order they run.
+    SUBAGENT_TYPES = ("note_scanner", "note_retriever", "extractor")
+
+    #: Stream modes ``astream_results`` requests. "values"/"tasks" are what the
+    #: dashboard reads; "updates" is the extra one, carrying each node's own write
+    #: at the moment it happens — which is what makes a branch's results visible
+    #: before the extract_branch -> merge_and_update fan-in barrier. The progress
+    #: model ignores "updates", so asking for it changes nothing on screen.
+    RESULT_STREAM_MODES = ("values", "tasks", "updates")
+
     def __init__(self, llm: BaseAgentModel | None = None, *, config: CipocConfig | None = None, **kwargs):
         self._value_validator = VariableValueValidator()
         super().__init__(agent_type="orchestrator", llm=llm, config=config, **kwargs)
-        self._scanner = NoteScannerAgent(config=self._config)
-        self._retriever = NoteRetrieverAgent(config=self._config)
-        self._extractor = ExtractorAgent(config=self._config)
+        shared = llm or self._shared_subagent_model()
+        # The mode is propagated, not re-read per agent: the orchestrator's own
+        # nodes await the subagents' arun, so a subagent left in sync mode would
+        # trip the _require_mode guard rather than quietly running the other path.
+        self._scanner = NoteScannerAgent(config=self._config, llm=shared, use_async=self._async)
+        self._retriever = NoteRetrieverAgent(config=self._config, llm=shared, use_async=self._async)
+        self._extractor = ExtractorAgent(config=self._config, llm=shared, use_async=self._async)
         variable_groups_path = self._config.documents().variable_groups_path
         self._target_variables = load_variable_groups(variable_groups_path)
         self._target_group_hierarchy = load_group_hierarchy(variable_groups_path)
@@ -177,6 +193,29 @@ class OrchestratorAgent(BaseAgent):
         self._data_dictionary_path = self._config.documents().data_dictionary_path
         rules_path = getattr(self._config.documents(), "rules_path", None)
         self._rule_store = load_rule_store(rules_path) if rules_path is not None else None
+
+    def _shared_subagent_model(self) -> BaseAgentModel | None:
+        """One model client for every subagent, or ``None`` to let each build its own.
+
+        ``max_concurrency`` is a property of the endpoint, not of an agent, and it
+        is enforced by a semaphore on the model wrapper. Four agents holding four
+        wrappers means four independent semaphores, so ``max_concurrency: 8`` is
+        really 32 requests in flight. Under the sync path the executor pool masks
+        that; under real async I/O it is a live endpoint-overload risk. Sharing one
+        wrapper makes the cap the cap.
+
+        Only shared when every subagent's resolved ``LLMConfig`` matches the
+        defaults, so a future ``agents.extractor.model`` override is not silently
+        ignored. A per-agent ``retry:`` override is deliberately not a reason to
+        refuse: ``llm_config`` drops it (it configures the graph node, not the
+        client), and each agent keeps its own policy regardless of which model
+        object it holds.
+        """
+        defaults = self._config.llm_config()
+        agent_types = ("orchestrator", *self.SUBAGENT_TYPES)
+        if all(self._config.llm_config(agent) == defaults for agent in agent_types):
+            return self.agent
+        return None
 
     # --- Graph wiring (compiled once per instance) ---
     def _wire_graph(self, workflow: StateGraph) -> None:
@@ -190,7 +229,7 @@ class OrchestratorAgent(BaseAgent):
         # failure in them is a bug that should surface on the first attempt.
         workflow.add_node("initialize", self.initialize)
         workflow.add_node("scan_notes", self.scan_notes, destinations=("note_branch",))
-        workflow.add_node("note_branch", self.note_branch)
+        workflow.add_node("note_branch", self._node("note_branch"))
         workflow.add_node("characterize_corpus", self.characterize_corpus)
         workflow.add_node("check_state", self.check_state)
         workflow.add_node("plan_extraction", self.plan_extraction, destinations=("extract_branch", "check_state"))
@@ -217,8 +256,8 @@ class OrchestratorAgent(BaseAgent):
         filter (retrieve_notes) -> extractor (extract). Compiled once, fanned out
         from plan_extraction via Send."""
         branch = StateGraph(ExtractBranchState)
-        branch.add_node("retrieve_notes", self.retrieve_notes)
-        branch.add_node("extract", self.extract)
+        branch.add_node("retrieve_notes", self._node("retrieve_notes"))
+        branch.add_node("extract", self._node("extract"))
         branch.add_edge(START, "retrieve_notes")
         branch.add_edge("retrieve_notes", "extract")
         branch.add_edge("extract", END)
@@ -262,9 +301,16 @@ class OrchestratorAgent(BaseAgent):
         return Command(goto=sends)
     
     def note_branch(self, note: ClinicalNote):
-        processed_note = self._scanner.run(note, progress=False)
+        return self._scanned(self._scanner.run(note, progress=False))
+
+    async def anote_branch(self, note: ClinicalNote):
+        return self._scanned(await self._scanner.arun(note, progress=False))
+
+    @staticmethod
+    def _scanned(processed_note: ProcessedClinicalNote) -> dict:
         return {"note_corpus": {processed_note.note_id: processed_note}}
-    
+
+
     def characterize_corpus(self, state: CaseState) -> dict:
         descriptors = build_corpus_descriptors(state.note_corpus)
         digests = build_corpus_digests(state.note_corpus)
@@ -355,10 +401,14 @@ class OrchestratorAgent(BaseAgent):
         )
 
     # --- Extract subgraph nodes ---
-    def retrieve_notes(self, state: ExtractBranchState) -> dict:
-        """Narrow the corpus for one group through the two-stage selection funnel:
-        the deterministic hard filter on the group's own NoteFilter, then the
-        retriever soft filter judging relevance to the group's variables."""
+    # Each of these delegates to a subagent graph, so the sync node and its async
+    # twin share a prep step (all the deterministic work, including the
+    # short-circuits that skip the subagent entirely) and differ only in whether
+    # the subagent is called or awaited.
+    @staticmethod
+    def _retrieve_prep(state: ExtractBranchState) -> RetrieverInput | None:
+        """The retriever request for this group, or None when the hard filter
+        already emptied the corpus and there is nothing to judge."""
         group = state.requested_variables
         # Hard filter reuses prefilter_notes with the group's NoteFilter. anchor=None
         # for now, so the within_days dimension is skipped until a temporal anchor
@@ -366,37 +416,68 @@ class OrchestratorAgent(BaseAgent):
         kept = prefilter_notes(state.branch_note_corpus.values(), group.note_filter, anchor=None)
         kept_ids = [note.note_id for note in kept]
         if not kept_ids:
+            return None
+        return RetrieverInput(
+            requested_variables=group.to_variable_group(),
+            available_digests={
+                note_id: digest
+                for note_id, digest in state.branch_note_digests.items()
+                if note_id in kept_ids
+            },
+        )
+
+    def retrieve_notes(self, state: ExtractBranchState) -> dict:
+        """Narrow the corpus for one group through the two-stage selection funnel:
+        the deterministic hard filter on the group's own NoteFilter, then the
+        retriever soft filter judging relevance to the group's variables."""
+        request = self._retrieve_prep(state)
+        if request is None:
             return {"retrieved_note_ids": []}
         # Soft filter: the retriever ranks the surviving digests for this group's
         # variables and returns None when nothing is plausibly relevant.
-        relevant_ids = self._retriever.run(
-            RetrieverInput(
-                requested_variables=group.to_variable_group(),
-                available_digests={
-                    note_id: digest
-                    for note_id, digest in state.branch_note_digests.items()
-                    if note_id in kept_ids
-                },
-            ),
-            progress=False,
-        )
+        relevant_ids = self._retriever.run(request, progress=False)
         return {"retrieved_note_ids": relevant_ids or []}
+
+    async def aretrieve_notes(self, state: ExtractBranchState) -> dict:
+        request = self._retrieve_prep(state)
+        if request is None:
+            return {"retrieved_note_ids": []}
+        relevant_ids = await self._retriever.arun(request, progress=False)
+        return {"retrieved_note_ids": relevant_ids or []}
+
+    @staticmethod
+    def _extract_prep(
+        state: ExtractBranchState,
+    ) -> tuple[VariableGroupInfo, ExtractorInput | None]:
+        """The group being extracted plus the extractor request — or None for the
+        request when no relevant notes survived selection, in which case the
+        caller records a clean miss instead of calling the LLM."""
+        group = state.requested_variables.to_variable_group()
+        if not state.retrieved_note_ids:
+            return group, None
+        notes = [state.branch_note_corpus[note_id] for note_id in state.retrieved_note_ids]
+        return group, ExtractorInput(requested_variables=group, notes=notes)
+
+    @staticmethod
+    def _not_found(group: VariableGroupInfo) -> dict:
+        return {"variable_results": not_found_results(
+            group, "No relevant notes were selected for this variable."
+        )}
 
     def extract(self, state: ExtractBranchState) -> dict:
         """Extract the group's variables from the retrieved notes and fold the
         validated output into per-item orchestration results."""
-        group = state.requested_variables.to_variable_group()
-        if not state.retrieved_note_ids:
-            # No relevant notes survived selection: nothing to read, so record a
-            # clean miss for every requested variable instead of calling the LLM.
-            return {"variable_results": not_found_results(
-                group, "No relevant notes were selected for this variable."
-            )}
-        notes = [state.branch_note_corpus[note_id] for note_id in state.retrieved_note_ids]
-        output = self._extractor.run(
-            ExtractorInput(requested_variables=group, notes=notes),
-            progress=False,
-        )
+        group, request = self._extract_prep(state)
+        if request is None:
+            return self._not_found(group)
+        output = self._extractor.run(request, progress=False)
+        return {"variable_results": to_case_results(group, output.extracted_values)}
+
+    async def aextract(self, state: ExtractBranchState) -> dict:
+        group, request = self._extract_prep(state)
+        if request is None:
+            return self._not_found(group)
+        output = await self._extractor.arun(request, progress=False)
         return {"variable_results": to_case_results(group, output.extracted_values)}
 
     def merge_and_update(self, state: CaseState) -> dict:
@@ -420,6 +501,22 @@ class OrchestratorAgent(BaseAgent):
 
 
     # --- Public API ---
+    @staticmethod
+    def _case_input(raw_notes: list[dict], structured_data: dict[int, str] | None) -> dict:
+        return {
+            "note_corpus": {note["note_id"]: ClinicalNote(**note) for note in raw_notes},
+            "structured_data": structured_data or {},
+        }
+
+    def _progress_settings(self) -> dict:
+        """Dashboard settings for a case run, shared by the sync and async paths."""
+        return {
+            "subgraphs": True,
+            "description": "Orchestrator",
+            "target_groups": self._target_variables,
+            "group_hierarchy": self._target_group_hierarchy,
+        }
+
     def run(
         self,
         raw_notes: list[dict],
@@ -431,27 +528,138 @@ class OrchestratorAgent(BaseAgent):
         by NAACCR item ID; those variables are seeded as structured-data results
         and skip extraction. Returns the durable ``Case`` snapshot.
         """
+        self._require_mode(False)
         final_state = run_with_progress(
             self._graph,
-            {
-                "note_corpus": {note["note_id"]: ClinicalNote(**note) for note in raw_notes},
-                "structured_data": structured_data or {},
-            },
-            subgraphs=True,
-            description="Orchestrator",
-            target_groups=self._target_variables,
-            group_hierarchy=self._target_group_hierarchy,
+            self._case_input(raw_notes, structured_data),
+            **self._progress_settings(),
         )
 
         return CaseState(**final_state).to_case()
+
+    @staticmethod
+    def _landed_results(
+        event: ProgressEvent, seen: set[int]
+    ) -> Iterator[CaseVariableResult]:
+        """Terminal per-variable results carried by one ``updates`` event.
+
+        Every node that writes ``variable_results`` is a source: ``extract`` for a
+        branch that just landed, ``plan_extraction`` for the leftovers resolved at
+        the fixed point, and ``initialize`` for caller-supplied structured data,
+        which is terminal from the start. Still-PENDING seeds are skipped and each
+        item is emitted once, so the union of everything yielded is exactly the
+        final ``Case.variable_results``.
+
+        ``seen`` also absorbs the duplicate a nested write produces: the parent
+        graph echoes the branch's ``variable_results`` again when ``extract_branch``
+        completes, and the nested write is the earlier — and therefore the
+        incremental — one.
+        """
+        for _, update in event.writes:
+            results = update.get("variable_results") if isinstance(update, Mapping) else None
+            if not isinstance(results, Mapping):
+                continue
+            for raw in results.values():
+                result = CaseVariableResult.model_validate(raw)
+                if result.status == VariableStatus.PENDING or result.item_id in seen:
+                    continue
+                seen.add(result.item_id)
+                yield result
+
+    async def astream_results(
+        self,
+        raw_notes: list[dict],
+        structured_data: dict[int, str] | None = None,
+        *,
+        progress: bool = True,
+    ) -> AsyncIterator[CaseVariableResult | Case]:
+        """Yield each ``CaseVariableResult`` as its group's branch lands, then the
+        finished ``Case`` as the last item.
+
+        Requires an agent built with ``use_async=True``. This does not move the
+        ``extract_branch -> merge_and_update`` barrier: *dependent* groups still
+        wait on the initial stage. What it changes is that within a wave, a
+        branch's results reach the caller the moment that branch finishes rather
+        than at the join. Granularity is per group, because the group -> per-item
+        unfold (``to_case_results``) has already happened by then — so what is
+        yielded is a real ``CaseVariableResult``, identical for group and
+        individual extraction mode.
+        """
+        self._require_mode(True)
+        graph_input = self._case_input(raw_notes, structured_data)
+        events = (
+            astream_with_progress(
+                self._graph,
+                graph_input,
+                stream_mode=self.RESULT_STREAM_MODES,
+                **self._progress_settings(),
+            )
+            if progress
+            else astream_events(
+                self._graph,
+                graph_input,
+                stream_mode=self.RESULT_STREAM_MODES,
+                subgraphs=True,
+            )
+        )
+
+        seen: set[int] = set()
+        final_state: dict | None = None
+        # aclosing, because a caller is free to stop consuming early: without it
+        # the inner generator's teardown — which restores the terminal out of the
+        # alternate screen and stops the painter thread — waits on the garbage
+        # collector.
+        async with aclosing(events) as stream:
+            async for event in stream:
+                if event.kind == "values" and event.is_root:
+                    final_state = event.payload
+                    continue
+                for result in self._landed_results(event, seen):
+                    yield result
+
+        if final_state is None:
+            raise RuntimeError("Orchestrator produced no final state.")
+        yield CaseState(**final_state).to_case()
+
+    async def arun(
+        self,
+        raw_notes: list[dict],
+        structured_data: dict[int, str] | None = None,
+        *,
+        progress: bool = True,
+    ) -> Case:
+        """Async twin of :meth:`run`; requires an agent built with ``use_async=True``.
+
+        Drains :meth:`astream_results` and returns its final ``Case``, so the two
+        entry points share one stream and cannot disagree about the result.
+        """
+        case: Case | None = None
+        async for item in self.astream_results(
+            raw_notes, structured_data, progress=progress
+        ):
+            if isinstance(item, Case):
+                case = item
+        if case is None:  # astream_results raises first; belt and braces
+            raise RuntimeError("Orchestrator produced no final state.")
+        return case
 
 
 if __name__ == "__main__":
     # End-to-end pipeline smoke run: scan -> characterize -> plan -> retrieve ->
     # extract -> finalize over the shared note bundle fixture.
     import argparse
+    import asyncio
 
     parser = argparse.ArgumentParser(description="Run the orchestrator end-to-end.")
+    parser.add_argument(
+        "--async",
+        dest="use_async",
+        action="store_true",
+        help=(
+            "Run the async graph (arun) instead of the sync one. Exercises the "
+            "async node twins against the real endpoint; no progress dashboard yet."
+        ),
+    )
     parser.add_argument(
         "--structured-data",
         default=None,
@@ -471,14 +679,18 @@ if __name__ == "__main__":
         # JSON object keys are strings; item IDs are ints, so coerce the keys.
         structured_data = {int(k): str(v) for k, v in json.loads(text).items()}
 
-    agent = OrchestratorAgent()
+    agent = OrchestratorAgent(use_async=args.use_async)
     agent.draw(path="src/cipoc/agents/visualization/orchestrator.png")
 
     note_path = Path(__file__).resolve().parents[3] / "tests" / "fixtures" / "note_bundle.json"
     with open(note_path, "r") as f:
         raw_notes = json.load(f)
 
-    case = agent.run(raw_notes, structured_data=structured_data)
+    case = (
+        asyncio.run(agent.arun(raw_notes, structured_data=structured_data))
+        if args.use_async
+        else agent.run(raw_notes, structured_data=structured_data)
+    )
     result_path = Path(__file__).resolve().parents[3] / "tests" / "test_outputs" / "orchestrator_test.json"
     result_path.parent.mkdir(parents=True, exist_ok=True)
     with open(result_path, "w") as f:

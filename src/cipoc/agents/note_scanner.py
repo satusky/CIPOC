@@ -77,6 +77,8 @@ class NoteScannerAgent(BaseAgent):
         super().__init__(agent_type="note_scanner", llm=llm, config=config, **kwargs)
 
     # --- Nodes (bound methods: (state) -> dict) ---
+    # Each LLM node is a prompt builder plus a result folder, so the sync node and
+    # its async twin differ only in the call verb and share every line of logic.
     def initialize(self, state: ScannerState) -> dict:
         """Seed the conversation once with the shared persona + the note (the cacheable prefix)."""
         return {"messages": [
@@ -84,12 +86,23 @@ class NoteScannerAgent(BaseAgent):
             HumanMessage(f"Clinical note:\n{state.note.model_dump_json(indent=2)}"),
         ]}
 
+    @staticmethod
+    def _concept_messages(state: ScannerState) -> list[AnyMessage]:
+        return state.messages + [HumanMessage(_CONCEPT_DETECTION_PROMPT)]
+
+    def _concept_result(self, response: ConceptFindingList) -> dict:
+        return {"concepts": self._findings_to_concepts(response.findings)}
+
     def detect_concepts(self, state: ScannerState) -> dict:
         """Single LLM call detecting presence/evidence for every tracked concept."""
-        response = self.agent.structured(
-            ConceptFindingList, state.messages + [HumanMessage(_CONCEPT_DETECTION_PROMPT)]
+        return self._concept_result(
+            self.agent.structured(ConceptFindingList, self._concept_messages(state))
         )
-        return {"concepts": self._findings_to_concepts(response.findings)}
+
+    async def adetect_concepts(self, state: ScannerState) -> dict:
+        return self._concept_result(
+            await self.agent.astructured(ConceptFindingList, self._concept_messages(state))
+        )
 
     @staticmethod
     def _findings_to_concepts(findings: list[ConceptFinding]) -> dict[str, ConceptWithEvidence]:
@@ -108,23 +121,47 @@ class NoteScannerAgent(BaseAgent):
                 )
         return concepts
 
-    def summarize_note(self, state: ScannerState) -> dict:
-        """Summarize a clinical note and tag it with search keywords."""
-        response = self.agent.structured(
-            NoteSummary, state.messages + [HumanMessage(NOTE_SUMMARY_PROMPT)]
-        )
+    @staticmethod
+    def _summary_messages(state: ScannerState) -> list[AnyMessage]:
+        return state.messages + [HumanMessage(NOTE_SUMMARY_PROMPT)]
+
+    @staticmethod
+    def _summary_result(response: NoteSummary) -> dict:
         return {"summary": response.summary, "flags": response.keywords}
 
-    def get_cancer_mentions(self, state: ScannerState) -> dict:
-        """Detail any mentions of cancer in a clinical note."""
-        response = self.agent.structured(
-            CancerMentions, state.messages + [HumanMessage(CANCER_MENTIONS_PROMPT)]
+    def summarize_note(self, state: ScannerState) -> dict:
+        """Summarize a clinical note and tag it with search keywords."""
+        return self._summary_result(
+            self.agent.structured(NoteSummary, self._summary_messages(state))
         )
+
+    async def asummarize_note(self, state: ScannerState) -> dict:
+        return self._summary_result(
+            await self.agent.astructured(NoteSummary, self._summary_messages(state))
+        )
+
+    @staticmethod
+    def _mentions_messages(state: ScannerState) -> list[AnyMessage]:
+        return state.messages + [HumanMessage(CANCER_MENTIONS_PROMPT)]
+
+    @staticmethod
+    def _mentions_result(response: CancerMentions) -> dict:
         # Roll the per-mention temporality up to a note-level set (empty -> None).
         return {
             "cancer_mentions": response.mentions,
             "cancer_status": {m.status for m in response.mentions} or None,
         }
+
+    def get_cancer_mentions(self, state: ScannerState) -> dict:
+        """Detail any mentions of cancer in a clinical note."""
+        return self._mentions_result(
+            self.agent.structured(CancerMentions, self._mentions_messages(state))
+        )
+
+    async def aget_cancer_mentions(self, state: ScannerState) -> dict:
+        return self._mentions_result(
+            await self.agent.astructured(CancerMentions, self._mentions_messages(state))
+        )
 
     @staticmethod
     def cancer_gate(state: ScannerState) -> str:
@@ -136,9 +173,11 @@ class NoteScannerAgent(BaseAgent):
     def _wire_graph(self, workflow: StateGraph) -> None:
         workflow.add_node("initialize", self.initialize)
         # All three scan nodes call the model; each retries its own request.
-        workflow.add_node("detect_concepts", self.detect_concepts, retry_policy=self.retry_policy)
-        workflow.add_node("summarize_note", self.summarize_note, retry_policy=self.retry_policy)
-        workflow.add_node("get_cancer_mentions", self.get_cancer_mentions, retry_policy=self.retry_policy)
+        # _node picks the sync method or its async twin; the policy is unchanged
+        # either way, so the same nodes retry in both modes.
+        workflow.add_node("detect_concepts", self._node("detect_concepts"), retry_policy=self.retry_policy)
+        workflow.add_node("summarize_note", self._node("summarize_note"), retry_policy=self.retry_policy)
+        workflow.add_node("get_cancer_mentions", self._node("get_cancer_mentions"), retry_policy=self.retry_policy)
 
         workflow.add_edge(START, "initialize")
         workflow.add_edge("initialize", "summarize_note")
@@ -149,6 +188,10 @@ class NoteScannerAgent(BaseAgent):
         workflow.add_edge("get_cancer_mentions", END)
 
     # --- Public API ---
+    @staticmethod
+    def _as_note(notes: ClinicalNote | dict) -> ClinicalNote:
+        return ClinicalNote(**notes) if isinstance(notes, dict) else notes
+
     def run(
         self,
         notes: ClinicalNote | dict,
@@ -156,9 +199,9 @@ class NoteScannerAgent(BaseAgent):
         progress: bool = True,
     ) -> ProcessedClinicalNote:
         """Run the scanner over a single note and return the enriched note."""
-        if isinstance(notes, dict):
-            notes = ClinicalNote(**notes)
-        graph_input = {"note": notes}
+        self._require_mode(False)
+        note = self._as_note(notes)
+        graph_input = {"note": note}
         result = (
             run_with_progress(
                 self._graph,
@@ -168,7 +211,20 @@ class NoteScannerAgent(BaseAgent):
             if progress
             else self._graph.invoke(graph_input)
         )
-        return ProcessedClinicalNote(**notes.model_dump(), **result)
+        return ProcessedClinicalNote(**note.model_dump(), **result)
+
+    async def arun(
+        self,
+        notes: ClinicalNote | dict,
+        *,
+        progress: bool = False,
+    ) -> ProcessedClinicalNote:
+        """Async twin of :meth:`run`; requires an agent built with ``use_async=True``."""
+        note = self._as_note(notes)
+        result = await self._arun_graph(
+            {"note": note}, progress=progress, description="Note Scanner"
+        )
+        return ProcessedClinicalNote(**note.model_dump(), **result)
 
 
 if __name__ == "__main__":

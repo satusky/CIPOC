@@ -30,7 +30,7 @@ from scripts.rule_compilation.store_index import (
 from scripts.rule_compilation.tag import SectionTagging, TaggedUnit
 
 RULES_DIR = Path("documents/rules")
-DATA_DICTIONARY = Path("documents/naaccr_data_dictionary_v25.json")
+DATA_DICTIONARY = Path("documents/manuals/naaccr_data_dictionary_v25.json")
 
 
 class _FakeStructuredModel:

@@ -50,7 +50,7 @@ from .store_index import (
 )
 
 RULES_DIR = Path("documents/rules")
-DATA_DICTIONARY = Path("documents/naaccr_data_dictionary_v25.json")
+DATA_DICTIONARY = Path("documents/manuals/naaccr_data_dictionary_v25.json")
 
 
 def main(argv: list[str] | None = None) -> int:

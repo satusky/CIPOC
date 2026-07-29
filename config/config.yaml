@@ -17,10 +17,24 @@ llm:
   api_key: ${RENCI_AZURE_API_KEY}
 
   # Endpoint-wide concurrency cap. Bounds in-flight requests via a semaphore on
-  # the shared model wrapper. This is a property of the endpoint, not the agent:
-  # to make it a global cap, build one model from these defaults and inject it
-  # into every subagent (llm=). Omit or set null for unbounded.
+  # the model wrapper. This is a property of the endpoint, not the agent, so the
+  # orchestrator builds one wrapper from these defaults and injects it into every
+  # subagent — making this a real global cap rather than one per agent. Setting
+  # any model-client field (model, base_url, reasoning, ...) under an agent below
+  # opts that run out of sharing, so the cap becomes per-agent again. A per-agent
+  # `retry:` override does not. Omit or set null for unbounded.
   max_concurrency: 8
+
+  # Wire the async node twins instead of the sync nodes. Opt-in: the sync path
+  # stays the default and the notebook-safe route, because an async agent is
+  # driven by `arun()`, a coroutine the caller must await (there is no internal
+  # asyncio.run, which would raise inside a Databricks/Jupyter cell that already
+  # has a loop running). Only the LLM-calling nodes differ between the two
+  # graphs; everything deterministic is the same callable in both. Overridable
+  # per agent below, but the orchestrator propagates its own mode to the
+  # subagents it builds, so setting it there only matters when an agent is
+  # constructed standalone.
+  async_mode: false
 
   # Reasoning settings (OpenAI-style). Set to null to disable.
   reasoning:
@@ -46,9 +60,10 @@ agents:
     # model: gpt-5.5
     # reasoning:
     #   effort: high
+    # async_mode: true
 
 documents:
   documents_path: documents/
-  data_dictionary_path: documents/naaccr_data_dictionary_v25.json
+  data_dictionary_path: documents/manuals/naaccr_data_dictionary_v25.json
   rules_path: documents/rules/
   variable_groups_path: config/variable_groups.json

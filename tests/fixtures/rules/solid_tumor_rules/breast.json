@@ -61,7 +61,7 @@
       "8522/3": "Invasive duct and lobular carcinoma",
       "8540/3": "Paget disease of the breast"
     },
-    "notes": "Fixture: the one required code_table unit; codes are a subset of the item 522 set in documents/naaccr_data_dictionary_v25.json."
+    "notes": "Fixture: the one required code_table unit; codes are a subset of the item 522 set in documents/manuals/naaccr_data_dictionary_v25.json."
   },
   {
     "rule_id": "solid_tumor_rules:breast:behavior_epc",

@@ -49,13 +49,18 @@ class NoteRetrieverAgent(BaseAgent):
             HumanMessage("Variables to extract:\n" + state.requested_variables.model_dump_json()),
         ]}
 
-    def identify_relevant_notes(self, state: RetrieverState) -> dict:
-        """LLM call to identify relevant notes based on task and note digests."""
+    # The prompt builder and the result folder are shared by the sync node and its
+    # async twin, which then differ only in the call verb.
+    @staticmethod
+    def _selection_messages(state: RetrieverState) -> list[AnyMessage]:
         digest_string = "\n".join(digest.model_dump_json() for digest in state.available_digests.values())
-        response = self.agent.structured(
-            RelevantNoteIDs, state.messages + [HumanMessage(SELECT_NOTES_PROMPT), HumanMessage("Note digests:\n" + digest_string)]
-        )
+        return state.messages + [
+            HumanMessage(SELECT_NOTES_PROMPT),
+            HumanMessage("Note digests:\n" + digest_string),
+        ]
 
+    @staticmethod
+    def _selection_result(state: RetrieverState, response: RelevantNoteIDs) -> dict:
         input_note_ids = set(state.available_digests)
         valid_ids = [note_id for note_id in response.note_ids if note_id in input_note_ids]
 
@@ -63,12 +68,25 @@ class NoteRetrieverAgent(BaseAgent):
             return {"relevant_note_ids": None}
         return {"relevant_note_ids": valid_ids}
 
+    def identify_relevant_notes(self, state: RetrieverState) -> dict:
+        """LLM call to identify relevant notes based on task and note digests."""
+        return self._selection_result(
+            state, self.agent.structured(RelevantNoteIDs, self._selection_messages(state))
+        )
+
+    async def aidentify_relevant_notes(self, state: RetrieverState) -> dict:
+        return self._selection_result(
+            state, await self.agent.astructured(RelevantNoteIDs, self._selection_messages(state))
+        )
+
 
     # --- Graph wiring (compiled once per instance) ---
     def _wire_graph(self, workflow: StateGraph) -> None:
         workflow.add_node("initialize", self.initialize)
         workflow.add_node(
-            "identify_relevant_notes", self.identify_relevant_notes, retry_policy=self.retry_policy
+            "identify_relevant_notes",
+            self._node("identify_relevant_notes"),
+            retry_policy=self.retry_policy,
         )
 
         workflow.add_edge(START, "initialize")
@@ -83,6 +101,7 @@ class NoteRetrieverAgent(BaseAgent):
         progress: bool = True,
     ) -> list[int] | None:
         """Select relevant notes for the requested variables; returns their IDs (or None)."""
+        self._require_mode(False)
         result = (
             run_with_progress(
                 self._graph,
@@ -91,6 +110,18 @@ class NoteRetrieverAgent(BaseAgent):
             )
             if progress
             else self._graph.invoke(retriever_input)
+        )
+        return result["relevant_note_ids"]
+
+    async def arun(
+        self,
+        retriever_input: RetrieverInput | dict,
+        *,
+        progress: bool = False,
+    ) -> list[int] | None:
+        """Async twin of :meth:`run`; requires an agent built with ``use_async=True``."""
+        result = await self._arun_graph(
+            retriever_input, progress=progress, description="Note Retriever"
         )
         return result["relevant_note_ids"]
 

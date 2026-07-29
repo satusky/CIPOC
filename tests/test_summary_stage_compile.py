@@ -29,7 +29,7 @@ from scripts.rule_compilation.tag import SectionTagging, TaggedUnit
 
 SOURCE = Path("documents/markdown/Summary-Stage_v3.3.md")
 RULES_DIR = Path("documents/rules")
-DATA_DICTIONARY = Path("documents/naaccr_data_dictionary_v25.json")
+DATA_DICTIONARY = Path("documents/manuals/naaccr_data_dictionary_v25.json")
 
 MANUAL = "summary_stage_2018"
 

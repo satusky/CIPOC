@@ -3,8 +3,13 @@
 Covers the predicate in isolation, the wiring (which nodes carry a policy and —
 just as important — which do not), and the end-to-end behaviour through a real
 agent graph driven by a stub model.
+
+Everything here is asserted in both execution modes. Async mode changes which
+callable a node registers, not how it retries, so the same node->policy map and
+the same attempt counts must hold on both paths.
 """
 
+import asyncio
 import logging
 import unittest
 
@@ -45,6 +50,11 @@ class FakeLLM:
             raise self.exc_factory()
         return schema(note_ids=[1])
 
+    async def astructured(self, schema, messages, **kwargs):
+        """Same script on the async path: the async OpenAI client raises the same
+        exception classes, so the predicate and the counts carry over verbatim."""
+        return self.structured(schema, messages, **kwargs)
+
 
 class RetryPredicateTests(unittest.TestCase):
     def test_transient_endpoint_failures_retry(self):
@@ -83,34 +93,39 @@ class RetryWiringTests(unittest.TestCase):
         }
 
     def test_llm_nodes_retry_and_deterministic_nodes_do_not(self):
+        """Asserted for both graphs: ``_node()`` resolves which callable a node
+        runs, never whether it carries a policy, so a dropped ``retry_policy=``
+        kwarg — or a new twin registered without one — fails here."""
         from cipoc.agents import ExtractorAgent, NoteScannerAgent, OrchestratorAgent
 
-        orchestrator = OrchestratorAgent()
-        self.assertEqual(
-            self._policies(NoteScannerAgent()._graph),
-            {
-                "initialize": False,
-                "summarize_note": True,
-                "detect_concepts": True,
-                "get_cancer_mentions": True,
-            },
-        )
-        self.assertEqual(
-            self._policies(NoteRetrieverAgent()._graph),
-            {"initialize": False, "identify_relevant_notes": True},
-        )
-        self.assertEqual(
-            self._policies(ExtractorAgent()._graph),
-            {
-                "initialize": False,
-                "load_notes": False,
-                "extract_group_values": True,
-                "variable_branch": False,  # subgraph: its own nodes retry
-                "merge_variable_results": False,
-            },
-        )
-        # Every orchestrator LLM call goes through a subagent graph.
-        self.assertNotIn(True, set(self._policies(orchestrator._graph).values()))
+        for use_async in (False, True):
+            with self.subTest(use_async=use_async):
+                self.assertEqual(
+                    self._policies(NoteScannerAgent(use_async=use_async)._graph),
+                    {
+                        "initialize": False,
+                        "summarize_note": True,
+                        "detect_concepts": True,
+                        "get_cancer_mentions": True,
+                    },
+                )
+                self.assertEqual(
+                    self._policies(NoteRetrieverAgent(use_async=use_async)._graph),
+                    {"initialize": False, "identify_relevant_notes": True},
+                )
+                self.assertEqual(
+                    self._policies(ExtractorAgent(use_async=use_async)._graph),
+                    {
+                        "initialize": False,
+                        "load_notes": False,
+                        "extract_group_values": True,
+                        "variable_branch": False,  # subgraph: its own nodes retry
+                        "merge_variable_results": False,
+                    },
+                )
+                # Every orchestrator LLM call goes through a subagent graph.
+                orchestrator = OrchestratorAgent(use_async=use_async)
+                self.assertNotIn(True, set(self._policies(orchestrator._graph).values()))
 
 
 class RetryThroughGraphTests(unittest.TestCase):
@@ -121,8 +136,8 @@ class RetryThroughGraphTests(unittest.TestCase):
         # LangGraph logs each retry at INFO with a traceback; keep the run quiet.
         logging.getLogger("langgraph.pregel._retry").setLevel(logging.CRITICAL)
 
-    def _agent(self, llm, **policy):
-        agent = NoteRetrieverAgent(llm=llm)
+    def _agent(self, llm, *, use_async=False, **policy):
+        agent = NoteRetrieverAgent(llm=llm, use_async=use_async)
         agent._retry_policy = agent._retry_policy._replace(
             initial_interval=0.001, max_interval=0.002, **policy
         )
@@ -130,27 +145,35 @@ class RetryThroughGraphTests(unittest.TestCase):
         return agent
 
     def _run(self, agent):
-        return agent.run(
-            RetrieverInput(requested_variables=self.GROUP, available_digests=self.DIGESTS),
-            progress=False,
+        request = RetrieverInput(
+            requested_variables=self.GROUP, available_digests=self.DIGESTS
         )
+        if agent._async:
+            return asyncio.run(agent.arun(request))
+        return agent.run(request, progress=False)
 
     def test_rate_limits_are_retried_until_the_call_succeeds(self):
-        llm = FakeLLM(fail_times=3)
-        self.assertEqual(self._run(self._agent(llm)), [1])
-        self.assertEqual(llm.calls, 4)
+        for use_async in (False, True):
+            with self.subTest(use_async=use_async):
+                llm = FakeLLM(fail_times=3)
+                self.assertEqual(self._run(self._agent(llm, use_async=use_async)), [1])
+                self.assertEqual(llm.calls, 4)
 
     def test_non_transient_error_fails_on_first_attempt(self):
-        llm = FakeLLM(99, lambda: _status_error(BadRequestError, 400))
-        with self.assertRaises(BadRequestError):
-            self._run(self._agent(llm))
-        self.assertEqual(llm.calls, 1)
+        for use_async in (False, True):
+            with self.subTest(use_async=use_async):
+                llm = FakeLLM(99, lambda: _status_error(BadRequestError, 400))
+                with self.assertRaises(BadRequestError):
+                    self._run(self._agent(llm, use_async=use_async))
+                self.assertEqual(llm.calls, 1)
 
     def test_exhausting_attempts_reraises_the_original_error(self):
-        llm = FakeLLM(99)
-        with self.assertRaises(RateLimitError):
-            self._run(self._agent(llm, max_attempts=3))
-        self.assertEqual(llm.calls, 3)
+        for use_async in (False, True):
+            with self.subTest(use_async=use_async):
+                llm = FakeLLM(99)
+                with self.assertRaises(RateLimitError):
+                    self._run(self._agent(llm, use_async=use_async, max_attempts=3))
+                self.assertEqual(llm.calls, 3)
 
 
 class RetryConfigTests(unittest.TestCase):
