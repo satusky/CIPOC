@@ -287,9 +287,7 @@ def build_corpus_descriptors(note_corpus: dict[int | str, ProcessedClinicalNote]
     )
 
 
-def build_corpus_digests(
-    note_corpus: dict[int | str, ProcessedClinicalNote],
-) -> dict[int | str, NoteDigest]:
+def build_corpus_digests(note_corpus: dict[int, ProcessedClinicalNote]) -> dict[int, NoteDigest]:
     return {
         note_id: NoteDigest(
             note_id=note.note_id,
