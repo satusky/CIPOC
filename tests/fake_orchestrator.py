@@ -135,13 +135,18 @@ class FakeNoteScanner:
     def summarize_note(self, state: ScannerState) -> dict:
         self._script.pause()
         return {
-            "summary": f"{state.note.type} recorded {state.note.date}.",
-            "flags": ["metasta", "therapy", "lymph node", state.note.type.split()[0].lower()],
+            "summary": f"{state.note.note_type} recorded {state.note.date}.",
+            "flags": [
+                "metasta",
+                "therapy",
+                "lymph node",
+                state.note.note_type.split()[0].lower(),
+            ],
         }
 
     def detect_concepts(self, state: ScannerState) -> dict:
         self._script.pause()
-        concepts = build_concept_presence_dict(with_evidence=True)
+        concepts = build_concept_presence_dict()
         for name, present in self._script.concepts.items():
             if name in concepts:
                 concepts[name] = ConceptWithEvidence(
@@ -300,7 +305,7 @@ class FakeExtractor:
         outcome = self._script.outcome(item_id)
         note = notes[0] if notes else None
         spans = (
-            [TextSpan(id=note.note_id, text=note.content.splitlines()[0])]
+            [TextSpan(note_id=note.note_id, text=note.content.splitlines()[0])]
             if outcome.value is not None and note is not None
             else []
         )

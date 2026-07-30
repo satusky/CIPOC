@@ -12,16 +12,15 @@ Determine which of the following clinical concepts are present in the note.
 Concepts:
 {concept_list}
 
-For each concept listed above, report:
-- concept: the concept key exactly as written above.
+The response schema contains one required field for each concept listed above. For every field, report:
 - presence: true if the concept is present in the note, otherwise false. If you are uncertain \
 whether cancer is present, default to true.
 - confidence: your confidence in the presence/absence judgment for that concept.
-- evidence: verbatim text span(s) from the note supporting a positive finding; leave empty \
+- evidence: verbatim text span(s) from the note supporting a positive finding, using the \
+clinical note's note_id as each span's note_id; leave empty \
 when the concept is absent.
 
-Return exactly one finding per concept listed above. Do not report concepts that are not \
-listed, and do not omit any listed concept.
+Populate every required concept field in the response schema.
 """
 
 

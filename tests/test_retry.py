@@ -115,7 +115,7 @@ class RetryWiringTests(unittest.TestCase):
 
 class RetryThroughGraphTests(unittest.TestCase):
     GROUP = VariableGroupInfo(name="test", variables=[VariableInfo(item_id=400, name="Primary Site")])
-    DIGESTS = {1: NoteDigest(note_id=1, type="pathology", summary="s")}
+    DIGESTS = {1: NoteDigest(note_id=1, note_type="pathology", summary="s")}
 
     def setUp(self):
         # LangGraph logs each retry at INFO with a traceback; keep the run quiet.

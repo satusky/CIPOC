@@ -22,18 +22,15 @@ CancerStatus = Literal["historical", "recent", "current"]
 
 
 class TextSpan(BaseModel):
-    id: int | str = Field(description="The note_id of the clinical note this text was copied from. Must exactly match the note_id of one of the provided notes — not a field name (e.g. 'content') or an invented label (e.g. 'note51').")
+    note_id: int | str = Field(description="The ID value of the note this text was copied from. Must exactly match the ID value for one of the provided notes — not a field name (e.g. 'content').")
     text: str = Field(description="Verbatim text snippet from a document that provides evidence for a claim.")
 
 
-class ConceptPresence(BaseModel):
+class ConceptWithEvidence(BaseModel):
     presence: bool = Field(default=False, description="Presence (`True`) or absence (`False`) of a concept in a document.")
     confidence: ConfidenceLevel | None = confidence_field(default=None)
-    model_config = ConfigDict(protected_namespaces=())
-
-
-class ConceptWithEvidence(ConceptPresence):
     evidence: list[TextSpan] | None = Field(default=None, description="List of text span(s) in the clinical note that provide evidence for this claim. A span containing newline characters should be split into multiple spans.")
+    model_config = ConfigDict(protected_namespaces=())
 
 
 class CancerMention(ConceptWithEvidence):
@@ -45,23 +42,23 @@ class CancerMention(ConceptWithEvidence):
 class ClinicalNote(BaseModel):
     note_id: int | str = Field(description="ID value for note.")
     date: str = Field(description="Date note was written in 'YYYY-MM-DD' format.")
-    type: str = Field(description="Type of note.")
+    note_type: str = Field(description="Type of note.")
     content: str = Field(description="Text contents of note.")
     model_config = ConfigDict(protected_namespaces=())
 
 
-def build_concept_presence_dict(concepts: list[str] | dict[str, dict] = CONCEPTS, with_evidence: bool = False) -> dict[str, ConceptPresence] | dict[str, ConceptWithEvidence]:
+def build_concept_presence_dict(
+    concepts: list[str] | dict[str, dict] = CONCEPTS,
+) -> dict[str, ConceptWithEvidence]:
     if isinstance(concepts, list):
         concepts = {concept: {} for concept in concepts}
-    if with_evidence:
-        return {concept: ConceptWithEvidence(**vals) for concept, vals in concepts.items()}
-    return {concept: ConceptPresence(**vals) for concept, vals in concepts.items()}
+    return {concept: ConceptWithEvidence(**vals) for concept, vals in concepts.items()}
 
 
 class ProcessedClinicalNote(ClinicalNote):
     summary: str | None = Field(default=None, description="Summary of clinical note.")
     concepts: dict[str, ConceptWithEvidence] = Field(
-        default_factory=lambda: build_concept_presence_dict(with_evidence=True)
+        default_factory=build_concept_presence_dict
     ) # type: ignore
     cancer_status: set[CancerStatus] | None = Field(default=None, description="Distinct temporality statuses across all cancer mentions in the note. `None` when no cancer is present.")
     cancer_mentions: list[CancerMention] | None = Field(default=None, description="List of cancer mentions.")
@@ -76,7 +73,7 @@ class ProcessedClinicalNote(ClinicalNote):
 
 class NoteDigest(BaseModel):
     note_id: int | str = Field(description="ID value for note.")
-    type: str = Field(description="Type of note.")
+    note_type: str = Field(description="Type of note.")
     summary: str | None = Field(default=None, description="Summary of clinical note.")
     flags: list[str] | None = Field(default=None, description="Keywords associated with the note contents for search.")
 
@@ -95,7 +92,6 @@ class NoteCorpusDescriptors(BaseModel):
         default_factory=dict,
         description="Dictionary of affected tissues keyed by the status (current, recent, historical) associated with tumors in that tissue. `None` if no cancer is present."
     )
-    concepts: dict[str, ConceptPresence] = Field(default_factory=build_concept_presence_dict) # type: ignore
+    concepts: dict[str, ConceptWithEvidence] = Field(default_factory=build_concept_presence_dict) # type: ignore
     unique_flags: set[str]
     model_config = ConfigDict(protected_namespaces=())
-
