@@ -243,17 +243,18 @@ class ExtractorAgent(BaseAgent):
                 # rendering match; the note this span cites must exist and must
                 # actually contain the quoted text.
                 cited_notes = [
-                    note for note in state.notes if str(note.note_id) == str(span.id)
+                    note for note in state.notes if str(note.note_id) == str(span.note_id)
                 ]
                 if not cited_notes:
                     errors.append(
-                        f"Supporting text span {index} cites note id '{span.id}', which is "
-                        "not one of the provided notes; set id to the note_id the text was "
-                        "copied from."
+                        f"Supporting text span {index} cites note id '{span.note_id}', which "
+                        "is not one of the provided notes; set note_id to the note_id the "
+                        "text was copied from."
                     )
                 elif not any(span.text in note.content for note in cited_notes):
                     errors.append(
-                        f"Supporting text span {index} is not verbatim text from note {span.id}."
+                        f"Supporting text span {index} is not verbatim text from note "
+                        f"{span.note_id}."
                     )
 
         return {

@@ -29,7 +29,6 @@ from cipoc.models import (
     VariableGroupInfo,
     VariableInfo,
     VariableStatus,
-    ConceptPresence,
     ConceptWithEvidence,
 )
 from cipoc.models.case import TERMINAL_VARIABLE_STATUSES
@@ -38,7 +37,7 @@ from .coding_context import resolve_gross_site, site_in_ranges
 
 def _concept_present(corpus: NoteCorpusDescriptors, concept: str) -> bool:
     """Return whether a single concept is flagged present in the corpus roll-up."""
-    return corpus.concepts.get(concept, ConceptPresence(presence=False)).presence
+    return corpus.concepts.get(concept, ConceptWithEvidence(presence=False)).presence
 
 
 # Treatment is modeled as granular modalities rather than an aggregate concept,
@@ -193,7 +192,7 @@ def note_matches_filter(
     # Note type: case-insensitive exact match against the allowed set.
     if note_filter.note_types:
         allowed = {t.strip().casefold() for t in note_filter.note_types}
-        if (note.type or "").strip().casefold() not in allowed:
+        if (note.note_type or "").strip().casefold() not in allowed:
             return False
 
     ##### Commented out for now because the keywords are LLM generated and will usually not pass
@@ -239,7 +238,7 @@ def prefilter_notes(
 def build_corpus_descriptors(note_corpus: dict[int, ProcessedClinicalNote]) -> NoteCorpusDescriptors:
     notes = list(note_corpus.values())
     dates = sorted([note.date for note in notes])
-    types = set([note.type for note in notes])
+    types = {note.note_type for note in notes}
 
     affected_tissues = defaultdict(set)
     unique_flags = set([])
@@ -251,17 +250,23 @@ def build_corpus_descriptors(note_corpus: dict[int, ProcessedClinicalNote]) -> N
         if note.flags is not None:
             unique_flags.update(note.flags)
 
-    def merge_concept_dicts(right: dict[str, ConceptPresence] | dict[str, ConceptWithEvidence], left: dict[str, ConceptPresence] | dict) -> dict[str, ConceptPresence]:       
+    def merge_concept_dicts(
+        right: dict[str, ConceptWithEvidence],
+        left: dict[str, ConceptWithEvidence],
+    ) -> dict[str, ConceptWithEvidence]:
         for concept, update in right.items():
             current = left.get(concept)
             if current is None:
-                left.update({concept: ConceptPresence(presence=update.presence, confidence=update.confidence)})
+                left[concept] = ConceptWithEvidence(
+                    presence=update.presence,
+                    confidence=update.confidence,
+                )
                 continue
 
             if current.presence and current.confidence == "max":
                 continue
             
-            left[concept] = ConceptPresence(
+            left[concept] = ConceptWithEvidence(
                 presence=current.presence or update.presence,
                 confidence=max(current.confidence, update.confidence) if current.confidence and update.confidence else None,
             )
@@ -269,7 +274,7 @@ def build_corpus_descriptors(note_corpus: dict[int, ProcessedClinicalNote]) -> N
         return left
 
     note_concepts = [note.concepts for note in notes]
-    all_concepts = {}
+    all_concepts: dict[str, ConceptWithEvidence] = {}
     for concept_dict in note_concepts:
         all_concepts = merge_concept_dicts(concept_dict, all_concepts)
 
@@ -284,7 +289,15 @@ def build_corpus_descriptors(note_corpus: dict[int, ProcessedClinicalNote]) -> N
 
 
 def build_corpus_digests(note_corpus: dict[int, ProcessedClinicalNote]) -> dict[int, NoteDigest]:
-    return {note_id: NoteDigest(**note.model_dump()) for note_id, note in note_corpus.items()}
+    return {
+        note_id: NoteDigest(
+            note_id=note.note_id,
+            note_type=note.note_type,
+            summary=note.summary,
+            flags=note.flags,
+        )
+        for note_id, note in note_corpus.items()
+    }
 
 
 # --- Extraction planning (flow Step 5) ---

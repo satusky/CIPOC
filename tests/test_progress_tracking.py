@@ -455,7 +455,7 @@ class ProgressDisabledTests(unittest.TestCase):
                 self.inputs.append(graph_input)
                 return self.result
 
-        note = ClinicalNote(note_id=1, date="2026-01-01", type="test", content="")
+        note = ClinicalNote(note_id=1, date="2026-01-01", note_type="test", content="")
 
         scanner = object.__new__(NoteScannerAgent)
         scanner._graph = FakeGraph({})

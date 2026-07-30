@@ -4,13 +4,12 @@ from pydantic import ValidationError
 
 from cipoc.agents.note_scanner import (
     ConceptFinding,
-    ConceptFindingList,
     NoteScannerAgent,
     ScannerState,
+    concept_findings_model,
 )
 from cipoc.models import (
     ClinicalNote,
-    ConfidenceLevel,
     CONCEPT_DESCRIPTIONS,
     TextSpan,
 )
@@ -26,12 +25,21 @@ class FakeLLM:
         return self.response
 
 
-def _finding(name, present=False):
+def _finding(present=False, *, evidence="carcinoma"):
     return ConceptFinding(
-        concept=name,
         presence=present,
         confidence="max",
-        evidence=[TextSpan(id=1, text="carcinoma")] if present else [],
+        evidence=[TextSpan(note_id="wrong", text=evidence)] if present else [],
+    )
+
+
+def _findings(**present):
+    schema = concept_findings_model(CONCEPT_DESCRIPTIONS)
+    return schema(
+        **{
+            name: _finding(present.get(name, False), evidence=name)
+            for name in CONCEPT_DESCRIPTIONS
+        }
     )
 
 
@@ -46,7 +54,7 @@ def _state():
         note=ClinicalNote(
             note_id=1,
             date="2025-01-01",
-            type="Pathology Report",
+            note_type="Pathology Report",
             content="Final diagnosis: invasive carcinoma.",
         ),
         messages=[],
@@ -54,53 +62,43 @@ def _state():
 
 
 class ConceptDetectionTests(unittest.TestCase):
-    def test_concept_template_contains_every_description(self):
-        self.assertEqual(
-            NoteScannerAgent._concepts_to_findings(),
-            [
-                {"concept": name, "description": description}
-                for name, description in CONCEPT_DESCRIPTIONS.items()
-            ],
-        )
+    def test_schema_requires_every_configured_concept(self):
+        descriptions = {**CONCEPT_DESCRIPTIONS, "immunotherapy": "Cancer immunotherapy."}
+        schema = concept_findings_model(descriptions).model_json_schema()
+
+        self.assertEqual(set(schema["required"]), set(descriptions))
 
     def test_finding_requires_model_populated_fields(self):
         with self.assertRaises(ValidationError):
-            ConceptFinding(concept="cancer")
+            ConceptFinding()
 
-    def test_detect_concepts_normalizes_an_incomplete_response(self):
-        scanner = _scanner_with(
-            ConceptFindingList(findings=[_finding("surgery", present=True)])
-        )
+    def test_complete_schema_rejects_an_incomplete_response(self):
+        schema = concept_findings_model(CONCEPT_DESCRIPTIONS)
 
-        with self.assertLogs("cipoc.agents.note_scanner", level="WARNING"):
-            result = scanner.detect_concepts(_state())
+        with self.assertRaises(ValidationError):
+            schema(cancer=_finding(True))
 
+    def test_detect_concepts_returns_all_findings_and_normalizes_evidence_ids(self):
+        scanner = _scanner_with(_findings(cancer=True, surgery=True))
+
+        result = scanner.detect_concepts(_state())
         concepts = result["concepts"]
+
         self.assertEqual(set(concepts), set(CONCEPT_DESCRIPTIONS))
         self.assertTrue(concepts["surgery"].presence)
         self.assertTrue(concepts["cancer"].presence)
-        self.assertEqual(concepts["cancer"].confidence, ConfidenceLevel.LOW)
+        self.assertEqual(concepts["surgery"].evidence[0].note_id, 1)
 
-    def test_detect_concepts_prefers_positive_duplicate(self):
-        response = ConceptFindingList(
-            findings=[_finding(name) for name in CONCEPT_DESCRIPTIONS]
-            + [_finding("cancer", present=True)]
-        )
-        scanner = _scanner_with(response)
+    def test_cancer_is_implied_by_cancer_directed_treatment(self):
+        scanner = _scanner_with(_findings(chemotherapy=True))
 
-        with self.assertLogs("cipoc.agents.note_scanner", level="WARNING"):
-            result = scanner.detect_concepts(_state())
+        result = scanner.detect_concepts(_state())
 
         self.assertTrue(result["concepts"]["cancer"].presence)
+        self.assertEqual(result["concepts"]["cancer"].evidence[0].text, "chemotherapy")
 
     def test_detect_concepts_passes_template_and_returns_findings(self):
-        response = ConceptFindingList(
-            findings=[
-                _finding(name, present=name == "cancer")
-                for name in CONCEPT_DESCRIPTIONS
-            ]
-        )
-        scanner = _scanner_with(response)
+        scanner = _scanner_with(_findings(cancer=True))
 
         result = scanner.detect_concepts(_state())
 
@@ -108,7 +106,7 @@ class ConceptDetectionTests(unittest.TestCase):
         self.assertEqual(set(result["concepts"]), set(CONCEPT_DESCRIPTIONS))
         prompt = scanner.agent.messages[-1].content
         for name, description in CONCEPT_DESCRIPTIONS.items():
-            self.assertIn(f'"concept": "{name}"', prompt)
+            self.assertIn(f'"{name}":', prompt)
             self.assertIn(description, prompt)
 
 
