@@ -1,0 +1,137 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:nasal_cavity:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Nasal Cavity (excluding Malignant Melanoma)",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/nasal_cavity.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C300"
+      ],
+      "histologies": [
+        "8000-8713",
+        "8800-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C30.0  Nasal cavity (excluding nose, NOS C76.0)\n\n**Note 1:** This schema is based on the UICC chapter *Nasal Cavity and Paranasal Sinuses,* pages 46-50.\n\n**Note 2:**  Laterality must be coded for this site, except subsites nasal cartilage and nasal septum, for which laterality is coded 0.\n\n**Note 3:** In addition to directly assigning TNM, Summary Stage 2000 (SS2000) must be captured.  If directly assigning SS2000, use the *Nasal Cavity and Middle Ear* chapter on page 126 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=126).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_tnm:nasal_cavity:behavior:c2",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Nasal Cavity (excluding Malignant Melanoma)",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "tnm-2.1:tables/behavior.json",
+    "kind": "code_table",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C300"
+      ],
+      "histologies": [
+        "8000-8713",
+        "8800-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "Behavior ICD-O-3 (4 codes)\n0: Benign\n1: Uncertain Benign/Malig\n2: In Situ\n3: Malignant Primary",
+    "codes": {
+      "0": "Benign",
+      "1": "Uncertain Benign/Malig",
+      "2": "In Situ",
+      "3": "Malignant Primary"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_tnm:nasal_cavity:nodes_pos_fpa:c3",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Nasal Cavity (excluding Malignant Melanoma)",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "tnm-2.1:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C300"
+      ],
+      "histologies": [
+        "8000-8713",
+        "8800-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative.\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in patient record",
+    "codes": {
+      "00": "All nodes examined negative.",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_tnm:nasal_cavity:nodes_pos_fpa:i4",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Nasal Cavity (excluding Malignant Melanoma)",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "tnm-2.1:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C300"
+      ],
+      "histologies": [
+        "8000-8713",
+        "8800-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.",
+    "codes": null,
+    "notes": null
+  }
+]

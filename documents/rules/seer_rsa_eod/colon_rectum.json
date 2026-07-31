@@ -1,0 +1,605 @@
+[
+  {
+    "rule_id": "seer_rsa_eod:colon_rectum:schema:i1",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Colon and Rectum",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/colon_rectum.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C180",
+        "C182-C189",
+        "C199",
+        "C209"
+      ],
+      "histologies": [
+        "8000-8149",
+        "8154",
+        "8160-8231",
+        "8243-8248",
+        "8250-8682",
+        "8690-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "8000-8149, 8154, 8160-8231, 8243-8248, 8250-8682, 8690-8700, 8720-8790 \n\nC180 Cecum\nC182 Ascending colon\nC183 Hepatic flexure of colon\nC184 Transverse colon\nC185 Splenic flexure of colon\nC186 Descending colon\nC187 Sigmoid colon\nC188 Overlapping lesion of colon\nC189 Colon, NOS\nC199 Rectosigmoid junction\nC209 Rectum, NOS\n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 20 *Colon and Rectum*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other EOD Schemas with Colon and Rectum sites**\n* **GIST**: 8935-8936\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **NET Colon and Rectum**: 8150-8153, 8155-8156, 8158, 8240-8242, 8249, 8683\n* **Soft Tissue Abdomen and Thoracic**: 8710-8714, 8800-8803, 8810-8921, 8932-8934, 8940-8990, 9000-9016, 9030-9043, 9045-9138, 9141-9230, 9240-9580, 9582\n* **Soft Tissue Other**: 8992\n* **Soft Tissue Rare**: 8804-8806, 8930-8931, 8991, 9020, 9044, 9231, 9581",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:colon_rectum:behavior:c2",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Colon and Rectum",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "code_table",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C180",
+        "C182-C189",
+        "C199",
+        "C209"
+      ],
+      "histologies": [
+        "8000-8149",
+        "8154",
+        "8160-8231",
+        "8243-8248",
+        "8250-8682",
+        "8690-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Behavior ICD-O-3 (4 codes)\n0: Benign\n1: Uncertain Benign/Malig\n2: In Situ\n3: Malignant Primary",
+    "codes": {
+      "0": "Benign",
+      "1": "Uncertain Benign/Malig",
+      "2": "In Situ",
+      "3": "Malignant Primary"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:colon_rectum:behavior:i3",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Colon and Rectum",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C180",
+        "C182-C189",
+        "C199",
+        "C209"
+      ],
+      "histologies": [
+        "8000-8149",
+        "8154",
+        "8160-8231",
+        "8243-8248",
+        "8250-8682",
+        "8690-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:colon_rectum:tumor_size_summary_full_15510:c4",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Colon and Rectum",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_full_15510.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C180",
+        "C182-C189",
+        "C199",
+        "C209"
+      ],
+      "histologies": [
+        "8000-8149",
+        "8154",
+        "8160-8231",
+        "8243-8248",
+        "8250-8682",
+        "8690-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (7 codes)\n000: No mass/tumor found\n001: 1 mm or described as less than 1 mm\n002-988: Exact size in millimeters (2 mm to 988 mm)\n989: 989 millimeters or larger\n990: Microscopic focus or foci only and no size of focus is given\n998: Alternate descriptions of tumor size for specific sites: Familial/multiple polyposis: - Rectosigmoid and rectum (C19.9, C20.9) - Colon (C18.0, C18.2-C18.9) If no size is documented: Circumferential: - Esophagus (C15.0-C15.5, C15.8-C15.9) Diffuse; widespread: 3/4s or more; linitis plastica: - Stomach and Esophagus GE Junction (C16.0-C16.6, C16.8-C16.9) Diffuse, entire lung or NOS: - Lung and main stem bronchus (C34.0-C34.3, C34.8-C34.9) Diffuse: - Breast (C50.0-C50.6, C50.8-C50.9)\n999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm",
+      "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+      "989": "989 millimeters or larger",
+      "990": "Microscopic focus or foci only and no size of focus is given",
+      "998": "Alternate descriptions of tumor size for specific sites:\n\nFamilial/multiple polyposis:\n- Rectosigmoid and rectum (C19.9, C20.9)\n- Colon (C18.0, C18.2-C18.9)\n\nIf no size is documented:\nCircumferential:\n- Esophagus (C15.0-C15.5, C15.8-C15.9)\n\nDiffuse; widespread: 3/4s or more; linitis plastica:\n- Stomach and Esophagus GE Junction (C16.0-C16.6, C16.8-C16.9)\n\nDiffuse, entire lung or NOS:\n- Lung and main stem bronchus (C34.0-C34.3, C34.8-C34.9)\n\nDiffuse:\n- Breast (C50.0-C50.6, C50.8-C50.9)",
+      "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:colon_rectum:tumor_size_summary_full_15510:i5",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Colon and Rectum",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_full_15510.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C180",
+        "C182-C189",
+        "C199",
+        "C209"
+      ],
+      "histologies": [
+        "8000-8149",
+        "8154",
+        "8160-8231",
+        "8243-8248",
+        "8250-8682",
+        "8690-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:colon_rectum:nodes_pos_fpa:c6",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Colon and Rectum",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C180",
+        "C182-C189",
+        "C199",
+        "C209"
+      ],
+      "histologies": [
+        "8000-8149",
+        "8154",
+        "8160-8231",
+        "8243-8248",
+        "8250-8682",
+        "8690-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in medical record",
+    "codes": {
+      "00": "All nodes examined negative",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:colon_rectum:nodes_pos_fpa:i7",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Colon and Rectum",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C180",
+        "C182-C189",
+        "C199",
+        "C209"
+      ],
+      "histologies": [
+        "8000-8149",
+        "8154",
+        "8160-8231",
+        "8243-8248",
+        "8250-8682",
+        "8690-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:colon_rectum:nodes_exam_76029:c8",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Colon and Rectum",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C180",
+        "C182-C189",
+        "C199",
+        "C209"
+      ],
+      "histologies": [
+        "8000-8149",
+        "8154",
+        "8160-8231",
+        "8243-8248",
+        "8250-8682",
+        "8690-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (8 codes)\n00: No nodes examined\n01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)\n90: 90 or more nodes examined\n95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed\n96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated\n97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated\n98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown\n99: Unknown if nodes were examined; not applicable or negative Not documented in medical record",
+    "codes": {
+      "00": "No nodes examined",
+      "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+      "90": "90 or more nodes examined",
+      "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+      "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+      "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+      "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+      "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:colon_rectum:nodes_exam_76029:i9",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Colon and Rectum",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C180",
+        "C182-C189",
+        "C199",
+        "C209"
+      ],
+      "histologies": [
+        "8000-8149",
+        "8154",
+        "8160-8231",
+        "8243-8248",
+        "8250-8682",
+        "8690-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:colon_rectum:ss2018_colon_and_rectum_including_net_40538:c10",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Colon and Rectum",
+      "Summary Stage 2018: Colon and Rectum"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_colon_and_rectum_including_net_40538.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C180",
+        "C182-C189",
+        "C199",
+        "C209"
+      ],
+      "histologies": [
+        "8000-8149",
+        "8154",
+        "8160-8231",
+        "8243-8248",
+        "8250-8682",
+        "8690-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018: Colon and Rectum (7 codes)\n0: **In situ, intraepithelial, noninvasive**\n1: **Localized only (localized, NOS)** All sites (C180, C182-C189) - Confined to colon, rectum, rectosigmoid, NOS - Confined to polyp (head, stalk, NOS) - Extension through wall, NOS - Intraluminal extension to colon and/or anal canal/anus (rectum only) - Invasion of + Intramucosal, NOS + Lamina propria + Mucosa, NOS + Muscularis mucosae + Muscularis, NOS + Muscularis propria + Rectum (C209): WITH or WITHOUT intraluminal extension to colon and/or anal canal/anus - Perimuscular tissue invaded - Submucosa (superficial invasion) - Subserosal tissue/(sub)serosal fat invaded - Transmural, NOS - Wall, NOS Peritonealized or non-peritonealized: Invasion into pericolorectal tissues and/or pericolonic adipose tissue ONLY *(do not apply these instructions to structures listed under ALL SITES)* * Non-peritonealized site or segment of colon (*see Note 6*) or UNKNOWN if peritonealized * Includes invasion of pericolic or perirectal fat tissues * For peritonealized sites or segments, see code 2)\n2: **Regional by direct extension only** All sites (C180, C182-C189) + Abdominal wall** + Adherent to other organ …",
+    "codes": {
+      "0": "**In situ, intraepithelial, noninvasive**",
+      "1": "**Localized only (localized, NOS)**\n\nAll sites (C180, C182-C189)\n- Confined to colon, rectum, rectosigmoid, NOS\n- Confined to polyp (head, stalk, NOS)\n- Extension through wall, NOS\n- Intraluminal extension to colon and/or anal canal/anus (rectum only)\n- Invasion of\n  + Intramucosal, NOS\n  + Lamina propria\n  + Mucosa, NOS\n  + Muscularis mucosae\n  + Muscularis, NOS\n  + Muscularis propria\n     + Rectum (C209): WITH or WITHOUT intraluminal extension to colon and/or anal canal/anus\n - Perimuscular tissue invaded\n - Submucosa (superficial invasion)\n- Subserosal tissue/(sub)serosal fat invaded\n- Transmural, NOS\n- Wall, NOS\n\nPeritonealized or non-peritonealized: Invasion into pericolorectal tissues and/or pericolonic adipose tissue ONLY\n*(do not apply these instructions to structures listed under ALL SITES)*\n * Non-peritonealized site or segment of colon (*see Note 6*) or UNKNOWN if peritonealized\n * Includes invasion of pericolic or perirectal fat tissues\n * For peritonealized sites or segments, see code 2)",
+      "2": "**Regional by direct extension only**\n\nAll sites (C180, C182-C189)\n+ Abdominal wall**\n+ Adherent to other organs or structures clinically with no microscopic examination\n+ Adjacent (connective) tissue(s), NOS\n+ Fat, NOS\n+ Mesentery (including mesenteric fat, mesocolon)\n+ Mesothelium\n+ Retroperitoneum (excluding fat)\n+ Serosa\n+ Small intestine\n+ Tumor found in adhesion(s) if microscopic examination performed\n+ Tunica serosa\n+ Visceral peritoneum\n\nCecum (C180)\n+ Greater omentum\n\nAscending colon (C182)\n+ Kidney, right\n+ Liver, right lobe\n+ Retroperitoneal fat\n+ Ureter, right\n\nTransverse colon and flexures (C183, C184, C185)\n+ Bile ducts\n+ Gallbladder\n+ Gastrocolic ligament\n+ Greater omentum \n+ Kidney\n+ Liver\n+ Pancreas\n+ Spleen\n+ Stomach\n\nDescending colon (C186)\n+ Kidney, left\n+ Pelvic wall\n+ Retroperitoneal fat\n+ Spleen\n+ Ureter, left\n\nSigmoid colon (C187)\n+ Pelvic wall \n \nRectosigmoid (C199)\n+ Cul de sac (rectouterine pouch)\n+ Pelvic wall\n+ Small intestine\n\nRectum (C209)\n+ Anus\n+ Bladder (males only)\n+ Cul de sac (rectouterine pouch)\n+ Ductus deferens\n+ Pelvic wall\n+ Prostate\n+ Rectovaginal septum\n+ Rectovesical fat (males only)\n+ Seminal vesicle(s)\n+ Skeletal muscles of pelvic floor\n+ Vagina\n\nPeritonealized or non-peritonealized: Invasion into pericolorectal tissues and/or pericolonic adipose tissue ONLY \n*(do not apply these instructions to structures listed under ALL SITES, or the specific subsites)*\n * Peritonealized site or segment of colon (*see Note 6*) or stated as peritonealized in pathology report\n * Includes invasion of pericolic or perirectal fat tissues\n * For non-peritonealized sites or segments, or UNKNOWN if peritonealized, see code 1) (*see Note 7*)",
+      "3": "**Regional lymph node(s) involved only**\n\nAll sites (C180, C182-C189)\n+ Colic, NOS\n+ Epicolic (adjacent to bowel wall)\n+ Mesenteric, NOS\n+ Mesocolic, NOS\n+ Paracolic\n+ Pericolic\n+ Tumor deposits (TD) in the subserosa, mesentery, mesorectal  or nonperitonealized pericolic or perirectal tissues WITHOUT regional nodal metastasis\n+ Regional lymph node(s), NOS\n   * Lymph node(s), NOS\n\nCecum (C180) \n+ Cecal, NOS\n   * Anterior cecal (prececal)\n   * Posterior cecal (retrocecal)\n+ Colic (right)\n+ Ileocolic\n+ Periappendiceal\n\nAscending colon (C182)\n+ Colic (middle-right branch, right)\n+ Ileocolic\n\nHepatic flexure (C183)\n+ Colic (middle, right)\n+ Ileocolic\n\nTransverse colon (C184)\n+ Colic (middle)\n\nSplenic flexure (C185)\n+ Colic (left, middle)\n+ Mesenteric (inferior)\n\nDescending colon (C186)\n+ Colic (left)\n+ Mesenteric (inferior)\n+ Sigmoid\n\nSigmoid colon (C187)\n+ Colic (left)\n+ Mesenteric (inferior)\n+ Rectal (superior) (hemorrhoidal)\n+ Rectosigmoid\n+ Sigmoid (sigmoidal) (sigmoid mesenteric)\n+ Superior rectal (hemorrhoidal)\n\nRectosigmoid (C199)\n+ Hemorrhoidal (middle, superior)\n+ Mesenteric (inferior)\n+ Mesorectal\n+ Pericolic\n+ Perirectal\n+ Rectal (middle, superior) \n+ Sigmoid (mesenteric)\n\nRectum (C209)\n+ Hemorrhoidal (middle, superior)\n+ Iliac (hypogastric, internal, obturator) (see code 7 for common, external, NOS)\n+ Mesenteric (inferior)\n+ Mesorectal\n+ Perirectal\n+ Rectal (inferior)\n+ Sacral, NOS\n   * Lateral sacral (laterosacral)\n   * Middle sacral (promontorial) (Gerota's node)\n   * Presacral\n+ Sigmoidal (sigmoid mesenteric)",
+      "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+      "7": "**Distant site(s)/lymph node(s) involved**\n\nDistant site(s) (including further contiguous extension)\n\nAll sites (C180, C182-C189)\n+ Adrenal (suprarenal) gland\n+ Bladder\n+ Diaphragm\n+ Fallopian tube\n+ Fistula to skin\n+ Gallbladder\n+ Other segment(s) of colon via serosa\n+ Ovary(ies)\n + Uterus\n\nCecum (C180)\n+ Kidney, right\n+ Liver\n+ Ureter, right\n\nTransverse colon and flexures (C183-C185)\n+ Ureter\n\nSigmoid colon (C187)\n+ Cul de sac (rectouterine pouch)\n+ Ureter\n\nRectosigmoid (C199)\n+ Bladder\n+ Colon via serosa\n+ Fallopian tube\n+ Ovary\n+ Prostate\n+ Skeletal muscles of pelvic floor\n+ Ureter\n+ Vagina\n\nRectum (C209)\n+ Bladder (for females only)\n+ Bone(s) of pelvis \n+ Cervix\n+ Perineum, perianal skin\n+ Sacral plexus\n+ Sacrum\n+ Ureter\n+ Urethra\n+ Uterus\n\nDistant lymph node(s), NOS\n+ Colon\n  * Iliac (common, external, hypogastric, internal, obturator, NOS)\n  * Inferior mesenteric (cecum, ascending colon, hepatic flexure, transverse colon)\n  * Para-aortic\n  * Retroperitoneal \n  * Superior mesenteric\n + Rectosigmoid\n   * Hemorrhoidal, inferior (rectosigmoid)\n   * Iliac (common, external, hypogastric, internal, obturator, NOS)\n   * Rectal, inferior \n   * Superior mesenteric\n+ Rectum\n   * Colic (left) (rectum)\n   * Iliac (common, external, NOS) (see code 3 for hypogastric, internal, obturator)\n   * Superior mesenteric\n\nDistant metastasis, NOS \n+ Carcinomatosis\n+ Peritoneal surface metastasis (peritoneum)\n+ Distant metastasis WITH or WITHOUT distant lymph node(s)",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:colon_rectum:ss2018_colon_and_rectum_including_net_40538:i11",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Colon and Rectum",
+      "Summary Stage 2018: Colon and Rectum"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_colon_and_rectum_including_net_40538.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C180",
+        "C182-C189",
+        "C199",
+        "C209"
+      ],
+      "histologies": [
+        "8000-8149",
+        "8154",
+        "8160-8231",
+        "8243-8248",
+        "8250-8682",
+        "8690-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Colon and Rectum**\n\n8000-8700, 8720-8790\n\nC180, C182-C189, C199, C209\nC180 Cecum\nC182 Ascending colon\nC183 Hepatic flexure of colon\nC184 Transverse colon\nC185 Splenic flexure of colon\nC186 Descending colon\nC187 Sigmoid colon\nC188 Overlapping lesion of colon\nC189 Colon, NOS\nC199 Rectosigmoid junction\nC209 Rectum, NOS\n\n**Note 1:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 20 *Colon and Rectum*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n* Chapter 33 *Neuroendocrine Tumors of the Colon and Rectum*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n* *Neuroendocrine Tumors of the Colon and Rectum*, from the AJCC Cancer Staging System Version 9 (2023). Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other Summary Stage Chapters with Colon and Rectum sites**\n* **GIST**: 8935-8936\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Soft Tissue**: 8710-8714, 8800-8934, 8940-9138, 9141-9582\n\n**Note 3:** **In situ**\n* Code 0 (behavior code 2) includes cancer cells confined within the glandular basement membrane (intraepithelial), or described as in situ. \n\n**Note 4:** **Localized tumors** \n* For the following, AJCC 8th edition stages these as in situ tumors. SS2018 stages these as localized (behavior code 3)\n  * Intramucosal, NOS\n  * Lamina propria\n  * Mucosa, NOS\n  * Confined to, but not through muscularis mucosa\n\n**Note 5:** **Intraluminal extension** \n* Ignore intraluminal extension to adjacent segment(s) of colon/rectum or to the ileum from the cecum; code depth of invasion or extracolonic spread as indicated.\n\n**Note 6:** **Peritonealized parts of the Colon and Rectum** \n* The colon and rectum may be entirely peritonealized, partially peritonealized, or non-peritonealized. Use this list to help distinguish between localized and regional Tumors (See Note 7).\n  * Entirely peritonealized segments: Cecum, Transverse colon, Sigmoid colon, Rectosigmoid colon\n  * Segmental surfaces that are peritonealized: Anterior and lateral surfaces of: Ascending colon, Descending colon, Hepatic flexure, Splenic flexure, Upper third of rectum. Anterior surface: Middle third of rectum.\n  * Entirely non-peritonealized segment: Lower third of rectum\n  * Segmental surfaces that are non-peritonealized: Posterior surface of: Ascending colon, Descending colon, Hepatic flexure, Splenic flexure, Upper two-thirds of rectum\n\n**Note 7:** **Invasion into “pericolonic/pericolorectal tissue** \n* Invasion into “pericolonic/pericolorectal tissue” can be either localized (code 1) or regional (code 2), depending on the primary site and whether it is peritonealized (fully or partially) or not. When extension is described as “pericolonic/pericolorectal tissue”\n  * Localized may NOT be used for entirely peritonealized sites (cecum, transverse colon, sigmoid colon, rectosigmoid colon), as this would be equivalent to peritonealized pericolic/perirectal tissue invasion (regional, code 2)\n  * Localized may ONLY be used for peritonealized sites (See Note 6) when the extension is described using other terms listed under localized (code 1) (ex. subserosal fat). If there are no other terms used to describe the extension, other than invasion of “pericolorectal tissue”, then assign regional (code 2) \n  * For partially peritonealized sites (See Note 6), “pericolonic/pericolorectal tissue” may indicate invasion of either non-peritonealized (localized, code 1) or peritonealized tissue (regional, code 2)\n    * Check for mention of serosa/peritoneum in the operative report and/or pathology report final diagnosis or gross description to determine the correct code. Again, if other descriptions besides “pericolonic/pericolorectal tissue” are used, assign localized (code 1) or regional (code 2) based on the terminology used\n   * If the pathologist does not further describe the “pericolic/perirectal tissues” as either “non-peritonealized pericolic/perirectal tissues” vs “peritonealized pericolic/perirectal tissues” and the operative report and/or gross description does not describe the tumor relation to the serosa/peritoneal surface, and it cannot be determined whether the tumor arises in a peritonealized portion of the colon, code localized (code 1).\n\n**Note 8:** **Adherent tumors** \n* Tumor that is adherent to other organs or structures, macroscopically, is coded as regional (code 2) or distant (code 7). However, if no tumor is present in the adhesion, microscopically, the classification should be coded to localized (code 1) or regional (code 2).\n\n**Note 9:** **Involvement of serosal surface** \n* Tumors characterized by involvement of the serosal surface (visceral peritoneum) by direct extension or perforation in which the tumor cells are continuous with the serosal surface through inflammation are coded to regional (code 2).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:colon_rectum:grade_clinical_73056:c12",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Colon and Rectum",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_73056.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C180",
+        "C182-C189",
+        "C199",
+        "C209"
+      ],
+      "histologies": [
+        "8000-8149",
+        "8154",
+        "8160-8231",
+        "8243-8248",
+        "8250-8682",
+        "8690-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (5 codes)\n1: G1: Well differentiated\n2: G2: Moderately differentiated\n3: G3: Poorly differentiated\n4: G4: Undifferentiated\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Well differentiated",
+      "2": "G2: Moderately differentiated",
+      "3": "G3: Poorly differentiated",
+      "4": "G4: Undifferentiated",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:colon_rectum:grade_clinical_73056:i13",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Colon and Rectum",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_73056.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C180",
+        "C182-C189",
+        "C199",
+        "C209"
+      ],
+      "histologies": [
+        "8000-8149",
+        "8154",
+        "8160-8231",
+        "8243-8248",
+        "8250-8682",
+        "8690-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Clinical must not be blank. \n\n**Note 2:** Assign the highest grade from the primary tumor assessed during the clinical time frame. \n\n**Note 3:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 4:** G4 includes anaplastic.\n\n**Note 5:** Code 9 (unknown) when\n* Grade from primary site is not documented\n* Clinical workup is not done (for example, cancer is an incidental finding during surgery for another condition)\n* Grade checked \"not applicable\" on CAP Protocol (if available) and no other grade information is available\n\n**Note 6:** If there is only one grade available and it cannot be determined if it is clinical or pathological, assume it is a Grade Clinical and code appropriately per Grade Clinical categories for that site, and then code unknown (9) for Grade Pathological, and blank for Grade Post Therapy Clin (yc) and Grade Post Therapy Path (yp).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:colon_rectum:grade_pathological_31963:c14",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Colon and Rectum",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_31963.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C180",
+        "C182-C189",
+        "C199",
+        "C209"
+      ],
+      "histologies": [
+        "8000-8149",
+        "8154",
+        "8160-8231",
+        "8243-8248",
+        "8250-8682",
+        "8690-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (5 codes)\n1: G1: Well differentiated\n2: G2: Moderately differentiated\n3: G3: Poorly differentiated\n4: G4: Undifferentiated\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Well differentiated",
+      "2": "G2: Moderately differentiated",
+      "3": "G3: Poorly differentiated",
+      "4": "G4: Undifferentiated",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:colon_rectum:grade_pathological_31963:i15",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Colon and Rectum",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_31963.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C180",
+        "C182-C189",
+        "C199",
+        "C209"
+      ],
+      "histologies": [
+        "8000-8149",
+        "8154",
+        "8160-8231",
+        "8243-8248",
+        "8250-8682",
+        "8690-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Pathological must not be blank.\n\n**Note 2:** There is a preferred grading system for this schema. If the clinical grade given uses the preferred grading system and the pathological grade does not use the preferred grading system, do not record the Grade Clinical in the Grade Pathological field. Assign Grade Pathological 9. \n* *Example: * Biopsy of primary site shows a moderately differentiated adenocarcinoma. The surgical resection states a high-grade adenocarcinoma. \n    - Code Grade Clinical as 2 since Moderately differentiated (G2) is the preferred grading system\n     - Code Grade Pathological as 9 since the preferred grading system was not used and the Generic Grade Categories do not apply to this grade table\n\n**Note 3:** Assign the highest grade from the primary tumor.  \n\n**Note 4:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 5:** G4 includes anaplastic.\n\n**Note 6:** Use the grade from the **clinical work up** from the primary tumor in different scenarios based on behavior or surgical resection\n* **Behavior**\n  - Tumor behavior for the clinical and the pathological diagnoses are the same AND the clinical grade is the highest grade \n   - Tumor behavior for clinical diagnosis is invasive, and the tumor behavior for the pathological diagnosis is in situ\n* **Surgical Resection**\n   - Surgical resection is done of the primary tumor and there is no grade documented from the surgical resection\n    - Surgical resection is done of the primary tumor and there is no residual cancer\n* **No Surgical Resection**\n    - Surgical resection of the primary tumor has not been done, but there is positive microscopic confirmation of distant metastases during the clinical time frame\n\n**Note 7:** Code 9 (unknown) when\n* Grade from primary site is not documented\n* No resection of the primary site (see exception in Note 6, Surgical resection, last bullet)\n* Neo-adjuvant therapy is followed by a resection (see Grade Post Therapy Path (yp))\n* Grade checked “not applicable” on CAP Protocol (if available) and no other grade information is available\n* Clinical case only (see Grade Clinical)\n* There is only one grade available, and it cannot be determined if it is clinical, pathological, post therapy clinical or post therapy pathological",
+    "codes": null,
+    "notes": null
+  }
+]

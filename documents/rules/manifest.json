@@ -28,5 +28,21 @@
     "effective_note": "2024 edition; each compiled item carries its own effective date on applies_to.dx_date_min (the item's NAACCR implementation year). publication_date records edition recency for precedence only.",
     "source_markdown": "documents/markdown/store-manual-2024.md",
     "compiled_at": "2026-07-28"
+  },
+  "seer_rsa_eod": {
+    "title": "SEER*RSA EOD Public 3.3",
+    "family": "SEER-RSA",
+    "publication_date": "2024-01-01",
+    "effective_note": "Edition recency for precedence only, not an effective date. Every unit carries its own applies_to.dx_date_min (the algorithm's effective year, or the schema-selection table's year_dx range when it states one).",
+    "source_markdown": "https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/eod_public-3.3.zip",
+    "compiled_at": "2026-07-30"
+  },
+  "seer_rsa_tnm": {
+    "title": "SEER*RSA TNM 2.1",
+    "family": "SEER-RSA",
+    "publication_date": "2016-01-01",
+    "effective_note": "Edition recency for precedence only, not an effective date. Every unit carries its own applies_to.dx_date_min (the algorithm's effective year, or the schema-selection table's year_dx range when it states one).",
+    "source_markdown": "https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/tnm-2.1.zip",
+    "compiled_at": "2026-07-30"
   }
 }

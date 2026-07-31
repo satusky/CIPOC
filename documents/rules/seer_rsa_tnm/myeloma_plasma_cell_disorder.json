@@ -1,0 +1,33 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:myeloma_plasma_cell_disorder:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Plasma Cell Disorders including Myeloma",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/myeloma_plasma_cell_disorder.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C000-C440",
+        "C442-C689",
+        "C691-C694",
+        "C698-C809"
+      ],
+      "histologies": [
+        "9731",
+        "9732",
+        "9734"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "9731 Plasmacytoma, NOS (except C441, C690, C695-C696)\n9732 Multiple myeloma (except C441, C690, C695-C696)\n9734 Plasmacytoma, extramedullary (except C441, C690, C695-C696)\n\n**Note:** TNM is not defined for this schema. If directly assigning Summary Stage 2000 (SS2000), use the *Hematopoietic, Reticuloendothelial, Immunoproliferative, and Myeloproliferative Neoplasms* chapter on page 286 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=286).",
+    "codes": null,
+    "notes": null
+  }
+]

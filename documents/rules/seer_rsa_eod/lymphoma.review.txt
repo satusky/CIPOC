@@ -1,0 +1,60 @@
+========================================================================
+SEER*RSA STAGING INGEST REVIEW REPORT
+========================================================================
+Schema: lymphoma
+Source: https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/eod_public-3.3.zip
+Units emitted: 135  |  accepted: 135  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     63
+  instruction    72
+
+Accepted units by NAACCR item:
+     523 18
+     756 18
+     764 18
+     820 18
+     830 18
+    3843 18
+    3844 18
+
+Applicability predicates carried by this schema's units (9):
+  {'sites': ['C000-C424', 'C470-C509', 'C511-C608', 'C619-C631', 'C637-C689', 'C691-C694', 'C698-C699', 'C739-C749', 'C760-C809'], 'histologies': ['9590', '9596-9663', '9673-9699', '9702-9719', '9725-9726', '9735', '9737-9738'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C440', 'C442-C449', 'C510', 'C609', 'C632'], 'histologies': ['9590', '9596', '9650-9663', '9673-9679', '9687-9699', '9702-9705', '9714-9717', '9725', '9735', '9737-9738'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C700-C729', 'C751-C753'], 'histologies': ['9590', '9596-9663', '9673-9679', '9687-9689', '9691-9698', '9716-9718', '9725-9726', '9735', '9737-9738'], 'behaviors': ['3'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C700-C729', 'C751-C753'], 'histologies': ['9690', '9719'], 'behaviors': ['3'], 'dx_date_min': '2018-01-01', 'dx_date_max': '2022-12-31'}
+  {'sites': ['C750', 'C754-C759'], 'histologies': ['9590', '9596-9663', '9673-9699', '9702-9719', '9725-9726', '9735', '9737-9738'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C000-C440', 'C442-C689', 'C691-C694', 'C698-C699', 'C739-C749', 'C750', 'C754-C759', 'C760-C809'], 'histologies': ['9591'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C700-C729', 'C751-C753'], 'histologies': ['9591'], 'behaviors': ['3'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C000-C440', 'C442-C689', 'C691-C694', 'C698-C699', 'C739-C749', 'C750', 'C754-C759', 'C760-C809'], 'histologies': ['9826-9827'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C700-C729', 'C751-C753'], 'histologies': ['9826-9827'], 'behaviors': ['3'], 'dx_date_min': '2018-01-01'}
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED CODE TABLES (up to 4 of 63)
+------------------------------------------------------------------------
+
+[seer_rsa_eod:lymphoma:behavior:c10]  items=[523]  anchor=eod_public-3.3:tables/behavior.json
+  Lymphoma > Behavior ICD-O-3
+0: Benign
+1: Uncertain Benign/Malig
+2: In Situ
+3: Malignant Primary
+
+[seer_rsa_eod:lymphoma:tumor_size_summary_dna_13275:c34]  items=[756]  anchor=eod_public-3.3:tables/tumor_size_summary_dna_13275.json
+  Lymphoma > Tumor Size Summary
+999: Not applicable
+
+[seer_rsa_eod:lymphoma:nodes_exam_dna_95635:c67]  items=[830]  anchor=eod_public-3.3:tables/nodes_exam_dna_95635.json
+  Lymphoma > Regional Nodes Examined
+99: Not applicable
+
+[seer_rsa_eod:lymphoma:grade_clinical_18316:c100]  items=[3843]  anchor=eod_public-3.3:tables/grade_clinical_18316.json
+  Lymphoma > Grade Clinical
+8: Not applicable
+
+========================================================================

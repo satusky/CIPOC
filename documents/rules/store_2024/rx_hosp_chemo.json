@@ -1,39 +1,5 @@
 [
   {
-    "rule_id": "store_2024:rx_hosp_chemo:chemotherapy_at_this_facility:t1",
-    "source_doc": "store_2024",
-    "section_path": [
-      "Chemotherapy at this Facility"
-    ],
-    "anchor": "L9650-L9655:chemotherapy-at-this-facility",
-    "kind": "code_table",
-    "item_ids": [
-      700
-    ],
-    "applies_to": {
-      "sites": null,
-      "histologies": null,
-      "behaviors": null,
-      "sex": null,
-      "dx_date_min": "2000-01-01",
-      "dx_date_max": null
-    },
-    "text": "| Item # | Length | Allowable Values |  |  |\n|---|---|---|---|---|\n| 700 | 2 | 00-03, 82, 85-88, 99 |  |  |",
-    "codes": {
-      "00": "00",
-      "01": "01",
-      "02": "02",
-      "03": "03",
-      "82": "82",
-      "85": "85",
-      "86": "86",
-      "87": "87",
-      "88": "88",
-      "99": "99"
-    },
-    "notes": null
-  },
-  {
     "rule_id": "store_2024:rx_hosp_chemo:description:i1",
     "source_doc": "store_2024",
     "section_path": [

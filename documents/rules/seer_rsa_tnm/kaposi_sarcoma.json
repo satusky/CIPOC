@@ -1,0 +1,28 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:kaposi_sarcoma:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Kaposi Sarcoma of All Sites",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/kaposi_sarcoma.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C000-C809"
+      ],
+      "histologies": [
+        "9140"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** TNM is not defined for this schema. If directly assigning Summary Stage 2000 (SS2000), use the *Kaposi Sarcoma of All Sites* chapter on page 280 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=280).\n\n**Note 2:**  This scheme cannot be compared to either the Historic Stage or the 1977 Summary Stage schemes.",
+    "codes": null,
+    "notes": null
+  }
+]

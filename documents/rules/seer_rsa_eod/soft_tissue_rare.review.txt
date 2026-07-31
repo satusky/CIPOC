@@ -1,0 +1,86 @@
+========================================================================
+SEER*RSA STAGING INGEST REVIEW REPORT
+========================================================================
+Schema: soft_tissue_rare
+Source: https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/eod_public-3.3.zip
+Units emitted: 210  |  accepted: 210  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     98
+  instruction    112
+
+Accepted units by NAACCR item:
+     523 28
+     756 28
+     764 28
+     820 28
+     830 28
+    3843 28
+    3844 28
+
+Applicability predicates carried by this schema's units (14):
+  {'sites': ['C000-C148', 'C150', 'C153', 'C158', 'C300-C329', 'C470', 'C490', 'C739', 'C750', 'C754-C759'], 'histologies': ['8804-8806', '8910', '8920', '8930-8931', '8991', '9020', '9044', '9120', '9231', '9581'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C151-C152', 'C154-C155', 'C159', 'C160-C269', 'C339-C388', 'C471-C472', 'C474', 'C476-C479', 'C491-C492', 'C496-C499', 'C500-C509', 'C529', 'C589-C689', 'C473', 'C475', 'C493-C495'], 'histologies': ['8804-8806', '8930-8931', '8991', '9020', '9044', '9231', '9581'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C480-C488'], 'histologies': ['8804-8805', '8991', '9020', '9044', '9231', '9581'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C480', 'C481-C482', 'C488'], 'histologies': ['8806', '8930-8931'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C510-C519'], 'histologies': ['8804-8806', '8930-8931', '8991', '9044', '9231', '9581'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C530-C539'], 'histologies': ['8804', '8806', '8991', '9020', '9044', '9231'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C530-C539'], 'histologies': ['8930-8931'], 'dx_date_min': '2018-01-01', 'dx_date_max': '2020-12-31'}
+  {'sites': ['C530-C539'], 'histologies': ['8815', '8859', '8901', '8912', '8920', '9120', '9133', '9180', '9222', '9366-9368', '9581'], 'dx_date_min': '2021-01-01'}
+  {'sites': ['C569', 'C570'], 'histologies': ['8804-8805', '8859', '8901', '8910-8920', '8991', '9020', '9044', '9120', '9133', '9180', '9222', '9231', '9366-9368', '9581'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C571-C579', 'C740-C749', 'C809'], 'histologies': ['8804-8806', '8815', '8859', '8901', '8910-8920', '8930-8931', '8991', '9020', '9044', '9120', '9133', '9180', '9222', '9231', '9366-9368', '9581'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C690-C695', 'C699'], 'histologies': ['8859', '8930-8931', '8991', '9020', '9180', '9222', '9231', '9366-9368'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C700-C721', 'C728-C729'], 'histologies': ['8804-8806', '8859', '8901', '8910-8920', '8930-8931', '8991', '9020', '9044', '9222', '9231', '9366-9368', '9581'], 'behaviors': ['3'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C722', 'C724-C725', 'C751-C753'], 'histologies': ['8804-8806', '8910', '8920', '8930-8931', '8991', '9020', '9044', '9231', '9581'], 'behaviors': ['3'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C723'], 'histologies': ['8859', '8930-8931', '8991', '9020', '9222', '9231', '9366-9368'], 'behaviors': ['3'], 'dx_date_min': '2018-01-01'}
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED CODE TABLES (up to 4 of 98)
+------------------------------------------------------------------------
+
+[seer_rsa_eod:soft_tissue_rare:behavior:c15]  items=[523]  anchor=eod_public-3.3:tables/behavior.json
+  Soft Tissue Sarcoma - Unusual Histologies and Sites > Behavior ICD-O-3
+0: Benign
+1: Uncertain Benign/Malig
+2: In Situ
+3: Malignant Primary
+
+[seer_rsa_eod:soft_tissue_rare:tumor_size_summary_full_15510:c53]  items=[756]  anchor=eod_public-3.3:tables/tumor_size_summary_full_15510.json
+  Soft Tissue Sarcoma - Unusual Histologies and Sites > Tumor Size Summary
+000: No mass/tumor found
+001: 1 mm or described as less than 1 mm
+002-988: Exact size in millimeters (2 mm to 988 mm)
+989: 989 millimeters or larger
+990: Microscopic focus or foci only and no size of focus is given
+998: Alternate descriptions of tumor size for specific sites: Familial/multiple polyposis: - Rectosigmoid …
+999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable
+
+[seer_rsa_eod:soft_tissue_rare:nodes_exam_76029:c105]  items=[830]  anchor=eod_public-3.3:tables/nodes_exam_76029.json
+  Soft Tissue Sarcoma - Unusual Histologies and Sites > Regional Nodes Examined
+00: No nodes examined
+01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)
+90: 90 or more nodes examined
+95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed
+96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated
+97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated
+98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented …
+99: Unknown if nodes were examined; not applicable or negative Not documented in medical record
+
+[seer_rsa_eod:soft_tissue_rare:grade_clinical_41135:c157]  items=[3843]  anchor=eod_public-3.3:tables/grade_clinical_41135.json
+  Soft Tissue Sarcoma - Unusual Histologies and Sites > Grade Clinical
+1: G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3 Stated as FNCLCC …
+2: G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5 Stated as FNCLCC Grade 2
+3: G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8 Stated as FNCLCC …
+A: Well differentiated
+B: Moderately differentiated
+C: Poorly differentiated
+D: Undifferentiated, anaplastic
+H: Stated as "high grade" only
+9: Grade cannot be assessed (GX); Unknown
+
+========================================================================

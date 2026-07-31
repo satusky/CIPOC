@@ -91,6 +91,33 @@ def _code_in_item_set(code: str, valid: dict) -> bool:
     return False
 
 
+def descriptions_are_informative(codes: dict[str, str]) -> bool:
+    """True when a code table's descriptions distinguish its codes.
+
+    A ``code_table`` exists to tell the extractor what each code *means*; a table
+    whose descriptions merely echo the codes (``{'1': '1', 'L': 'L', …}``) or
+    repeat one string for every code carries nothing the key set does not already
+    carry. Those turn up when the tagging model transcribes a manual's bare
+    "Codes" column instead of its coding instructions.
+
+    They are worse than useless downstream. ``reduce_valid_codes`` folds every
+    applicable table into one dict, so an empty table silently overwrites a real
+    one's descriptions for every code they share — and which table wins is
+    decided by ``specificity_rank``'s alphabetical tie-break, i.e. arbitrarily.
+    Rejecting them at compile time is what keeps that fold order from mattering.
+    """
+    described = {
+        code: (description or "").strip()
+        for code, description in codes.items()
+        if (description or "").strip() not in ("", code)
+    }
+    if not described:
+        return False  # every description echoes its own code, or is blank
+    if len(described) > 1 and len(set(described.values())) == 1:
+        return False  # one string repeated across every code distinguishes nothing
+    return True
+
+
 def _well_formed_code_or_range(entry: str, normalize) -> bool:
     low, sep, high = entry.partition("-")
     if normalize(low) is None:
@@ -105,26 +132,36 @@ def validate_unit(
     *,
     source_lines: list[str],
     data_dictionary: dict,
+    require_provenance: bool = True,
 ) -> UnitValidation:
-    """Run every deterministic check on one unit and collect failures."""
+    """Run every deterministic check on one unit and collect failures.
+
+    ``require_provenance`` gates the anchor/fidelity block only. It exists for
+    compilers whose source is not markdown: the check assumes an ``L<start>-L<end>``
+    line range into a source file and a model that could have paraphrased. A
+    deterministic ingest (see ``compile_staging``) has neither — its anchor names
+    the source JSON member and its text is copied by code, so the fidelity score
+    would measure nothing. Every other check still runs.
+    """
     result = UnitValidation(rule_id=unit.rule_id)
 
     # --- Provenance: anchor resolves, text fuzzy-matches the region ---
-    match = _ANCHOR.match(unit.anchor or "")
-    if not match:
-        result.errors.append(f"Anchor {unit.anchor!r} is not in 'L<start>-L<end>:slug' form.")
-    else:
-        start, end = int(match.group(1)), int(match.group(2))
-        if not (1 <= start <= end <= len(source_lines)):
-            result.errors.append(f"Anchor line range L{start}-L{end} is out of bounds.")
+    if require_provenance:
+        match = _ANCHOR.match(unit.anchor or "")
+        if not match:
+            result.errors.append(f"Anchor {unit.anchor!r} is not in 'L<start>-L<end>:slug' form.")
         else:
-            region = "\n".join(source_lines[start - 1 : end])
-            result.fidelity = fidelity_score(unit.text, region)
-            if result.fidelity < FIDELITY_THRESHOLD:
-                result.errors.append(
-                    f"Unit text fidelity {result.fidelity:.2f} below {FIDELITY_THRESHOLD:.2f}; "
-                    "text may be paraphrased rather than excerpted."
-                )
+            start, end = int(match.group(1)), int(match.group(2))
+            if not (1 <= start <= end <= len(source_lines)):
+                result.errors.append(f"Anchor line range L{start}-L{end} is out of bounds.")
+            else:
+                region = "\n".join(source_lines[start - 1 : end])
+                result.fidelity = fidelity_score(unit.text, region)
+                if result.fidelity < FIDELITY_THRESHOLD:
+                    result.errors.append(
+                        f"Unit text fidelity {result.fidelity:.2f} below {FIDELITY_THRESHOLD:.2f}; "
+                        "text may be paraphrased rather than excerpted."
+                    )
 
     if not unit.section_path:
         result.errors.append("Empty section_path; provenance trail missing.")
@@ -138,6 +175,11 @@ def validate_unit(
     if unit.kind == "code_table":
         if not unit.codes:
             result.errors.append("code_table unit carries no codes.")
+        elif not descriptions_are_informative(unit.codes):
+            result.errors.append(
+                "code_table descriptions carry no information beyond the codes themselves; "
+                f"e.g. {list(unit.codes.items())[:3]}"
+            )
         for item_id in unit.item_ids:
             entry = data_dictionary.get(str(item_id), {})
             if str(entry.get("Data Type", "")).casefold() == "date":

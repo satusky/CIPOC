@@ -1,0 +1,31 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:digestive_other:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Other and Ill-Defined Digestive Organs",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/digestive_other.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C260",
+        "C268-C269"
+      ],
+      "histologies": [
+        "8000-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C260  Intestinal tract, NOS\nC268  Overlapping lesion of digestive system\nC269  Gastrointestinal tract, NOS\n\n**Note:** TNM is not defined for this schema. If directly assigning Summary Stage 2000 (SS2000), use the *Other and Ill-defined Digestive Organs* chapter on page 122 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=122).",
+    "codes": null,
+    "notes": null
+  }
+]

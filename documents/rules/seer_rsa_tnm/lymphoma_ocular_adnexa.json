@@ -1,0 +1,33 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:lymphoma_ocular_adnexa:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Lymphoma of the Ocular Adnexa and Skin of Eyelid",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/lymphoma_ocular_adnexa.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C441",
+        "C690",
+        "C695-C696"
+      ],
+      "histologies": [
+        "9590-9699",
+        "9702-9738",
+        "9811-9818",
+        "9820-9837"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "M-9590-9699,9702-9738, 9811-9818,9820-9837\nC441  Skin of Eyelid\nC690  Conjunctiva\nC695  Lacrimal Gland\nC696  Orbit\n\n**Note 1:** This schema is based on the UICC chapters *Hodgkin & Non-Hodgkin Lymphomas,* pages 304-310.\n* UICC does not define Lymphoma Ocular Adnexa. A list of all possible values are provided for T, N and M (no definitions are available)\n* Assign Clinical and Pathologic Stage Group using the Lymphoma chapter\n\n**Note 2:** Laterality must be coded for this site.\n\n**Note 3:** In addition to directly assigning Clinical and Pathologic Stage Group, Summary Stage 2000 (SS2000) must be captured.  If directly assigning SS2000, use the *Hodgkin & Non-Hodgkin Lymphoma of All Sites* chapter on page 284 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=284).",
+    "codes": null,
+    "notes": null
+  }
+]

@@ -11,6 +11,8 @@ __pycache__
 
 planning/
 tests/test_outputs/
+# Downloaded SEER*RSA release ZIPs (compile_staging --cache-dir)
+.cache/
 documents/manuals
 documents/markdown
 src/cipoc/agents/visualization/*.html

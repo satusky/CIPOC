@@ -1,0 +1,529 @@
+[
+  {
+    "rule_id": "seer_rsa_eod:thyroid:schema:i1",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Thyroid",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/thyroid.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C739"
+      ],
+      "histologies": [
+        "8000-8344",
+        "8350-8420",
+        "8440-8509",
+        "8514-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "8000-8344, 8350-8420, 8440-8509, 8514-8700, 8720-8790\n\nC739 Thyroid gland\n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 73 *Thyroid-Differentiated and Anaplastic Carcinoma*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other EOD Schemas with Thyroid sites**\n* **GIST**: 8935-8936\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Soft Tissue Head and Neck**: 8710-8714, 8800-8803, 8810-8905, 8912, 8921, 8932-8934, 8940-8990, 9000-9016, 9030-9043, 9045-9111, 9121-9138, 9141-9230, 9240-9580, 9582\n* **Soft Tissue Other**: 8992\n**Soft Tissue Rare**: 8804-8806, 8910, 8920, 8930-8931, 8991, 9020, 9044, 9120, 9231, 9581\n* **Thyroid Medullary**: 8345-8349, 8430, 8510, 8512-8513",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:thyroid:behavior:c2",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Thyroid",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "code_table",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C739"
+      ],
+      "histologies": [
+        "8000-8344",
+        "8350-8420",
+        "8440-8509",
+        "8514-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Behavior ICD-O-3 (4 codes)\n0: Benign\n1: Uncertain Benign/Malig\n2: In Situ\n3: Malignant Primary",
+    "codes": {
+      "0": "Benign",
+      "1": "Uncertain Benign/Malig",
+      "2": "In Situ",
+      "3": "Malignant Primary"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:thyroid:behavior:i3",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Thyroid",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C739"
+      ],
+      "histologies": [
+        "8000-8344",
+        "8350-8420",
+        "8440-8509",
+        "8514-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:thyroid:tumor_size_summary_47973:c4",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Thyroid",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_47973.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C739"
+      ],
+      "histologies": [
+        "8000-8344",
+        "8350-8420",
+        "8440-8509",
+        "8514-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (6 codes)\n000: No mass/tumor found\n001: 1 mm or described as less than 1 mm\n002-988: Exact size in millimeters (2 mm to 988 mm)\n989: 989 millimeters or larger\n990: Microscopic focus or foci only and no size of focus is given\n999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm",
+      "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+      "989": "989 millimeters or larger",
+      "990": "Microscopic focus or foci only and no size of focus is given",
+      "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:thyroid:tumor_size_summary_47973:i5",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Thyroid",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_47973.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C739"
+      ],
+      "histologies": [
+        "8000-8344",
+        "8350-8420",
+        "8440-8509",
+        "8514-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "For this schema, Tumor Size is used with EOD Primary Tumor to derive EOD T. \n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:thyroid:nodes_pos_fpa:c6",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Thyroid",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C739"
+      ],
+      "histologies": [
+        "8000-8344",
+        "8350-8420",
+        "8440-8509",
+        "8514-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in medical record",
+    "codes": {
+      "00": "All nodes examined negative",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:thyroid:nodes_pos_fpa:i7",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Thyroid",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C739"
+      ],
+      "histologies": [
+        "8000-8344",
+        "8350-8420",
+        "8440-8509",
+        "8514-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:thyroid:nodes_exam_76029:c8",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Thyroid",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C739"
+      ],
+      "histologies": [
+        "8000-8344",
+        "8350-8420",
+        "8440-8509",
+        "8514-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (8 codes)\n00: No nodes examined\n01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)\n90: 90 or more nodes examined\n95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed\n96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated\n97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated\n98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown\n99: Unknown if nodes were examined; not applicable or negative Not documented in medical record",
+    "codes": {
+      "00": "No nodes examined",
+      "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+      "90": "90 or more nodes examined",
+      "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+      "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+      "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+      "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+      "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:thyroid:nodes_exam_76029:i9",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Thyroid",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C739"
+      ],
+      "histologies": [
+        "8000-8344",
+        "8350-8420",
+        "8440-8509",
+        "8514-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:thyroid:ss2018_thyroid_33058:c10",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Thyroid",
+      "Summary Stage 2018: Thyroid"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_thyroid_33058.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C739"
+      ],
+      "histologies": [
+        "8000-8344",
+        "8350-8420",
+        "8440-8509",
+        "8514-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018: Thyroid (7 codes)\n0: **In situ: noninvasive, intraepithelial**\n1: **Localized only (localized, NOS)** - Confined to thyroid, NOS - Into thyroid capsule, but not beyond - Multiple foci confined to thyroid - Single invasive tumor confined to thyroid\n2: **Regional by direct extension only** - Blood vessel(s) (major) + Carotid artery (encased) + Jugular vein + Thyroid artery or vein - Cricoid cartilage - Esophagus - Extrathyroidal extension (microscopic, macroscopic, NOS) - Larynx - Nerves + Recurrent laryngeal + Vagus nerve - Parathyroid - Pericapsular soft tissue/connective tissue - Sternocleidomastoid muscle - Strap muscle(s) + Omohyoid + Sternohyoid + Sternothyroid + Thyrohyoid - Subcutaneous soft tissue - Thyroid cartilage - Trachea - Tumor described as \"FIXED to adjacent tissues\"\n3: **Regional lymph node(s) involved only** - Level I + Level IA - Submental + Level IB - Submandibular (submaxillary), sublingual - Level II - Upper jugular + Jugulodigastric (subdigastric) + Upper deep cervical + Level IIA - Anterior + Level IIB - Posterior - Level III - Middle jugular + Middle deep cervical - Level IV - Lower jugular + Jugulo-omohyoid (supraomohyoid) + Lower deep c …",
+    "codes": {
+      "0": "**In situ: noninvasive, intraepithelial**",
+      "1": "**Localized only (localized, NOS)**\n- Confined to thyroid, NOS\n- Into thyroid capsule, but not beyond\n- Multiple foci confined to thyroid\n- Single invasive tumor confined to thyroid",
+      "2": "**Regional by direct extension only**\n- Blood vessel(s) (major)\n  + Carotid artery (encased)\n  + Jugular vein\n  + Thyroid artery or vein\n- Cricoid cartilage\n- Esophagus\n- Extrathyroidal extension (microscopic, macroscopic, NOS)\n- Larynx\n- Nerves\n  + Recurrent laryngeal\n  + Vagus nerve\n- Parathyroid\n- Pericapsular soft tissue/connective tissue\n- Sternocleidomastoid muscle \n- Strap muscle(s)\n  + Omohyoid\n  + Sternohyoid\n  + Sternothyroid\n  + Thyrohyoid\n- Subcutaneous soft tissue\n- Thyroid cartilage\n- Trachea\n- Tumor described as \"FIXED to adjacent tissues\"",
+      "3": "**Regional lymph node(s) involved only**\n- Level I\n    + Level IA - Submental\n    + Level IB - Submandibular (submaxillary), sublingual\n- Level II - Upper jugular  \n    + Jugulodigastric (subdigastric)\n    + Upper deep cervical        \n    + Level IIA - Anterior\n    + Level IIB - Posterior    \n- Level III - Middle jugular\n    + Middle deep cervical\n- Level IV - Lower jugular \n    + Jugulo-omohyoid (supraomohyoid)\n    + Lower deep cervical        \n    + Virchow node\n- Level V - Posterior triangle group\n    + Posterior cervical\n    + Level VA - Spinal accessory        \n    + Level VB - Transverse cervical, supraclavicular \n- Level VI - Anterior compartment group\n    + Laterotracheal\n    + Paralaryngeal\n    + Paratracheal - above suprasternal notch\n    + Perithyroidal\n    + Precricoid (Delphian)\n    + Prelaryngeal\n    + Pretracheal - above suprasternal notch\n    + Recurrent laryngeal\n- Level VII - Superior mediastinal group (for other mediastinal node(s) see code 7)\n    + Esophageal groove\n    + Paratracheal - below suprasternal notch\n    + Pretracheal - below suprasternal notch    \n- Other lymph nodes\n    + Cervical, NOS\n    + Deep cervical, NOS\n    + Facial\n        * Buccinator (buccal)\n        * Mandibular\n        * Nasolabial\n    + Internal jugular, NOS\n    + Parapharyngeal \n    + Parotid\n        * Infraauricular\n        * Intraparotid\n        * Periparotid\n        * Preauricular\n   + Retroauricular (mastoid)\n   + Retropharyngeal\n   + Suboccipital\n- Regional lymph node(s), NOS\n  + Lymph node(s), NOS",
+      "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+      "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n   + Gross extrathyroidal extension invading \n      * Bone\n      * Mediastinal tissues\n      * Prevertebral fascia\n      * Skeletal muscle, other than strap or sternocleidomastoid muscle \n- Distant lymph node(s), NOS\n- Distant metastasis, NOS\n  + Carcinomatosis \n  + Distant mets WITH or WITHOUT distant lymph node(s)",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:thyroid:ss2018_thyroid_33058:i11",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Thyroid",
+      "Summary Stage 2018: Thyroid"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_thyroid_33058.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C739"
+      ],
+      "histologies": [
+        "8000-8344",
+        "8350-8420",
+        "8440-8509",
+        "8514-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Thyroid**\n\n8000-8700, 8720-8790\n\nC739\nC739 Thyroid gland\n\n**Note 1:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 73 *Thyroid-Differentiated and Anaplastic Carcinoma*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n* Chapter 74 *Thyroid-Medullary*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other Summary Stage Chapters with Thyroid sites**\n* **GIST**: 8935-8936\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Soft Tissue**: 8710-8714, 8800-8934, 8940-9138, 9141-9582:\n\n**Note 3:** **Psammoma bodies** \n* Psammoma bodies are counted as positive regional lymph nodes",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:thyroid:grade_clinical_standard_94331:c12",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Thyroid",
+      "Grade Clinical - Standard"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_standard_94331.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C739"
+      ],
+      "histologies": [
+        "8000-8344",
+        "8350-8420",
+        "8440-8509",
+        "8514-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical - Standard (5 codes)\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\n9: Grade cannot be assessed; Unknown",
+    "codes": {
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "9": "Grade cannot be assessed; Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:thyroid:grade_clinical_standard_94331:i13",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Thyroid",
+      "Grade Clinical - Standard"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_standard_94331.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C739"
+      ],
+      "histologies": [
+        "8000-8344",
+        "8350-8420",
+        "8440-8509",
+        "8514-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Clinical must not be blank.\n\n**Note 2:** Assign the highest grade from the primary tumor assessed during the clinical time frame. \n\n**Note 3:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 4:** Code 9 (unknown) when \n* Grade from primary site is not documented\n* Clinical workup is not done (for example, cancer is an incidental finding during surgery for another condition)\n* Grade checked \"not applicable\" on CAP Protocol (if available) and no other grade information is available\n\n**Note 5:** If there is only one grade available and it cannot be determined if it is clinical or pathological, assume it is a Grade Clinical and code appropriately per Grade Clinical categories for that site, and then code unknown (9) for Grade Pathological, and blank for Grade Post Therapy Clin (yc) and Grade Post Therapy Path (yp).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:thyroid:grade_pathological_standard_94268:c14",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Thyroid",
+      "Grade Pathological - Standard"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_standard_94268.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C739"
+      ],
+      "histologies": [
+        "8000-8344",
+        "8350-8420",
+        "8440-8509",
+        "8514-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological - Standard (5 codes)\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\n9: Grade cannot be assessed; Unknown",
+    "codes": {
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "9": "Grade cannot be assessed; Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:thyroid:grade_pathological_standard_94268:i15",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Thyroid",
+      "Grade Pathological - Standard"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_standard_94268.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C739"
+      ],
+      "histologies": [
+        "8000-8344",
+        "8350-8420",
+        "8440-8509",
+        "8514-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Pathological must not be blank.\n\n**Note 2:** Assign the highest grade from the primary tumor.  \n\n**Note 3:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 4:** Use the grade from the **clinical work up** from the primary tumor in different scenarios based on behavior or surgical resection\n* **Behavior**\n  - Tumor behavior for the clinical and the pathological diagnoses are the same AND the clinical grade is the highest grade \n   - Tumor behavior for clinical diagnosis is invasive, and the tumor behavior for the pathological diagnosis is in situ\n* **Surgical Resection**\n   - Surgical resection is done of the primary tumor and there is no grade documented from the surgical resection\n    - Surgical resection is done of the primary tumor and there is no residual cancer\n* **No surgical resection**\n    - Surgical resection of the primary tumor has not been done, but there is positive microscopic confirmation of distant metastases during the clinical time frame\n\n**Note 5:** Code 9 (unknown) when \n* Grade from primary site is not documented\n* No resection of the primary site (see exception in Note 4, Surgical resection, last bullet)\n* Neo-adjuvant therapy is followed by a resection (see Grade Post Therapy Path (yp))\n* Grade checked “not applicable” on CAP Protocol (if available) and no other grade information is available\n* Clinical case only (see Grade Clinical)\n* There is only one grade available, and it cannot be determined if it is clinical, pathological, post therapy clinical or post therapy pathological",
+    "codes": null,
+    "notes": null
+  }
+]

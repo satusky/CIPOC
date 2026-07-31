@@ -1,0 +1,30 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:placenta:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Placenta",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/placenta.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C589"
+      ],
+      "histologies": [
+        "8000-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C589  Placenta\n\n**Note 1:** This schema is based on the UICC chapter *Gestational Trophoblastic Tumours,* pages 232-236.\n\n**Note 2:** This classification applies to choriocarcinoma (9100/3). Placental site tumors should be reported separately. Histologic confirmation is not required if the human chorionic gonadotropin (BhCG) level is abnormally elevated.\n\n**Note 3:** If a trophoblastic tumor is not associated with a pregnancy and arises in another site, such as ovary, use the primary site code and the appropriate TNM chapter.\n\n**Note 4:** In addition to directly assigning TNM, Summary Stage 2000 (SS2000) must be captured.  If directly assigning SS2000, use the *Placenta* chapter on page 222 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=222).",
+    "codes": null,
+    "notes": null
+  }
+]

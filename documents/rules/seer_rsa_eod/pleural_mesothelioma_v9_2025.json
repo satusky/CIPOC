@@ -1,0 +1,481 @@
+[
+  {
+    "rule_id": "seer_rsa_eod:pleural_mesothelioma_v9_2025:schema:i1",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Pleural Mesothelioma [V9: 2025+]",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/pleural_mesothelioma_v9_2025.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C340-C349",
+        "C384"
+      ],
+      "histologies": [
+        "9050-9053"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "9050-9053 \n\nC340 Main bronchus\nC341 Upper lobe, lung\nC342 Middle lobe, lung\nC343 Lower lobe, lung\nC348 Overlapping lesion of lung\nC349 Lung, NOS\nC384 Pleura\n\n**Note:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Diffuse Pleural Mesothelioma, from the AJCC Cancer Staging System Version 9 (2025). Used with permission of the American College of Surgeons, Chicago, Illinois.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:pleural_mesothelioma_v9_2025:behavior:c2",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Pleural Mesothelioma [V9: 2025+]",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "code_table",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C349",
+        "C384"
+      ],
+      "histologies": [
+        "9050-9053"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "Behavior ICD-O-3 (4 codes)\n0: Benign\n1: Uncertain Benign/Malig\n2: In Situ\n3: Malignant Primary",
+    "codes": {
+      "0": "Benign",
+      "1": "Uncertain Benign/Malig",
+      "2": "In Situ",
+      "3": "Malignant Primary"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:pleural_mesothelioma_v9_2025:behavior:i3",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Pleural Mesothelioma [V9: 2025+]",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C349",
+        "C384"
+      ],
+      "histologies": [
+        "9050-9053"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:pleural_mesothelioma_v9_2025:tumor_size_summary_full_15510:c4",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Pleural Mesothelioma [V9: 2025+]",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_full_15510.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C349",
+        "C384"
+      ],
+      "histologies": [
+        "9050-9053"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (7 codes)\n000: No mass/tumor found\n001: 1 mm or described as less than 1 mm\n002-988: Exact size in millimeters (2 mm to 988 mm)\n989: 989 millimeters or larger\n990: Microscopic focus or foci only and no size of focus is given\n998: Alternate descriptions of tumor size for specific sites: Familial/multiple polyposis: - Rectosigmoid and rectum (C19.9, C20.9) - Colon (C18.0, C18.2-C18.9) If no size is documented: Circumferential: - Esophagus (C15.0-C15.5, C15.8-C15.9) Diffuse; widespread: 3/4s or more; linitis plastica: - Stomach and Esophagus GE Junction (C16.0-C16.6, C16.8-C16.9) Diffuse, entire lung or NOS: - Lung and main stem bronchus (C34.0-C34.3, C34.8-C34.9) Diffuse: - Breast (C50.0-C50.6, C50.8-C50.9)\n999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm",
+      "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+      "989": "989 millimeters or larger",
+      "990": "Microscopic focus or foci only and no size of focus is given",
+      "998": "Alternate descriptions of tumor size for specific sites:\n\nFamilial/multiple polyposis:\n- Rectosigmoid and rectum (C19.9, C20.9)\n- Colon (C18.0, C18.2-C18.9)\n\nIf no size is documented:\nCircumferential:\n- Esophagus (C15.0-C15.5, C15.8-C15.9)\n\nDiffuse; widespread: 3/4s or more; linitis plastica:\n- Stomach and Esophagus GE Junction (C16.0-C16.6, C16.8-C16.9)\n\nDiffuse, entire lung or NOS:\n- Lung and main stem bronchus (C34.0-C34.3, C34.8-C34.9)\n\nDiffuse:\n- Breast (C50.0-C50.6, C50.8-C50.9)",
+      "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:pleural_mesothelioma_v9_2025:tumor_size_summary_full_15510:i5",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Pleural Mesothelioma [V9: 2025+]",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_full_15510.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C349",
+        "C384"
+      ],
+      "histologies": [
+        "9050-9053"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:pleural_mesothelioma_v9_2025:nodes_pos_fpa:c6",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Pleural Mesothelioma [V9: 2025+]",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C349",
+        "C384"
+      ],
+      "histologies": [
+        "9050-9053"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in medical record",
+    "codes": {
+      "00": "All nodes examined negative",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:pleural_mesothelioma_v9_2025:nodes_pos_fpa:i7",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Pleural Mesothelioma [V9: 2025+]",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C349",
+        "C384"
+      ],
+      "histologies": [
+        "9050-9053"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:pleural_mesothelioma_v9_2025:nodes_exam_76029:c8",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Pleural Mesothelioma [V9: 2025+]",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C349",
+        "C384"
+      ],
+      "histologies": [
+        "9050-9053"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (8 codes)\n00: No nodes examined\n01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)\n90: 90 or more nodes examined\n95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed\n96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated\n97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated\n98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown\n99: Unknown if nodes were examined; not applicable or negative Not documented in medical record",
+    "codes": {
+      "00": "No nodes examined",
+      "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+      "90": "90 or more nodes examined",
+      "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+      "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+      "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+      "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+      "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:pleural_mesothelioma_v9_2025:nodes_exam_76029:i9",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Pleural Mesothelioma [V9: 2025+]",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C349",
+        "C384"
+      ],
+      "histologies": [
+        "9050-9053"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:pleural_mesothelioma_v9_2025:ss2018_pleura_60930:c10",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Pleural Mesothelioma [V9: 2025+]",
+      "Summary Stage 2018: Pleural Mesothelioma"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_pleura_60930.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C349",
+        "C384"
+      ],
+      "histologies": [
+        "9050-9053"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018: Pleural Mesothelioma (7 codes)\n0: **In situ, intraepithelial, noninvasive**\n1: **Localized only (localized, NOS)** - Confined to pleura, NOS - Invasive tumor (mesothelioma) confined to pleura, NOS - Ipsilateral pleural (diaphragmatic, parietal, mediastinal, and viscera) involved WITHOUT involvement of fissure\n2: **Regional by direct extension only** Locally advanced, technically unresectable tumor Extension of/invasion to - Adjacent (connective) tissue, NOS - Chest wall - Confluent visceral pleural tumor (including any involvement of interlobar fissure) - Diaphragmatic muscle - Endothoracic fascia - Fissure - Lung parenchyma, or lung involvement, NOS - Mediastinal fat (mediastinal tissues) invasion - Nodule(s) beneath visceral pleural surface (ipsilateral pleura) - Pericardium (extension through the internal surface) (non-transmural, NOS) WITHOUT pericardial effusion - “Psum > 30 mm WITH or WITHOUT” involvement of adjacent sites (clinical evaluation only) - Pulmonary parenchyma (visceral pleural extension) - Rib\n3: **Regional lymph node(s) involved only** - Aortic (above diaphragm), NOS + Ascending aorta (phrenic) + Peri/para-aortic + Subaortic (aortico-pulmonar …",
+    "codes": {
+      "0": "**In situ, intraepithelial, noninvasive**",
+      "1": "**Localized only (localized, NOS)**\n- Confined to pleura, NOS\n- Invasive tumor (mesothelioma) confined to pleura, NOS \n- Ipsilateral pleural (diaphragmatic, parietal, mediastinal, and viscera) involved \nWITHOUT involvement of fissure",
+      "2": "**Regional by direct extension only**\n\nLocally advanced, technically unresectable tumor \n\nExtension of/invasion to\n- Adjacent (connective) tissue, NOS\n- Chest wall \n- Confluent visceral pleural tumor (including any involvement of interlobar fissure)\n- Diaphragmatic muscle\n- Endothoracic fascia\n- Fissure\n- Lung parenchyma, or lung involvement, NOS\n- Mediastinal fat (mediastinal tissues) invasion\n- Nodule(s) beneath visceral pleural surface (ipsilateral pleura)\n- Pericardium (extension through the internal surface) (non-transmural, NOS) WITHOUT pericardial effusion\n- “Psum > 30 mm WITH or WITHOUT” involvement of adjacent sites (clinical evaluation only)\n- Pulmonary parenchyma (visceral pleural extension)\n- Rib",
+      "3": "**Regional lymph node(s) involved only**\n- Aortic (above diaphragm), NOS\n  + Ascending aorta (phrenic)\n  + Peri/para-aortic\n  + Subaortic (aortico-pulmonary window)\n- Carinal (tracheobronchial) (tracheal bifurcation)\n- Hilar (ipsilateral)\n  + Bronchopulmonary\n  + Proximal lobar\n  + Pulmonary root\n- Intercostal\n- Internal mammary (parasternal)\n- Intrapulmonary\n  + Interlobar\n  + Lobar\n  + Segmental\n  + Subsegmental\n- Mediastinal, NOS (ipsilateral)\n  + Anterior\n  + Posterior (tracheoesophageal)\n- Pericardial\n- Peri/parabronchial\n- Peri/paraesophageal (below carina)\n- Peri/paratracheal (lower [azygos], upper, NOS)\n- Pretracheal and retrotracheal (precarinal), NOS\n- Prevascular\n- Pulmonary ligament\n- Subcardial\n- Subcarinal\n- Regional lymph node(s), NOS\n  + Lymph node(s), NOS",
+      "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+      "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n  + Brachial plexus\n  + Cervical (neck) tissues\n  + Contralateral lung\n  + Contralateral pleura (direct contiguous extension)\n  + Contralateral pleura/chest wall (discontinuous involvement)\n  + Heart muscle\n  + Intra-abdominal organs\n  - Mediastinal organs (direct contiguous extension or discontinuous involvement)\n    + Esophagus\n    - Great vessels\n    - Heart (muscle)\n    - Myocardium\n    - Spine\n    - Trachea\n  + Mesothelioma WITH malignant pleural fluid\n  + Pericardial effusion, malignant\n  + Pericardium WITH pericardial effusion\n  + Peritoneum (direct transdiaphragmatic extension of tumor)\n  + Peritoneum (discontinuous extension of tumor)\n  + Pleural effusion (see Note 2)\n - Distant lymph node(s), NOS\n    + Hilar (contralateral, bilateral)\n      * Bronchopulmonary\n      * Proximal lobar\n      * Pulmonary root\n   + Mediastinal (contralateral, bilateral)\n      * Anterior\n      * Posterior (tracheoesophageal)\n   + Peridiaphragmatic (ipsilateral, contralateral)\n     * Mediastinal\n   + Scalene (ipsilateral, contralateral) \n     * Inferior deep cervical\n   + Supraclavicular (ipsilateral or contralateral)\n     * Transverse cervical\n- Distant metastasis, NOS\n  + Carcinomatosis\n  + Distant metastasis WITH or WITHOUT distant lymph node(s)",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:pleural_mesothelioma_v9_2025:ss2018_pleura_60930:i11",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Pleural Mesothelioma [V9: 2025+]",
+      "Summary Stage 2018: Pleural Mesothelioma"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_pleura_60930.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C349",
+        "C384"
+      ],
+      "histologies": [
+        "9050-9053"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Pleural Mesothelioma**\n\n9050-9053 \n\nC340-C343, C348-C349, C384\nC340 Main bronchus\nC341 Upper lobe, lung\nC342 Middle lobe, lung\nC343 Lower lobe, lung\nC348 Overlapping lesion of lung\nC349 Lung, NOS\nC384 Pleura\n\n**Note 1:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 37 *Malignant Pleural Mesothelioma*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Pleural effusions** \n* Most pleural effusions are due to tumor. When the cytopathological examinations of pleural fluid are negative for tumor, the effusion should be excluded as a staging element and the tumor should not be classified as metastasis.\n   * The physician statement of pleural effusion can be used to code this data item\n* If the physician feels the pleural effusion is due to tumor, despite negative cytology, the physician's assessment can be used.\n  * If pleural fluid cytology is described as suspicious/suspicious for mesothelioma, code 7",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:pleural_mesothelioma_v9_2025:grade_clinical_v9_88505:c12",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Pleural Mesothelioma [V9: 2025+]",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_v9_88505.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C349",
+        "C384"
+      ],
+      "histologies": [
+        "9050-9053"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (3 codes)\nL: Nuclear Grade I WITH or WITHOUT necrosis OR Nuclear Grade II WITHOUT necrosis\nH: Nuclear Grade II WITH necrosis OR Nuclear Grade III WITH or WITHOUT necrosis\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "L": "Nuclear Grade I WITH or WITHOUT necrosis OR\nNuclear Grade II WITHOUT necrosis",
+      "H": "Nuclear Grade II WITH necrosis OR\nNuclear Grade III WITH or WITHOUT necrosis",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:pleural_mesothelioma_v9_2025:grade_clinical_v9_88505:i13",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Pleural Mesothelioma [V9: 2025+]",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_v9_88505.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C349",
+        "C384"
+      ],
+      "histologies": [
+        "9050-9053"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Clinical must not be blank. \n\n**Note 2:** Assign the highest grade from the primary tumor assessed during the clinical time frame. \n\n**Note 3:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 4:** Code 9 (unknown) when\n* Grade from primary site is not documented\n* Clinical workup is not done (for example, cancer is an incidental finding during surgery for another condition)\n* Grade checked \"not applicable\" on CAP Protocol (if available) and no other grade information is available\n\n**Note 5:** If there is only one grade available and it cannot be determined if it is clinical or pathological, assume it is a Grade Clinical and code appropriately per Grade Clinical categories for that site, and then code unknown (9) for Grade Pathological, and blank for Grade Post Therapy Clin (yc) and Grade Post Therapy Path (yp).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:pleural_mesothelioma_v9_2025:grade_pathological_v9_76065:c14",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Pleural Mesothelioma [V9: 2025+]",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_v9_76065.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C349",
+        "C384"
+      ],
+      "histologies": [
+        "9050-9053"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (3 codes)\nL: Nuclear Grade I WITH or WITHOUT necrosis OR Nuclear Grade II WITHOUT necrosis\nH: Nuclear Grade II WITH necrosis OR Nuclear Grade III WITH or WITHOUT necrosis\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "L": "Nuclear Grade I WITH or WITHOUT necrosis OR\nNuclear Grade II WITHOUT necrosis",
+      "H": "Nuclear Grade II WITH necrosis OR\nNuclear Grade III WITH or WITHOUT necrosis",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:pleural_mesothelioma_v9_2025:grade_pathological_v9_76065:i15",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Pleural Mesothelioma [V9: 2025+]",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_v9_76065.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C349",
+        "C384"
+      ],
+      "histologies": [
+        "9050-9053"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Pathological must not be blank.\n\n**Note 2:** There is a preferred grading system for this schema. If the clinical grade given uses the preferred grading system and the pathological grade does not use the preferred grading system, do not record the Grade Clinical in the Grade Pathological field. Assign Grade Pathological 9. \n* *Example:* Biopsy of pleura shows a Nuclear Grade 2 with necrosis mesothelioma. The surgical resection states a moderately differentiated mesothelioma. \n    * Code Grade Clinical as H since “Nuclear Grade 2 with necrosis” is the preferred grading system\n    * Code Grade Pathological as 9 (unknown)\n\n**Note 3:** Assign the highest grade from the primary tumor.  \n\n**Note 4:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 5:** Use the grade from the **clinical work up** from the primary tumor in different scenarios based on behavior or surgical resection\n* **Behavior**\n  - Tumor behavior for the clinical and the pathological diagnoses are the same AND the clinical grade is the highest grade \n   - Tumor behavior for clinical diagnosis is invasive, and the tumor behavior for the pathological diagnosis is in situ\n* **Surgical Resection**\n   - Surgical resection is done of the primary tumor and there is no grade documented from the surgical resection\n    - Surgical resection is done of the primary tumor and there is no residual cancer\n* **No Surgical Resection**\n    - Surgical resection of the primary tumor has not been done, but there is positive microscopic confirmation of distant metastases during the clinical time frame\n\n**Note 6:** Code 9 (unknown) when\n* Grade from primary site is not documented\n* No resection of the primary site (see exception in Note 6, Surgical resection, last bullet)\n* Neo-adjuvant therapy is followed by a resection (see Grade Post Therapy Path (yp))\n* Grade checked “not applicable” on CAP Protocol (if available) and no other grade information is available\n* Clinical case only (see Grade Clinical)\n* There is only one grade available, and it cannot be determined if it is clinical, pathological, post therapy clinical or post therapy pathological",
+    "codes": null,
+    "notes": null
+  }
+]

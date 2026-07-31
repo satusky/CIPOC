@@ -1,0 +1,30 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:middle_ear:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Middle Ear",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/middle_ear.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C301"
+      ],
+      "histologies": [
+        "8000-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C301  Middle ear\n\n**Note 1:**  Laterality must be coded for this site.\n\n**Note 2:** TNM is not defined for this schema. If directly assigning Summary Stage 2000 (SS2000), use the *Nasal Cavity and Middle Ear* chapter on page 126 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=126).",
+    "codes": null,
+    "notes": null
+  }
+]

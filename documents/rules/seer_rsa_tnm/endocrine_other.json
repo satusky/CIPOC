@@ -1,0 +1,33 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:endocrine_other:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Thymus and Other Endocrine Glands (excluding Adrenal Gland, Pituitary Gland, Craniopharyngeal Duct, and Pineal Gland",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/endocrine_other.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C379",
+        "C750",
+        "C754-C755",
+        "C758-C759"
+      ],
+      "histologies": [
+        "8000-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C379  Thymus\nC750  Parathyroid gland\nC754  Carotid body\nC755  Aortic body and other paraganglia\nC758  Overlapping lesion of endocrine glands and related structures\nC759  Endocrine gland, NOS\n\n**Note 1:**  Laterality must be coded for C754.\n\n**Note 2:** TNM is not defined for this schema. If directly assigning Summary Stage 2000 (SS2000), use the *Thymus, Adrenal (Suprarenal) Gland and Other Endocrine Glands* chapter on page 278 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=278).",
+    "codes": null,
+    "notes": null
+  }
+]

@@ -1,0 +1,511 @@
+[
+  {
+    "rule_id": "seer_rsa_eod:lymphoma_ocular_adnexa:schema:i1",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lymphoma Ocular Adnexa",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/lymphoma_ocular_adnexa.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C441",
+        "C690",
+        "C695-C696"
+      ],
+      "histologies": [
+        "9590-9699",
+        "9702-9719",
+        "9725-9726",
+        "9734-9738",
+        "9823",
+        "9826-9827",
+        "9930"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "9590-9699, 9702-9719, 9725-9726, 9734-9738, 9823, 9826-9827, 9930 (C441, C690, C695-C696)\n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 71 *Ocular Adnexal Lymphoma*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Origination of Ocular Adnexal Lymphomas** \n* Ocular adnexal lymphomas (OAL) originate in conjunctiva, eyelids, lacrimal gland, lacrimal drainage apparatus, and other orbital tissues surrounding the eye. This schema should not be used for secondary lymphomatous involvement of ocular adnexa or for intraocular lymphomas.\n\n**Note 3:** **The preferred histology terms in this schema are based on the 2024 WHO Classification of Tumours, Haematolymphoid Tumours, 5th edition.**\n\n* 9590: Malignant lymphoma, NOS\n* 9591: Malignant lymphoma, non-Hodgkin, NOS\n* 9596: Mediastinal grey zone lymphoma (MGZL)\n* 9597: Primary cutaneous follicle centre lymphoma (PCFCL)\n* 9650: Classic Hodgkin lymphoma (CHL), NOS\n* 9651: Classic Hodgkin lymphoma, lymphocyte-rich (LR-cHL)\n* 9652: Classic Hodgkin lymphoma, mixed cellularity (MC-cHL)\n* 9653: Classic Hodgkin lymphoma, lymphocyte-depleted, NOS (LD-cHL)\n* 9659: Nodular lymphocyte predominant Hodgkin lymphoma (NLPHL)\n* 9663: Classic Hodgkin lymphoma, nodular sclerosis, NOS (NSCHL) \n* 9673: Mantle cell lymphoma (MCL)\n* 9678: Primary effusion lymphoma (PEL)\n* 9679: Primary mediastinal large B-cell lymphoma (PBML/PMBCL)\n* 9680: Diffuse large B-cell lymphoma (DLBCL)\n* 9687: Burkitt lymphoma (BL), NOS\n* 9688: T-cell/histiocyte-rich large B-cell lymphoma (THRLBCL)\n* 9689: Splenic marginal zone lymphoma (SMZL)\n* 9690 Follicular lymphoma (FL), NOS (except C700-C729, C751-C753 for 1/1/2023+)\n* 9691: Follicular lymphoma, grade 2\n* 9695: Follicular lymphoma, grade 1\n* 9698: Follicular lymphoma, grade 3\n* 9699: Extranodal marginal zone lymphoma of mucosa-associated lymphoid tissue (MALT lymphoma)\n* 9702: Peripheral T-cell lymphoma, NOS\n* 9705: Nodal T follicular helper cell lymphoma, angioimmunoblastic type\n* 9708: Subcutaneous panniculitis-like T-cell lymphoma (SPTCL)\n* 9709: Primary cutaneous peripheral T-cell lymphomas (pcCTCL)\n* 9712: Intravascular large B-cell lymphoma (IVLBCL)\n* 9714: Anaplastic large cell lymphoma, ALK-positive (ALCL)\n* 9715: Anaplastic large cell lymphoma, ALK-negative (ALK-ALCL) (2021+ only)\n* 9716: Hepatosplenic T-cell lymphoma (HSTCL)\n* 9717: Intestinal T-cell lymphoma, NOS (ITCL-NOS)\n* 9718: Primary cutaneous anaplastic large cell lymphoma (C-ALCL)\n* 9719: Extranodal NK/T-cell lymphoma (ENKTL) (except C700-C729, C751-C753 for 1/1/2023+)\n* 9725: Hydroa vacciniforme-like lymphoma (2018-2020 only, nonreportable as of 2021)\n* 9726 Primary cutaneous gamma-delta T-cell lymphoma (PCGD-TCL) (2018-2020 only, see code 9687/3 for 2021+)\n* 9734: Extramedullary plasmacytoma (EMP)\n* 9735: Plasmablastic lymphoma (PBL)\n* 9737: ALK-positive large B-cell lymphoma (ALK+LBCL)\n* 9738: KSHV/HHV8-positive diffuse large B-cell lymphoma \n* 9823: Chronic lymphocytic leukemia/small lymphocytic lymphoma (CLL/SLL)\n* 9826: Burkitt cell leukemia (2018-2020 only, see code 9687/3 for 2021+)\n* 9827: Adult T-cell leukemia/lymphoma (ATLL)\n* 9930: Myeloid Sarcoma",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lymphoma_ocular_adnexa:tumor_size_summary_63115:c2",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lymphoma Ocular Adnexa",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_63115.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C441",
+        "C690",
+        "C695-C696"
+      ],
+      "histologies": [
+        "9590-9699",
+        "9702-9719",
+        "9725-9726",
+        "9734-9738",
+        "9823",
+        "9826-9827",
+        "9930"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (6 codes)\n000: No mass/tumor found\n001: 1 mm or described as less than 1 mm\n002-988: Exact size in millimeters (2 mm to 988 mm)\n989: 989 millimeters or larger\n990: Microscopic focus or foci only and no size of focus is given\n999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm",
+      "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+      "989": "989 millimeters or larger",
+      "990": "Microscopic focus or foci only and no size of focus is given",
+      "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lymphoma_ocular_adnexa:tumor_size_summary_63115:i3",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lymphoma Ocular Adnexa",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_63115.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C441",
+        "C690",
+        "C695-C696"
+      ],
+      "histologies": [
+        "9590-9699",
+        "9702-9719",
+        "9725-9726",
+        "9734-9738",
+        "9823",
+        "9826-9827",
+        "9930"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lymphoma_ocular_adnexa:nodes_pos_fpa:c4",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lymphoma Ocular Adnexa",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C441",
+        "C690",
+        "C695-C696"
+      ],
+      "histologies": [
+        "9590-9699",
+        "9702-9719",
+        "9725-9726",
+        "9734-9738",
+        "9823",
+        "9826-9827",
+        "9930"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in medical record",
+    "codes": {
+      "00": "All nodes examined negative",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lymphoma_ocular_adnexa:nodes_pos_fpa:i5",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lymphoma Ocular Adnexa",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C441",
+        "C690",
+        "C695-C696"
+      ],
+      "histologies": [
+        "9590-9699",
+        "9702-9719",
+        "9725-9726",
+        "9734-9738",
+        "9823",
+        "9826-9827",
+        "9930"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lymphoma_ocular_adnexa:nodes_exam_76029:c6",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lymphoma Ocular Adnexa",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C441",
+        "C690",
+        "C695-C696"
+      ],
+      "histologies": [
+        "9590-9699",
+        "9702-9719",
+        "9725-9726",
+        "9734-9738",
+        "9823",
+        "9826-9827",
+        "9930"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (8 codes)\n00: No nodes examined\n01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)\n90: 90 or more nodes examined\n95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed\n96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated\n97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated\n98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown\n99: Unknown if nodes were examined; not applicable or negative Not documented in medical record",
+    "codes": {
+      "00": "No nodes examined",
+      "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+      "90": "90 or more nodes examined",
+      "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+      "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+      "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+      "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+      "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lymphoma_ocular_adnexa:nodes_exam_76029:i7",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lymphoma Ocular Adnexa",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C441",
+        "C690",
+        "C695-C696"
+      ],
+      "histologies": [
+        "9590-9699",
+        "9702-9719",
+        "9725-9726",
+        "9734-9738",
+        "9823",
+        "9826-9827",
+        "9930"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lymphoma_ocular_adnexa:ss2018_lymphoma_ocular_adnexa_3583:c8",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lymphoma Ocular Adnexa",
+      "Summary Stage 2018: Lymphoma Ocular Adnexa"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_lymphoma_ocular_adnexa_3583.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C441",
+        "C690",
+        "C695-C696"
+      ],
+      "histologies": [
+        "9590-9699",
+        "9702-9719",
+        "9725-9726",
+        "9734-9738",
+        "9823",
+        "9826-9827",
+        "9930"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018: Lymphoma Ocular Adnexa (6 codes)\n1: **Localized only (localized, NOS)** - Lymphoma involving the conjunctiva alone WITHOUT or UNKNOWN eyelid or orbital involvement - Lymphoma with orbital involvement WITH or WITHOUT conjunctival involvement - Lymphoma with preseptal eyelid involvement WITH or WITHOUT orbital or conjunctival involvement\n2: **Regional by direct extension only** - Orbital adnexal lymphoma AND extraorbital lymphoma extending beyond the orbit to adjacent structures + Bone + Brain + Maxillofacial sinuses\n3: **Regional lymph node(s) involved only** - Cervical - Parotid - Preauricular - Regions draining the ocular adnexal structures - Submandibular - Regional lymph node(s), NOS + Lymph node(s), NOS\n4: **Regional by BOTH direct extension AND regional lymph node(s) involved** Codes (2) + (3)\n7: **Distant site(s)/lymph node(s) involved** - Distant sites + Non-contiguous involvement of other extranodal sites including, but not limited to * Breast * Gastrointestinal tract * Kidney * Liver * Lung * Parotid gland * Salivary gland * Spleen * Submandibular gland - Distant lymph node(s), NOS + Diffuse OR disseminated involvement of peripheral and central lymph no …",
+    "codes": {
+      "1": "**Localized only (localized, NOS)**\n- Lymphoma involving the conjunctiva alone WITHOUT or UNKNOWN eyelid or orbital involvement\n- Lymphoma with orbital involvement WITH or WITHOUT conjunctival involvement\n- Lymphoma with preseptal eyelid involvement WITH or WITHOUT orbital or conjunctival involvement",
+      "2": "**Regional by direct extension only**\n- Orbital adnexal lymphoma AND extraorbital lymphoma extending beyond the orbit to adjacent structures\n   + Bone \n   + Brain\n   + Maxillofacial sinuses",
+      "3": "**Regional lymph node(s) involved only** \n- Cervical\n- Parotid\n- Preauricular\n- Regions draining the ocular adnexal structures\n- Submandibular\n- Regional lymph node(s), NOS\n  + Lymph node(s), NOS",
+      "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n\nCodes (2) + (3)",
+      "7": "**Distant site(s)/lymph node(s) involved**\n- Distant sites\n  + Non-contiguous involvement of other extranodal sites including, but not limited to\n     * Breast\n     * Gastrointestinal tract\n     * Kidney\n     * Liver\n     * Lung\n     * Parotid gland\n     * Salivary gland\n     * Spleen\n     * Submandibular gland\n- Distant lymph node(s), NOS\n  + Diffuse OR disseminated involvement of peripheral and central lymph node regions\n  + Mediastinum\n- Distant metastasis, NOS\n  + Blood/peripheral blood\n  + Bone marrow\n  + Distant metastasis WITH or WITHOUT distant lymph node(s)",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lymphoma_ocular_adnexa:ss2018_lymphoma_ocular_adnexa_3583:i9",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lymphoma Ocular Adnexa",
+      "Summary Stage 2018: Lymphoma Ocular Adnexa"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_lymphoma_ocular_adnexa_3583.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C441",
+        "C690",
+        "C695-C696"
+      ],
+      "histologies": [
+        "9590-9699",
+        "9702-9719",
+        "9725-9726",
+        "9734-9738",
+        "9823",
+        "9826-9827",
+        "9930"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Lymphoma Ocular Adnexa**\n\n9590-9699, 9702-9719, 9725-9726, 9734-9738, 9823, 9826-9827, 9930 (C441, C690, C695-C696)\n\n**Note 1:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 71 *Ocular Adnexal Lymphoma*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Not applicable codes** \n* Code 0 is not applicable for this chapter.\n\n**Note 3:** **Ocular adnexal lymphomas** \n* Ocular adnexal lymphomas (OAL) originate in conjunctiva, eyelids, lacrimal gland, lacrimal drainage apparatus, and other orbital tissues surrounding the eye. \n* This chapter should not be used for secondary lymphomatous involvement of ocular adnexa or for intraocular lymphomas.\n\n**Note 4:** **Peripheral blood or bone marrow involvement** \n* If there is peripheral blood or bone marrow involvement, code 7.\n\n**Note 5:** **The preferred histology terms in this schema are based on the 2024 WHO Classification of Tumours, Haematolymphoid Tumours, 5th edition.**\n\n* 9590: Malignant lymphoma, NOS\n* 9591: Malignant lymphoma, non-Hodgkin, NOS\n* 9596: Mediastinal grey zone lymphoma (MGZL)\n* 9597: Primary cutaneous follicle centre lymphoma (PCFCL)\n* 9650: Classic Hodgkin lymphoma (CHL), NOS\n* 9651: Classic Hodgkin lymphoma, lymphocyte-rich (LR-cHL)\n* 9652: Classic Hodgkin lymphoma, mixed cellularity (MC-cHL)\n* 9653: Classic Hodgkin lymphoma, lymphocyte-depleted, NOS (LD-cHL)\n* 9659: Nodular lymphocyte predominant Hodgkin lymphoma (NLPHL)\n* 9663: Classic Hodgkin lymphoma, nodular sclerosis, NOS (NSCHL) \n* 9673: Mantle cell lymphoma (MCL)\n* 9678: Primary effusion lymphoma (PEL)\n* 9679: Primary mediastinal large B-cell lymphoma (PBML/PMBCL)\n* 9680: Diffuse large B-cell lymphoma (DLBCL)\n* 9687: Burkitt lymphoma (BL), NOS\n* 9688: T-cell/histiocyte-rich large B-cell lymphoma (THRLBCL)\n* 9689: Splenic marginal zone lymphoma (SMZL)\n* 9690 Follicular lymphoma (FL), NOS (except C700-C729, C751-C753 for 1/1/2023+)\n* 9691: Follicular lymphoma, grade 2\n* 9695: Follicular lymphoma, grade 1\n* 9698: Follicular lymphoma, grade 3\n* 9699: Extranodal marginal zone lymphoma of mucosa-associated lymphoid tissue (MALT lymphoma)\n* 9702: Peripheral T-cell lymphoma, NOS\n* 9705: Nodal T follicular helper cell lymphoma, angioimmunoblastic type\n* 9708: Subcutaneous panniculitis-like T-cell lymphoma (SPTCL)\n* 9709: Primary cutaneous peripheral T-cell lymphomas (pcCTCL)\n* 9712: Intravascular large B-cell lymphoma (IVLBCL)\n* 9714: Anaplastic large cell lymphoma, ALK-positive (ALCL)\n* 9715: Anaplastic large cell lymphoma, ALK-negative (ALK-ALCL) (2021+ only)\n* 9716: Hepatosplenic T-cell lymphoma (HSTCL)\n* 9717: Intestinal T-cell lymphoma, NOS (ITCL-NOS)\n* 9718: Primary cutaneous anaplastic large cell lymphoma (C-ALCL)\n* 9719: Extranodal NK/T-cell lymphoma (ENKTL) (except C700-C729, C751-C753 for 1/1/2023+)\n* 9725: Hydroa vacciniforme-like lymphoma (2018-2020 only, nonreportable as of 2021)\n* 9726 Primary cutaneous gamma-delta T-cell lymphoma (PCGD-TCL) (2018-2020 only, see code 9687/3 for 2021+)\n* 9734: Extramedullary plasmacytoma (EMP)\n* 9735: Plasmablastic lymphoma (PBL)\n* 9737: ALK-positive large B-cell lymphoma (ALK+LBCL)\n* 9738: KSHV/HHV8-positive diffuse large B-cell lymphoma \n* 9823: Chronic lymphocytic leukemia/small lymphocytic lymphoma (CLL/SLL)\n* 9826: Burkitt cell leukemia (2018-2020 only, see code 9687/3 for 2021+)\n* 9827: Adult T-cell leukemia/lymphoma (ATLL)\n* 9930: Myeloid Sarcoma",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lymphoma_ocular_adnexa:grade_clinical_19087:c10",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lymphoma Ocular Adnexa",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_19087.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C441",
+        "C690",
+        "C695-C696"
+      ],
+      "histologies": [
+        "9590-9699",
+        "9702-9719",
+        "9725-9726",
+        "9734-9738",
+        "9823",
+        "9826-9827",
+        "9930"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (5 codes)\n1: G1: 0-5 centroblasts per 10 HPF\n2: G2: 6-15 centroblasts per 10 HPF\n3: G3: More than 15 centroblasts per 10 HPF but with admixed centrocytes\n4: G4: More than 15 centroblasts per 10 HPF but without centrocytes\n9: Grade cannot be assessed (GX); Unknown Not a follicular histology (9690/3, 9691/3, 9695/3, 9698/3)",
+    "codes": {
+      "1": "G1: 0-5 centroblasts per 10 HPF",
+      "2": "G2: 6-15 centroblasts per 10 HPF",
+      "3": "G3: More than 15 centroblasts per 10 HPF but with admixed centrocytes",
+      "4": "G4: More than 15 centroblasts per 10 HPF but without centrocytes",
+      "9": "Grade cannot be assessed (GX); Unknown \nNot a follicular histology (9690/3, 9691/3, 9695/3, 9698/3)"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lymphoma_ocular_adnexa:grade_clinical_19087:i11",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lymphoma Ocular Adnexa",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_19087.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C441",
+        "C690",
+        "C695-C696"
+      ],
+      "histologies": [
+        "9590-9699",
+        "9702-9719",
+        "9725-9726",
+        "9734-9738",
+        "9823",
+        "9826-9827",
+        "9930"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade is applicable for the follicular lymphomas only (9690/3, 9691/3, 9695/3, 9698/3).  For all other lymphoma histologies, code 9.\n\n**Note 2:** Grade Clinical must not be blank.\n\n**Note 3:** Assign the highest grade from the primary tumor assessed during the clinical time frame. \n\n**Note 4:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 5:** Follicular lymphoma grade is based on the absolute number of centroblasts per high-power (40 x objective, 0.159 square mm) microscopic field (HPF).\n\n**Note 6:** Code 9 (unknown) when \n* Grade from primary site is not documented. \n* Clinical workup is not done (for example, cancer is an incidental finding during surgery for another condition). \n* Grade checked \"not applicable\" on CAP Protocol (if available) and no other grade information is available. \n\n**Note 7:** If there is only one grade available and it cannot be determined if it is clinical or pathological, assume it is a Grade Clinical and code appropriately per Grade Clinical categories for that site, and then code unknown (9) for Grade Pathological, and blank for Grade Post Therapy Clin (yc) and Grade Post Therapy Path (yp).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lymphoma_ocular_adnexa:grade_pathological_49403:c12",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lymphoma Ocular Adnexa",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_49403.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C441",
+        "C690",
+        "C695-C696"
+      ],
+      "histologies": [
+        "9590-9699",
+        "9702-9719",
+        "9725-9726",
+        "9734-9738",
+        "9823",
+        "9826-9827",
+        "9930"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (5 codes)\n1: G1: 0-5 centroblasts per 10 HPF\n2: G2: 6-15 centroblasts per 10 HPF\n3: G3: More than 15 centroblasts per 10 HPF but with admixed centrocytes\n4: G4: More than 15 centroblasts per 10 HPF but without centrocytes\n9: Grade cannot be assessed (GX); Unknown Not a follicular histology (9690/3, 9691/3, 9695/3, 9698/3)",
+    "codes": {
+      "1": "G1: 0-5 centroblasts per 10 HPF",
+      "2": "G2: 6-15 centroblasts per 10 HPF",
+      "3": "G3: More than 15 centroblasts per 10 HPF but with admixed centrocytes",
+      "4": "G4: More than 15 centroblasts per 10 HPF but without centrocytes",
+      "9": "Grade cannot be assessed (GX); Unknown \nNot a follicular histology (9690/3, 9691/3, 9695/3, 9698/3)"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lymphoma_ocular_adnexa:grade_pathological_49403:i13",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lymphoma Ocular Adnexa",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_49403.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C441",
+        "C690",
+        "C695-C696"
+      ],
+      "histologies": [
+        "9590-9699",
+        "9702-9719",
+        "9725-9726",
+        "9734-9738",
+        "9823",
+        "9826-9827",
+        "9930"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade is applicable for the follicular lymphomas only (9690/3, 9691/3, 9695/3, 9698/3).  For all other lymphoma histologies, code 9.\n\n**Note 2:** Grade Pathological must not be blank.\n\n**Note 3:** There is a preferred grading system for this schema. If the clinical grade given uses the preferred grading system and the pathological grade does not use the preferred grading system, do not record the Grade Clinical in the Grade Pathological field. Assign Grade Pathological 9.\n* *Example:* Biopsy of eye shows a follicular lymphoma, G3. The surgical resection states a low-grade follicular lymphoma.\n    - Code Grade Clinical as 3 since G3 is the preferred grading system.\n    - Code Grade Pathological as 9 since the preferred grading system was not used and the Generic Grade Categories do not apply to this grade table.\n\n**Note 4:** Assign the highest grade from the primary tumor.  \n\n**Note 5:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 6:** Follicular lymphoma grade is based on the absolute number of centroblasts per high-power (40 x objective, 0.159 square mm) microscopic field (HPF).\n\n**Note 7:** Use the grade from the **clinical work up** from the primary tumor in different scenarios based on behavior or surgical resection\n* **Behavior**\n  - Tumor behavior for the clinical and the pathological diagnoses are the same AND the clinical grade is the highest grade. \n   - Tumor behavior for clinical diagnosis is invasive, and the tumor behavior for the pathological diagnosis is in situ.\n* **Surgical Resection**\n   - Surgical resection is done of the primary tumor and there is no grade documented from the surgical resection.\n    - Surgical resection is done of the primary tumor and there is no residual cancer.\n* **No surgical resection**\n    - Surgical resection of the primary tumor has not been done, but there is positive microscopic confirmation of distant metastases during the clinical time frame.\n\n**Note 8:** Code 9 (unknown) when \n* Grade from primary site is not documented.\n* No resection of the primary site (see exception in Note 7, Surgical resection, last bullet).\n* Neo-adjuvant therapy is followed by a resection (see Grade Post Therapy Path (yp)).\n* Grade checked “not applicable” on CAP Protocol (if available) and no other grade information is available.\n* Clinical case only (see Grade Clinical).\n* There is only one grade available, and it cannot be determined if it is clinical, pathological, post therapy clinical or post therapy pathological.",
+    "codes": null,
+    "notes": null
+  }
+]

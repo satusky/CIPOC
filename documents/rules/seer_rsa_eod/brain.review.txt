@@ -1,0 +1,62 @@
+========================================================================
+SEER*RSA STAGING INGEST REVIEW REPORT
+========================================================================
+Schema: brain
+Source: https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/eod_public-3.3.zip
+Units emitted: 30  |  accepted: 30  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     14
+  instruction    16
+
+Accepted units by NAACCR item:
+     523 4
+     756 4
+     764 4
+     820 4
+     830 4
+    3843 4
+    3844 4
+
+Applicability predicates carried by this schema's units (2):
+  {'sites': ['C700', 'C710-C719'], 'histologies': ['8000-8700', '8720-8790', '8802', '8810', '8815', '8850', '8890', '8900', '9064', '9070-9071', '9080', '9084-9085', '9100-9105', '9120', '9133', '9140', '9180', '9220', '9362', '9364', '9380-9540', '9680', '9699', '9702-9715', '9751-9759'], 'dx_date_min': '2018-01-01', 'dx_date_max': '2022-12-31'}
+  {'sites': ['C700', 'C710-C719'], 'histologies': ['8710-8714', '8800-8801', '8803-8806', '8811-8814', '8816-8818', '8820-8842', '8851-8881', '8891-8898', '8901-9063', '9065', '9072-9073', '9081-9083', '9086-9091', '9110-9111', '9121-9132', '9135-9138', '9141-9175', '9181-9213', '9221-9361', '9363', '9365-9373', '9541-9582', '9590-9679', '9687-9698', '9700-9701', '9716-9742', '9749', '9761-9993'], 'behaviors': ['0', '1'], 'dx_date_min': '2018-01-01', 'dx_date_max': '2022-12-31'}
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED CODE TABLES (up to 4 of 14)
+------------------------------------------------------------------------
+
+[seer_rsa_eod:brain:behavior:c3]  items=[523]  anchor=eod_public-3.3:tables/behavior.json
+  Brain [8th: 2018-2022] > Behavior ICD-O-3
+0: Benign
+1: Uncertain Benign/Malig
+2: In Situ
+3: Malignant Primary
+
+[seer_rsa_eod:brain:tumor_size_summary_63115:c8]  items=[756]  anchor=eod_public-3.3:tables/tumor_size_summary_63115.json
+  Brain [8th: 2018-2022] > Tumor Size Summary
+000: No mass/tumor found
+001: 1 mm or described as less than 1 mm
+002-988: Exact size in millimeters (2 mm to 988 mm)
+989: 989 millimeters or larger
+990: Microscopic focus or foci only and no size of focus is given
+999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable
+
+[seer_rsa_eod:brain:nodes_exam_dna_95635:c15]  items=[830]  anchor=eod_public-3.3:tables/nodes_exam_dna_95635.json
+  Brain [8th: 2018-2022] > Regional Nodes Examined
+99: Not applicable
+
+[seer_rsa_eod:brain:ss2018_brain_67865:c20]  items=[764]  anchor=eod_public-3.3:tables/ss2018_brain_67865.json
+  Brain [8th: 2018-2022] > Summary Stage 2018: Brain
+1: **Localized only (localized, NOS)** - Confined to brain, NOS - Confined to meninges, NOS - Confined to …
+2: **Regional by direct extension only** Tumor crosses the midline * All sites - Bone (skull) - …
+7: **Distant site(s)/lymph node(s) involved** - Distant site(s) (including further contiguous extension) + …
+8: **Benign or borderline brain** * Behavior is /0 or /1
+9: Unknown if extension or metastasis
+
+========================================================================

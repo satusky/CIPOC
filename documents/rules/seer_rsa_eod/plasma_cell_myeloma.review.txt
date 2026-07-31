@@ -1,0 +1,56 @@
+========================================================================
+SEER*RSA STAGING INGEST REVIEW REPORT
+========================================================================
+Schema: plasma_cell_myeloma
+Source: https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/eod_public-3.3.zip
+Units emitted: 30  |  accepted: 30  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     14
+  instruction    16
+
+Accepted units by NAACCR item:
+     523 4
+     756 4
+     764 4
+     820 4
+     830 4
+    3843 4
+    3844 4
+
+Applicability predicates carried by this schema's units (2):
+  {'sites': ['C000-C699', 'C739-C750', 'C754-C809'], 'histologies': ['9732'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C700-C729', 'C751-C753'], 'histologies': ['9732'], 'behaviors': ['3'], 'dx_date_min': '2018-01-01'}
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED CODE TABLES (up to 4 of 14)
+------------------------------------------------------------------------
+
+[seer_rsa_eod:plasma_cell_myeloma:behavior:c3]  items=[523]  anchor=eod_public-3.3:tables/behavior.json
+  Plasma Cell Myeloma > Behavior ICD-O-3
+0: Benign
+1: Uncertain Benign/Malig
+2: In Situ
+3: Malignant Primary
+
+[seer_rsa_eod:plasma_cell_myeloma:tumor_size_summary_dna_13275:c8]  items=[756]  anchor=eod_public-3.3:tables/tumor_size_summary_dna_13275.json
+  Plasma Cell Myeloma > Tumor Size Summary
+999: Not applicable
+
+[seer_rsa_eod:plasma_cell_myeloma:nodes_exam_dna_95635:c15]  items=[830]  anchor=eod_public-3.3:tables/nodes_exam_dna_95635.json
+  Plasma Cell Myeloma > Regional Nodes Examined
+99: Not applicable
+
+[seer_rsa_eod:plasma_cell_myeloma:ss2018_44993:c20]  items=[764]  anchor=eod_public-3.3:tables/ss2018_44993.json
+  Plasma Cell Myeloma > Summary Stage 2018: Myeloma and Plasma Cell Disorders
+1: **Localized only** - Single plasmacytoma occurring in bone (osseous or medullary) (9731) + WITH or …
+3: **Regional lymph node(s) involved only** - Extraosseous plasmacytomas only (9734) + Regional lymph …
+7: **Distant site(s)/lymph node(s) involved** - Lymphoplasmacytic lymphoma (9671) - Plasma cell myeloma …
+9: Unknown if extension or metastasis (applicable for 9731 and 9734 only)
+
+========================================================================

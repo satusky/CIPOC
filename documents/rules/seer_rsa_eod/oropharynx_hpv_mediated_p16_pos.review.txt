@@ -1,0 +1,71 @@
+========================================================================
+SEER*RSA STAGING INGEST REVIEW REPORT
+========================================================================
+Schema: oropharynx_hpv_mediated_p16_pos
+Source: https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/eod_public-3.3.zip
+Units emitted: 30  |  accepted: 30  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     14
+  instruction    16
+
+Accepted units by NAACCR item:
+     523 4
+     756 4
+     764 4
+     820 4
+     830 4
+    3843 4
+    3844 4
+
+Applicability predicates carried by this schema's units (2):
+  {'sites': ['C019', 'C024', 'C051-C052', 'C090-C091', 'C098-C099', 'C100', 'C102-C104', 'C108-C109'], 'histologies': ['8000-8700'], 'dx_date_min': '2018-01-01', 'dx_date_max': '2025-12-31'}
+  {'sites': ['C111'], 'histologies': ['8000-8700'], 'dx_date_min': '2018-01-01', 'dx_date_max': '2024-12-31'}
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED CODE TABLES (up to 4 of 14)
+------------------------------------------------------------------------
+
+[seer_rsa_eod:oropharynx_hpv_mediated_p16_pos:behavior:c3]  items=[523]  anchor=eod_public-3.3:tables/behavior.json
+  Oropharynx HPV-Associated [8th: 2018-2025] > Behavior ICD-O-3
+0: Benign
+1: Uncertain Benign/Malig
+2: In Situ
+3: Malignant Primary
+
+[seer_rsa_eod:oropharynx_hpv_mediated_p16_pos:tumor_size_summary_47973:c8]  items=[756]  anchor=eod_public-3.3:tables/tumor_size_summary_47973.json
+  Oropharynx HPV-Associated [8th: 2018-2025] > Tumor Size Summary
+000: No mass/tumor found
+001: 1 mm or described as less than 1 mm
+002-988: Exact size in millimeters (2 mm to 988 mm)
+989: 989 millimeters or larger
+990: Microscopic focus or foci only and no size of focus is given
+999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable
+
+[seer_rsa_eod:oropharynx_hpv_mediated_p16_pos:nodes_exam_76029:c15]  items=[830]  anchor=eod_public-3.3:tables/nodes_exam_76029.json
+  Oropharynx HPV-Associated [8th: 2018-2025] > Regional Nodes Examined
+00: No nodes examined
+01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)
+90: 90 or more nodes examined
+95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed
+96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated
+97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated
+98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented …
+99: Unknown if nodes were examined; not applicable or negative Not documented in medical record
+
+[seer_rsa_eod:oropharynx_hpv_mediated_p16_pos:ss2018_oropharynx_excluding_melanoma_8720_8790_9999:c20]  items=[764]  anchor=eod_public-3.3:tables/ss2018_oropharynx_excluding_melanoma_8720_8790_9999.json
+  Oropharynx HPV-Associated [8th: 2018-2025] > Summary Stage 2018: Oropharynx
+0: **In situ: noninvasive, intraepithelial**
+1: **Localized only (localized, NOS)** - All sites + Confined to site of origin + Epiglottis, lingual …
+2: **Regional by direct extension only** - All sites + Epiglottis, lingual surface plus both lateral walls …
+3: **Regional lymph node(s) involved only** - Level I + Level IA - Submental + Level IB - Submandibular …
+4: **Regional by BOTH direct extension AND regional lymph node(s) involved** - Codes (2) + (3)
+7: **Distant site(s)/lymph node(s) involved** - Distant site(s) (including further contiguous extension) + …
+9: Unknown if extension or metastasis
+
+========================================================================

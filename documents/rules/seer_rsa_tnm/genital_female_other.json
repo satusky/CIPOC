@@ -1,0 +1,30 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:genital_female_other:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Other and Unspecified Female Genital Organs",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/genital_female_other.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C577-C579"
+      ],
+      "histologies": [
+        "8000-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C577  Other specified parts of female genital organs\nC578  Overlapping lesion of female genital organs\nC579  Female genital tract, NOS\n\n**Note:** TNM is not defined for this schema. If directly assigning Summary Stage 2000 (SS2000), use the *Other and Unspecified Female Genital Organs* chapter on page 220 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=220).",
+    "codes": null,
+    "notes": null
+  }
+]

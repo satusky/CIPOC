@@ -1,0 +1,31 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:brain:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Brain and Cerebral Meninges",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/brain.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C700",
+        "C710-C719"
+      ],
+      "histologies": [
+        "8000-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C700  Cerebral meninges\nC710  Cerebrum\nC711  Frontal lobe\nC712  Temporal lobe\nC713  Parietal lobe\nC714  Occipital lobe\nC715  Ventricle, NOS\nC716  Cerebellum, NOS\nC717  Brain stem\nC718  Overlapping lesion of brain\nC719  Brain, NOS\n\n**Note 1:** TNM opted not to recommend a TNM scheme in 7th edition.\n\n**Note 2:** TNM is not defined for this schema. If directly assigning Summary Stage 2000 (SS2000), use the *Brain and Cerebral Meninges* chapter on page 272 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=272).",
+    "codes": null,
+    "notes": null
+  }
+]

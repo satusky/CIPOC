@@ -1,0 +1,32 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:sinus_other:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Accessory (Paranasal) Sinuses (excluding Malignant Melanoma)",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/sinus_other.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C312-C313",
+        "C318-C319"
+      ],
+      "histologies": [
+        "8000-8713",
+        "8800-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C312  Frontal sinus\nC313  Sphenoid sinus\nC318  Overlapping lesion of accessory sinuses\nC319  Accessory sinus, NOS\n\n**Note 1:**  Laterality must be coded for frontal sinus, C312\n\n**Note 2:** TNM is not defined for this schema. If directly assigning Summary Stage 2000 (SS2000), use the *Accessory (Paranasal) Sinuses* chapter on page 134 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=134).",
+    "codes": null,
+    "notes": null
+  }
+]

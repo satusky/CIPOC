@@ -1,0 +1,891 @@
+[
+  {
+    "rule_id": "seer_rsa_eod:prostate:schema:i1",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/prostate.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "8000-8700, 8720-8790\n\nC619 Prostate gland\n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 58 *Prostate*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other EOD Schemas with Prostate sites**\n* **Soft Tissue Abdomen and Thoracic**: 8710-8714, 8800-8803, 8810-8921, 8932-8934, 8940-8990, 9000-9016, 9030-9043, 9045-9138, 9141-9230, 9240-9580, 9582\n* **Soft Tissue Other**: 8804-8806, 8930-8931, 8991-8992, 9020, 9044, 9231, 9581\n* **GIST**: 8935-8936\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n\n**Note 3:** **Transitional cell carcinoma of prostatic urethra** \n* See the *Urethra* schema for transitional cell (urothelial) carcinoma of the prostatic urethra (C680).\n\n**Note 4:** **Additional data items for staging** \n* In addition to coding *EOD Primary Tumor, EOD Regional Nodes* and *EOD Mets*, the following data items are also needed to assign a stage group for Prostate.\n  * PSA (Prostatic Specific Antigen) Lab Value\n  * Grade Clinical\n  * Grade Pathological",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:behavior:c2",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "code_table",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Behavior ICD-O-3 (4 codes)\n0: Benign\n1: Uncertain Benign/Malig\n2: In Situ\n3: Malignant Primary",
+    "codes": {
+      "0": "Benign",
+      "1": "Uncertain Benign/Malig",
+      "2": "In Situ",
+      "3": "Malignant Primary"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:behavior:i3",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:tumor_size_summary_63115:c4",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_63115.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (6 codes)\n000: No mass/tumor found\n001: 1 mm or described as less than 1 mm\n002-988: Exact size in millimeters (2 mm to 988 mm)\n989: 989 millimeters or larger\n990: Microscopic focus or foci only and no size of focus is given\n999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm",
+      "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+      "989": "989 millimeters or larger",
+      "990": "Microscopic focus or foci only and no size of focus is given",
+      "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:tumor_size_summary_63115:i5",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_63115.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:nodes_pos_fpa:c6",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in medical record",
+    "codes": {
+      "00": "All nodes examined negative",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:nodes_pos_fpa:i7",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:nodes_exam_76029:c8",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (8 codes)\n00: No nodes examined\n01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)\n90: 90 or more nodes examined\n95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed\n96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated\n97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated\n98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown\n99: Unknown if nodes were examined; not applicable or negative Not documented in medical record",
+    "codes": {
+      "00": "No nodes examined",
+      "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+      "90": "90 or more nodes examined",
+      "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+      "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+      "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+      "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+      "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:nodes_exam_76029:i9",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:ss2018_prostate_76172:c10",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Summary Stage 2018: Prostate"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_prostate_76172.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018: Prostate (7 codes)\n0: **In situ**, intraepithelial, noninvasive\n1: **Localized only (localized, NOS)** - Clinically apparent or inapparent tumor - Confined to prostate, NOS - Intracapsular involvement only - Invasion into (but not beyond) prostatic capsule - No extracapsular extension - One or more lobes involved\n2: **Regional by direct extension only** - Bladder neck - Bladder, NOS - External sphincter - Extraprostatic/extracapsular extension (beyond prostate capsule), unilateral, bilateral, NOS - Extraprostatic urethra (membranous urethra) - Fixation, NOS - Levator muscles - Periprostatic tissue - Rectovesical (Denonvillier's) fascia - Rectum - Seminal vesicles - Skeletal muscle - Through capsule, NOS - Ureter(s)\n3: **Regional lymph node(s) involved only** - Hypogastric - Iliac, NOS + External + Internal (hypogastric) (obturator), NOS - Pelvic, NOS - Periprostatic - Sacral, NOS + Lateral (laterosacral) + Middle (promontory) (Gerota's node) + Presacral - Regional lymph node(s), NOS + Lymph node(s), NOS\n4: **Regional by BOTH direct extension AND regional lymph node(s) involved** - Codes (2) + (3)\n7: **Distant site(s)/lymph node(s) involved** - Distant site(s) (i …",
+    "codes": {
+      "0": "**In situ**, intraepithelial, noninvasive",
+      "1": "**Localized only (localized, NOS)**\n- Clinically apparent or inapparent tumor \n- Confined to prostate, NOS\n- Intracapsular involvement only\n- Invasion into (but not beyond) prostatic capsule\n- No extracapsular extension\n- One or more lobes involved",
+      "2": "**Regional by direct extension only**\n- Bladder neck\n- Bladder, NOS\n- External sphincter\n- Extraprostatic/extracapsular extension (beyond prostate capsule), unilateral, bilateral, NOS\n- Extraprostatic urethra (membranous urethra)\n- Fixation, NOS\n- Levator muscles\n- Periprostatic tissue\n- Rectovesical (Denonvillier's) fascia\n- Rectum\n- Seminal vesicles\n- Skeletal muscle\n- Through capsule, NOS\n- Ureter(s)",
+      "3": "**Regional lymph node(s) involved only** \n- Hypogastric\n- Iliac, NOS\n    + External\n    + Internal (hypogastric) (obturator), NOS\n- Pelvic, NOS\n- Periprostatic\n- Sacral, NOS\n    + Lateral (laterosacral)\n    + Middle (promontory) (Gerota's node)\n    + Presacral \n- Regional lymph node(s), NOS\n  + Lymph node(s), NOS",
+      "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+      "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n  + Bone\n  + Extension to or fixation to pelvic wall or pelvic bone\n  + \"Frozen pelvis\", NOS \n  + Other organs\n  + Penis\n  + Sigmoid colon\n  + Soft tissue other than periprostatic\n- Distant lymph node(s), NOS\n  + Aortic (lateral [lumbar], para-aortic, periaortic, NOS)\n  + Cervical\n  + Common iliac\n  + Inguinal (deep, NOS)\n     * Node of Cloquet or Rosenmuller (highest deep inguinal)\n     * Superficial (femoral)\n  + Retroperitoneal, NOS\n  + Scalene (inferior deep cervical)\n  + Supraclavicular (transverse cervical)\n- Distant metastasis, NOS\n  + Carcinomatosis \n  + Distant metastasis WITH or WITHOUT distant lymph node(s)",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:ss2018_prostate_76172:i11",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Summary Stage 2018: Prostate"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_prostate_76172.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Prostate**\n\n8000-8700, 8720-8790\n\nC619\nC619 Prostate gland\n\n**Note 1:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 58 *Prostate*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other Summary Stage Chapters with Prostate sites**\n* **GIST**: 8935-8936\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Soft Tissue**: 8710-8714, 8800-8934, 8940-9138, 9141-9582\n\n**Note 3:** **Transitional cell carcinoma of prostatic urethra** \n* See the *Urethra* chapter for transitional cell (urothelial) carcinoma of the prostatic urethra (C680).\n\n**Note 4:** **TURP only** \n* When the only information available is a TURP, with no evidence of lymph node involvement or distant metastasis involvement, assign code 1.\n\n**Note 5:** **Do not use imaging** \n* Imaging is not used to determine clinical extension. If a physician incorporates imaging findings into their evaluation, do not use this information. \n* If it cannot be determined if the physician is using imaging, assume they are not and code the Summary Stage based on the physician’s statement\n\n**Note 6:** **No DRE, but physician assigns stage** \n* If there is no information from the DRE, but the physician assigns an extent of disease, the registrar can use that.\n  * ***Example:*** DRE reveals prostate is \"firm.\" Physician stages the patient as a cT2a. \n  * The T2a (localized) can be used since the physician has documented this\n\n**Note 7:** **Localized cancers** \n* Localized (code 1) can be assigned when the DRE result is not documented, or DRE not done and there is no evidence of extraprostatic extension\n  * ***Example 1:*** Patient with elevated PSA and positive needle core biopsy, but no documentation regarding tumor apparency (inapparent versus apparent), and there is no evidence of extraprostatic extension. No prostatectomy done \n  * ***Example 2:*** Pathology report from a needle core biopsy done confirming cancer. No information on PSA, DRE, Radical prostatectomy, or physician statement regarding clinical extension\n  * ***Example 3:*** Pathology report from a needle core biopsy done confirming cancer. No information on PSA, DRE or physician statement regarding clinical extension. Physician states imaging shows extraprostatic extension and assigns cT3a\n\n**Note 8:** **Extraprostatic extension** \n* If a needle core biopsy confirms extraprostatic extension, that information can be used for Summary Stage. \n\n**Note 9:** **Involvement of prostatic urethra** \n* Involvement of prostatic urethra does not alter the Summary Stage code.\n\n**Note 10:** **Frozen pelvis** \n* \"Frozen pelvis\" is a clinical term which means tumor extends to pelvic sidewall(s) (code 7).\n\n**Note 11:** **Incidental finding** \n* When prostate cancer is an incidental finding during a prostatectomy for other reasons (for example, a cystoprostatectomy for bladder cancer), use the appropriate code for the extent of disease found.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:grade_clinical_46962:c12",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_46962.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (11 codes)\n1: Grade Group 1: Gleason score less than or equal to 6\n2: Grade Group 2: Gleason score 7 Gleason pattern 3+4\n3: Grade Group 3: Gleason score 7 Gleason pattern 4+3\n4: Grade Group 4: Gleason score 8\n5: Grade Group 5: Gleason score 9 or 10\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\nE: Stated as \"Gleason score 7\" with no patterns documented or Any Gleason patterns combination equal to 7 not specified in 2 or 3\n9: Grade cannot be assessed; Unknown",
+    "codes": {
+      "1": "Grade Group 1: Gleason score less than or equal to 6",
+      "2": "Grade Group 2: Gleason score 7\nGleason pattern 3+4",
+      "3": "Grade Group 3: Gleason score 7\nGleason pattern 4+3",
+      "4": "Grade Group 4: Gleason score 8",
+      "5": "Grade Group 5: Gleason score 9 or 10",
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "E": "Stated as \"Gleason score 7\" with no patterns documented or \nAny Gleason patterns combination equal to 7 not specified in 2 or 3",
+      "9": "Grade cannot be assessed; Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:grade_clinical_46962:i13",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_46962.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Clinical must not be blank.\n\n**Note 2:** Assign the highest grade from the primary tumor assessed during the clinical time frame. \n\n**Note 3:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 4:** Codes 1-5 take priority over A-E. \n\n**Note 5:** For prostate, a TURP or simple prostatectomy qualifies for a clinical grade only.\n\n**Note 6:** Code 9 (unknown) when \n* Grade from primary site is not documented\n* Clinical workup is not done (for example, cancer is an incidental finding during surgery for another condition)\n* Grade checked \"not applicable\" on CAP Protocol (if available) and no other grade information is available\n\n**Note 7:** If there is only one grade available and it cannot be determined if it is clinical or pathological, assume it is a Grade Clinical and code appropriately per Grade Clinical categories for that site, and then code unknown (9) for Grade Pathological, and blank for Grade Post Therapy Clin (yc) and Grade Post Therapy Path (yp).\n\n**Note 8:** If you are assigning an AJCC Staging System stage group\n* Grade is required to assign stage group\n* Codes A-E are treated as an unknown grade when assigning AJCC stage group \n* An unknown grade may result in an unknown stage group",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:grade_pathological_20069:c14",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_20069.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (11 codes)\n1: Grade Group 1: Gleason score less than or equal to 6\n2: Grade Group 2: Gleason score 7 Gleason pattern 3+4\n3: Grade Group 3: Gleason score 7 Gleason pattern 4+3\n4: Grade Group 4: Gleason score 8\n5: Grade Group 5: Gleason score 9 or 10\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\nE: Stated as \"Gleason score 7\" with no patterns documented or Any Gleason patterns combination equal to 7 not specified in 2 or 3\n9: Grade cannot be assessed; Unknown",
+    "codes": {
+      "1": "Grade Group 1: Gleason score less than or equal to 6",
+      "2": "Grade Group 2: Gleason score 7\nGleason pattern 3+4",
+      "3": "Grade Group 3: Gleason score 7\nGleason pattern 4+3",
+      "4": "Grade Group 4: Gleason score 8",
+      "5": "Grade Group 5: Gleason score 9 or 10",
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "E": "Stated as \"Gleason score 7\" with no patterns documented or \nAny Gleason patterns combination equal to 7 not specified in 2 or 3",
+      "9": "Grade cannot be assessed; Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:grade_pathological_20069:i15",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_20069.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Pathological must not be blank.\n\n**Note 2:** There is a preferred grading system for this schema. If the clinical grade given uses the preferred grading system and the pathological grade does not use the preferred grading system, do not record the Grade Clinical in the Grade Pathological field. Assign Grade Pathological using the applicable generic grade codes (A-D). \n* *Example:* Biopsy of prostate, adenocarcinoma, Gleason Patterns 2+3, Score =5. Tue surgical resection states a moderately differentiated adenocarcinoma\n    - Code Grade Clinical as 1 since Gleason Score Clinical is less than 6 and this is the preferred grading system\n     - Code Grade Pathological as B (moderately differentiated), per the Coding Guidelines for Generic Grade Categories\n\n**Note 3:** Assign the highest grade from the primary tumor.  \n\n**Note 4:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 5:** Codes 1-5 take priority over A-E.\n\n**Note 6:** For prostate, a TURP or simple prostatectomy does not qualify for surgical resection. A radical prostatectomy must be performed.\n\n**Note 7:** Use the grade from the **clinical work up** from the primary tumor in different scenarios based on behavior or surgical resection\n* **Behavior**\n  - Tumor behavior for the clinical and the pathological diagnoses are the same AND the clinical grade is the highest grade \n   - Tumor behavior for clinical diagnosis is invasive, and the tumor behavior for the pathological diagnosis is in situ\n* **Surgical Resection**\n   - Surgical resection is done of the primary tumor and there is no grade documented from the surgical resection\n    - Surgical resection is done of the primary tumor and there is no residual cancer\n* **No surgical resection**\n    - Surgical resection of the primary tumor has not been done, but there is positive microscopic confirmation of distant metastases during the clinical time frame\n\n**Note 8:** The Grade Pathological may differ from Gleason Patterns Pathological [NAACCR #3839] and Gleason Score Pathological [NAACCR #3841] if the Grade Clinical, based on Gleason Patterns Clinical [NAACCR #3838] and Gleason Score Clinical [NAACCR #3840], is higher.\n* *Example:* Prostate biopsy, Gleason Pattern 4+4 and Gleason Score 8. Prostatectomy, Gleason Pattern 3+ 3 and Gleason Score 6.\n    - Both Grade Clinical and Grade Pathological would be coded 4 based on the Gleason Score Clinical of 8\n     - Gleason Patterns Pathological would be coded 33 and Gleason Score Pathological would be coded 06\n\n**Note 9:** Code 9 (unknown) when \n* Grade from primary site is not documented\n* No resection of the primary site (see exception in Note 8, Surgical resection, last bullet)\n* Neo-adjuvant therapy is followed by a resection (see Grade Post Therapy Path (yp))\n* Grade checked “not applicable” on CAP Protocol (if available) and no other grade information is available\n* Clinical case only (see Grade Clinical)\n* There is only one grade available and it cannot be determined if it is clinical, pathological, post therapy clinical or post therapy pathological\n\n**Note 10:** If you are assigning an AJCC Staging System stage group\n* Grade is required to assign stage group\n* Codes A-E are treated as an unknown grade when assigning AJCC stage group \n* An unknown grade may result in an unknown stage group",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:gleason_pattern_clinical_75179:c16",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Gleason Patterns Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/gleason_pattern_clinical_75179.json",
+    "kind": "code_table",
+    "item_ids": [
+      3838
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Gleason Patterns Clinical (34 codes)\n11: Primary pattern 1, secondary pattern 1\n12: Primary pattern 1, secondary pattern 2\n13: Primary pattern 1, secondary pattern 3\n14: Primary pattern 1, secondary pattern 4\n15: Primary pattern 1, secondary pattern 5\n19: Primary pattern 1, secondary pattern unknown\n21: Primary pattern 2, secondary pattern 1\n22: Primary pattern 2, secondary pattern 2\n23: Primary pattern 2, secondary pattern 3\n24: Primary pattern 2, secondary pattern 4\n25: Primary pattern 2, secondary pattern 5\n29: Primary pattern 2, secondary pattern unknown\n31: Primary pattern 3, secondary pattern 1\n32: Primary pattern 3, secondary pattern 2\n33: Primary pattern 3, secondary pattern 3\n34: Primary pattern 3, secondary pattern 4\n35: Primary pattern 3, secondary pattern 5\n39: Primary pattern 3, secondary pattern unknown\n41: Primary pattern 4, secondary pattern 1\n42: Primary pattern 4, secondary pattern 2\n43: Primary pattern 4, secondary pattern 3\n44: Primary pattern 4, secondary pattern 4\n45: Primary pattern 4, secondary pattern 5\n49: Primary pattern 4, secondary pattern unknown\n51: Primary pattern 5, secondary pattern 1\n52: Primary pattern 5, secondary pattern 2\n53: Primary pattern 5 …",
+    "codes": {
+      "11": "Primary pattern 1, secondary pattern 1",
+      "12": "Primary pattern 1, secondary pattern 2",
+      "13": "Primary pattern 1, secondary pattern 3",
+      "14": "Primary pattern 1, secondary pattern 4",
+      "15": "Primary pattern 1, secondary pattern 5",
+      "19": "Primary pattern 1, secondary pattern unknown",
+      "21": "Primary pattern 2, secondary pattern 1",
+      "22": "Primary pattern 2, secondary pattern 2",
+      "23": "Primary pattern 2, secondary pattern 3",
+      "24": "Primary pattern 2, secondary pattern 4",
+      "25": "Primary pattern 2, secondary pattern 5",
+      "29": "Primary pattern 2, secondary pattern unknown",
+      "31": "Primary pattern 3, secondary pattern 1",
+      "32": "Primary pattern 3, secondary pattern 2",
+      "33": "Primary pattern 3, secondary pattern 3",
+      "34": "Primary pattern 3, secondary pattern 4",
+      "35": "Primary pattern 3, secondary pattern 5",
+      "39": "Primary pattern 3, secondary pattern unknown",
+      "41": "Primary pattern 4, secondary pattern 1",
+      "42": "Primary pattern 4, secondary pattern 2",
+      "43": "Primary pattern 4, secondary pattern 3",
+      "44": "Primary pattern 4, secondary pattern 4",
+      "45": "Primary pattern 4, secondary pattern 5",
+      "49": "Primary pattern 4, secondary pattern unknown",
+      "51": "Primary pattern 5, secondary pattern 1",
+      "52": "Primary pattern 5, secondary pattern 2",
+      "53": "Primary pattern 5, secondary pattern 3",
+      "54": "Primary pattern 5, secondary pattern 4",
+      "55": "Primary pattern 5, secondary pattern 5",
+      "59": "Primary pattern 5, secondary pattern unknown",
+      "X6": "TURP and/or Biopsy done, primary pattern unknown, secondary pattern unknown",
+      "X7": "No needle core biopsy/TURP performed",
+      "X8": "Not applicable: Information not collected for this case\n(If this information is required by your standard setter, use of code X8 may result in an edit error.)",
+      "X9": "Not documented in medical record\nGleason Patterns Clinical not assessed or unknown if assessed\nUnknown whether TURP and/or Biopsy done"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:gleason_pattern_clinical_75179:i17",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Gleason Patterns Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/gleason_pattern_clinical_75179.json",
+    "kind": "instruction",
+    "item_ids": [
+      3838
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** **Physician Statement** \n* Physician statement of Gleason Patterns Clinical can be used to code this data item when there is no other information available. \n\n**Note 2:** **Procedures** \n* Code the Gleason Patterns Clinical from a needle core biopsy, trans rectal ultrasound (TRUS) guided biopsy, transurethral resection of prostate (TURP), and/or simple prostatectomy in this field.\n* Gleason primary and secondary patterns provided for any prostate tissue identified from a transurethral resection of a bladder tumor (TURBT) specimen can also be used in this field\n\n**Note 3:** **Neoadjuvant Treatment** \n* Code the Gleason primary and secondary patterns prior to neoadjuvant treatment.\n\n**Note 4:** **Gleason Grading** \n* Usually, prostate cancers are graded using Gleason score or pattern. Gleason grading for prostate primaries is based on a 5-component system (5 histologic patterns). Prostatic cancer generally shows two main histologic patterns. The primary pattern, the pattern occupying greater than 50% of the cancer, is usually indicated by the first number of the Gleason grade, and the secondary pattern is usually indicated by the second number.  These two numbers are added together to create a pattern score.  \n* If there are two numbers, assume that they refer to two patterns (the first number being the primary pattern and the second number the secondary pattern), and sum them to obtain the score.\n* If only one number is given, and it is less than or equal to 5, assume that it describes a pattern (since scores of 5 or less would reflect Primary or Secondary Pattern Scores of 1 or 2). Code the number as the primary pattern and code the secondary pattern as Unknown. \n  * For ***example,*** if only one number is given and it is a 3, code \"39\" for Gleason Patterns and \"X9\" for Gleason Score.\n* If only one number is given, and it is greater than 5, assume that it is a score. \n  * For ***example,*** if only one number is given, and it is a 7, code \"X6\" for Gleason Patterns and \"07\" for Gleason Score. \n* If the pathology report specifies a specific number out of a total of 10, the first number given is the score. \n  * For ***example,*** if the pathology report says Gleason 7/10, code \"07' for Gleason Score and \"X6\" for Gleason Patterns. \n\n**Note 5:** **Different patterns** \n* If different patterns are documented on multiple needle core biopsies, code the pattern that reflects the highest or most aggressive score regardless of if the pathologist provides an overall pattern in a final summary. If different patterns equal the same high score, give priority to the highest primary pattern and then the highest secondary pattern. \n  * For ***example,*** both Gleason 3, 4 and Gleason 4, 3 equal Gleason score 7; code 43. Do not mix patterns from multiple specimens.\n\n**Note 6:** **Multiple procedures** \n* If multiple procedures are performed (e.g., needle core biopsy, trans rectal ultrasound (TRUS) guided biopsy, transurethral resection of prostate (TURP), and/or simple prostatectomy), code the pattern that reflects the highest score.\n\n**Note 7:** **Related data item** \n* The clinical score is recorded in the related data item 3840: Gleason Score Clinical.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:gleason_score_clinical_67175:c18",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Gleason Score Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/gleason_score_clinical_67175.json",
+    "kind": "code_table",
+    "item_ids": [
+      3840
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Gleason Score Clinical (12 codes)\n02: Gleason score 2\n03: Gleason score 3\n04: Gleason score 4\n05: Gleason score 5\n06: Gleason score 6\n07: Gleason score 7\n08: Gleason score 8\n09: Gleason score 9\n10: Gleason score 10\nX7: No needle core biopsy/TURP performed\nX8: Not applicable: Information not collected for this case (If this information is required by your standard setter, use of code X8 may result in an edit error.)\nX9: Not documented in medical record Gleason Score Clinical not assessed or unknown if assessed",
+    "codes": {
+      "02": "Gleason score 2",
+      "03": "Gleason score 3",
+      "04": "Gleason score 4",
+      "05": "Gleason score 5",
+      "06": "Gleason score 6",
+      "07": "Gleason score 7",
+      "08": "Gleason score 8",
+      "09": "Gleason score 9",
+      "10": "Gleason score 10",
+      "X7": "No needle core biopsy/TURP performed",
+      "X8": "Not applicable: Information not collected for this case\n(If this information is required by your standard setter, use of code X8 may result in an edit error.)",
+      "X9": "Not documented in medical record\nGleason Score Clinical not assessed or unknown if assessed"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:gleason_score_clinical_67175:i19",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Gleason Score Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/gleason_score_clinical_67175.json",
+    "kind": "instruction",
+    "item_ids": [
+      3840
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** **Physician Statement** \n* Physician statement of Gleason Score Clinical can be used to code this data item when there is no other information available.\n\n**Note 2:** **Procedures** \n* Code the Gleason Score Clinical from a needle core biopsy, trans rectal ultrasound (TRUS) guided biopsy, transurethral resection of prostate (TURP), and/or simple prostatectomy in this field.\n* Gleason primary and secondary patterns provided for any prostate tissue identified from a transurethral resection of a bladder tumor (TURBT) specimen can also be used in this field\n\n**Note 3:** **Neoadjuvant Treatment** \n* Code the Gleason primary and secondary patterns prior to neoadjuvant treatment.\n\n**Note 4:** **Gleason Grading** \n* Usually, prostate cancers are graded using Gleason score or pattern. Gleason grading for prostate primaries is based on a 5-component system (5 histologic patterns). Prostatic cancer generally shows two main histologic patterns. The primary pattern, the pattern occupying greater than 50% of the cancer, is usually indicated by the first number of the Gleason grade, and the secondary pattern is usually indicated by the second number.  These two numbers are added together to create a pattern score.  \n* If there are two numbers, assume that they refer to two patterns (the first number being the primary pattern and the second number the secondary pattern), and sum them to obtain the score.\n* If only one number is given, and it is less than or equal to 5, assume that it describes a pattern (since scores of 5 or less would reflect Primary or Secondary Pattern Scores of 1 or 2). Code the number as the primary pattern and code the secondary pattern as Unknown. \n   * For ***example,*** if only one number is given and it is a 3, code \"39\" for Gleason Patterns and \"X9\" for Gleason Score.\n* If only one number is given, and it is greater than 5, assume that it is a score. \n   * For ***example,*** if only one number is given, and it is a 7, code \"X6\" for Gleason Patterns and \"07\" for Gleason Score. \n* If the pathology report specifies a specific number out of a total of 10, the first number given is the score. \n  * For ***example***, if the pathology report says Gleason 7/10, code \"07' for Gleason Score and \"X6\" for Gleason Patterns. \n\n**Note 5:** **Multiple procedures** \n* If multiple procedures are performed (e.g., needle core biopsy, trans rectal ultrasound (TRUS) guided biopsy, transurethral resection of prostate (TURP), and/or simple prostatectomy), code the pattern that reflects the highest score.\n\n**Note 6:** **Related data item** \n* Record the Gleason score based on the addition of the primary and secondary patterns coded in the related data item 3838: Gleason Patterns Clinical.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:gleason_patterns_pathological_833:c20",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Gleason Patterns Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/gleason_patterns_pathological_833.json",
+    "kind": "code_table",
+    "item_ids": [
+      3839
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Gleason Patterns Pathological (34 codes)\n11: Primary pattern 1, secondary pattern 1\n12: Primary pattern 1, secondary pattern 2\n13: Primary pattern 1, secondary pattern 3\n14: Primary pattern 1, secondary pattern 4\n15: Primary pattern 1, secondary pattern 5\n19: Primary pattern 1, secondary pattern unknown\n21: Primary pattern 2, secondary pattern 1\n22: Primary pattern 2, secondary pattern 2\n23: Primary pattern 2, secondary pattern 3\n24: Primary pattern 2, secondary pattern 4\n25: Primary pattern 2, secondary pattern 5\n29: Primary pattern 2, secondary pattern unknown\n31: Primary pattern 3, secondary pattern 1\n32: Primary pattern 3, secondary pattern 2\n33: Primary pattern 3, secondary pattern 3\n34: Primary pattern 3, secondary pattern 4\n35: Primary pattern 3, secondary pattern 5\n39: Primary pattern 3, secondary pattern unknown\n41: Primary pattern 4, secondary pattern 1\n42: Primary pattern 4, secondary pattern 2\n43: Primary pattern 4, secondary pattern 3\n44: Primary pattern 4, secondary pattern 4\n45: Primary pattern 4, secondary pattern 5\n49: Primary pattern 4, secondary pattern unknown\n51: Primary pattern 5, secondary pattern 1\n52: Primary pattern 5, secondary pattern 2\n53: Primary patte …",
+    "codes": {
+      "11": "Primary pattern 1, secondary pattern 1",
+      "12": "Primary pattern 1, secondary pattern 2",
+      "13": "Primary pattern 1, secondary pattern 3",
+      "14": "Primary pattern 1, secondary pattern 4",
+      "15": "Primary pattern 1, secondary pattern 5",
+      "19": "Primary pattern 1, secondary pattern unknown",
+      "21": "Primary pattern 2, secondary pattern 1",
+      "22": "Primary pattern 2, secondary pattern 2",
+      "23": "Primary pattern 2, secondary pattern 3",
+      "24": "Primary pattern 2, secondary pattern 4",
+      "25": "Primary pattern 2, secondary pattern 5",
+      "29": "Primary pattern 2, secondary pattern unknown",
+      "31": "Primary pattern 3, secondary pattern 1",
+      "32": "Primary pattern 3, secondary pattern 2",
+      "33": "Primary pattern 3, secondary pattern 3",
+      "34": "Primary pattern 3, secondary pattern 4",
+      "35": "Primary pattern 3, secondary pattern 5",
+      "39": "Primary pattern 3, secondary pattern unknown",
+      "41": "Primary pattern 4, secondary pattern 1",
+      "42": "Primary pattern 4, secondary pattern 2",
+      "43": "Primary pattern 4, secondary pattern 3",
+      "44": "Primary pattern 4, secondary pattern 4",
+      "45": "Primary pattern 4, secondary pattern 5",
+      "49": "Primary pattern 4, secondary pattern unknown",
+      "51": "Primary pattern 5, secondary pattern 1",
+      "52": "Primary pattern 5, secondary pattern 2",
+      "53": "Primary pattern 5, secondary pattern 3",
+      "54": "Primary pattern 5, secondary pattern 4",
+      "55": "Primary pattern 5, secondary pattern 5",
+      "59": "Primary pattern 5, secondary pattern unknown",
+      "X6": "Radical prostatectomy done, primary pattern unknown, secondary pattern unknown",
+      "X7": "No radical prostatectomy/autopsy performed",
+      "X8": "Not applicable: Information not collected for this case\n(If this information is required by your standard setter, use of code X8 may result in an edit error.)",
+      "X9": "Not documented in medical record\nGleason Patterns Pathological not assessed or unknown if assessed\nUnknown if radical prostatectomy done"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:gleason_patterns_pathological_833:i21",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Gleason Patterns Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/gleason_patterns_pathological_833.json",
+    "kind": "instruction",
+    "item_ids": [
+      3839
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** **Physician Statement** \n* Physician statement of Gleason Patterns Pathological can be used to code this data item when there is no other information available.\n\n**Note 2:** **Procedures** \n* Code the Gleason primary and secondary patterns from a radical prostatectomy or autopsy only in this field. Unlike Grade Group Pathological, do not include patterns from tissues taken prior to prostatectomy.\n  * Code results from a transurethral resection of prostate (TURP) or simple prostatectomy in Gleason Patterns Clinical\n\n**Note 3:** **Gleason Grading** \n* Usually, prostate cancers are graded using Gleason score or pattern. Gleason grading for prostate primaries is based on a 5-component system (5 histologic patterns). Prostatic cancer generally shows two main histologic patterns. The primary pattern, the pattern occupying greater than 50% of the cancer, is usually indicated by the first number of the Gleason grade, and the secondary pattern is usually indicated by the second number.  These two numbers are added together to create a pattern score.  \n* If there are two numbers, assume that they refer to two patterns (the first number being the primary pattern and the second number the secondary pattern), and sum them to obtain the score.\n* If only one number is given, and it is less than or equal to 5, assume that it describes a pattern (since scores of 5 or less would reflect Primary or Secondary Pattern Scores of 1 or 2). Code the number as the primary pattern and code the secondary pattern as Unknown. \n  * For ***example***, if only one number is given, and it is a 3, code \"39\" for Gleason Patterns and \"X9\" for Gleason Score.\n* If only one number is given, and it is greater than 5, assume that it is a score. \n  * For ***example***, if only one number is given, and it is a 7, code \"X6\" for Gleason Patterns and \"07\" for Gleason Score. \n* If the pathology report specifies a specific number out of a total of 10, the first number given is the score. \n  * For ***example,*** if the pathology report says Gleason 7/10, code \"07' for Gleason Score and \"X6\" for Gleason Patterns. \n\n**Note 4:** **Different patterns** \n* If different patterns are documented on multiple specimens, code the pattern that reflects the highest or most aggressive score regardless of if the pathologist provides an overall pattern in a final summary. If different patterns equal the same high score, give priority to the highest primary pattern and then the highest secondary pattern.\n\n**Note 5:** **Tertiary pattern** \n* If a tertiary pattern is documented on prostatectomy or autopsy, code in the related data item 3842: Gleason Tertiary Pattern.\n\n**Note 6:** **Neoadjuvant therapy** \n* Code X9 when neoadjuvant therapy was given\n\n**Note 7:** **Active surveillance, then Radical Prostatectomy**\n* Code X9 when first course of treatment is active surveillance, but a radical prostatectomy is done at a later date due to disease progression or the patient changed their mind\n\n**Note 8:** **Related data item** \n* The pathological score is recorded in the related data item 3841: Gleason Score Pathological.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:gleason_score_pathological_82121:c22",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Gleason Score Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/gleason_score_pathological_82121.json",
+    "kind": "code_table",
+    "item_ids": [
+      3841
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Gleason Score Pathological (12 codes)\n02: Gleason score 2\n03: Gleason score 3\n04: Gleason score 4\n05: Gleason score 5\n06: Gleason score 6\n07: Gleason score 7\n08: Gleason score 8\n09: Gleason score 9\n10: Gleason score 10\nX7: No radical prostatectomy/autopsy performed\nX8: Not applicable: Information not collected for this case (If this information is required by your standard setter, use of code X8 may result in an edit error.)\nX9: Not documented in medical record Gleason Score Pathological not assessed or unknown if assessed Unknown if radical prostatectomy done",
+    "codes": {
+      "02": "Gleason score 2",
+      "03": "Gleason score 3",
+      "04": "Gleason score 4",
+      "05": "Gleason score 5",
+      "06": "Gleason score 6",
+      "07": "Gleason score 7",
+      "08": "Gleason score 8",
+      "09": "Gleason score 9",
+      "10": "Gleason score 10",
+      "X7": "No radical prostatectomy/autopsy performed",
+      "X8": "Not applicable: Information not collected for this case\n(If this information is required by your standard setter, use of code X8 may result in an edit error.)",
+      "X9": "Not documented in medical record\nGleason Score Pathological not assessed or unknown if assessed\nUnknown if radical prostatectomy done"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:gleason_score_pathological_82121:i23",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Gleason Score Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/gleason_score_pathological_82121.json",
+    "kind": "instruction",
+    "item_ids": [
+      3841
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** **Physician Statement** \n* Physician statement of Gleason Score Pathological can be used to code this data item when there is no other information available.\n\n**Note 2:** **Procedures** \n* Code the Gleason Score Pathological from a radical prostatectomy or autopsy only in this field. Unlike Grade Group Pathological, do not include patterns from tissues taken prior to a radical prostatectomy.\n  * Code results from a transurethral resection of prostate (TURP) or simple prostatectomy in Gleason Score Clinical\n \n**Note 3:** **Gleason Grading** \n* Usually, prostate cancers are graded using Gleason score or pattern. Gleason grading for prostate primaries is based on a 5-component system (5 histologic patterns). Prostatic cancer generally shows two main histologic patterns. The primary pattern, the pattern occupying greater than 50% of the cancer, is usually indicated by the first number of the Gleason grade, and the secondary pattern is usually indicated by the second number. These two numbers are added together to create a pattern score, ranging from 2 to 10. \n* If there are two numbers, assume that they refer to two patterns (the first number being the primary pattern and the second number the secondary pattern), and sum them to obtain the score.\n* If only one number is given, and it is less than or equal to 5, code the total score to X9, unknown or no information. \n* If only one number is given, and it is greater than 5, assume that it is a score and code as stated. \n* If the pathology report specifies a specific number out of a total of 10, the first number given is the score. \n\n* ***Example:*** The pathology report says Gleason 3/10. The Gleason score would be 3 and coded as 03.\n\n**Note 4:** **Neoadjuvant therapy** \n* Code X9 when neoadjuvant therapy was given\n\n**Note 5:** **Active surveillance, then Radical Prostatectomy**\n* Code X9 when first course of treatment is active surveillance, but a radical prostatectomy is done at a later date due to disease progression or the patient changed their mind\n\n**Note 6:** **Related data item** \n* Record the Gleason score based on the addition of the primary and secondary patterns coded in the related data item 3839: Gleason Patterns Pathological.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:gleason_tertiary_pattern_6430:c24",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Gleason Tertiary Pattern"
+    ],
+    "anchor": "eod_public-3.3:tables/gleason_tertiary_pattern_6430.json",
+    "kind": "code_table",
+    "item_ids": [
+      3842
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Gleason Tertiary Pattern (8 codes)\n10: Tertiary pattern 1\n20: Tertiary pattern 2\n30: Tertiary pattern 3\n40: Tertiary pattern 4\n50: Tertiary pattern 5\nX7: No radical prostatectomy/autopsy performed\nX8: Not applicable: Information not collected for this case (If this information is required by your standard setter, use of code X8 may result in an edit error.)\nX9: Not documented in medical record Gleason Tertiary Pattern not assessed or unknown if assessed",
+    "codes": {
+      "10": "Tertiary pattern 1",
+      "20": "Tertiary pattern 2",
+      "30": "Tertiary pattern 3",
+      "40": "Tertiary pattern 4",
+      "50": "Tertiary pattern 5",
+      "X7": "No radical prostatectomy/autopsy performed",
+      "X8": "Not applicable: Information not collected for this case\n(If this information is required by your standard setter, use of code X8 may result in an edit error.)",
+      "X9": "Not documented in medical record\nGleason Tertiary Pattern not assessed or unknown if assessed"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:prostate:gleason_tertiary_pattern_6430:i25",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Prostate",
+      "Gleason Tertiary Pattern"
+    ],
+    "anchor": "eod_public-3.3:tables/gleason_tertiary_pattern_6430.json",
+    "kind": "instruction",
+    "item_ids": [
+      3842
+    ],
+    "applies_to": {
+      "sites": [
+        "C619"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** **Physician Statement** \n* Physician statement of Gleason tertiary pattern can be used to code this data item when there is no other information available.\n\n**Note 2:** **Procedures** \n* Record the tertiary pattern documented on radical prostatectomy or autopsy only. Record the tertiary pattern prior to neoadjuvant treatment. \n* If a tertiary pattern is documented on needle core biopsy or transurethral resection of prostate (TURP), it should be disregarded. \n* Do not code the tertiary pattern on radical prostatectomy or autopsy in Gleason Patterns Pathological.\n\n**Note 3:** **Tertiary Patterns 1 and 2** \n* The CAP Prostate Protocol does not include Patterns 1 and 2 for Tertiary Pattern.\n\n**Note 4:** **Neoadjuvant therapy** \n* Code X9 when neoadjuvant therapy was given\n\n**Note 5:** **Active surveillance, then Radical Prostatectomy**\n* Code X9 when first course of treatment is active surveillance, but a radical prostatectomy is done at a later date due to disease progression or the patient changed their mind",
+    "codes": null,
+    "notes": null
+  }
+]

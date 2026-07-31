@@ -1,0 +1,514 @@
+[
+  {
+    "rule_id": "seer_rsa_eod:corpus_adenosarcoma:schema:i1",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Corpus Uteri Adenosarcoma",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/corpus_adenosarcoma.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C540-C543",
+        "C548-C549",
+        "C559"
+      ],
+      "histologies": [
+        "8933"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "8933 \n\nC540 Isthmus uteri\nC541 Endometrium\nC542 Myometrium\nC543 Fundus uteri\nC548 Overlapping lesion of corpus uteri\nC549 Corpus uteri\nC559 Uterus, NOS\n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 54 *Corpus Uteri-Sarcoma*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:corpus_adenosarcoma:tumor_size_summary_63115:c2",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Corpus Uteri Adenosarcoma",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_63115.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C540-C543",
+        "C548-C549",
+        "C559"
+      ],
+      "histologies": [
+        "8933"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (6 codes)\n000: No mass/tumor found\n001: 1 mm or described as less than 1 mm\n002-988: Exact size in millimeters (2 mm to 988 mm)\n989: 989 millimeters or larger\n990: Microscopic focus or foci only and no size of focus is given\n999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm",
+      "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+      "989": "989 millimeters or larger",
+      "990": "Microscopic focus or foci only and no size of focus is given",
+      "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:corpus_adenosarcoma:tumor_size_summary_63115:i3",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Corpus Uteri Adenosarcoma",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_63115.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C540-C543",
+        "C548-C549",
+        "C559"
+      ],
+      "histologies": [
+        "8933"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:corpus_adenosarcoma:nodes_pos_fpa:c4",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Corpus Uteri Adenosarcoma",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C540-C543",
+        "C548-C549",
+        "C559"
+      ],
+      "histologies": [
+        "8933"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in medical record",
+    "codes": {
+      "00": "All nodes examined negative",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:corpus_adenosarcoma:nodes_pos_fpa:i5",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Corpus Uteri Adenosarcoma",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C540-C543",
+        "C548-C549",
+        "C559"
+      ],
+      "histologies": [
+        "8933"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:corpus_adenosarcoma:nodes_exam_76029:c6",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Corpus Uteri Adenosarcoma",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C540-C543",
+        "C548-C549",
+        "C559"
+      ],
+      "histologies": [
+        "8933"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (8 codes)\n00: No nodes examined\n01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)\n90: 90 or more nodes examined\n95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed\n96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated\n97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated\n98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown\n99: Unknown if nodes were examined; not applicable or negative Not documented in medical record",
+    "codes": {
+      "00": "No nodes examined",
+      "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+      "90": "90 or more nodes examined",
+      "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+      "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+      "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+      "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+      "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:corpus_adenosarcoma:nodes_exam_76029:i7",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Corpus Uteri Adenosarcoma",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C540-C543",
+        "C548-C549",
+        "C559"
+      ],
+      "histologies": [
+        "8933"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:corpus_adenosarcoma:ss2018_corpus_sarcoma_75896:c8",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Corpus Uteri Adenosarcoma",
+      "Summary Stage 2018: Corpus Sarcoma"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_corpus_sarcoma_75896.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C540-C543",
+        "C548-C549",
+        "C559"
+      ],
+      "histologies": [
+        "8933"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018: Corpus Sarcoma (6 codes)\n1: **Localized only (localized, NOS)** * Confined to endometrium (stromal) * Invasion of myometrium (inner half, outer half, NOS) - WITHOUT or UNKNOWN involvement of endocervix * Tunica serosa of the visceral peritoneum (serosa covering the corpus) Confined to corpus, NOS Localized, NOS FIGO Stage I (IA, IB, IC, I NOS)\n2: **Regional by direct extension only** * Adnexa, NOS * Bladder wall * Bladder, NOS excluding mucosa (see code 7 for bladder mucosa) * Bowell wall * Cervix (glandular or stromal) * Cervix uteri, NOS, but not beyond uterus * Endocervix (glandular or stromal) * Extension beyond uterus, within pelvis, NOS * Fallopian tube(s) * \"Frozen pelvis\" (clinically described) * Ligament(s) (broad, ovarian, round, suspensory) * Ovary(ies) * Parametrium * Parietal serosa of pelvic cavity * Pelvic wall(s) * Rectal wall * Rectum, NOS excluding mucosa (see code 7 for rectal mucosa) * Ureter * Vagina * Visceral peritoneum of pelvic organs (excluding serosa of corpus uteri) * Vulva Malignant cells in peritoneal cytology FIGO Stage II (IIA, IIB, II NOS)\n3: **Regional lymph node(s) involved only** - Para-aortic, NOS + Aortic + Lateral aortic/la …",
+    "codes": {
+      "1": "**Localized only (localized, NOS)**\n\n* Confined to endometrium (stromal)\n*  Invasion of myometrium (inner half, outer half, NOS)\n   - WITHOUT or UNKNOWN involvement of endocervix\n* Tunica serosa of the visceral peritoneum (serosa covering the corpus)\n\nConfined to corpus, NOS\nLocalized, NOS\n\nFIGO Stage I (IA, IB, IC, I NOS)",
+      "2": "**Regional by direct extension only**\n\n* Adnexa, NOS\n* Bladder wall\n* Bladder, NOS excluding mucosa (see code 7 for bladder mucosa)\n* Bowell wall\n* Cervix (glandular or stromal)\n* Cervix uteri, NOS, but not beyond uterus\n* Endocervix (glandular or stromal)\n* Extension beyond uterus, within pelvis, NOS\n* Fallopian tube(s)\n* \"Frozen pelvis\" (clinically described)\n* Ligament(s) (broad, ovarian, round, suspensory)\n* Ovary(ies)\n* Parametrium\n* Parietal serosa of pelvic cavity\n* Pelvic wall(s)\n* Rectal wall\n* Rectum, NOS excluding mucosa (see code 7 for rectal mucosa)\n* Ureter\n* Vagina\n* Visceral peritoneum of pelvic organs (excluding serosa of corpus uteri)\n* Vulva\n\nMalignant cells in peritoneal cytology\n\nFIGO Stage II (IIA, IIB, II NOS)",
+      "3": "**Regional lymph node(s) involved only**\n- Para-aortic, NOS\n  + Aortic\n  + Lateral aortic/lateral lumbar\n  + Periaortic\n- Pelvic, NOS\n  + Iliac, NOS\n     + Common\n     + External\n     + Internal (hypogastric) (obturator)\n   + Paracervical\n   + Parametrial\n   + Sacral, NOS\n      + Lateral (laterosacral)\n      + Middle (promontorial) (Gerota's node)\n      + Presacral\n      + Uterosacral\n- Regional lymph node(s), NOS\n  + Lymph node(s), NOS\n\nFIGO Stage IIIC\n* Localized tumor WITH regional lymph node involvement",
+      "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+      "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n   + Abdominal serosa (visceral or parietal peritoneum of abdomen)\n   +  Abdominal structures (other, NOS)\n   + Abdominal tissues (infiltration)\n  + Bladder mucosa (excluding bullous edema)\n   + Bone\n   + Cul de sac (rectouterine pouch)\n   + Intraperitoneal disease\n   + Liver\n   + Lung\n   + Rectal mucosa (excluding bullous edema)\n   + Sigmoid colon\n   + Small intestine\n - Distant lymph node(s), NOS \n   + Femoral\n   + Inguinal, NOS\n      + Inguinofemoral (groin)\n      + Node of Cloquet or Rosenmuller (highest deep inguinal)\n      + Superficial inguinal (femoral)\n- Distant metastasis, NOS\n   + Carcinomatosis\n   + Distant metastasis WITH or WITHOUT distant lymph node(s)\n\nFIGO Stage III (IIIA, IIB, III NOS)\nFIGO Stage IV (IVA, IVB, IV NOS)",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:corpus_adenosarcoma:ss2018_corpus_sarcoma_75896:i9",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Corpus Uteri Adenosarcoma",
+      "Summary Stage 2018: Corpus Sarcoma"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_corpus_sarcoma_75896.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C540-C543",
+        "C548-C549",
+        "C559"
+      ],
+      "histologies": [
+        "8933"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Corpus Sarcoma**\n\n8710-8714, 8800-8941, 8951-8975, 8981-9138, 9141-9582\n\nC540-C543, C548-C549, C559\nC540 Isthmus uteri\nC541 Endometrium\nC542 Myometrium\nC543 Fundus uteri\nC548 Overlapping lesion of corpus uteri\nC549 Corpus uteri\nC559 Uterus, NOS\n\n**Note 1:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 54 *Corpus Uteri-Sarcoma*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Not applicable codes** \n* Code 0 is not applicable for this chapter.\n\n**Note 3:** **Isolated tumor cells** \n* Isolated tumor cells (ITCs) are defined as single tumor cells or small clusters not greater than 0.2 mm, usually detected by immunohistochemical (IHC) or molecular methods. ITCs do not usually show evidence of malignant activity (e.g., proliferation or stromal reaction). \n* Lymph nodes with ITCs only are **not** counted as positive nodes for Summary Stage",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:corpus_adenosarcoma:grade_clinical_24620:c10",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Corpus Uteri Adenosarcoma",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_24620.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C540-C543",
+        "C548-C549",
+        "C559"
+      ],
+      "histologies": [
+        "8933"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (7 codes)\n1: G1: Well differentiated\n2: G2: Moderately differentiated\n3: G3: Poorly differentiated or undifferentiated\nL: Low grade\nH: High grade\nS: Sarcomatous overgrowth\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Well differentiated",
+      "2": "G2: Moderately differentiated",
+      "3": "G3: Poorly differentiated or undifferentiated",
+      "L": "Low grade",
+      "H": "High grade",
+      "S": "Sarcomatous overgrowth",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:corpus_adenosarcoma:grade_clinical_24620:i11",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Corpus Uteri Adenosarcoma",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_24620.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C540-C543",
+        "C548-C549",
+        "C559"
+      ],
+      "histologies": [
+        "8933"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Clinical must not be blank.\n\n**Note 2:** Assign the highest grade from the primary tumor assessed during the clinical time frame. \n\n**Note 3:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 4:** G3 includes anaplastic.\n\n**Note 5:** Sarcomatous overgrowth (S) takes priority over L and H\n* *Example*: Pathology report: Adenocarcinoma with sarcomatous overgrowth, high and low grade\n   - Code Grade to S for the sarcomatous overgrowth\n\n**Note 6:** Code 9 (unknown) when \n* Grade from primary site is not documented\n* Clinical workup is not done (for example, cancer is an incidental finding during surgery for another condition)\n* Grade checked \"not applicable\" on CAP Protocol (if available) and no other grade information is available\n\n**Note 7:** If there is only one grade available and it cannot be determined if it is clinical or pathological, assume it is a Grade Clinical and code appropriately per Grade Clinical categories for that site, and then code unknown (9) for Grade Pathological, and blank for Grade Post Therapy Clin (yc) and Grade Post Therapy Path (yp).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:corpus_adenosarcoma:grade_pathological_40052:c12",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Corpus Uteri Adenosarcoma",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_40052.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C540-C543",
+        "C548-C549",
+        "C559"
+      ],
+      "histologies": [
+        "8933"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (7 codes)\n1: G1: Well differentiated\n2: G2: Moderately differentiated\n3: G3: Poorly differentiated or undifferentiated\nL: Low grade\nH: High grade\nS: Sarcomatous overgrowth\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Well differentiated",
+      "2": "G2: Moderately differentiated",
+      "3": "G3: Poorly differentiated or undifferentiated",
+      "L": "Low grade",
+      "H": "High grade",
+      "S": "Sarcomatous overgrowth",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:corpus_adenosarcoma:grade_pathological_40052:i13",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Corpus Uteri Adenosarcoma",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_40052.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C540-C543",
+        "C548-C549",
+        "C559"
+      ],
+      "histologies": [
+        "8933"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Pathological must not be blank.\n\n**Note 2:** There is a preferred grading system for this schema. If the clinical grade given uses the preferred grading system and the pathological grade does not use the preferred grading system, do not record the Grade Clinical in the Grade Pathological field. \n* *Example:* Corpus biopsy reports states moderately differentiated adenosarcoma.  The surgical resection states a high grade adenosarcoma. Assign Grade Pathological using the H code \n   - Code Grade Clinical as 2 since Moderately differentiated (G2) is the preferred grading system\n   - Code Grade Pathological as H since the preferred grading system was not used and there is a code available for “high grade” only\n\n**Note 3:** Assign the highest grade from the primary tumor.  \n\n**Note 4:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 5:** G3 includes anaplastic.\n\n**Note 6:** Sarcomatous overgrowth (S) takes priority over L and H\n* *Example:* Pathology report: Adenocarcinoma with sarcomatous overgrowth, high and low grade\n    - Code Grade to S for the sarcomatous overgrowth\n\n**Note 7:** Use the grade from the **clinical work up** from the primary tumor in different scenarios based on behavior or surgical resection\n* **Behavior**\n  - Tumor behavior for the clinical and the pathological diagnoses are the same AND the clinical grade is the highest grade \n   - Tumor behavior for clinical diagnosis is invasive, and the tumor behavior for the pathological diagnosis is in situ\n* **Surgical Resection**\n   - Surgical resection is done of the primary tumor and there is no grade documented from the surgical resection\n    - Surgical resection is done of the primary tumor and there is no residual cancer\n* **No surgical resection**\n    - Surgical resection of the primary tumor has not been done, but there is positive microscopic confirmation of distant metastases during the clinical time frame\n\n**Note 8:** Code 9 (unknown) when \n* Grade from primary site is not documented\n* No resection of the primary site (see exception in Note 7, Surgical resection, last bullet)\n* Neo-adjuvant therapy is followed by a resection (see Grade Post Therapy Path (yp))\n* Grade checked “not applicable” on CAP Protocol (if available) and no other grade information is available\n* Clinical case only (see Grade Clinical)\n* There is only one grade available and it cannot be determined if it is clinical, pathological, post therapy clinical or post therapy pathological",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:corpus_adenosarcoma:figo_stage_corpus_adenosarcoma_24886:c14",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Corpus Uteri Adenosarcoma",
+      "FIGO Stage Corpus Adenosarcoma"
+    ],
+    "anchor": "eod_public-3.3:tables/figo_stage_corpus_adenosarcoma_24886.json",
+    "kind": "code_table",
+    "item_ids": [
+      3836
+    ],
+    "applies_to": {
+      "sites": [
+        "C540-C543",
+        "C548-C549",
+        "C559"
+      ],
+      "histologies": [
+        "8933"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "FIGO Stage Corpus Adenosarcoma (16 codes)\n1: FIGO Stage I\n1A: FIGO Stage IA\n1B: FIGO Stage IB\n1C: FIGO Stage IC\n2: FIGO Stage II\n2A: FIGO Stage IIA\n2B: FIGO Stage IIB\n3: FIGO Stage III\n3A: FIGO Stage IIIA\n3B: FIGO Stage IIIB\n3C: FIGO Stage IIIC\n4: FIGO Stage IV\n4A: FIGO Stage IVA\n4B: FIGO Stage IVB\n98: Not applicable: Information not collected for this case (If this item is required by your standard setter, use of code 98 will result in an edit error.)\n99: Not documented in medical record FIGO stage not assessed or unknown if assessed",
+    "codes": {
+      "1": "FIGO Stage I",
+      "1A": "FIGO Stage IA",
+      "1B": "FIGO Stage IB",
+      "1C": "FIGO Stage IC",
+      "2": "FIGO Stage II",
+      "2A": "FIGO Stage IIA",
+      "2B": "FIGO Stage IIB",
+      "3": "FIGO Stage III",
+      "3A": "FIGO Stage IIIA",
+      "3B": "FIGO Stage IIIB",
+      "3C": "FIGO Stage IIIC",
+      "4": "FIGO Stage IV",
+      "4A": "FIGO Stage IVA",
+      "4B": "FIGO Stage IVB",
+      "98": "Not applicable:  Information not collected for this case\n(If this item is required by your standard setter, use of code 98 will result in an edit error.)",
+      "99": "Not documented in medical record\nFIGO stage not assessed or unknown if assessed"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:corpus_adenosarcoma:figo_stage_corpus_adenosarcoma_24886:i15",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Corpus Uteri Adenosarcoma",
+      "FIGO Stage Corpus Adenosarcoma"
+    ],
+    "anchor": "eod_public-3.3:tables/figo_stage_corpus_adenosarcoma_24886.json",
+    "kind": "instruction",
+    "item_ids": [
+      3836
+    ],
+    "applies_to": {
+      "sites": [
+        "C540-C543",
+        "C548-C549",
+        "C559"
+      ],
+      "histologies": [
+        "8933"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** **Physician Statement**\n* There must be a statement about FIGO stage from the managing physician in order to code this data item.\n  * Do not code FIGO stage based on the pathology report\n  * Do not code FIGO stage based only on T, N, M\n  * If \"FIGO\" is not included with a stated stage, then do not assume it is a FIGO stage\n\n**Note 2:** **FIGO Stage vs FIGO Grade** \n* FIGO stage is not the same thing as FIGO grade. Only code FIGO stage in this field, do not code FIGO grade.\n* Code FIGO grade in the grade fields\n\n**Note 3:** **Multiple FIGO stages**\n* If there is more than one FIGO stage provided from the clinical and pathological work up, code the most extensive FIGO stage.\n\n**Note 4:** **FIGO Stage 0 (in-situ)**\n* The FIGO stage definitions do not include Stage 0 (Tis).\n* Code 97 for any non-invasive neoplasm (behavior /2)",
+    "codes": null,
+    "notes": null
+  }
+]

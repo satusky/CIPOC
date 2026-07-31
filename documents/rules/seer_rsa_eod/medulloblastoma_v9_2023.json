@@ -1,0 +1,1469 @@
+[
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:schema:i1",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/medulloblastoma_v9_2023.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C700-C729"
+      ],
+      "histologies": [
+        "9362",
+        "9470-9472",
+        "9474-9478",
+        "9501-9504",
+        "9508"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "C700-C729: 9362, 9470-9472, 9474-9478, 9501-9504, 9508\nC700-C722, C724-C729: 9473\nC753: 9362\n\nC700  Cerebral meninges \nC701  Spinal meninges\nC709  Meninges, NOS\nC710  Cerebrum \nC711  Frontal lobe \nC712  Temporal lobe \nC713  Parietal lobe \nC714  Occipital lobe \nC715  Ventricle, NOS\nC716  Cerebellum, NOS\nC717  Brain stem\nC718  Overlapping lesion of brain\nC719  Brain, NOS\nC720  Spinal cord\nC721  Cauda equina\nC722  Olfactory nerve \nC723  Optic nerve \nC724  Acoustic nerve \nC725  Cranial nerve, NOS\nC728  Overlapping lesion of brain and central nervous system\nC729  Nervous system, NOS\nC753  Pineal Gland (9362 only)\n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Brain and Spinal Cord, from the AJCC Cancer Staging System Version 9 (2022). Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **New schema for 2023+** \n* This is a new schema for cases diagnosed 2023+. \n* For cases diagnosed prior to 2023, see the following schemas\n  * Brain (C700, C710-C719)\n  * CNS Other (C701, C709, C720-C721, C728-C729)\n  * Intracranial Gland (C753)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:schema:i2",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/medulloblastoma_v9_2023.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C700-C722",
+        "C724-C729"
+      ],
+      "histologies": [
+        "9473"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "C700-C729: 9362, 9470-9472, 9474-9478, 9501-9504, 9508\nC700-C722, C724-C729: 9473\nC753: 9362\n\nC700  Cerebral meninges \nC701  Spinal meninges\nC709  Meninges, NOS\nC710  Cerebrum \nC711  Frontal lobe \nC712  Temporal lobe \nC713  Parietal lobe \nC714  Occipital lobe \nC715  Ventricle, NOS\nC716  Cerebellum, NOS\nC717  Brain stem\nC718  Overlapping lesion of brain\nC719  Brain, NOS\nC720  Spinal cord\nC721  Cauda equina\nC722  Olfactory nerve \nC723  Optic nerve \nC724  Acoustic nerve \nC725  Cranial nerve, NOS\nC728  Overlapping lesion of brain and central nervous system\nC729  Nervous system, NOS\nC753  Pineal Gland (9362 only)\n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Brain and Spinal Cord, from the AJCC Cancer Staging System Version 9 (2022). Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **New schema for 2023+** \n* This is a new schema for cases diagnosed 2023+. \n* For cases diagnosed prior to 2023, see the following schemas\n  * Brain (C700, C710-C719)\n  * CNS Other (C701, C709, C720-C721, C728-C729)\n  * Intracranial Gland (C753)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:schema:i3",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/medulloblastoma_v9_2023.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C753"
+      ],
+      "histologies": [
+        "9362"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "C700-C729: 9362, 9470-9472, 9474-9478, 9501-9504, 9508\nC700-C722, C724-C729: 9473\nC753: 9362\n\nC700  Cerebral meninges \nC701  Spinal meninges\nC709  Meninges, NOS\nC710  Cerebrum \nC711  Frontal lobe \nC712  Temporal lobe \nC713  Parietal lobe \nC714  Occipital lobe \nC715  Ventricle, NOS\nC716  Cerebellum, NOS\nC717  Brain stem\nC718  Overlapping lesion of brain\nC719  Brain, NOS\nC720  Spinal cord\nC721  Cauda equina\nC722  Olfactory nerve \nC723  Optic nerve \nC724  Acoustic nerve \nC725  Cranial nerve, NOS\nC728  Overlapping lesion of brain and central nervous system\nC729  Nervous system, NOS\nC753  Pineal Gland (9362 only)\n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Brain and Spinal Cord, from the AJCC Cancer Staging System Version 9 (2022). Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **New schema for 2023+** \n* This is a new schema for cases diagnosed 2023+. \n* For cases diagnosed prior to 2023, see the following schemas\n  * Brain (C700, C710-C719)\n  * CNS Other (C701, C709, C720-C721, C728-C729)\n  * Intracranial Gland (C753)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:behavior:c4",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "code_table",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729"
+      ],
+      "histologies": [
+        "9362",
+        "9470-9472",
+        "9474-9478",
+        "9501-9504",
+        "9508"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Behavior ICD-O-3 (4 codes)\n0: Benign\n1: Uncertain Benign/Malig\n2: In Situ\n3: Malignant Primary",
+    "codes": {
+      "0": "Benign",
+      "1": "Uncertain Benign/Malig",
+      "2": "In Situ",
+      "3": "Malignant Primary"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:behavior:c5",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "code_table",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C722",
+        "C724-C729"
+      ],
+      "histologies": [
+        "9473"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Behavior ICD-O-3 (4 codes)\n0: Benign\n1: Uncertain Benign/Malig\n2: In Situ\n3: Malignant Primary",
+    "codes": {
+      "0": "Benign",
+      "1": "Uncertain Benign/Malig",
+      "2": "In Situ",
+      "3": "Malignant Primary"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:behavior:c6",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "code_table",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C753"
+      ],
+      "histologies": [
+        "9362"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Behavior ICD-O-3 (4 codes)\n0: Benign\n1: Uncertain Benign/Malig\n2: In Situ\n3: Malignant Primary",
+    "codes": {
+      "0": "Benign",
+      "1": "Uncertain Benign/Malig",
+      "2": "In Situ",
+      "3": "Malignant Primary"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:behavior:i7",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729"
+      ],
+      "histologies": [
+        "9362",
+        "9470-9472",
+        "9474-9478",
+        "9501-9504",
+        "9508"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:behavior:i8",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C722",
+        "C724-C729"
+      ],
+      "histologies": [
+        "9473"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:behavior:i9",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C753"
+      ],
+      "histologies": [
+        "9362"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:tumor_size_summary_63115:c10",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_63115.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729"
+      ],
+      "histologies": [
+        "9362",
+        "9470-9472",
+        "9474-9478",
+        "9501-9504",
+        "9508"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (6 codes)\n000: No mass/tumor found\n001: 1 mm or described as less than 1 mm\n002-988: Exact size in millimeters (2 mm to 988 mm)\n989: 989 millimeters or larger\n990: Microscopic focus or foci only and no size of focus is given\n999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm",
+      "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+      "989": "989 millimeters or larger",
+      "990": "Microscopic focus or foci only and no size of focus is given",
+      "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:tumor_size_summary_63115:c11",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_63115.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C722",
+        "C724-C729"
+      ],
+      "histologies": [
+        "9473"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (6 codes)\n000: No mass/tumor found\n001: 1 mm or described as less than 1 mm\n002-988: Exact size in millimeters (2 mm to 988 mm)\n989: 989 millimeters or larger\n990: Microscopic focus or foci only and no size of focus is given\n999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm",
+      "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+      "989": "989 millimeters or larger",
+      "990": "Microscopic focus or foci only and no size of focus is given",
+      "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:tumor_size_summary_63115:c12",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_63115.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C753"
+      ],
+      "histologies": [
+        "9362"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (6 codes)\n000: No mass/tumor found\n001: 1 mm or described as less than 1 mm\n002-988: Exact size in millimeters (2 mm to 988 mm)\n989: 989 millimeters or larger\n990: Microscopic focus or foci only and no size of focus is given\n999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm",
+      "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+      "989": "989 millimeters or larger",
+      "990": "Microscopic focus or foci only and no size of focus is given",
+      "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:tumor_size_summary_63115:i13",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_63115.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729"
+      ],
+      "histologies": [
+        "9362",
+        "9470-9472",
+        "9474-9478",
+        "9501-9504",
+        "9508"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:tumor_size_summary_63115:i14",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_63115.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C722",
+        "C724-C729"
+      ],
+      "histologies": [
+        "9473"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:tumor_size_summary_63115:i15",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_63115.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C753"
+      ],
+      "histologies": [
+        "9362"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:nodes_pos_dna_91511:c16",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_dna_91511.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729"
+      ],
+      "histologies": [
+        "9362",
+        "9470-9472",
+        "9474-9478",
+        "9501-9504",
+        "9508"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (1 codes)\n99: Not applicable",
+    "codes": {
+      "99": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:nodes_pos_dna_91511:c17",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_dna_91511.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C722",
+        "C724-C729"
+      ],
+      "histologies": [
+        "9473"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (1 codes)\n99: Not applicable",
+    "codes": {
+      "99": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:nodes_pos_dna_91511:c18",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_dna_91511.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C753"
+      ],
+      "histologies": [
+        "9362"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (1 codes)\n99: Not applicable",
+    "codes": {
+      "99": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:nodes_pos_dna_91511:i19",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_dna_91511.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729"
+      ],
+      "histologies": [
+        "9362",
+        "9470-9472",
+        "9474-9478",
+        "9501-9504",
+        "9508"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:nodes_pos_dna_91511:i20",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_dna_91511.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C722",
+        "C724-C729"
+      ],
+      "histologies": [
+        "9473"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:nodes_pos_dna_91511:i21",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_dna_91511.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C753"
+      ],
+      "histologies": [
+        "9362"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:nodes_exam_dna_95635:c22",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_dna_95635.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729"
+      ],
+      "histologies": [
+        "9362",
+        "9470-9472",
+        "9474-9478",
+        "9501-9504",
+        "9508"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (1 codes)\n99: Not applicable",
+    "codes": {
+      "99": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:nodes_exam_dna_95635:c23",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_dna_95635.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C722",
+        "C724-C729"
+      ],
+      "histologies": [
+        "9473"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (1 codes)\n99: Not applicable",
+    "codes": {
+      "99": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:nodes_exam_dna_95635:c24",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_dna_95635.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C753"
+      ],
+      "histologies": [
+        "9362"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (1 codes)\n99: Not applicable",
+    "codes": {
+      "99": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:nodes_exam_dna_95635:i25",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_dna_95635.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729"
+      ],
+      "histologies": [
+        "9362",
+        "9470-9472",
+        "9474-9478",
+        "9501-9504",
+        "9508"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:nodes_exam_dna_95635:i26",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_dna_95635.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C722",
+        "C724-C729"
+      ],
+      "histologies": [
+        "9473"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:nodes_exam_dna_95635:i27",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_dna_95635.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C753"
+      ],
+      "histologies": [
+        "9362"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:ss2018_medulloblastoma_22906:c28",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Summary Stage 2023: Medulloblastoma"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_medulloblastoma_22906.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729"
+      ],
+      "histologies": [
+        "9362",
+        "9470-9472",
+        "9474-9478",
+        "9501-9504",
+        "9508"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2023: Medulloblastoma (5 codes)\n1: **Localized only (Localized, NOS)** Single tumor with no invasion or seeding to other structures Confined to site of origin, NOS Localized, NOS\n2: **Regional, NOS** Tumor crosses the midline\n7: **Distant site(s)/lymph node(s) involved** * Distant site(s) (including further contiguous extension) * All Sites * Blood * Bone (including skull) * Bone marrow * \"Drop\" metastasis * Extra-neural metastasis, NOS * Gross spinal subarachnoid seeing * Intracranial spread beyond primary site * Major blood vessel(s) * Meninges (e.g., dura) * Microscopic confirmation of tumor cells present in CSF by cytology (circulating cells in cerebral spinal fluid) * Multiple/multifocal tumors * Nerves (cranial, NOS) * Tumor invades or encroaches upon ventricular system * Visible metastasis in cervicomedullary (junction) * Brain tumors (C700, C710-C719) * Anterior cranial fossa * Brain stem * Cerebellum * Cerebrum (cerebral hemisphere) * Contralateral hemisphere * Hypothalamus * Middle cranial fossa * Nasal cavity * Nasopharynx * Other direct extension outside CNS * Pallium * Posterior cranial fossa * Posterior pharynx * Suprasellar brain * Tapetum * Thalamus * …",
+    "codes": {
+      "1": "**Localized only (Localized, NOS)**\n\nSingle tumor with no invasion or seeding to other structures\n\nConfined to site of origin, NOS\nLocalized, NOS",
+      "2": "**Regional, NOS**\n\nTumor crosses the midline",
+      "7": "**Distant site(s)/lymph node(s) involved**\n\n* Distant site(s) (including further contiguous extension)\n  * All Sites\n    * Blood\n    * Bone (including skull)\n    * Bone marrow\n    * \"Drop\" metastasis\n    * Extra-neural metastasis, NOS\n    * Gross spinal subarachnoid seeing\n    * Intracranial spread beyond primary site\n    * Major blood vessel(s)\n    * Meninges (e.g., dura)\n    * Microscopic confirmation of tumor cells present in CSF by cytology (circulating cells in cerebral spinal fluid)\n    * Multiple/multifocal tumors\n    * Nerves (cranial, NOS)\n    * Tumor invades or encroaches upon ventricular system\n    * Visible metastasis in cervicomedullary (junction)\n  * Brain tumors (C700, C710-C719)\n    * Anterior cranial fossa\n    * Brain stem\n    * Cerebellum\n    * Cerebrum (cerebral hemisphere)\n    * Contralateral hemisphere\n    * Hypothalamus\n    * Middle cranial fossa\n    * Nasal cavity\n    * Nasopharynx\n    * Other direct extension outside CNS\n    * Pallium\n    * Posterior cranial fossa\n    * Posterior pharynx\n    * Suprasellar brain\n    * Tapetum\n    * Thalamus\n  * CNS Tumors (C701, C709, C720-C729)\n    * Adjacent connective tissue\n    * Adjacent muscle\n    * Brain \n    * Eye\n    * Sphenoid and frontal sinuses(skull)\n  * Pineal Gland (C753)\n    * Adjacent connective/soft tissue\n    * Cavernous sinus\n    * Infratentorial and central brain\n  * Distant lymph node(s), NOS\n  * Distant metastasis, NOS\n    * Carcinomatosis \n    * Distant metastasis WITH or WITHOUT distant lymph node(s)",
+      "8": "**Benign or borderline brain**\n* Behavior is /0 or /1",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:ss2018_medulloblastoma_22906:c29",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Summary Stage 2023: Medulloblastoma"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_medulloblastoma_22906.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C722",
+        "C724-C729"
+      ],
+      "histologies": [
+        "9473"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2023: Medulloblastoma (5 codes)\n1: **Localized only (Localized, NOS)** Single tumor with no invasion or seeding to other structures Confined to site of origin, NOS Localized, NOS\n2: **Regional, NOS** Tumor crosses the midline\n7: **Distant site(s)/lymph node(s) involved** * Distant site(s) (including further contiguous extension) * All Sites * Blood * Bone (including skull) * Bone marrow * \"Drop\" metastasis * Extra-neural metastasis, NOS * Gross spinal subarachnoid seeing * Intracranial spread beyond primary site * Major blood vessel(s) * Meninges (e.g., dura) * Microscopic confirmation of tumor cells present in CSF by cytology (circulating cells in cerebral spinal fluid) * Multiple/multifocal tumors * Nerves (cranial, NOS) * Tumor invades or encroaches upon ventricular system * Visible metastasis in cervicomedullary (junction) * Brain tumors (C700, C710-C719) * Anterior cranial fossa * Brain stem * Cerebellum * Cerebrum (cerebral hemisphere) * Contralateral hemisphere * Hypothalamus * Middle cranial fossa * Nasal cavity * Nasopharynx * Other direct extension outside CNS * Pallium * Posterior cranial fossa * Posterior pharynx * Suprasellar brain * Tapetum * Thalamus * …",
+    "codes": {
+      "1": "**Localized only (Localized, NOS)**\n\nSingle tumor with no invasion or seeding to other structures\n\nConfined to site of origin, NOS\nLocalized, NOS",
+      "2": "**Regional, NOS**\n\nTumor crosses the midline",
+      "7": "**Distant site(s)/lymph node(s) involved**\n\n* Distant site(s) (including further contiguous extension)\n  * All Sites\n    * Blood\n    * Bone (including skull)\n    * Bone marrow\n    * \"Drop\" metastasis\n    * Extra-neural metastasis, NOS\n    * Gross spinal subarachnoid seeing\n    * Intracranial spread beyond primary site\n    * Major blood vessel(s)\n    * Meninges (e.g., dura)\n    * Microscopic confirmation of tumor cells present in CSF by cytology (circulating cells in cerebral spinal fluid)\n    * Multiple/multifocal tumors\n    * Nerves (cranial, NOS)\n    * Tumor invades or encroaches upon ventricular system\n    * Visible metastasis in cervicomedullary (junction)\n  * Brain tumors (C700, C710-C719)\n    * Anterior cranial fossa\n    * Brain stem\n    * Cerebellum\n    * Cerebrum (cerebral hemisphere)\n    * Contralateral hemisphere\n    * Hypothalamus\n    * Middle cranial fossa\n    * Nasal cavity\n    * Nasopharynx\n    * Other direct extension outside CNS\n    * Pallium\n    * Posterior cranial fossa\n    * Posterior pharynx\n    * Suprasellar brain\n    * Tapetum\n    * Thalamus\n  * CNS Tumors (C701, C709, C720-C729)\n    * Adjacent connective tissue\n    * Adjacent muscle\n    * Brain \n    * Eye\n    * Sphenoid and frontal sinuses(skull)\n  * Pineal Gland (C753)\n    * Adjacent connective/soft tissue\n    * Cavernous sinus\n    * Infratentorial and central brain\n  * Distant lymph node(s), NOS\n  * Distant metastasis, NOS\n    * Carcinomatosis \n    * Distant metastasis WITH or WITHOUT distant lymph node(s)",
+      "8": "**Benign or borderline brain**\n* Behavior is /0 or /1",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:ss2018_medulloblastoma_22906:c30",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Summary Stage 2023: Medulloblastoma"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_medulloblastoma_22906.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C753"
+      ],
+      "histologies": [
+        "9362"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2023: Medulloblastoma (5 codes)\n1: **Localized only (Localized, NOS)** Single tumor with no invasion or seeding to other structures Confined to site of origin, NOS Localized, NOS\n2: **Regional, NOS** Tumor crosses the midline\n7: **Distant site(s)/lymph node(s) involved** * Distant site(s) (including further contiguous extension) * All Sites * Blood * Bone (including skull) * Bone marrow * \"Drop\" metastasis * Extra-neural metastasis, NOS * Gross spinal subarachnoid seeing * Intracranial spread beyond primary site * Major blood vessel(s) * Meninges (e.g., dura) * Microscopic confirmation of tumor cells present in CSF by cytology (circulating cells in cerebral spinal fluid) * Multiple/multifocal tumors * Nerves (cranial, NOS) * Tumor invades or encroaches upon ventricular system * Visible metastasis in cervicomedullary (junction) * Brain tumors (C700, C710-C719) * Anterior cranial fossa * Brain stem * Cerebellum * Cerebrum (cerebral hemisphere) * Contralateral hemisphere * Hypothalamus * Middle cranial fossa * Nasal cavity * Nasopharynx * Other direct extension outside CNS * Pallium * Posterior cranial fossa * Posterior pharynx * Suprasellar brain * Tapetum * Thalamus * …",
+    "codes": {
+      "1": "**Localized only (Localized, NOS)**\n\nSingle tumor with no invasion or seeding to other structures\n\nConfined to site of origin, NOS\nLocalized, NOS",
+      "2": "**Regional, NOS**\n\nTumor crosses the midline",
+      "7": "**Distant site(s)/lymph node(s) involved**\n\n* Distant site(s) (including further contiguous extension)\n  * All Sites\n    * Blood\n    * Bone (including skull)\n    * Bone marrow\n    * \"Drop\" metastasis\n    * Extra-neural metastasis, NOS\n    * Gross spinal subarachnoid seeing\n    * Intracranial spread beyond primary site\n    * Major blood vessel(s)\n    * Meninges (e.g., dura)\n    * Microscopic confirmation of tumor cells present in CSF by cytology (circulating cells in cerebral spinal fluid)\n    * Multiple/multifocal tumors\n    * Nerves (cranial, NOS)\n    * Tumor invades or encroaches upon ventricular system\n    * Visible metastasis in cervicomedullary (junction)\n  * Brain tumors (C700, C710-C719)\n    * Anterior cranial fossa\n    * Brain stem\n    * Cerebellum\n    * Cerebrum (cerebral hemisphere)\n    * Contralateral hemisphere\n    * Hypothalamus\n    * Middle cranial fossa\n    * Nasal cavity\n    * Nasopharynx\n    * Other direct extension outside CNS\n    * Pallium\n    * Posterior cranial fossa\n    * Posterior pharynx\n    * Suprasellar brain\n    * Tapetum\n    * Thalamus\n  * CNS Tumors (C701, C709, C720-C729)\n    * Adjacent connective tissue\n    * Adjacent muscle\n    * Brain \n    * Eye\n    * Sphenoid and frontal sinuses(skull)\n  * Pineal Gland (C753)\n    * Adjacent connective/soft tissue\n    * Cavernous sinus\n    * Infratentorial and central brain\n  * Distant lymph node(s), NOS\n  * Distant metastasis, NOS\n    * Carcinomatosis \n    * Distant metastasis WITH or WITHOUT distant lymph node(s)",
+      "8": "**Benign or borderline brain**\n* Behavior is /0 or /1",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:ss2018_medulloblastoma_22906:i31",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Summary Stage 2023: Medulloblastoma"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_medulloblastoma_22906.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729"
+      ],
+      "histologies": [
+        "9362",
+        "9470-9472",
+        "9474-9478",
+        "9501-9504",
+        "9508"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Medulloblastoma**\n\nC700-C729: 9362, 9470-9472, 9474-9478, 9501-9504, 9508\nC700-C722, C724-C729: 9473\nC753: 9362\n\nC700-C729, C753\nC700 Cerebral meninges\nC701 Spinal meninges\nC709 Meninges, NOS\nC710 Cerebrum\nC711 Frontal lobe\nC712 Temporal lobe\nC713 Parietal lobe\nC714 Occipital lobe\nC715 Ventricle, NOS\nC716 Cerebellum, NOS\nC717 Brain stem\nC718 Overlapping lesion of brain\nC719 Brain, NOS\nC720 Spinal cord\nC721 Cauda equina\nC722 Olfactory nerve\nC723 Optic nerve\nC724 Acoustic nerve\nC725 Cranial nerve, NOS\nC728 Overlapping lesion of brain and central nervous system\nC729 Nervous system, NOS\nC753 Pineal Gland\n\n**Note 1:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Brain and Spinal Cord, from the AJCC Cancer Staging System Version 9 (2022). Used with permission of the American College of Surgeons, Chicago, Illinois\n\n**Note 2:** **New schema for 2023+** \n* This is a new Summary Stage chapter for cases diagnosed 2023+. \n* For cases diagnosed prior to 2023+, use the appropriate Summary Stage chapter based on primary site \n  * C700, C710-C719: Summary Stage Chapter *Brain*\n  * C701, C709, C720-C729: Summary Stage Chapter *CNS Other*\n  * C753: Summary Stage Chapter *Intracranial Gland*\n\n**Note 3:** **Benign/borderline tumors** \n* Benign (/0) or Borderline (/1) tumors **are always coded to 8** regardless of size, extension to adjacent sites, or multiple tumors\n\n**Note 4:** **Applicable codes** \n* Codes 0, 3, and 4 are not applicable for this chapter.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:ss2018_medulloblastoma_22906:i32",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Summary Stage 2023: Medulloblastoma"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_medulloblastoma_22906.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C722",
+        "C724-C729"
+      ],
+      "histologies": [
+        "9473"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Medulloblastoma**\n\nC700-C729: 9362, 9470-9472, 9474-9478, 9501-9504, 9508\nC700-C722, C724-C729: 9473\nC753: 9362\n\nC700-C729, C753\nC700 Cerebral meninges\nC701 Spinal meninges\nC709 Meninges, NOS\nC710 Cerebrum\nC711 Frontal lobe\nC712 Temporal lobe\nC713 Parietal lobe\nC714 Occipital lobe\nC715 Ventricle, NOS\nC716 Cerebellum, NOS\nC717 Brain stem\nC718 Overlapping lesion of brain\nC719 Brain, NOS\nC720 Spinal cord\nC721 Cauda equina\nC722 Olfactory nerve\nC723 Optic nerve\nC724 Acoustic nerve\nC725 Cranial nerve, NOS\nC728 Overlapping lesion of brain and central nervous system\nC729 Nervous system, NOS\nC753 Pineal Gland\n\n**Note 1:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Brain and Spinal Cord, from the AJCC Cancer Staging System Version 9 (2022). Used with permission of the American College of Surgeons, Chicago, Illinois\n\n**Note 2:** **New schema for 2023+** \n* This is a new Summary Stage chapter for cases diagnosed 2023+. \n* For cases diagnosed prior to 2023+, use the appropriate Summary Stage chapter based on primary site \n  * C700, C710-C719: Summary Stage Chapter *Brain*\n  * C701, C709, C720-C729: Summary Stage Chapter *CNS Other*\n  * C753: Summary Stage Chapter *Intracranial Gland*\n\n**Note 3:** **Benign/borderline tumors** \n* Benign (/0) or Borderline (/1) tumors **are always coded to 8** regardless of size, extension to adjacent sites, or multiple tumors\n\n**Note 4:** **Applicable codes** \n* Codes 0, 3, and 4 are not applicable for this chapter.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:ss2018_medulloblastoma_22906:i33",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Summary Stage 2023: Medulloblastoma"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_medulloblastoma_22906.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C753"
+      ],
+      "histologies": [
+        "9362"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Medulloblastoma**\n\nC700-C729: 9362, 9470-9472, 9474-9478, 9501-9504, 9508\nC700-C722, C724-C729: 9473\nC753: 9362\n\nC700-C729, C753\nC700 Cerebral meninges\nC701 Spinal meninges\nC709 Meninges, NOS\nC710 Cerebrum\nC711 Frontal lobe\nC712 Temporal lobe\nC713 Parietal lobe\nC714 Occipital lobe\nC715 Ventricle, NOS\nC716 Cerebellum, NOS\nC717 Brain stem\nC718 Overlapping lesion of brain\nC719 Brain, NOS\nC720 Spinal cord\nC721 Cauda equina\nC722 Olfactory nerve\nC723 Optic nerve\nC724 Acoustic nerve\nC725 Cranial nerve, NOS\nC728 Overlapping lesion of brain and central nervous system\nC729 Nervous system, NOS\nC753 Pineal Gland\n\n**Note 1:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Brain and Spinal Cord, from the AJCC Cancer Staging System Version 9 (2022). Used with permission of the American College of Surgeons, Chicago, Illinois\n\n**Note 2:** **New schema for 2023+** \n* This is a new Summary Stage chapter for cases diagnosed 2023+. \n* For cases diagnosed prior to 2023+, use the appropriate Summary Stage chapter based on primary site \n  * C700, C710-C719: Summary Stage Chapter *Brain*\n  * C701, C709, C720-C729: Summary Stage Chapter *CNS Other*\n  * C753: Summary Stage Chapter *Intracranial Gland*\n\n**Note 3:** **Benign/borderline tumors** \n* Benign (/0) or Borderline (/1) tumors **are always coded to 8** regardless of size, extension to adjacent sites, or multiple tumors\n\n**Note 4:** **Applicable codes** \n* Codes 0, 3, and 4 are not applicable for this chapter.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:grade_clinical_78613:c34",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_78613.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729"
+      ],
+      "histologies": [
+        "9362",
+        "9470-9472",
+        "9474-9478",
+        "9501-9504",
+        "9508"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (11 codes)\n1: WHO Grade I: Circumscribed tumors of low proliferative potential associated with the possibility of cure following resection\n2: WHO Grade II: Infiltrative tumors with low proliferative potential with increased risk of progression or recurrence\n3: WHO Grade III: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with an aggressive clinical course\n4: WHO Grade IV: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with the most aggressive clinical course and shorter overall survival\nL: Stated as \"low grade\" NOS\nH: Stated as \"high grade\" NOS\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "WHO Grade I: Circumscribed tumors of low proliferative potential associated with the possibility of cure following resection",
+      "2": "WHO Grade II: Infiltrative tumors with low proliferative potential with increased risk of progression or recurrence",
+      "3": "WHO Grade III: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with an aggressive clinical course",
+      "4": "WHO Grade IV: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with the most aggressive clinical course and shorter overall survival",
+      "L": "Stated as \"low grade\" NOS",
+      "H": "Stated as \"high grade\" NOS",
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:grade_clinical_78613:c35",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_78613.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C722",
+        "C724-C729"
+      ],
+      "histologies": [
+        "9473"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (11 codes)\n1: WHO Grade I: Circumscribed tumors of low proliferative potential associated with the possibility of cure following resection\n2: WHO Grade II: Infiltrative tumors with low proliferative potential with increased risk of progression or recurrence\n3: WHO Grade III: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with an aggressive clinical course\n4: WHO Grade IV: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with the most aggressive clinical course and shorter overall survival\nL: Stated as \"low grade\" NOS\nH: Stated as \"high grade\" NOS\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "WHO Grade I: Circumscribed tumors of low proliferative potential associated with the possibility of cure following resection",
+      "2": "WHO Grade II: Infiltrative tumors with low proliferative potential with increased risk of progression or recurrence",
+      "3": "WHO Grade III: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with an aggressive clinical course",
+      "4": "WHO Grade IV: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with the most aggressive clinical course and shorter overall survival",
+      "L": "Stated as \"low grade\" NOS",
+      "H": "Stated as \"high grade\" NOS",
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:grade_clinical_78613:c36",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_78613.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C753"
+      ],
+      "histologies": [
+        "9362"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (11 codes)\n1: WHO Grade I: Circumscribed tumors of low proliferative potential associated with the possibility of cure following resection\n2: WHO Grade II: Infiltrative tumors with low proliferative potential with increased risk of progression or recurrence\n3: WHO Grade III: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with an aggressive clinical course\n4: WHO Grade IV: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with the most aggressive clinical course and shorter overall survival\nL: Stated as \"low grade\" NOS\nH: Stated as \"high grade\" NOS\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "WHO Grade I: Circumscribed tumors of low proliferative potential associated with the possibility of cure following resection",
+      "2": "WHO Grade II: Infiltrative tumors with low proliferative potential with increased risk of progression or recurrence",
+      "3": "WHO Grade III: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with an aggressive clinical course",
+      "4": "WHO Grade IV: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with the most aggressive clinical course and shorter overall survival",
+      "L": "Stated as \"low grade\" NOS",
+      "H": "Stated as \"high grade\" NOS",
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:grade_clinical_78613:i37",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_78613.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729"
+      ],
+      "histologies": [
+        "9362",
+        "9470-9472",
+        "9474-9478",
+        "9501-9504",
+        "9508"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Clinical must not be blank.\n\n**Note 2:** For the Brain, CNS Other and Intracranial Schemas **ONLY**, Grade Clinical may be assigned without histologic confirmation if the histology is documented based on imaging. \n\n**Note 3:** Assign the highest grade from the primary tumor assessed during the clinical time frame. \n\n**Note 4:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 5:** Codes 1-4 take priority over A-D, L and H.\n\n**Note 6:** CNS WHO classifications use a grading scheme that is a \"malignancy scale\" ranging across a wide variety of neoplasms rather than a strict histologic grading system that can be applied equally to all tumor types.  \n* Code the WHO grading system for selected tumors of the CNS as noted in the AJCC 8th edition Table 72.2 when WHO grade is not documented in the record\n   + A list of the histologies that have a default grade can also be found in the *Brain/Spinal Cord* CAP Protocol in Table 1: *WHO Grading System for Some of the More Common Tumors of the CNS*, Table 2: *WHO Grading System for Diffuse Infiltrating Astrocytomas and Table* 3: *WHO Grading Meningiomas* \nhttps://www.cap.org/protocols-and-guidelines/cancer-reporting-tools/cancer-protocol-templates\n* For **benign tumors ONLY (behavior 0), ** code 1 can be automatically assigned for all histologies\n  + This was confirmed by the CAP Cancer Committee\n\n**Note 7:** Code 9 (unknown) when \n* Grade from primary site is not documented\n* Clinical workup is not done (for example, cancer is an incidental finding during surgery for another condition)\n* Grade checked \"not applicable\" on CAP Protocol (if available) and no other grade information is available\n\n**Note 8:** If there is only one grade available and it cannot be determined if it is clinical or pathological, assume it is a Grade Clinical and code appropriately per Grade Clinical categories for that site, and then code unknown (9) for Grade Pathological, and blank for Grade Post Therapy Clin (yc) and Grade Post Therapy Path (yp).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:grade_clinical_78613:i38",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_78613.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C722",
+        "C724-C729"
+      ],
+      "histologies": [
+        "9473"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Clinical must not be blank.\n\n**Note 2:** For the Brain, CNS Other and Intracranial Schemas **ONLY**, Grade Clinical may be assigned without histologic confirmation if the histology is documented based on imaging. \n\n**Note 3:** Assign the highest grade from the primary tumor assessed during the clinical time frame. \n\n**Note 4:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 5:** Codes 1-4 take priority over A-D, L and H.\n\n**Note 6:** CNS WHO classifications use a grading scheme that is a \"malignancy scale\" ranging across a wide variety of neoplasms rather than a strict histologic grading system that can be applied equally to all tumor types.  \n* Code the WHO grading system for selected tumors of the CNS as noted in the AJCC 8th edition Table 72.2 when WHO grade is not documented in the record\n   + A list of the histologies that have a default grade can also be found in the *Brain/Spinal Cord* CAP Protocol in Table 1: *WHO Grading System for Some of the More Common Tumors of the CNS*, Table 2: *WHO Grading System for Diffuse Infiltrating Astrocytomas and Table* 3: *WHO Grading Meningiomas* \nhttps://www.cap.org/protocols-and-guidelines/cancer-reporting-tools/cancer-protocol-templates\n* For **benign tumors ONLY (behavior 0), ** code 1 can be automatically assigned for all histologies\n  + This was confirmed by the CAP Cancer Committee\n\n**Note 7:** Code 9 (unknown) when \n* Grade from primary site is not documented\n* Clinical workup is not done (for example, cancer is an incidental finding during surgery for another condition)\n* Grade checked \"not applicable\" on CAP Protocol (if available) and no other grade information is available\n\n**Note 8:** If there is only one grade available and it cannot be determined if it is clinical or pathological, assume it is a Grade Clinical and code appropriately per Grade Clinical categories for that site, and then code unknown (9) for Grade Pathological, and blank for Grade Post Therapy Clin (yc) and Grade Post Therapy Path (yp).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:grade_clinical_78613:i39",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_78613.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C753"
+      ],
+      "histologies": [
+        "9362"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Clinical must not be blank.\n\n**Note 2:** For the Brain, CNS Other and Intracranial Schemas **ONLY**, Grade Clinical may be assigned without histologic confirmation if the histology is documented based on imaging. \n\n**Note 3:** Assign the highest grade from the primary tumor assessed during the clinical time frame. \n\n**Note 4:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 5:** Codes 1-4 take priority over A-D, L and H.\n\n**Note 6:** CNS WHO classifications use a grading scheme that is a \"malignancy scale\" ranging across a wide variety of neoplasms rather than a strict histologic grading system that can be applied equally to all tumor types.  \n* Code the WHO grading system for selected tumors of the CNS as noted in the AJCC 8th edition Table 72.2 when WHO grade is not documented in the record\n   + A list of the histologies that have a default grade can also be found in the *Brain/Spinal Cord* CAP Protocol in Table 1: *WHO Grading System for Some of the More Common Tumors of the CNS*, Table 2: *WHO Grading System for Diffuse Infiltrating Astrocytomas and Table* 3: *WHO Grading Meningiomas* \nhttps://www.cap.org/protocols-and-guidelines/cancer-reporting-tools/cancer-protocol-templates\n* For **benign tumors ONLY (behavior 0), ** code 1 can be automatically assigned for all histologies\n  + This was confirmed by the CAP Cancer Committee\n\n**Note 7:** Code 9 (unknown) when \n* Grade from primary site is not documented\n* Clinical workup is not done (for example, cancer is an incidental finding during surgery for another condition)\n* Grade checked \"not applicable\" on CAP Protocol (if available) and no other grade information is available\n\n**Note 8:** If there is only one grade available and it cannot be determined if it is clinical or pathological, assume it is a Grade Clinical and code appropriately per Grade Clinical categories for that site, and then code unknown (9) for Grade Pathological, and blank for Grade Post Therapy Clin (yc) and Grade Post Therapy Path (yp).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:grade_pathological_53280:c40",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_53280.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729"
+      ],
+      "histologies": [
+        "9362",
+        "9470-9472",
+        "9474-9478",
+        "9501-9504",
+        "9508"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (11 codes)\n1: WHO Grade I : Circumscribed tumors of low proliferative potential associated with the possibility of cure following resection\n2: WHO Grade II: Infiltrative tumors with low proliferative potential with increased risk of progression or recurrence\n3: WHO Grade III: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with an aggressive clinical course\n4: WHO Grade IV: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with the most aggressive clinical course and shorter overall survival\nL: Stated as \"low grade\" NOS\nH: Stated as \"high grade\" NOS\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "WHO Grade I : Circumscribed tumors of low proliferative potential associated with the possibility of cure following resection",
+      "2": "WHO Grade II: Infiltrative tumors with low proliferative potential with increased risk of progression or recurrence",
+      "3": "WHO Grade III: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with an aggressive clinical course",
+      "4": "WHO Grade IV: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with the most aggressive clinical course and shorter overall survival",
+      "L": "Stated as \"low grade\" NOS",
+      "H": "Stated as \"high grade\" NOS",
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:grade_pathological_53280:c41",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_53280.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C722",
+        "C724-C729"
+      ],
+      "histologies": [
+        "9473"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (11 codes)\n1: WHO Grade I : Circumscribed tumors of low proliferative potential associated with the possibility of cure following resection\n2: WHO Grade II: Infiltrative tumors with low proliferative potential with increased risk of progression or recurrence\n3: WHO Grade III: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with an aggressive clinical course\n4: WHO Grade IV: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with the most aggressive clinical course and shorter overall survival\nL: Stated as \"low grade\" NOS\nH: Stated as \"high grade\" NOS\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "WHO Grade I : Circumscribed tumors of low proliferative potential associated with the possibility of cure following resection",
+      "2": "WHO Grade II: Infiltrative tumors with low proliferative potential with increased risk of progression or recurrence",
+      "3": "WHO Grade III: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with an aggressive clinical course",
+      "4": "WHO Grade IV: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with the most aggressive clinical course and shorter overall survival",
+      "L": "Stated as \"low grade\" NOS",
+      "H": "Stated as \"high grade\" NOS",
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:grade_pathological_53280:c42",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_53280.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C753"
+      ],
+      "histologies": [
+        "9362"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (11 codes)\n1: WHO Grade I : Circumscribed tumors of low proliferative potential associated with the possibility of cure following resection\n2: WHO Grade II: Infiltrative tumors with low proliferative potential with increased risk of progression or recurrence\n3: WHO Grade III: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with an aggressive clinical course\n4: WHO Grade IV: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with the most aggressive clinical course and shorter overall survival\nL: Stated as \"low grade\" NOS\nH: Stated as \"high grade\" NOS\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "WHO Grade I : Circumscribed tumors of low proliferative potential associated with the possibility of cure following resection",
+      "2": "WHO Grade II: Infiltrative tumors with low proliferative potential with increased risk of progression or recurrence",
+      "3": "WHO Grade III: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with an aggressive clinical course",
+      "4": "WHO Grade IV: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated with the most aggressive clinical course and shorter overall survival",
+      "L": "Stated as \"low grade\" NOS",
+      "H": "Stated as \"high grade\" NOS",
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:grade_pathological_53280:i43",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_53280.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729"
+      ],
+      "histologies": [
+        "9362",
+        "9470-9472",
+        "9474-9478",
+        "9501-9504",
+        "9508"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Pathological must not be blank.\n\n**Note 2:** Assign the highest grade from the primary tumor.  \n\n**Note 3:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 4:** Codes 1-4 take priority over A-D, L and H.\n\n**Note 5:** CNS WHO classifications use a grading scheme that is a \"malignancy scale\" ranging across a wide variety of neoplasms rather than a strict histologic grading system that can be applied equally to all tumor types.  \n* Code the WHO grading system for selected tumors of the CNS as noted in the AJCC 8th edition Table 72.2 when WHO grade is not documented in the record\n   + A list of the histologies that have a default grade can also be found in the *Brain/Spinal Cord* CAP Protocol in Table 1: *WHO Grading System for Some of the More Common Tumors of the CNS*, Table 2: *WHO Grading System for Diffuse Infiltrating Astrocytomas and Table* 3: *WHO Grading Meningiomas* \nhttps://www.cap.org/protocols-and-guidelines/cancer-reporting-tools/cancer-protocol-templates\n* For **benign tumors ONLY (behavior 0),** code 1 can be automatically assigned for all histologies\n  + This was confirmed by the CAP Cancer Committee\n\n**Note 6:** Use the grade from the **clinical work up** from the primary tumor in different scenarios based on behavior or surgical resection\n* **Behavior**\n  - Tumor behavior for the clinical and the pathological diagnoses are the same AND the clinical grade is the highest grade \n   - Tumor behavior for clinical diagnosis is invasive, and the tumor behavior for the pathological diagnosis is in situ\n* **Surgical Resection**\n   - Surgical resection is done of the primary tumor and there is no grade documented from the surgical resection\n    - Surgical resection is done of the primary tumor and there is no residual cancer\n * **No surgical resection**\n    - Surgical resection of the primary tumor has not been done, but there is positive microscopic confirmation of distant metastases during the clinical time frame\n\n**Note 7:** Code 9 (unknown) when \n* Grade from primary site is not documented\n* No resection of the primary site (see exception in Note 6, Surgical resection, last bullet)\n* Neo-adjuvant therapy is followed by a resection (see Grade Post Therapy Path (yp))\n* Grade checked “not applicable” on CAP Protocol (if available) and no other grade information is available\n* Clinical case only (see Grade Clinical)\n* There is only one grade available, and it cannot be determined if it is clinical, pathological, post therapy clinical or post therapy pathological",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:grade_pathological_53280:i44",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_53280.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C722",
+        "C724-C729"
+      ],
+      "histologies": [
+        "9473"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Pathological must not be blank.\n\n**Note 2:** Assign the highest grade from the primary tumor.  \n\n**Note 3:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 4:** Codes 1-4 take priority over A-D, L and H.\n\n**Note 5:** CNS WHO classifications use a grading scheme that is a \"malignancy scale\" ranging across a wide variety of neoplasms rather than a strict histologic grading system that can be applied equally to all tumor types.  \n* Code the WHO grading system for selected tumors of the CNS as noted in the AJCC 8th edition Table 72.2 when WHO grade is not documented in the record\n   + A list of the histologies that have a default grade can also be found in the *Brain/Spinal Cord* CAP Protocol in Table 1: *WHO Grading System for Some of the More Common Tumors of the CNS*, Table 2: *WHO Grading System for Diffuse Infiltrating Astrocytomas and Table* 3: *WHO Grading Meningiomas* \nhttps://www.cap.org/protocols-and-guidelines/cancer-reporting-tools/cancer-protocol-templates\n* For **benign tumors ONLY (behavior 0),** code 1 can be automatically assigned for all histologies\n  + This was confirmed by the CAP Cancer Committee\n\n**Note 6:** Use the grade from the **clinical work up** from the primary tumor in different scenarios based on behavior or surgical resection\n* **Behavior**\n  - Tumor behavior for the clinical and the pathological diagnoses are the same AND the clinical grade is the highest grade \n   - Tumor behavior for clinical diagnosis is invasive, and the tumor behavior for the pathological diagnosis is in situ\n* **Surgical Resection**\n   - Surgical resection is done of the primary tumor and there is no grade documented from the surgical resection\n    - Surgical resection is done of the primary tumor and there is no residual cancer\n * **No surgical resection**\n    - Surgical resection of the primary tumor has not been done, but there is positive microscopic confirmation of distant metastases during the clinical time frame\n\n**Note 7:** Code 9 (unknown) when \n* Grade from primary site is not documented\n* No resection of the primary site (see exception in Note 6, Surgical resection, last bullet)\n* Neo-adjuvant therapy is followed by a resection (see Grade Post Therapy Path (yp))\n* Grade checked “not applicable” on CAP Protocol (if available) and no other grade information is available\n* Clinical case only (see Grade Clinical)\n* There is only one grade available, and it cannot be determined if it is clinical, pathological, post therapy clinical or post therapy pathological",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:medulloblastoma_v9_2023:grade_pathological_53280:i45",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Medulloblastoma [V9: 2023+]",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_53280.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C753"
+      ],
+      "histologies": [
+        "9362"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2023-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Pathological must not be blank.\n\n**Note 2:** Assign the highest grade from the primary tumor.  \n\n**Note 3:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 4:** Codes 1-4 take priority over A-D, L and H.\n\n**Note 5:** CNS WHO classifications use a grading scheme that is a \"malignancy scale\" ranging across a wide variety of neoplasms rather than a strict histologic grading system that can be applied equally to all tumor types.  \n* Code the WHO grading system for selected tumors of the CNS as noted in the AJCC 8th edition Table 72.2 when WHO grade is not documented in the record\n   + A list of the histologies that have a default grade can also be found in the *Brain/Spinal Cord* CAP Protocol in Table 1: *WHO Grading System for Some of the More Common Tumors of the CNS*, Table 2: *WHO Grading System for Diffuse Infiltrating Astrocytomas and Table* 3: *WHO Grading Meningiomas* \nhttps://www.cap.org/protocols-and-guidelines/cancer-reporting-tools/cancer-protocol-templates\n* For **benign tumors ONLY (behavior 0),** code 1 can be automatically assigned for all histologies\n  + This was confirmed by the CAP Cancer Committee\n\n**Note 6:** Use the grade from the **clinical work up** from the primary tumor in different scenarios based on behavior or surgical resection\n* **Behavior**\n  - Tumor behavior for the clinical and the pathological diagnoses are the same AND the clinical grade is the highest grade \n   - Tumor behavior for clinical diagnosis is invasive, and the tumor behavior for the pathological diagnosis is in situ\n* **Surgical Resection**\n   - Surgical resection is done of the primary tumor and there is no grade documented from the surgical resection\n    - Surgical resection is done of the primary tumor and there is no residual cancer\n * **No surgical resection**\n    - Surgical resection of the primary tumor has not been done, but there is positive microscopic confirmation of distant metastases during the clinical time frame\n\n**Note 7:** Code 9 (unknown) when \n* Grade from primary site is not documented\n* No resection of the primary site (see exception in Note 6, Surgical resection, last bullet)\n* Neo-adjuvant therapy is followed by a resection (see Grade Post Therapy Path (yp))\n* Grade checked “not applicable” on CAP Protocol (if available) and no other grade information is available\n* Clinical case only (see Grade Clinical)\n* There is only one grade available, and it cannot be determined if it is clinical, pathological, post therapy clinical or post therapy pathological",
+    "codes": null,
+    "notes": null
+  }
+]

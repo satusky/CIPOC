@@ -1,0 +1,545 @@
+[
+  {
+    "rule_id": "seer_rsa_eod:lung_v9_2025:schema:i1",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lung [V9: 2025+]",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/lung_v9_2025.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C340-C343",
+        "C348-C349"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8972",
+        "8980",
+        "8982"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "8000-8700, 8720-8790, 8972, 8980, 8982\n\nC340 Main bronchus\nC341 Upper lobe, lung \nC342 Middle lobe, lung \nC343 Lower lobe, lung \nC348 Overlapping lesion of lung \nC349 Lung, NOS \n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Lung, from the AJCC Cancer Staging System Version 9 (2025). Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other EOD Schemas with Lung sites**\n* **GIST**: 8935-8936\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Pleural Mesothelioma**: 9050-9053\n* **Soft Tissue Abdomen and Thoracic**: 8710-8714, 8800-8803, 8810-8921, 8932-8934, 8940-8971, 8973-8976, 8981, 8983-8990, 9000-9016, 9030-9043, 9045, 9054-9138, 9141-9230, 9240-9580, 9582\n* **Soft Tissue Other**: 8992\n* **Soft Tissue Rare**: 8804-8806, 8930-8931, 8991, 9020, 9044, 9231, 9581",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lung_v9_2025:behavior:c2",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lung [V9: 2025+]",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "code_table",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C343",
+        "C348-C349"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8972",
+        "8980",
+        "8982"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "Behavior ICD-O-3 (4 codes)\n0: Benign\n1: Uncertain Benign/Malig\n2: In Situ\n3: Malignant Primary",
+    "codes": {
+      "0": "Benign",
+      "1": "Uncertain Benign/Malig",
+      "2": "In Situ",
+      "3": "Malignant Primary"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lung_v9_2025:behavior:i3",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lung [V9: 2025+]",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C343",
+        "C348-C349"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8972",
+        "8980",
+        "8982"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lung_v9_2025:tumor_size_summary_full_31213:c4",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lung [V9: 2025+]",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_full_31213.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C343",
+        "C348-C349"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8972",
+        "8980",
+        "8982"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (7 codes)\n000: No mass/tumor found\n001: 1 mm or described as less than 1 mm\n002-988: Exact size in millimeters (2 mm to 988 mm)\n989: 989 millimeters or larger\n990: Microscopic focus or foci only and no size of focus is given\n998: Alternate descriptions of tumor size for specific sites: Familial/multiple polyposis: - Rectosigmoid and rectum (C19.9, C20.9) - Colon (C18.0, C18.2-C18.9) If no size is documented: Circumferential: - Esophagus (C15.0-C15.5, C15.8-C15.9) Diffuse; widespread: 3/4s or more; linitis plastica: - Stomach and Esophagus GE Junction (C16.0-C16.6, C16.8-C16.9) Diffuse, entire lung or NOS: - Lung and main stem bronchus (C34.0-C34.3, C34.8-C34.9) Diffuse: - Breast (C50.0-C50.6, C50.8-C50.9)\n999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm",
+      "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+      "989": "989 millimeters or larger",
+      "990": "Microscopic focus or foci only and no size of focus is given",
+      "998": "Alternate descriptions of tumor size for specific sites:\n\nFamilial/multiple polyposis:\n- Rectosigmoid and rectum (C19.9, C20.9)\n- Colon (C18.0, C18.2-C18.9)\n\nIf no size is documented:\nCircumferential:\n- Esophagus (C15.0-C15.5, C15.8-C15.9)\n\nDiffuse; widespread: 3/4s or more; linitis plastica:\n- Stomach and Esophagus GE Junction (C16.0-C16.6, C16.8-C16.9)\n\nDiffuse, entire lung or NOS:\n- Lung and main stem bronchus (C34.0-C34.3, C34.8-C34.9)\n\nDiffuse:\n- Breast (C50.0-C50.6, C50.8-C50.9)",
+      "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lung_v9_2025:tumor_size_summary_full_31213:i5",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lung [V9: 2025+]",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_full_31213.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C343",
+        "C348-C349"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8972",
+        "8980",
+        "8982"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "For this schema, Tumor Size is used with EOD Primary Tumor to derive EOD T. \n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lung_v9_2025:nodes_pos_fpa:c6",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lung [V9: 2025+]",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C343",
+        "C348-C349"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8972",
+        "8980",
+        "8982"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in medical record",
+    "codes": {
+      "00": "All nodes examined negative",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lung_v9_2025:nodes_pos_fpa:i7",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lung [V9: 2025+]",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C343",
+        "C348-C349"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8972",
+        "8980",
+        "8982"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lung_v9_2025:nodes_exam_76029:c8",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lung [V9: 2025+]",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C343",
+        "C348-C349"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8972",
+        "8980",
+        "8982"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (8 codes)\n00: No nodes examined\n01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)\n90: 90 or more nodes examined\n95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed\n96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated\n97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated\n98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown\n99: Unknown if nodes were examined; not applicable or negative Not documented in medical record",
+    "codes": {
+      "00": "No nodes examined",
+      "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+      "90": "90 or more nodes examined",
+      "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+      "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+      "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+      "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+      "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lung_v9_2025:nodes_exam_76029:i9",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lung [V9: 2025+]",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C343",
+        "C348-C349"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8972",
+        "8980",
+        "8982"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lung_v9_2025:ss2018_lung_41334:c10",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lung [V9: 2025+]",
+      "Summary Stage 2018: Lung"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_lung_41334.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C343",
+        "C348-C349"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8972",
+        "8980",
+        "8982"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018: Lung (7 codes)\n0: **In situ, intraepithelial, noninvasive** - Adenocarcinoma in situ (AIS): adenocarcinoma with pure lepidic pattern, less than or equal to 3 cm in greatest dimension - Squamous cell carcinoma in situ (SCIS)\n1: **Localized only (localized, NOS)** - Adjacent ipsilateral lobe - Confined to carina, NOS - Confined to hilus - Confined to lung, NOS - Main stem bronchus, NOS (without involvement of the carina) + Including extension from other part of lung - Minimally invasive adenocarcinoma + Adenocarcinoma tumor WITH predominantly lepidic pattern (AIS) measuring less than or equal to 3 cm in greatest dimension * WITH invasive component measuring less than or equal to 5 mm in greatest dimension - Superficial tumor, WITH invasive component limited to bronchial wall + WITH or WITHOUT proximal extension to main stem bronchus\n2: **Regional by direct extension only** - Atelectasis/obstructive pneumonitis + Extends to hilar region, involving part or all of lung - Blood vessel(s) (major) + Aorta + Azygos vein + Pulmonary artery or vein + Superior vena cava (SVC syndrome) - Brachial plexus - Carina from lung - Chest wall (thoracic wall) - Compression of esophag …",
+    "codes": {
+      "0": "**In situ, intraepithelial, noninvasive** \n- Adenocarcinoma in situ (AIS): adenocarcinoma with pure lepidic pattern, less than or equal to 3 cm in greatest dimension\n- Squamous cell carcinoma in situ (SCIS)",
+      "1": "**Localized only (localized, NOS)**\n- Adjacent ipsilateral lobe\n- Confined to carina, NOS\n- Confined to hilus\n- Confined to lung, NOS\n- Main stem bronchus, NOS (without involvement of the carina)\n  + Including extension from other part of lung\n- Minimally invasive adenocarcinoma\n  + Adenocarcinoma tumor WITH predominantly lepidic pattern (AIS) measuring less than or equal to 3 cm in greatest dimension\n     * WITH invasive component measuring less than or equal to 5 mm in greatest dimension\n- Superficial tumor, WITH invasive component limited to bronchial wall\n  + WITH or WITHOUT proximal extension to main stem bronchus",
+      "2": "**Regional by direct extension only**\n- Atelectasis/obstructive pneumonitis\n    + Extends to hilar region, involving part or all of lung\n- Blood vessel(s) (major)\n    + Aorta\n    + Azygos vein\n    + Pulmonary artery or vein\n    + Superior vena cava (SVC syndrome)\n- Brachial plexus\n- Carina from lung\n- Chest wall (thoracic wall) \n- Compression of esophagus or trachea not specified as direct extension\n- Diaphragm (separate lesion-see code 7)\n- Esophagus\n- Mediastinum, extrapulmonary or NOS\n- Nerve(s)\n    + Cervical sympathetic (Horner's syndrome)\n    + Recurrent laryngeal (vocal cord paralysis)\n    + Vagus\n- Pancoast tumor (superior sulcus syndrome), NOS\n- Parietal pericardium\n- Parietal pleura (PL3)\n- Pericardium, NOS\n- Phrenic nerve\n- Pleura, NOS\n- Pulmonary ligament\n- Separate tumor nodule(s) in the same lobe as the primary\n- Visceral pleura invasion (PL1, PL2, or NOS)\n- Trachea",
+      "3": "**Regional lymph node(s) involved only**\n- IPSILATERAL nodes only\n  + Bronchial\n     - Peri/parabronchial\n  + Carinal (tracheobronchial) (tracheal bifurcation)\n  + Hilar (bronchopulmonary) (proximal lobar) (pulmonary root) \n  + Intrapulmonary \n     * Interlobar\n     * Lobar\n     * Segmental\n     * Subsegmental\n  + Mediastinal, NOS\n     * Anterior\n     * Aortic (above diaphragm), NOS\n        - Peri/para-aortic, NOS\n          + Ascending aorta (phrenic)\n        - Subaortic (aortic-pulmonary window)\n     * Inferior mediastinal \n        - Paraesophageal\n        - Pulmonary ligament\n         - Subcarinal\n    * Periesophageal \n    * Pericardial\n    * Posterior (tracheoesophageal)\n    * Precarinal\n    * Pretracheal, NOS\n    * Superior mediastinal\n       - Paratracheal (left, right, upper, low, NOS)\n         - Azygos (lower paratracheal)\n       - Prevascular\n       - Retrotracheal\n  + Regional lymph node(s), NOS\n    * Lymph node(s), NOS",
+      "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+      "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n  + Abdominal organs\n  + Adjacent rib\n  + Contralateral lung/main stem bronchus\n  + Heart\n  + Inferior vena cava\n  + Neural foramina\n  + Pericardial nodules or pleural effusion (malignant) (ipsilateral, contralateral, bilateral, NOS)\n  + Pleural tumor foci or nodules on ipsilateral lung (separate from direct extension) or contralateral lung\n  + Rib\n  + Separate tumor nodule(s) in contralateral lung\n  + Separate tumor nodule(s) in a different ipsilateral lobe \n  + Skeletal muscle\n  + Skin of chest\n  + Sternum\n  + Vertebra(e) (vertebral body)\n  + Visceral pericardium \n- Distant lymph node(s), NOS\n  + IPSILATERAL or CONTRALATERAL\n    * Low cervical\n    * Proximal root\n    * Scalene (inferior deep cervical)\n    * Sternal notch\n    * Supraclavicular (transverse cervical)\n  + CONTRALATERAL/BILATERAL nodes\n    * Bronchial\n      - Peri/parabronchial\n    * Carinal\n    * Hilar (bronchopulmonary) (proximal lobar) (pulmonary root) \n      - Intrapulmonary \n        - Interlobar\n        - Lobar\n        - Segmental \n        - Subsegmental\n    - Superior mediastinal\n       + Paratracheal (left, right, upper, low, NOS)\n         - Azygos (lower paratracheal)\n         \n- Distant metastasis, NOS\n  + Carcinomatosis \n  + Distant metastasis WITH or WITHOUT distant lymph node(s)",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lung_v9_2025:ss2018_lung_41334:i11",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lung [V9: 2025+]",
+      "Summary Stage 2018: Lung"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_lung_41334.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C343",
+        "C348-C349"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8972",
+        "8980",
+        "8982"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Lung**\n\n8000-8700, 8720-8790, 8972, 8980\n\nC340-C343, C348-C349\nC340 Main bronchus \nC341 Upper lobe, lung \nC342 Middle lobe, lung \nC343 Lower lobe, lung \nC348 Overlapping lesion of lung \nC349 Lung, NOS \n\n**Note 1:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 36 *Lung*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other Summary Stage Chapters with Lung sites**\n* **GIST**: 8935-8936\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Pleural Mesothelioma**: 9050-9053\n* **Soft Tissue**: 8710-8714, 8800-8934, 8940-8971, 8973-8975, 8981-9045, 9054-9138, 9141-9582\n\n**Note 3:** **Ground glass opacities (GGO), ground glass nodules (GGN), and ground/glass lepidic (GG/L)**\n* Ground glass opacities (GGO), ground glass nodules (GGN), and ground/glass lepidic (GG/L) are frequently observed on CT  and are increasingly detected with the advancements in imaging and are described as an area of hazy increased lung opacity.  GGO, GGN, and GG/L can be observed in both benign and malignant lung conditions along with pre-invasive lesions (adenocarcinoma in situ, minimally invasive adenocarcinoma, and lepidic carcinoma).  \n* They are often associated with early stage lung cancer but not necessarily malignancies themselves.\n* For staging purposes, these are **not to be counted as separate tumor nodules**\n\n**Note 4:** **Bronchopneumonia and Obstructive pneumonitis**\n* Bronchopneumonia is not the same thing as obstructive pneumonitis and should not be coded as such. \n  * **Bronchopneumonia** is an acute inflammation of the walls of the bronchioles, usually a result of spread of infection from the upper to the lower respiratory tract\n  * **Obstructive pneumonitis** is a combination of atelectasis, bronchiectasis with mucous plugging, and parenchymal inflammation that develops distal to an obstructing endobronchial lesion\n\n**Note 5:** **Atelectasis** \n* Atelectasis is the failure of the lung to expand (inflate) completely\n* This may be caused by a blocked airway, a tumor, general anesthesia, pneumonia or other lung infection, lung disease, or long-term bed rest with shallow breathing. Sometimes called a collapsed lung. \n  * For staging purposes, atelectasis must present with an obstructing tumor (code 2)\n\n**Note 6:** **Visceral pleural invasion**\n* Specific information about visceral pleura invasion (PL1 or PL2) or  parietal pleural invasion (PL3) are coded as regional (code 2).  Elastic layer involvement has prognostic significance for lung cancer. \n\n**Note 7:** **Separate ipsilateral tumor nodules**\n* Separate ipsilateral tumor nodules of the same histopathological type (intrapulmonary metastases) are coded either regional (code 2) for same lobe or distant (code 7) for different ipsilateral lobe or contralateral lung.\n\n**Note 8:** **\"Vocal cord paralysis\" or \"Superior vena cava syndrome\"**\n* \"Vocal cord paralysis,\" \"superior vena cava syndrome,\" and \"compression of the trachea or the esophagus\" are classified as either direct extension from the primary tumor or mediastinal lymph node involvement\n* If these manifestations are caused by direct extension of the primary tumor, code as primary tumor involvement (code 2)\n* If the primary tumor is peripheral and clearly unrelated to vocal cord paralysis, SVC obstruction, or compression of the trachea, or the esophagus, these manifestations are secondary to lymph node involvement; code as mediastinal lymph node involvement (code 3)\n* If unable to determine if these manifestations are due to direct extension or mediastinal lymph node involvement, record as mediastinal lymph node involvement (code 3)\n\n**Note 9:** **Pleural and pericardial effusions**\n* Most pleural and pericardial effusions with lung cancer are due to tumor\n* In a few patients, however, multiple cytopathological examinations of pleural and/or pericardial fluid are negative for tumor, and the fluid is non-bloody and is not an exudate. Where these elements and clinical judgment dictate that the effusion is not related to the tumor, the effusion should be excluded as a staging element. \n\n**Note 10:** **Occult carcinoma**\n* Occult carcinoma occurs when tumor is proven by the presence of malignant cells in sputum or bronchial washings, but there is no other evidence of the tumor\n* These cases are coded as unknown (code 9).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lung_v9_2025:grade_clinical_73056:c12",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lung [V9: 2025+]",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_73056.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C343",
+        "C348-C349"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8972",
+        "8980",
+        "8982"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (5 codes)\n1: G1: Well differentiated\n2: G2: Moderately differentiated\n3: G3: Poorly differentiated\n4: G4: Undifferentiated\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Well differentiated",
+      "2": "G2: Moderately differentiated",
+      "3": "G3: Poorly differentiated",
+      "4": "G4: Undifferentiated",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lung_v9_2025:grade_clinical_73056:i13",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lung [V9: 2025+]",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_73056.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C343",
+        "C348-C349"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8972",
+        "8980",
+        "8982"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Clinical must not be blank. \n\n**Note 2:** Assign the highest grade from the primary tumor assessed during the clinical time frame. \n\n**Note 3:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 4:** G4 includes anaplastic.\n\n**Note 5:** Code 9 (unknown) when\n* Grade from primary site is not documented\n* Clinical workup is not done (for example, cancer is an incidental finding during surgery for another condition)\n* Grade checked \"not applicable\" on CAP Protocol (if available) and no other grade information is available\n\n**Note 6:** If there is only one grade available and it cannot be determined if it is clinical or pathological, assume it is a Grade Clinical and code appropriately per Grade Clinical categories for that site, and then code unknown (9) for Grade Pathological, and blank for Grade Post Therapy Clin (yc) and Grade Post Therapy Path (yp).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lung_v9_2025:grade_pathological_31963:c14",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lung [V9: 2025+]",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_31963.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C343",
+        "C348-C349"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8972",
+        "8980",
+        "8982"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (5 codes)\n1: G1: Well differentiated\n2: G2: Moderately differentiated\n3: G3: Poorly differentiated\n4: G4: Undifferentiated\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Well differentiated",
+      "2": "G2: Moderately differentiated",
+      "3": "G3: Poorly differentiated",
+      "4": "G4: Undifferentiated",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:lung_v9_2025:grade_pathological_31963:i15",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Lung [V9: 2025+]",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_31963.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C340-C343",
+        "C348-C349"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8972",
+        "8980",
+        "8982"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2025-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Pathological must not be blank.\n\n**Note 2:** There is a preferred grading system for this schema. If the clinical grade given uses the preferred grading system and the pathological grade does not use the preferred grading system, do not record the Grade Clinical in the Grade Pathological field. Assign Grade Pathological 9. \n* *Example: * Biopsy of primary site shows a moderately differentiated adenocarcinoma. The surgical resection states a high-grade adenocarcinoma. \n    - Code Grade Clinical as 2 since Moderately differentiated (G2) is the preferred grading system\n     - Code Grade Pathological as 9 since the preferred grading system was not used and the Generic Grade Categories do not apply to this grade table\n\n**Note 3:** Assign the highest grade from the primary tumor.  \n\n**Note 4:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 5:** G4 includes anaplastic.\n\n**Note 6:** Use the grade from the **clinical work up** from the primary tumor in different scenarios based on behavior or surgical resection\n* **Behavior**\n  - Tumor behavior for the clinical and the pathological diagnoses are the same AND the clinical grade is the highest grade \n   - Tumor behavior for clinical diagnosis is invasive, and the tumor behavior for the pathological diagnosis is in situ\n* **Surgical Resection**\n   - Surgical resection is done of the primary tumor and there is no grade documented from the surgical resection\n    - Surgical resection is done of the primary tumor and there is no residual cancer\n* **No Surgical Resection**\n    - Surgical resection of the primary tumor has not been done, but there is positive microscopic confirmation of distant metastases during the clinical time frame\n\n**Note 7:** Code 9 (unknown) when\n* Grade from primary site is not documented\n* No resection of the primary site (see exception in Note 6, Surgical resection, last bullet)\n* Neo-adjuvant therapy is followed by a resection (see Grade Post Therapy Path (yp))\n* Grade checked “not applicable” on CAP Protocol (if available) and no other grade information is available\n* Clinical case only (see Grade Clinical)\n* There is only one grade available, and it cannot be determined if it is clinical, pathological, post therapy clinical or post therapy pathological",
+    "codes": null,
+    "notes": null
+  }
+]

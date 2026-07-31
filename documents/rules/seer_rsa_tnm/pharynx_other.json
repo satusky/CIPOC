@@ -1,0 +1,33 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:pharynx_other:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Pharynx, NOS, and Overlapping Lesion of Lip, Oral Cavity, and Pharynx (excluding Malignant Melanoma)",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/pharynx_other.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C140",
+        "C142",
+        "C148"
+      ],
+      "histologies": [
+        "8000-8713",
+        "8800-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C140  Pharynx, NOS\nC142  Waldeyer ring\nC148  Overlapping lesion of lip, oral cavity\n\n**Note:** TNM is not defined for this schema. If directly assigning Summary Stage 2000 (SS2000), use the *Pharynx, NOS and Other Ill-Defined Oral Cavity Sites* chapter on page 66 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=66).",
+    "codes": null,
+    "notes": null
+  }
+]

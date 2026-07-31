@@ -1,0 +1,1904 @@
+[
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:schema:i1",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/retroperitoneum.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C480"
+      ],
+      "histologies": [
+        "8000-8803",
+        "8810-8921",
+        "8932-8934",
+        "8940-8990",
+        "9000-9016",
+        "9030-9043",
+        "9045-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "C480: 8000-8803, 8810-8921, 8932-8934, 8940-8990, 9000-9016, 9030-9043, 9045-9138, 9141-9230, 9240-9580, 9582\n\nC481, C482, C488: 8710-8714, 8800-8803, 8810-8821, 8823-8921, 8932, 8934, 8940-8941, 8951-8959, 8963-8976, 8981-8990, 9010-9016, 9030-9043, 9045, 9051, 9053-9055, 9061-9065, 9072, 9081-9084, 9086, 9101-9105, 9120-9138, 9141-9230, 9240-9580, 9582\n\nC481, C482, C488 and Sex: 1, 3, 4, 5, 9: 8000-8700, 8720-8790, 8822, 8933, 8950, 8960, 8980, 9000, 9050, 9052, 9060, 9070-9071, 9073, 9080, 9085, 9090-9091, 9100, 9110-9111\n\nC480 Retroperitoneum\nC481 Specified parts of peritoneum (including omentum and mesentery)\nC482 Peritoneum, NOS\nC488 Overlapping lesion of retroperitoneum and peritoneum\n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 44 *Soft Tissue Sarcoma of the Retroperitoneum*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other EOD Schemas with Retroperitoneum sites**\n* **GIST**: 8935-8936\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Primary Peritoneal Carcinoma**: C481-C482, C488 and Sex: 2, 6 (8000-8700, 8720-8790, 8806, 8822, 8930-8931, 8933, 8950, 8960, 8980, 9000, 9050, 9052, 9060, 9070-9071, 9073, 9080, 9085, 9090-9091, 9100, 9110-9111)\n* **Soft Tissue Other**: 8992\n* **Soft Tissue Rare** \n  * C480-C488: (8804-8805, 8991, 9020, 9044, 9231, 9581)\n  * C480: (8806, 8930-8931)\n   * C481-C482, C488 and Sex: 1, 3, 5, 9 (8806, 8930, 8931)\n   * C481-C482, C488 and Sex: 4 (8806, 8930, 8931)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:schema:i2",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/retroperitoneum.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8822",
+        "8933",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "C480: 8000-8803, 8810-8921, 8932-8934, 8940-8990, 9000-9016, 9030-9043, 9045-9138, 9141-9230, 9240-9580, 9582\n\nC481, C482, C488: 8710-8714, 8800-8803, 8810-8821, 8823-8921, 8932, 8934, 8940-8941, 8951-8959, 8963-8976, 8981-8990, 9010-9016, 9030-9043, 9045, 9051, 9053-9055, 9061-9065, 9072, 9081-9084, 9086, 9101-9105, 9120-9138, 9141-9230, 9240-9580, 9582\n\nC481, C482, C488 and Sex: 1, 3, 4, 5, 9: 8000-8700, 8720-8790, 8822, 8933, 8950, 8960, 8980, 9000, 9050, 9052, 9060, 9070-9071, 9073, 9080, 9085, 9090-9091, 9100, 9110-9111\n\nC480 Retroperitoneum\nC481 Specified parts of peritoneum (including omentum and mesentery)\nC482 Peritoneum, NOS\nC488 Overlapping lesion of retroperitoneum and peritoneum\n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 44 *Soft Tissue Sarcoma of the Retroperitoneum*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other EOD Schemas with Retroperitoneum sites**\n* **GIST**: 8935-8936\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Primary Peritoneal Carcinoma**: C481-C482, C488 and Sex: 2, 6 (8000-8700, 8720-8790, 8806, 8822, 8930-8931, 8933, 8950, 8960, 8980, 9000, 9050, 9052, 9060, 9070-9071, 9073, 9080, 9085, 9090-9091, 9100, 9110-9111)\n* **Soft Tissue Other**: 8992\n* **Soft Tissue Rare** \n  * C480-C488: (8804-8805, 8991, 9020, 9044, 9231, 9581)\n  * C480: (8806, 8930-8931)\n   * C481-C482, C488 and Sex: 1, 3, 5, 9 (8806, 8930, 8931)\n   * C481-C482, C488 and Sex: 4 (8806, 8930, 8931)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:schema:i3",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/retroperitoneum.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8710-8714",
+        "8800-8803",
+        "8810-8821",
+        "8823-8921",
+        "8932",
+        "8934",
+        "8940-8941",
+        "8951-8959",
+        "8963-8976",
+        "8981-8990",
+        "9010-9016",
+        "9030-9043",
+        "9045",
+        "9051",
+        "9053-9055",
+        "9061-9065",
+        "9072",
+        "9081-9084",
+        "9086",
+        "9101-9105",
+        "9120-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "C480: 8000-8803, 8810-8921, 8932-8934, 8940-8990, 9000-9016, 9030-9043, 9045-9138, 9141-9230, 9240-9580, 9582\n\nC481, C482, C488: 8710-8714, 8800-8803, 8810-8821, 8823-8921, 8932, 8934, 8940-8941, 8951-8959, 8963-8976, 8981-8990, 9010-9016, 9030-9043, 9045, 9051, 9053-9055, 9061-9065, 9072, 9081-9084, 9086, 9101-9105, 9120-9138, 9141-9230, 9240-9580, 9582\n\nC481, C482, C488 and Sex: 1, 3, 4, 5, 9: 8000-8700, 8720-8790, 8822, 8933, 8950, 8960, 8980, 9000, 9050, 9052, 9060, 9070-9071, 9073, 9080, 9085, 9090-9091, 9100, 9110-9111\n\nC480 Retroperitoneum\nC481 Specified parts of peritoneum (including omentum and mesentery)\nC482 Peritoneum, NOS\nC488 Overlapping lesion of retroperitoneum and peritoneum\n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 44 *Soft Tissue Sarcoma of the Retroperitoneum*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other EOD Schemas with Retroperitoneum sites**\n* **GIST**: 8935-8936\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Primary Peritoneal Carcinoma**: C481-C482, C488 and Sex: 2, 6 (8000-8700, 8720-8790, 8806, 8822, 8930-8931, 8933, 8950, 8960, 8980, 9000, 9050, 9052, 9060, 9070-9071, 9073, 9080, 9085, 9090-9091, 9100, 9110-9111)\n* **Soft Tissue Other**: 8992\n* **Soft Tissue Rare** \n  * C480-C488: (8804-8805, 8991, 9020, 9044, 9231, 9581)\n  * C480: (8806, 8930-8931)\n   * C481-C482, C488 and Sex: 1, 3, 5, 9 (8806, 8930, 8931)\n   * C481-C482, C488 and Sex: 4 (8806, 8930, 8931)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:tumor_size_summary_47973:c4",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_47973.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C480"
+      ],
+      "histologies": [
+        "8000-8803",
+        "8810-8921",
+        "8932-8934",
+        "8940-8990",
+        "9000-9016",
+        "9030-9043",
+        "9045-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (6 codes)\n000: No mass/tumor found\n001: 1 mm or described as less than 1 mm\n002-988: Exact size in millimeters (2 mm to 988 mm)\n989: 989 millimeters or larger\n990: Microscopic focus or foci only and no size of focus is given\n999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm",
+      "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+      "989": "989 millimeters or larger",
+      "990": "Microscopic focus or foci only and no size of focus is given",
+      "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:tumor_size_summary_47973:c5",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_47973.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8822",
+        "8933",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (6 codes)\n000: No mass/tumor found\n001: 1 mm or described as less than 1 mm\n002-988: Exact size in millimeters (2 mm to 988 mm)\n989: 989 millimeters or larger\n990: Microscopic focus or foci only and no size of focus is given\n999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm",
+      "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+      "989": "989 millimeters or larger",
+      "990": "Microscopic focus or foci only and no size of focus is given",
+      "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:tumor_size_summary_47973:c6",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_47973.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8710-8714",
+        "8800-8803",
+        "8810-8821",
+        "8823-8921",
+        "8932",
+        "8934",
+        "8940-8941",
+        "8951-8959",
+        "8963-8976",
+        "8981-8990",
+        "9010-9016",
+        "9030-9043",
+        "9045",
+        "9051",
+        "9053-9055",
+        "9061-9065",
+        "9072",
+        "9081-9084",
+        "9086",
+        "9101-9105",
+        "9120-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (6 codes)\n000: No mass/tumor found\n001: 1 mm or described as less than 1 mm\n002-988: Exact size in millimeters (2 mm to 988 mm)\n989: 989 millimeters or larger\n990: Microscopic focus or foci only and no size of focus is given\n999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm",
+      "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+      "989": "989 millimeters or larger",
+      "990": "Microscopic focus or foci only and no size of focus is given",
+      "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:tumor_size_summary_47973:i7",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_47973.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C480"
+      ],
+      "histologies": [
+        "8000-8803",
+        "8810-8921",
+        "8932-8934",
+        "8940-8990",
+        "9000-9016",
+        "9030-9043",
+        "9045-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "For this schema, Tumor Size is used with EOD Primary Tumor to derive EOD T. \n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:tumor_size_summary_47973:i8",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_47973.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8822",
+        "8933",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "For this schema, Tumor Size is used with EOD Primary Tumor to derive EOD T. \n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:tumor_size_summary_47973:i9",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_47973.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8710-8714",
+        "8800-8803",
+        "8810-8821",
+        "8823-8921",
+        "8932",
+        "8934",
+        "8940-8941",
+        "8951-8959",
+        "8963-8976",
+        "8981-8990",
+        "9010-9016",
+        "9030-9043",
+        "9045",
+        "9051",
+        "9053-9055",
+        "9061-9065",
+        "9072",
+        "9081-9084",
+        "9086",
+        "9101-9105",
+        "9120-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "For this schema, Tumor Size is used with EOD Primary Tumor to derive EOD T. \n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:nodes_pos_fpa:c10",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C480"
+      ],
+      "histologies": [
+        "8000-8803",
+        "8810-8921",
+        "8932-8934",
+        "8940-8990",
+        "9000-9016",
+        "9030-9043",
+        "9045-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in medical record",
+    "codes": {
+      "00": "All nodes examined negative",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:nodes_pos_fpa:c11",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8822",
+        "8933",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in medical record",
+    "codes": {
+      "00": "All nodes examined negative",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:nodes_pos_fpa:c12",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8710-8714",
+        "8800-8803",
+        "8810-8821",
+        "8823-8921",
+        "8932",
+        "8934",
+        "8940-8941",
+        "8951-8959",
+        "8963-8976",
+        "8981-8990",
+        "9010-9016",
+        "9030-9043",
+        "9045",
+        "9051",
+        "9053-9055",
+        "9061-9065",
+        "9072",
+        "9081-9084",
+        "9086",
+        "9101-9105",
+        "9120-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in medical record",
+    "codes": {
+      "00": "All nodes examined negative",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:nodes_pos_fpa:i13",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C480"
+      ],
+      "histologies": [
+        "8000-8803",
+        "8810-8921",
+        "8932-8934",
+        "8940-8990",
+        "9000-9016",
+        "9030-9043",
+        "9045-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:nodes_pos_fpa:i14",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8822",
+        "8933",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:nodes_pos_fpa:i15",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8710-8714",
+        "8800-8803",
+        "8810-8821",
+        "8823-8921",
+        "8932",
+        "8934",
+        "8940-8941",
+        "8951-8959",
+        "8963-8976",
+        "8981-8990",
+        "9010-9016",
+        "9030-9043",
+        "9045",
+        "9051",
+        "9053-9055",
+        "9061-9065",
+        "9072",
+        "9081-9084",
+        "9086",
+        "9101-9105",
+        "9120-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:nodes_exam_76029:c16",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C480"
+      ],
+      "histologies": [
+        "8000-8803",
+        "8810-8921",
+        "8932-8934",
+        "8940-8990",
+        "9000-9016",
+        "9030-9043",
+        "9045-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (8 codes)\n00: No nodes examined\n01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)\n90: 90 or more nodes examined\n95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed\n96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated\n97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated\n98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown\n99: Unknown if nodes were examined; not applicable or negative Not documented in medical record",
+    "codes": {
+      "00": "No nodes examined",
+      "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+      "90": "90 or more nodes examined",
+      "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+      "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+      "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+      "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+      "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:nodes_exam_76029:c17",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8822",
+        "8933",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (8 codes)\n00: No nodes examined\n01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)\n90: 90 or more nodes examined\n95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed\n96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated\n97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated\n98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown\n99: Unknown if nodes were examined; not applicable or negative Not documented in medical record",
+    "codes": {
+      "00": "No nodes examined",
+      "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+      "90": "90 or more nodes examined",
+      "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+      "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+      "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+      "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+      "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:nodes_exam_76029:c18",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8710-8714",
+        "8800-8803",
+        "8810-8821",
+        "8823-8921",
+        "8932",
+        "8934",
+        "8940-8941",
+        "8951-8959",
+        "8963-8976",
+        "8981-8990",
+        "9010-9016",
+        "9030-9043",
+        "9045",
+        "9051",
+        "9053-9055",
+        "9061-9065",
+        "9072",
+        "9081-9084",
+        "9086",
+        "9101-9105",
+        "9120-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (8 codes)\n00: No nodes examined\n01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)\n90: 90 or more nodes examined\n95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed\n96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated\n97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated\n98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown\n99: Unknown if nodes were examined; not applicable or negative Not documented in medical record",
+    "codes": {
+      "00": "No nodes examined",
+      "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+      "90": "90 or more nodes examined",
+      "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+      "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+      "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+      "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+      "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:nodes_exam_76029:i19",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C480"
+      ],
+      "histologies": [
+        "8000-8803",
+        "8810-8921",
+        "8932-8934",
+        "8940-8990",
+        "9000-9016",
+        "9030-9043",
+        "9045-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:nodes_exam_76029:i20",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8822",
+        "8933",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:nodes_exam_76029:i21",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8710-8714",
+        "8800-8803",
+        "8810-8821",
+        "8823-8921",
+        "8932",
+        "8934",
+        "8940-8941",
+        "8951-8959",
+        "8963-8976",
+        "8981-8990",
+        "9010-9016",
+        "9030-9043",
+        "9045",
+        "9051",
+        "9053-9055",
+        "9061-9065",
+        "9072",
+        "9081-9084",
+        "9086",
+        "9101-9105",
+        "9120-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:ss2018_soft_tissue_retroperitoneum_5644:c22",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Summary Stage 2018: Retroperitoneum"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_soft_tissue_retroperitoneum_5644.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C480"
+      ],
+      "histologies": [
+        "8000-8803",
+        "8810-8921",
+        "8932-8934",
+        "8940-8990",
+        "9000-9016",
+        "9030-9043",
+        "9045-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018: Retroperitoneum (6 codes)\n1: **Localized only (localized, NOS)** - Confined to site of origin\n2: **Regional by direct extension only** * All sites - Adjacent connective tissue, NOS - Adjacent organs/structures, NOS - Bone/cartilage * Retroperitoneum (C480) + Adrenal(s) (suprarenal gland(s)) + Aorta + Colon (ascending and descending) + Kidney(s) + Pancreas + Vena cava + Vertebra - Peritoneum (C481, C482, C488) + Colon (except ascending and descending colon) + Esophagus + Gallbladder + Liver + Small intestine + Spleen + Stomach\n3: **Regional lymph node(s) involved only** - Intra-abdominal - Paracaval - Pelvic - Subdiaphragmatic - Regional lymph node(s), NOS + Lymph node(s), NOS\n4: **Regional by BOTH direct extension AND regional lymph node(s) involved** - Codes (2) + (3)\n7: **Distant site(s)/lymph node(s) involved** - Distant site(s) (including further contiguous extension) + Peritoneum (C481, C482, C488) * Colon (ascending and descending colon) - Distant lymph node(s), NOS - Distant metastasis, NOS + Carcinomatosis + Distant mets WITH or WITHOUT distant lymph node(s)\n9: Unknown if extension or metastasis",
+    "codes": {
+      "1": "**Localized only (localized, NOS)**\n- Confined to site of origin",
+      "2": "**Regional by direct extension only**\n* All sites\n  - Adjacent connective tissue, NOS\n  - Adjacent organs/structures, NOS\n  - Bone/cartilage \n* Retroperitoneum (C480)\n    + Adrenal(s) (suprarenal gland(s))\n    + Aorta\n    + Colon (ascending and descending)\n    + Kidney(s)\n    + Pancreas\n    + Vena cava\n    + Vertebra\n- Peritoneum (C481, C482, C488)\n    + Colon (except ascending and descending colon)\n    + Esophagus\n    + Gallbladder\n    + Liver\n    + Small intestine\n    + Spleen\n    + Stomach",
+      "3": "**Regional lymph node(s) involved only**\n- Intra-abdominal\n- Paracaval\n- Pelvic\n- Subdiaphragmatic \n- Regional lymph node(s), NOS\n  + Lymph node(s), NOS",
+      "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+      "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n  + Peritoneum (C481, C482, C488)\n     * Colon (ascending and descending colon) \n- Distant lymph node(s), NOS\n- Distant metastasis, NOS\n  + Carcinomatosis \n  + Distant mets WITH or WITHOUT distant lymph node(s)",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:ss2018_soft_tissue_retroperitoneum_5644:c23",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Summary Stage 2018: Retroperitoneum"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_soft_tissue_retroperitoneum_5644.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8822",
+        "8933",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018: Retroperitoneum (6 codes)\n1: **Localized only (localized, NOS)** - Confined to site of origin\n2: **Regional by direct extension only** * All sites - Adjacent connective tissue, NOS - Adjacent organs/structures, NOS - Bone/cartilage * Retroperitoneum (C480) + Adrenal(s) (suprarenal gland(s)) + Aorta + Colon (ascending and descending) + Kidney(s) + Pancreas + Vena cava + Vertebra - Peritoneum (C481, C482, C488) + Colon (except ascending and descending colon) + Esophagus + Gallbladder + Liver + Small intestine + Spleen + Stomach\n3: **Regional lymph node(s) involved only** - Intra-abdominal - Paracaval - Pelvic - Subdiaphragmatic - Regional lymph node(s), NOS + Lymph node(s), NOS\n4: **Regional by BOTH direct extension AND regional lymph node(s) involved** - Codes (2) + (3)\n7: **Distant site(s)/lymph node(s) involved** - Distant site(s) (including further contiguous extension) + Peritoneum (C481, C482, C488) * Colon (ascending and descending colon) - Distant lymph node(s), NOS - Distant metastasis, NOS + Carcinomatosis + Distant mets WITH or WITHOUT distant lymph node(s)\n9: Unknown if extension or metastasis",
+    "codes": {
+      "1": "**Localized only (localized, NOS)**\n- Confined to site of origin",
+      "2": "**Regional by direct extension only**\n* All sites\n  - Adjacent connective tissue, NOS\n  - Adjacent organs/structures, NOS\n  - Bone/cartilage \n* Retroperitoneum (C480)\n    + Adrenal(s) (suprarenal gland(s))\n    + Aorta\n    + Colon (ascending and descending)\n    + Kidney(s)\n    + Pancreas\n    + Vena cava\n    + Vertebra\n- Peritoneum (C481, C482, C488)\n    + Colon (except ascending and descending colon)\n    + Esophagus\n    + Gallbladder\n    + Liver\n    + Small intestine\n    + Spleen\n    + Stomach",
+      "3": "**Regional lymph node(s) involved only**\n- Intra-abdominal\n- Paracaval\n- Pelvic\n- Subdiaphragmatic \n- Regional lymph node(s), NOS\n  + Lymph node(s), NOS",
+      "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+      "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n  + Peritoneum (C481, C482, C488)\n     * Colon (ascending and descending colon) \n- Distant lymph node(s), NOS\n- Distant metastasis, NOS\n  + Carcinomatosis \n  + Distant mets WITH or WITHOUT distant lymph node(s)",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:ss2018_soft_tissue_retroperitoneum_5644:c24",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Summary Stage 2018: Retroperitoneum"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_soft_tissue_retroperitoneum_5644.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8710-8714",
+        "8800-8803",
+        "8810-8821",
+        "8823-8921",
+        "8932",
+        "8934",
+        "8940-8941",
+        "8951-8959",
+        "8963-8976",
+        "8981-8990",
+        "9010-9016",
+        "9030-9043",
+        "9045",
+        "9051",
+        "9053-9055",
+        "9061-9065",
+        "9072",
+        "9081-9084",
+        "9086",
+        "9101-9105",
+        "9120-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018: Retroperitoneum (6 codes)\n1: **Localized only (localized, NOS)** - Confined to site of origin\n2: **Regional by direct extension only** * All sites - Adjacent connective tissue, NOS - Adjacent organs/structures, NOS - Bone/cartilage * Retroperitoneum (C480) + Adrenal(s) (suprarenal gland(s)) + Aorta + Colon (ascending and descending) + Kidney(s) + Pancreas + Vena cava + Vertebra - Peritoneum (C481, C482, C488) + Colon (except ascending and descending colon) + Esophagus + Gallbladder + Liver + Small intestine + Spleen + Stomach\n3: **Regional lymph node(s) involved only** - Intra-abdominal - Paracaval - Pelvic - Subdiaphragmatic - Regional lymph node(s), NOS + Lymph node(s), NOS\n4: **Regional by BOTH direct extension AND regional lymph node(s) involved** - Codes (2) + (3)\n7: **Distant site(s)/lymph node(s) involved** - Distant site(s) (including further contiguous extension) + Peritoneum (C481, C482, C488) * Colon (ascending and descending colon) - Distant lymph node(s), NOS - Distant metastasis, NOS + Carcinomatosis + Distant mets WITH or WITHOUT distant lymph node(s)\n9: Unknown if extension or metastasis",
+    "codes": {
+      "1": "**Localized only (localized, NOS)**\n- Confined to site of origin",
+      "2": "**Regional by direct extension only**\n* All sites\n  - Adjacent connective tissue, NOS\n  - Adjacent organs/structures, NOS\n  - Bone/cartilage \n* Retroperitoneum (C480)\n    + Adrenal(s) (suprarenal gland(s))\n    + Aorta\n    + Colon (ascending and descending)\n    + Kidney(s)\n    + Pancreas\n    + Vena cava\n    + Vertebra\n- Peritoneum (C481, C482, C488)\n    + Colon (except ascending and descending colon)\n    + Esophagus\n    + Gallbladder\n    + Liver\n    + Small intestine\n    + Spleen\n    + Stomach",
+      "3": "**Regional lymph node(s) involved only**\n- Intra-abdominal\n- Paracaval\n- Pelvic\n- Subdiaphragmatic \n- Regional lymph node(s), NOS\n  + Lymph node(s), NOS",
+      "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+      "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n  + Peritoneum (C481, C482, C488)\n     * Colon (ascending and descending colon) \n- Distant lymph node(s), NOS\n- Distant metastasis, NOS\n  + Carcinomatosis \n  + Distant mets WITH or WITHOUT distant lymph node(s)",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:ss2018_soft_tissue_retroperitoneum_5644:i25",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Summary Stage 2018: Retroperitoneum"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_soft_tissue_retroperitoneum_5644.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C480"
+      ],
+      "histologies": [
+        "8000-8803",
+        "8810-8921",
+        "8932-8934",
+        "8940-8990",
+        "9000-9016",
+        "9030-9043",
+        "9045-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Retroperitoneum**\n\nC480 (8000-8803, 8810-8921, 8932-8934, 8940-8990, 9000-9016, 9030-9043, 9045-9138, 9141-9230, 9240-9580, 9582) \n\nC481- C482, C488 (8710-8714, 8800-8803, 8810-8821, 8823-8921, 8932, 8934, 8940-8941, 8951-8959, 8963-8975, 8981-8990, 9010-9016, 9030-9043, 9045, 9051, 9053-9055, 9061-9065, 9072, 9081-9084, 9086, 9101-9105, 9120-9138, 9141-9230, 9240-9580, 9582)\n\nC481-C482, C488 and Sex: 1, 3, 4, 5, 9 (8000-8700, 8720-8790, 8822, 8933, 8950, 8960, 8980, 9000, 9050, 9052, 9060, 9070-9071, 9073, 9080, 9085, 9090-9091, 9100, 9110)\n\nC480-C482, C488\nC480 Retroperitoneum\nC481 Specified parts of peritoneum (including omentum and mesentery)\nC482 Peritoneum, NOS\nC488 Overlapping lesion of retroperitoneum and peritoneum\n\n**Note 1:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 44 *Soft Tissue Sarcoma of the Retroperitoneum*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other Summary Stage Chapters with Retroperitoneum sites**\n* **Primary Peritoneal Carcinoma**: C481-C482, C488 and Sex: 2, 6 (8000-8700, 8720-8790, 8806, 8822, 8930-8931, 8933, 8950, 8960, 8980, 9000, 9050, 9052, 9060, 9070-9071, 9073, 9080, 9085, 9090-9091, 9100, 9110-9111)\n* **GIST**: 8935-8936\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Soft Tissue** \n  * C480; C481-C488 with Sex 1, 3, 5, 9 (8806, 8930-8931)\n  * 8804-8805, 8991-8992, 9020, 9044, 9231, 9581\n\n**Note 3:** **Not applicable codes** \n* Code 0 is not applicable for this chapter.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:ss2018_soft_tissue_retroperitoneum_5644:i26",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Summary Stage 2018: Retroperitoneum"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_soft_tissue_retroperitoneum_5644.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8822",
+        "8933",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Retroperitoneum**\n\nC480 (8000-8803, 8810-8921, 8932-8934, 8940-8990, 9000-9016, 9030-9043, 9045-9138, 9141-9230, 9240-9580, 9582) \n\nC481- C482, C488 (8710-8714, 8800-8803, 8810-8821, 8823-8921, 8932, 8934, 8940-8941, 8951-8959, 8963-8975, 8981-8990, 9010-9016, 9030-9043, 9045, 9051, 9053-9055, 9061-9065, 9072, 9081-9084, 9086, 9101-9105, 9120-9138, 9141-9230, 9240-9580, 9582)\n\nC481-C482, C488 and Sex: 1, 3, 4, 5, 9 (8000-8700, 8720-8790, 8822, 8933, 8950, 8960, 8980, 9000, 9050, 9052, 9060, 9070-9071, 9073, 9080, 9085, 9090-9091, 9100, 9110)\n\nC480-C482, C488\nC480 Retroperitoneum\nC481 Specified parts of peritoneum (including omentum and mesentery)\nC482 Peritoneum, NOS\nC488 Overlapping lesion of retroperitoneum and peritoneum\n\n**Note 1:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 44 *Soft Tissue Sarcoma of the Retroperitoneum*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other Summary Stage Chapters with Retroperitoneum sites**\n* **Primary Peritoneal Carcinoma**: C481-C482, C488 and Sex: 2, 6 (8000-8700, 8720-8790, 8806, 8822, 8930-8931, 8933, 8950, 8960, 8980, 9000, 9050, 9052, 9060, 9070-9071, 9073, 9080, 9085, 9090-9091, 9100, 9110-9111)\n* **GIST**: 8935-8936\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Soft Tissue** \n  * C480; C481-C488 with Sex 1, 3, 5, 9 (8806, 8930-8931)\n  * 8804-8805, 8991-8992, 9020, 9044, 9231, 9581\n\n**Note 3:** **Not applicable codes** \n* Code 0 is not applicable for this chapter.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:ss2018_soft_tissue_retroperitoneum_5644:i27",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Summary Stage 2018: Retroperitoneum"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_soft_tissue_retroperitoneum_5644.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8710-8714",
+        "8800-8803",
+        "8810-8821",
+        "8823-8921",
+        "8932",
+        "8934",
+        "8940-8941",
+        "8951-8959",
+        "8963-8976",
+        "8981-8990",
+        "9010-9016",
+        "9030-9043",
+        "9045",
+        "9051",
+        "9053-9055",
+        "9061-9065",
+        "9072",
+        "9081-9084",
+        "9086",
+        "9101-9105",
+        "9120-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Retroperitoneum**\n\nC480 (8000-8803, 8810-8921, 8932-8934, 8940-8990, 9000-9016, 9030-9043, 9045-9138, 9141-9230, 9240-9580, 9582) \n\nC481- C482, C488 (8710-8714, 8800-8803, 8810-8821, 8823-8921, 8932, 8934, 8940-8941, 8951-8959, 8963-8975, 8981-8990, 9010-9016, 9030-9043, 9045, 9051, 9053-9055, 9061-9065, 9072, 9081-9084, 9086, 9101-9105, 9120-9138, 9141-9230, 9240-9580, 9582)\n\nC481-C482, C488 and Sex: 1, 3, 4, 5, 9 (8000-8700, 8720-8790, 8822, 8933, 8950, 8960, 8980, 9000, 9050, 9052, 9060, 9070-9071, 9073, 9080, 9085, 9090-9091, 9100, 9110)\n\nC480-C482, C488\nC480 Retroperitoneum\nC481 Specified parts of peritoneum (including omentum and mesentery)\nC482 Peritoneum, NOS\nC488 Overlapping lesion of retroperitoneum and peritoneum\n\n**Note 1:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 44 *Soft Tissue Sarcoma of the Retroperitoneum*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other Summary Stage Chapters with Retroperitoneum sites**\n* **Primary Peritoneal Carcinoma**: C481-C482, C488 and Sex: 2, 6 (8000-8700, 8720-8790, 8806, 8822, 8930-8931, 8933, 8950, 8960, 8980, 9000, 9050, 9052, 9060, 9070-9071, 9073, 9080, 9085, 9090-9091, 9100, 9110-9111)\n* **GIST**: 8935-8936\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Soft Tissue** \n  * C480; C481-C488 with Sex 1, 3, 5, 9 (8806, 8930-8931)\n  * 8804-8805, 8991-8992, 9020, 9044, 9231, 9581\n\n**Note 3:** **Not applicable codes** \n* Code 0 is not applicable for this chapter.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:grade_clinical_64933:c28",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_64933.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C480"
+      ],
+      "histologies": [
+        "8000-8803",
+        "8810-8921",
+        "8932-8934",
+        "8940-8990",
+        "9000-9016",
+        "9030-9043",
+        "9045-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (9 codes)\n1: G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3 Stated as FNCLCC Grade 1\n2: G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5 Stated as FNCLCC Grade 2\n3: G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8 Stated as FNCLCC Grade 3\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\nH: Stated as \"high grade\" only\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3\n\nStated as FNCLCC Grade 1",
+      "2": "G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5\n\nStated as FNCLCC Grade 2",
+      "3": "G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8\n\nStated as FNCLCC Grade 3",
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "H": "Stated as \"high grade\" only",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:grade_clinical_64933:c29",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_64933.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8822",
+        "8933",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (9 codes)\n1: G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3 Stated as FNCLCC Grade 1\n2: G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5 Stated as FNCLCC Grade 2\n3: G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8 Stated as FNCLCC Grade 3\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\nH: Stated as \"high grade\" only\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3\n\nStated as FNCLCC Grade 1",
+      "2": "G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5\n\nStated as FNCLCC Grade 2",
+      "3": "G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8\n\nStated as FNCLCC Grade 3",
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "H": "Stated as \"high grade\" only",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:grade_clinical_64933:c30",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_64933.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8710-8714",
+        "8800-8803",
+        "8810-8821",
+        "8823-8921",
+        "8932",
+        "8934",
+        "8940-8941",
+        "8951-8959",
+        "8963-8976",
+        "8981-8990",
+        "9010-9016",
+        "9030-9043",
+        "9045",
+        "9051",
+        "9053-9055",
+        "9061-9065",
+        "9072",
+        "9081-9084",
+        "9086",
+        "9101-9105",
+        "9120-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (9 codes)\n1: G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3 Stated as FNCLCC Grade 1\n2: G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5 Stated as FNCLCC Grade 2\n3: G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8 Stated as FNCLCC Grade 3\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\nH: Stated as \"high grade\" only\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3\n\nStated as FNCLCC Grade 1",
+      "2": "G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5\n\nStated as FNCLCC Grade 2",
+      "3": "G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8\n\nStated as FNCLCC Grade 3",
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "H": "Stated as \"high grade\" only",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:grade_clinical_64933:i31",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_64933.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C480"
+      ],
+      "histologies": [
+        "8000-8803",
+        "8810-8921",
+        "8932-8934",
+        "8940-8990",
+        "9000-9016",
+        "9030-9043",
+        "9045-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Clinical must not be blank.\n\n**Note 2:** Assign the highest grade from the primary tumor assessed during the clinical time frame. \n\n**Note 3:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 4:** Code 1 for stated as “low grade” only.\n\n**Note 5:** Codes 1-3 take priority over A-D, H.\n\n**Note 6:** Code 9 (unknown) when\n* Grade from primary site is not documented\n* Clinical workup is not done (for example, cancer is an incidental finding during surgery for another condition)\n* Grade checked \"not applicable\" on CAP Protocol (if available) and no other grade information is available\n\n**Note 7:** If there is only one grade available and it cannot be determined if it is clinical or pathological, assume it is a Grade Clinical and code appropriately per Grade Clinical categories for that site, and then code unknown (9) for Grade Pathological, and blank for Grade Post Therapy Clin (yc) and Grade Post Therapy Path (yp).\n\n**Note 8:** If you are assigning an AJCC Staging System stage group\n* Grade is required to assign stage group\n* Codes A-D are treated as an unknown grade when assigning AJCC stage group \n* An unknown grade may result in an unknown stage group",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:grade_clinical_64933:i32",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_64933.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8822",
+        "8933",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Clinical must not be blank.\n\n**Note 2:** Assign the highest grade from the primary tumor assessed during the clinical time frame. \n\n**Note 3:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 4:** Code 1 for stated as “low grade” only.\n\n**Note 5:** Codes 1-3 take priority over A-D, H.\n\n**Note 6:** Code 9 (unknown) when\n* Grade from primary site is not documented\n* Clinical workup is not done (for example, cancer is an incidental finding during surgery for another condition)\n* Grade checked \"not applicable\" on CAP Protocol (if available) and no other grade information is available\n\n**Note 7:** If there is only one grade available and it cannot be determined if it is clinical or pathological, assume it is a Grade Clinical and code appropriately per Grade Clinical categories for that site, and then code unknown (9) for Grade Pathological, and blank for Grade Post Therapy Clin (yc) and Grade Post Therapy Path (yp).\n\n**Note 8:** If you are assigning an AJCC Staging System stage group\n* Grade is required to assign stage group\n* Codes A-D are treated as an unknown grade when assigning AJCC stage group \n* An unknown grade may result in an unknown stage group",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:grade_clinical_64933:i33",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_64933.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8710-8714",
+        "8800-8803",
+        "8810-8821",
+        "8823-8921",
+        "8932",
+        "8934",
+        "8940-8941",
+        "8951-8959",
+        "8963-8976",
+        "8981-8990",
+        "9010-9016",
+        "9030-9043",
+        "9045",
+        "9051",
+        "9053-9055",
+        "9061-9065",
+        "9072",
+        "9081-9084",
+        "9086",
+        "9101-9105",
+        "9120-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Clinical must not be blank.\n\n**Note 2:** Assign the highest grade from the primary tumor assessed during the clinical time frame. \n\n**Note 3:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 4:** Code 1 for stated as “low grade” only.\n\n**Note 5:** Codes 1-3 take priority over A-D, H.\n\n**Note 6:** Code 9 (unknown) when\n* Grade from primary site is not documented\n* Clinical workup is not done (for example, cancer is an incidental finding during surgery for another condition)\n* Grade checked \"not applicable\" on CAP Protocol (if available) and no other grade information is available\n\n**Note 7:** If there is only one grade available and it cannot be determined if it is clinical or pathological, assume it is a Grade Clinical and code appropriately per Grade Clinical categories for that site, and then code unknown (9) for Grade Pathological, and blank for Grade Post Therapy Clin (yc) and Grade Post Therapy Path (yp).\n\n**Note 8:** If you are assigning an AJCC Staging System stage group\n* Grade is required to assign stage group\n* Codes A-D are treated as an unknown grade when assigning AJCC stage group \n* An unknown grade may result in an unknown stage group",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:grade_pathological_19141:c34",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_19141.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C480"
+      ],
+      "histologies": [
+        "8000-8803",
+        "8810-8921",
+        "8932-8934",
+        "8940-8990",
+        "9000-9016",
+        "9030-9043",
+        "9045-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (9 codes)\n1: G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3 Stated as FNCLCC Grade 1\n2: G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5 Stated as FNCLCC Grade 2\n3: G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8 Stated as FNCLCC Grade 3\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\nH: Stated as \"high grade\" only\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3\n\nStated as FNCLCC Grade 1",
+      "2": "G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5\n\nStated as FNCLCC Grade 2",
+      "3": "G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8\n\nStated as FNCLCC Grade 3",
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "H": "Stated as \"high grade\" only",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:grade_pathological_19141:c35",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_19141.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8822",
+        "8933",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (9 codes)\n1: G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3 Stated as FNCLCC Grade 1\n2: G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5 Stated as FNCLCC Grade 2\n3: G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8 Stated as FNCLCC Grade 3\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\nH: Stated as \"high grade\" only\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3\n\nStated as FNCLCC Grade 1",
+      "2": "G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5\n\nStated as FNCLCC Grade 2",
+      "3": "G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8\n\nStated as FNCLCC Grade 3",
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "H": "Stated as \"high grade\" only",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:grade_pathological_19141:c36",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_19141.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8710-8714",
+        "8800-8803",
+        "8810-8821",
+        "8823-8921",
+        "8932",
+        "8934",
+        "8940-8941",
+        "8951-8959",
+        "8963-8976",
+        "8981-8990",
+        "9010-9016",
+        "9030-9043",
+        "9045",
+        "9051",
+        "9053-9055",
+        "9061-9065",
+        "9072",
+        "9081-9084",
+        "9086",
+        "9101-9105",
+        "9120-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (9 codes)\n1: G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3 Stated as FNCLCC Grade 1\n2: G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5 Stated as FNCLCC Grade 2\n3: G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8 Stated as FNCLCC Grade 3\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\nH: Stated as \"high grade\" only\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3\n\nStated as FNCLCC Grade 1",
+      "2": "G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5\n\nStated as FNCLCC Grade 2",
+      "3": "G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8\n\nStated as FNCLCC Grade 3",
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "H": "Stated as \"high grade\" only",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:grade_pathological_19141:i37",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_19141.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C480"
+      ],
+      "histologies": [
+        "8000-8803",
+        "8810-8921",
+        "8932-8934",
+        "8940-8990",
+        "9000-9016",
+        "9030-9043",
+        "9045-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Pathological must not be blank.\n\n**Note 2:** There is a preferred grading system for this schema. If the clinical grade given uses the preferred grading system and the pathological grade does not use the preferred grading system, do not record the Grade Clinical in the Grade Pathological field. Assign Grade Pathological using the applicable generic grade codes (A-D).\n* *Example:* Biopsy shows a myxofibrosarcoma, FNCLCC grade score 2. The surgical resection states a high grade myxofibrosarcoma \n    - Code Grade Clinical as 2 (G2) since FNCLCC is the preferred grading system\n     - Code Grade Pathological as D for high grade, per the Coding Guidelines for Generic Grade Categories\n\n**Note 3:** Assign the highest grade from the primary tumor.  \n\n**Note 4:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 5:** Code 1 for stated as “low grade” only.\n\n**Note 6:** Codes 1-3 take priority over A-D, H.\n\n**Note 7:** Use the grade from the **clinical work up** from the primary tumor in different scenarios based on behavior or surgical resection\n* **Behavior**\n  - Tumor behavior for the clinical and the pathological diagnoses are the same AND the clinical grade is the highest grade \n   - Tumor behavior for clinical diagnosis is invasive, and the tumor behavior for the pathological diagnosis is in situ\n* **Surgical Resection**\n   - Surgical resection is done of the primary tumor and there is no grade documented from the surgical resection\n    - Surgical resection is done of the primary tumor and there is no residual cancer\n* **No surgical resection**\n    - Surgical resection of the primary tumor has not been done, but there is positive microscopic confirmation of distant metastases during the clinical time frame\n\n**Note 8:** Code 9 (unknown) when\n* Grade from primary site is not documented\n* No resection of the primary site (see exception in Note 6, Surgical resection, last bullet)\n* Neo-adjuvant therapy is followed by a resection (see Grade Post Therapy Path (yp))\n* Grade checked “not applicable” on CAP Protocol (if available) and no other grade information is available\n* Clinical case only (see Grade Clinical)\n* There is only one grade available and it cannot be determined if it is clinical, pathological, post therapy clinical or post therapy pathological\n\n**Note 9:** If you are assigning an AJCC Staging System stage group\n* Grade is required to assign stage group\n* Codes A-D are treated as an unknown grade when assigning AJCC stage group \n* An unknown grade may result in an unknown stage group",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:grade_pathological_19141:i38",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_19141.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8822",
+        "8933",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Pathological must not be blank.\n\n**Note 2:** There is a preferred grading system for this schema. If the clinical grade given uses the preferred grading system and the pathological grade does not use the preferred grading system, do not record the Grade Clinical in the Grade Pathological field. Assign Grade Pathological using the applicable generic grade codes (A-D).\n* *Example:* Biopsy shows a myxofibrosarcoma, FNCLCC grade score 2. The surgical resection states a high grade myxofibrosarcoma \n    - Code Grade Clinical as 2 (G2) since FNCLCC is the preferred grading system\n     - Code Grade Pathological as D for high grade, per the Coding Guidelines for Generic Grade Categories\n\n**Note 3:** Assign the highest grade from the primary tumor.  \n\n**Note 4:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 5:** Code 1 for stated as “low grade” only.\n\n**Note 6:** Codes 1-3 take priority over A-D, H.\n\n**Note 7:** Use the grade from the **clinical work up** from the primary tumor in different scenarios based on behavior or surgical resection\n* **Behavior**\n  - Tumor behavior for the clinical and the pathological diagnoses are the same AND the clinical grade is the highest grade \n   - Tumor behavior for clinical diagnosis is invasive, and the tumor behavior for the pathological diagnosis is in situ\n* **Surgical Resection**\n   - Surgical resection is done of the primary tumor and there is no grade documented from the surgical resection\n    - Surgical resection is done of the primary tumor and there is no residual cancer\n* **No surgical resection**\n    - Surgical resection of the primary tumor has not been done, but there is positive microscopic confirmation of distant metastases during the clinical time frame\n\n**Note 8:** Code 9 (unknown) when\n* Grade from primary site is not documented\n* No resection of the primary site (see exception in Note 6, Surgical resection, last bullet)\n* Neo-adjuvant therapy is followed by a resection (see Grade Post Therapy Path (yp))\n* Grade checked “not applicable” on CAP Protocol (if available) and no other grade information is available\n* Clinical case only (see Grade Clinical)\n* There is only one grade available and it cannot be determined if it is clinical, pathological, post therapy clinical or post therapy pathological\n\n**Note 9:** If you are assigning an AJCC Staging System stage group\n* Grade is required to assign stage group\n* Codes A-D are treated as an unknown grade when assigning AJCC stage group \n* An unknown grade may result in an unknown stage group",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:retroperitoneum:grade_pathological_19141:i39",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Retroperitoneum",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_19141.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C481-C482",
+        "C488"
+      ],
+      "histologies": [
+        "8710-8714",
+        "8800-8803",
+        "8810-8821",
+        "8823-8921",
+        "8932",
+        "8934",
+        "8940-8941",
+        "8951-8959",
+        "8963-8976",
+        "8981-8990",
+        "9010-9016",
+        "9030-9043",
+        "9045",
+        "9051",
+        "9053-9055",
+        "9061-9065",
+        "9072",
+        "9081-9084",
+        "9086",
+        "9101-9105",
+        "9120-9138",
+        "9141-9230",
+        "9240-9580",
+        "9582"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Pathological must not be blank.\n\n**Note 2:** There is a preferred grading system for this schema. If the clinical grade given uses the preferred grading system and the pathological grade does not use the preferred grading system, do not record the Grade Clinical in the Grade Pathological field. Assign Grade Pathological using the applicable generic grade codes (A-D).\n* *Example:* Biopsy shows a myxofibrosarcoma, FNCLCC grade score 2. The surgical resection states a high grade myxofibrosarcoma \n    - Code Grade Clinical as 2 (G2) since FNCLCC is the preferred grading system\n     - Code Grade Pathological as D for high grade, per the Coding Guidelines for Generic Grade Categories\n\n**Note 3:** Assign the highest grade from the primary tumor.  \n\n**Note 4:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 5:** Code 1 for stated as “low grade” only.\n\n**Note 6:** Codes 1-3 take priority over A-D, H.\n\n**Note 7:** Use the grade from the **clinical work up** from the primary tumor in different scenarios based on behavior or surgical resection\n* **Behavior**\n  - Tumor behavior for the clinical and the pathological diagnoses are the same AND the clinical grade is the highest grade \n   - Tumor behavior for clinical diagnosis is invasive, and the tumor behavior for the pathological diagnosis is in situ\n* **Surgical Resection**\n   - Surgical resection is done of the primary tumor and there is no grade documented from the surgical resection\n    - Surgical resection is done of the primary tumor and there is no residual cancer\n* **No surgical resection**\n    - Surgical resection of the primary tumor has not been done, but there is positive microscopic confirmation of distant metastases during the clinical time frame\n\n**Note 8:** Code 9 (unknown) when\n* Grade from primary site is not documented\n* No resection of the primary site (see exception in Note 6, Surgical resection, last bullet)\n* Neo-adjuvant therapy is followed by a resection (see Grade Post Therapy Path (yp))\n* Grade checked “not applicable” on CAP Protocol (if available) and no other grade information is available\n* Clinical case only (see Grade Clinical)\n* There is only one grade available and it cannot be determined if it is clinical, pathological, post therapy clinical or post therapy pathological\n\n**Note 9:** If you are assigning an AJCC Staging System stage group\n* Grade is required to assign stage group\n* Codes A-D are treated as an unknown grade when assigning AJCC stage group \n* An unknown grade may result in an unknown stage group",
+    "codes": null,
+    "notes": null
+  }
+]

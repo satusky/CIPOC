@@ -1,0 +1,550 @@
+[
+  {
+    "rule_id": "seer_rsa_eod:net_ampulla_of_vater_v9_2024:schema:i1",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "NET Ampulla of Vater [V9: 2024+]",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/net_ampulla_of_vater_v9_2024.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C241"
+      ],
+      "histologies": [
+        "8150-8153",
+        "8155-8156",
+        "8158",
+        "8240-8242",
+        "8249",
+        "8683"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2024-01-01",
+      "dx_date_max": null
+    },
+    "text": "8150-8153, 8155-8156, 8158, 8240-8242, 8249, 8683\n\nC241 Ampulla of Vater\n\n**Note:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 30 *Neuroendocrine Tumors of the Duodenum and Ampulla of Vater*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n* *Neuroendocrine Tumors of the Duodenum and Ampulla of Vater*, from the AJCC Cancer Staging System Version 9 (2023). Used with permission of the American College of Surgeons, Chicago, Illinois.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:net_ampulla_of_vater_v9_2024:behavior:c2",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "NET Ampulla of Vater [V9: 2024+]",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "code_table",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C241"
+      ],
+      "histologies": [
+        "8150-8153",
+        "8155-8156",
+        "8158",
+        "8240-8242",
+        "8249",
+        "8683"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2024-01-01",
+      "dx_date_max": null
+    },
+    "text": "Behavior ICD-O-3 (4 codes)\n0: Benign\n1: Uncertain Benign/Malig\n2: In Situ\n3: Malignant Primary",
+    "codes": {
+      "0": "Benign",
+      "1": "Uncertain Benign/Malig",
+      "2": "In Situ",
+      "3": "Malignant Primary"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:net_ampulla_of_vater_v9_2024:behavior:i3",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "NET Ampulla of Vater [V9: 2024+]",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C241"
+      ],
+      "histologies": [
+        "8150-8153",
+        "8155-8156",
+        "8158",
+        "8240-8242",
+        "8249",
+        "8683"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2024-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:net_ampulla_of_vater_v9_2024:tumor_size_summary_63115:c4",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "NET Ampulla of Vater [V9: 2024+]",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_63115.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C241"
+      ],
+      "histologies": [
+        "8150-8153",
+        "8155-8156",
+        "8158",
+        "8240-8242",
+        "8249",
+        "8683"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2024-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (6 codes)\n000: No mass/tumor found\n001: 1 mm or described as less than 1 mm\n002-988: Exact size in millimeters (2 mm to 988 mm)\n989: 989 millimeters or larger\n990: Microscopic focus or foci only and no size of focus is given\n999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm",
+      "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+      "989": "989 millimeters or larger",
+      "990": "Microscopic focus or foci only and no size of focus is given",
+      "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:net_ampulla_of_vater_v9_2024:tumor_size_summary_63115:i5",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "NET Ampulla of Vater [V9: 2024+]",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_63115.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C241"
+      ],
+      "histologies": [
+        "8150-8153",
+        "8155-8156",
+        "8158",
+        "8240-8242",
+        "8249",
+        "8683"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2024-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:net_ampulla_of_vater_v9_2024:nodes_pos_fpa:c6",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "NET Ampulla of Vater [V9: 2024+]",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C241"
+      ],
+      "histologies": [
+        "8150-8153",
+        "8155-8156",
+        "8158",
+        "8240-8242",
+        "8249",
+        "8683"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2024-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in medical record",
+    "codes": {
+      "00": "All nodes examined negative",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:net_ampulla_of_vater_v9_2024:nodes_pos_fpa:i7",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "NET Ampulla of Vater [V9: 2024+]",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C241"
+      ],
+      "histologies": [
+        "8150-8153",
+        "8155-8156",
+        "8158",
+        "8240-8242",
+        "8249",
+        "8683"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2024-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:net_ampulla_of_vater_v9_2024:nodes_exam_76029:c8",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "NET Ampulla of Vater [V9: 2024+]",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C241"
+      ],
+      "histologies": [
+        "8150-8153",
+        "8155-8156",
+        "8158",
+        "8240-8242",
+        "8249",
+        "8683"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2024-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (8 codes)\n00: No nodes examined\n01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)\n90: 90 or more nodes examined\n95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed\n96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated\n97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated\n98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown\n99: Unknown if nodes were examined; not applicable or negative Not documented in medical record",
+    "codes": {
+      "00": "No nodes examined",
+      "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+      "90": "90 or more nodes examined",
+      "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+      "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+      "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+      "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+      "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:net_ampulla_of_vater_v9_2024:nodes_exam_76029:i9",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "NET Ampulla of Vater [V9: 2024+]",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C241"
+      ],
+      "histologies": [
+        "8150-8153",
+        "8155-8156",
+        "8158",
+        "8240-8242",
+        "8249",
+        "8683"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2024-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:net_ampulla_of_vater_v9_2024:ss2018_ampulla_of_vater_including_net_96311:c10",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "NET Ampulla of Vater [V9: 2024+]",
+      "Summary Stage 2018: Ampulla of Vater"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_ampulla_of_vater_including_net_96311.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C241"
+      ],
+      "histologies": [
+        "8150-8153",
+        "8155-8156",
+        "8158",
+        "8240-8242",
+        "8249",
+        "8683"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2024-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018: Ampulla of Vater (7 codes)\n0: **In situ, intraepithelial, noninvasive**\n1: **Localized only (localized, NOS)** - Ampulla of Vater - Confined to ampulla, NOS - Duodenal submucosa - Perisphincteric invasion (invasion beyond sphincter of Oddi) - Sphincter of Oddi\n2: **Regional by direct extension only** - Blood vessel(s) (major) + Common hepatic artery + Portal vein + Superior mesenteric artery - Celiac axis - Common bile duct - Duodenum, NOS - Extrahepatic bile duct(s) - Gallbladder - Hepatic flexure of colon - Lesser omentum - Liver including porta hepatis - Muscularis propria of the duodenum (duodenal wall) - Pancreas - Stomach (distal, proximal, NOS) - Transverse colon\n3: **Regional lymph node(s) involved only** - Anterior to ampulla of Vater - Inferior to ampulla of Vater - Posterior to ampulla of Vater - Superior to ampulla of Vater - Celiac - Hepatic - Hepatic artery - Lateral aortic (lumbar) - Node of foramen of the Winslow (epiploic) (omental) - Pancreaticoduodenal - Peripancreatic (excluding nodes at tail of pancreas) - Periportal (portal vein) - Proximal mesenteric - Pyloric (infrapyloric, subpyloric) - Retroperitoneal - Superior mesenteric - Regional ly …",
+    "codes": {
+      "0": "**In situ, intraepithelial, noninvasive**",
+      "1": "**Localized only (localized, NOS)**\n- Ampulla of Vater\n- Confined to ampulla, NOS\n- Duodenal submucosa\n- Perisphincteric invasion (invasion beyond sphincter of Oddi)\n- Sphincter of Oddi",
+      "2": "**Regional by direct extension only**\n- Blood vessel(s) (major)\n  + Common hepatic artery\n  + Portal vein\n  + Superior mesenteric artery\n- Celiac axis\n- Common bile duct\n- Duodenum, NOS \n- Extrahepatic bile duct(s) \n- Gallbladder\n- Hepatic flexure of colon\n- Lesser omentum\n- Liver including porta hepatis\n- Muscularis propria of the duodenum (duodenal wall)\n- Pancreas\n- Stomach (distal, proximal, NOS)\n- Transverse colon",
+      "3": "**Regional lymph node(s) involved only**\n- Anterior to ampulla of Vater \n- Inferior to ampulla of Vater\n- Posterior to ampulla of Vater\n- Superior to ampulla of Vater\n- Celiac\n- Hepatic \n- Hepatic artery\n- Lateral aortic (lumbar)\n- Node of foramen of the Winslow (epiploic) (omental)\n- Pancreaticoduodenal\n- Peripancreatic (excluding nodes at tail of pancreas)\n- Periportal (portal vein)\n- Proximal mesenteric\n- Pyloric (infrapyloric, subpyloric)\n- Retroperitoneal\n- Superior mesenteric\n- Regional lymph node(s), NOS\n  + Lymph node(s), NOS",
+      "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+      "7": "**Distant site(s)/lymph node(s) involved**\n- Distant sites (including further contiguous extension) \n  + Periduodenal or peripancreatic soft tissue\n- Distant lymph node(s), NOS\n   + At tail of pancreas\n   + Para-aortic\n   + Splenic\n- Distant metastasis, NOS\n  + Carcinomatosis \n  + Distant mets WITH or WITHOUT distant lymph node(s)",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:net_ampulla_of_vater_v9_2024:ss2018_ampulla_of_vater_including_net_96311:i11",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "NET Ampulla of Vater [V9: 2024+]",
+      "Summary Stage 2018: Ampulla of Vater"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_ampulla_of_vater_including_net_96311.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C241"
+      ],
+      "histologies": [
+        "8150-8153",
+        "8155-8156",
+        "8158",
+        "8240-8242",
+        "8249",
+        "8683"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2024-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Ampulla of Vater**\n\n8000-8700, 8720-8790\n\nC241\nC241 Ampulla of Vater\n\n**Note 1:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 27 *Ampulla of Vater*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n* Chapter 30 *Neuroendocrine Tumors of the Duodenum and Ampulla of Vater*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n* *Neuroendocrine Tumors of the Duodenum and Ampulla of Vater*, from the AJCC Cancer Staging System Version 9 (2023). Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other Summary Stage Chapters with Ampulla of Vater sites**\n* **GIST**: 8935-8936\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Soft Tissue**: 8710-8714, 8800-8934, 8940-9138, 9141-9582",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:net_ampulla_of_vater_v9_2024:grade_clinical_26768:c12",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "NET Ampulla of Vater [V9: 2024+]",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_26768.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C241"
+      ],
+      "histologies": [
+        "8150-8153",
+        "8155-8156",
+        "8158",
+        "8240-8242",
+        "8249",
+        "8683"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2024-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (8 codes)\n1: G1: Mitotic count (per 2mm2) less than 2 AND Ki-67 index (%) less than 3 Stated as WHO Grade 1\n2: G2: Mitotic count (per 2mm2) equal 2-20 OR Ki-67 index (%) equal 3-20 Stated as WHO Grade 2\n3: G3: Mitotic count (per 2mm2) greater than 20 OR Ki-67 index (%) greater than 20 Stated as WHO Grade 3\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Mitotic count (per 2mm2) less than 2 AND \n        Ki-67 index (%) less than 3\n\nStated as WHO Grade 1",
+      "2": "G2: Mitotic count (per 2mm2) equal 2-20 OR\n        Ki-67 index (%) equal 3-20\n\nStated as WHO Grade 2",
+      "3": "G3: Mitotic count (per 2mm2) greater than 20 OR \n    Ki-67 index (%) greater than 20\n\nStated as WHO Grade 3",
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:net_ampulla_of_vater_v9_2024:grade_clinical_26768:i13",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "NET Ampulla of Vater [V9: 2024+]",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_26768.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C241"
+      ],
+      "histologies": [
+        "8150-8153",
+        "8155-8156",
+        "8158",
+        "8240-8242",
+        "8249",
+        "8683"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2024-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Clinical must not be blank.\n\n**Note 2:** Assign the highest grade from the primary tumor assessed during the clinical time frame. \n\n**Note 3:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 4:** Codes 1-3 take priority over codes A-D.\n*  Grades A-D should only be used in the absence of a physician's statement of grade (G1, G2, G3) or no results for Ki-67 or Mitotic Count (See also Note 6)\n\n**Note 5:** Do not code grade based on the following terminology: \n* Neuroendocrine carcinoma, low grade (8240/3)\n* Neuroendocrine carcinoma, well differentiated (8240/3)\n* Neuroendocrine carcinoma, moderately differentiated (8249/3)\n* Poorly differentiated neuroendocrine carcinoma (8246/3)\n\n**Note 6:** Code grade based on the physician's documentation (G1, G2, G3) OR **in the absence of a physician's statement,** code grade based on the Ki-67 and Mitotic Count. \n* If a Ki-67 is documented as less than 3, many times the mitotic count is not done. In this situation, the Ki-67 alone is enough to code the grade (G1). \n* Grades 2 and 3, are either/or for Ki-67 and Mitotic Count. You do not need both the Ki-67 and Mitotic Count to assign grade 2 or 3.\n\n**Note 7:** Code 9 (unknown) when\n* Grade from primary site is not documented\n* Clinical workup is not done (for example, cancer is an incidental finding during surgery for another condition)\n* Grade checked \"not applicable\" on CAP Protocol (if available) and no other grade information is available\n\n**Note 8:** If there is only one grade available and it cannot be determined if it is clinical or pathological, assume it is a Grade Clinical and code appropriately per Grade Clinical categories for that site, and then code unknown (9) for Grade Pathological, and blank for Grade Post Therapy Clin (yc) and Grade Post Therapy Path (yp).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:net_ampulla_of_vater_v9_2024:grade_pathological_26086:c14",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "NET Ampulla of Vater [V9: 2024+]",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_26086.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C241"
+      ],
+      "histologies": [
+        "8150-8153",
+        "8155-8156",
+        "8158",
+        "8240-8242",
+        "8249",
+        "8683"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2024-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (8 codes)\n1: G1: Mitotic count (per 2mm2) less than 2 AND Ki-67 index (%) less than 3 Stated as WHO Grade 1\n2: G2: Mitotic count (per 2mm2) equal 2-20 OR Ki-67 index (%) equal 3-20 Stated as WHO Grade 2\n3: G3: Mitotic count (per 2mm2) greater than 20 OR Ki-67 index (%) greater than 20 Stated as WHO Grade 3\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Mitotic count (per 2mm2) less than 2 AND \n        Ki-67 index (%) less than 3\n\nStated as WHO Grade 1",
+      "2": "G2: Mitotic count (per 2mm2) equal 2-20 OR\n        Ki-67 index (%) equal 3-20\n\nStated as WHO Grade 2",
+      "3": "G3: Mitotic count (per 2mm2) greater than 20 OR \n        Ki-67 index (%) greater than 20\n\nStated as WHO Grade 3",
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:net_ampulla_of_vater_v9_2024:grade_pathological_26086:i15",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "NET Ampulla of Vater [V9: 2024+]",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_26086.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C241"
+      ],
+      "histologies": [
+        "8150-8153",
+        "8155-8156",
+        "8158",
+        "8240-8242",
+        "8249",
+        "8683"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2024-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Pathological must not be blank.\n\n**Note 2:** There is a preferred grading system for this schema. If the clinical grade given uses the preferred grading system and the pathological grade does not use the preferred grading system, do not record the Grade Clinical in the Grade Pathological field. Assign Grade Pathological using the applicable generic grade codes (A-D).\n* *Example:* Neuroendocrine tumor, biopsy reports a clinical grade of G1 based on a mitotic count less than 2 and Ki-67 as 1.4%. The surgical resection states a well differentiated neuroendocrine tumor without further documentation regarding the mitotic count and Ki-67\n    - Grade Clinical would be coded as 1 (G1) since the preferred grading system is based on the mitotic count and Ki-67\n     - Grade Pathological would be coded as A for well differentiated, per the Coding Guidelines for Generic Grade Categories\n\n**Note 3:** Assign the highest grade from the primary tumor.  \n\n**Note 4:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 5:** Codes 1-3 take priority over codes A-D.\n*  Grades A-D should only be used in the absence of a physician's statement of grade (G1, G2, G3) or no results for Ki-67 or Mitotic Count (See also Note 7)\n\n**Note 6:** Do not code grade based on the following terminology: \n* Neuroendocrine carcinoma, low grade (8240/3)\n* Neuroendocrine carcinoma, well differentiated (8240/3)\n* Neuroendocrine carcinoma, moderately differentiated (8249/3)\n* Poorly differentiated neuroendocrine carcinoma (8246/3)\n\n**Note 7:** Code grade based on the physician's documentation (G1, G2, G3) OR **in the absence of a physician's statement,** code grade based on the Ki-67 and Mitotic Count. \n* If a Ki-67 is documented as less than 3, many times the mitotic count is not done. In this situation, the Ki-67 alone is enough to code the grade (G1). \n* Grades 2 and 3, are either/or for Ki-67 and Mitotic Count. You do not need both the Ki-67 and Mitotic Count to assign grade 2 or 3.\n\n**Note 8:** Use the grade from the **clinical work up** from the primary tumor in different scenarios based on behavior or surgical resection\n* **Behavior**\n  - Tumor behavior for the clinical and the pathological diagnoses are the same AND the clinical grade is the highest grade \n   - Tumor behavior for clinical diagnosis is invasive, and the tumor behavior for the pathological diagnosis is in situ\n* **Surgical Resection**\n   - Surgical resection is done of the primary tumor and there is no grade documented from the surgical resection\n    - Surgical resection is done of the primary tumor and there is no residual cancer\n* **No surgical resection**\n    - Surgical resection of the primary tumor has not been done, but there is positive microscopic confirmation of distant metastases during the clinical time frame\n\n**Note 9:** Code 9 (unknown) when\n* Grade from primary site is not documented\n* No resection of the primary site (see exception in Note 6, Surgical resection, last bullet)\n* Neo-adjuvant therapy is followed by a resection (see Grade Post Therapy Path (yp))\n* Grade checked “not applicable” on CAP Protocol (if available) and no other grade information is available\n* Clinical case only (see Grade Clinical)\n* There is only one grade available and it cannot be determined if it is clinical, pathological, post therapy clinical or post therapy pathological",
+    "codes": null,
+    "notes": null
+  }
+]

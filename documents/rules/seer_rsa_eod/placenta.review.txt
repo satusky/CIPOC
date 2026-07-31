@@ -1,0 +1,63 @@
+========================================================================
+SEER*RSA STAGING INGEST REVIEW REPORT
+========================================================================
+Schema: placenta
+Source: https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/eod_public-3.3.zip
+Units emitted: 17  |  accepted: 17  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     8
+  instruction    9
+
+Accepted units by NAACCR item:
+     523 2
+     756 2
+     764 2
+     820 2
+     830 2
+    3836 2
+    3843 2
+    3844 2
+
+Applicability predicates carried by this schema's units (1):
+  {'sites': ['C589'], 'histologies': ['8000-8700', '8720-8790', '9100-9105'], 'dx_date_min': '2018-01-01'}
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED CODE TABLES (up to 4 of 8)
+------------------------------------------------------------------------
+
+[seer_rsa_eod:placenta:behavior:c2]  items=[523]  anchor=eod_public-3.3:tables/behavior.json
+  Placenta > Behavior ICD-O-3
+0: Benign
+1: Uncertain Benign/Malig
+2: In Situ
+3: Malignant Primary
+
+[seer_rsa_eod:placenta:nodes_pos_dna_91511:c6]  items=[820]  anchor=eod_public-3.3:tables/nodes_pos_dna_91511.json
+  Placenta > Regional Nodes Positive
+99: Not applicable
+
+[seer_rsa_eod:placenta:ss2018_placenta_66365:c10]  items=[764]  anchor=eod_public-3.3:tables/ss2018_placenta_66365.json
+  Placenta > Summary Stage 2018: Placenta
+0: In situ, intraepithelial, noninvasive
+1: **Localized only (localized, NOS)** * Confined to placenta FIGO Stage I
+2: **Regional by direct extension only** * Adjacent connective tissue, NOS * Cervix * Corpus uteri * Other …
+3: **Regional lymph node(s) involved only** - Aortic, NOS + Lateral (lumbar) + Para-aortic + Peri-aortic - …
+4: **Regional by BOTH direct extension AND regional lymph node(s) involved** - Codes (2) + (3)
+7: **Distant site(s)/lymph node(s) involved** - Distant site(s) (including further contiguous extension) + …
+9: Unknown if extension or metastasis
+
+[seer_rsa_eod:placenta:grade_pathological_standard_94268:c14]  items=[3844]  anchor=eod_public-3.3:tables/grade_pathological_standard_94268.json
+  Placenta > Grade Pathological - Standard
+A: Well differentiated
+B: Moderately differentiated
+C: Poorly differentiated
+D: Undifferentiated, anaplastic
+9: Grade cannot be assessed; Unknown
+
+========================================================================

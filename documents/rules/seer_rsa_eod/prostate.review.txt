@@ -1,0 +1,86 @@
+========================================================================
+SEER*RSA STAGING INGEST REVIEW REPORT
+========================================================================
+Schema: prostate
+Source: https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/eod_public-3.3.zip
+Units emitted: 25  |  accepted: 25  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     12
+  instruction    13
+
+Accepted units by NAACCR item:
+     523 2
+     756 2
+     764 2
+     820 2
+     830 2
+    3838 2
+    3839 2
+    3840 2
+    3841 2
+    3842 2
+    3843 2
+    3844 2
+
+Applicability predicates carried by this schema's units (1):
+  {'sites': ['C619'], 'histologies': ['8000-8700', '8720-8790'], 'dx_date_min': '2018-01-01'}
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED CODE TABLES (up to 4 of 12)
+------------------------------------------------------------------------
+
+[seer_rsa_eod:prostate:behavior:c2]  items=[523]  anchor=eod_public-3.3:tables/behavior.json
+  Prostate > Behavior ICD-O-3
+0: Benign
+1: Uncertain Benign/Malig
+2: In Situ
+3: Malignant Primary
+
+[seer_rsa_eod:prostate:nodes_exam_76029:c8]  items=[830]  anchor=eod_public-3.3:tables/nodes_exam_76029.json
+  Prostate > Regional Nodes Examined
+00: No nodes examined
+01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)
+90: 90 or more nodes examined
+95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed
+96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated
+97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated
+98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented …
+99: Unknown if nodes were examined; not applicable or negative Not documented in medical record
+
+[seer_rsa_eod:prostate:grade_pathological_20069:c14]  items=[3844]  anchor=eod_public-3.3:tables/grade_pathological_20069.json
+  Prostate > Grade Pathological
+1: Grade Group 1: Gleason score less than or equal to 6
+2: Grade Group 2: Gleason score 7 Gleason pattern 3+4
+3: Grade Group 3: Gleason score 7 Gleason pattern 4+3
+4: Grade Group 4: Gleason score 8
+5: Grade Group 5: Gleason score 9 or 10
+A: Well differentiated
+B: Moderately differentiated
+C: Poorly differentiated
+D: Undifferentiated, anaplastic
+E: Stated as "Gleason score 7" with no patterns documented or Any Gleason patterns combination equal to 7 …
+9: Grade cannot be assessed; Unknown
+
+[seer_rsa_eod:prostate:gleason_patterns_pathological_833:c20]  items=[3839]  anchor=eod_public-3.3:tables/gleason_patterns_pathological_833.json
+  Prostate > Gleason Patterns Pathological
+11: Primary pattern 1, secondary pattern 1
+12: Primary pattern 1, secondary pattern 2
+13: Primary pattern 1, secondary pattern 3
+14: Primary pattern 1, secondary pattern 4
+15: Primary pattern 1, secondary pattern 5
+19: Primary pattern 1, secondary pattern unknown
+21: Primary pattern 2, secondary pattern 1
+22: Primary pattern 2, secondary pattern 2
+23: Primary pattern 2, secondary pattern 3
+24: Primary pattern 2, secondary pattern 4
+25: Primary pattern 2, secondary pattern 5
+29: Primary pattern 2, secondary pattern unknown
+    … 22 further code(s)
+
+========================================================================

@@ -1,0 +1,70 @@
+========================================================================
+SEER*RSA STAGING INGEST REVIEW REPORT
+========================================================================
+Schema: gum
+Source: https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/eod_public-3.3.zip
+Units emitted: 15  |  accepted: 15  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     7
+  instruction    8
+
+Accepted units by NAACCR item:
+     523 2
+     756 2
+     764 2
+     820 2
+     830 2
+    3843 2
+    3844 2
+
+Applicability predicates carried by this schema's units (1):
+  {'sites': ['C030', 'C031', 'C039', 'C062'], 'histologies': ['8000-8700', '8982'], 'dx_date_min': '2018-01-01'}
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED CODE TABLES (up to 4 of 7)
+------------------------------------------------------------------------
+
+[seer_rsa_eod:gum:behavior:c2]  items=[523]  anchor=eod_public-3.3:tables/behavior.json
+  Gum > Behavior ICD-O-3
+0: Benign
+1: Uncertain Benign/Malig
+2: In Situ
+3: Malignant Primary
+
+[seer_rsa_eod:gum:tumor_size_summary_47973:c4]  items=[756]  anchor=eod_public-3.3:tables/tumor_size_summary_47973.json
+  Gum > Tumor Size Summary
+000: No mass/tumor found
+001: 1 mm or described as less than 1 mm
+002-988: Exact size in millimeters (2 mm to 988 mm)
+989: 989 millimeters or larger
+990: Microscopic focus or foci only and no size of focus is given
+999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable
+
+[seer_rsa_eod:gum:nodes_pos_fpa:c6]  items=[820]  anchor=eod_public-3.3:tables/nodes_pos_fpa.json
+  Gum > Regional Nodes Positive
+00: All nodes examined negative
+01-89: 1 - 89 nodes positive (code exact number of nodes positive)
+90: 90 or more nodes positive
+95: Positive aspiration or core biopsy of lymph node(s)
+97: Positive nodes - number unspecified
+98: No nodes examined
+99: Unknown if nodes are positive; not applicable Not documented in medical record
+
+[seer_rsa_eod:gum:nodes_exam_76029:c8]  items=[830]  anchor=eod_public-3.3:tables/nodes_exam_76029.json
+  Gum > Regional Nodes Examined
+00: No nodes examined
+01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)
+90: 90 or more nodes examined
+95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed
+96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated
+97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated
+98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented …
+99: Unknown if nodes were examined; not applicable or negative Not documented in medical record
+
+========================================================================

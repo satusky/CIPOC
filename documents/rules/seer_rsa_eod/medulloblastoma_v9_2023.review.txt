@@ -1,0 +1,69 @@
+========================================================================
+SEER*RSA STAGING INGEST REVIEW REPORT
+========================================================================
+Schema: medulloblastoma_v9_2023
+Source: https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/eod_public-3.3.zip
+Units emitted: 45  |  accepted: 45  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     21
+  instruction    24
+
+Accepted units by NAACCR item:
+     523 6
+     756 6
+     764 6
+     820 6
+     830 6
+    3843 6
+    3844 6
+
+Applicability predicates carried by this schema's units (3):
+  {'sites': ['C700-C729'], 'histologies': ['9362', '9470-9472', '9474-9478', '9501-9504', '9508'], 'dx_date_min': '2023-01-01'}
+  {'sites': ['C700-C722', 'C724-C729'], 'histologies': ['9473'], 'dx_date_min': '2023-01-01'}
+  {'sites': ['C753'], 'histologies': ['9362'], 'dx_date_min': '2023-01-01'}
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED CODE TABLES (up to 4 of 21)
+------------------------------------------------------------------------
+
+[seer_rsa_eod:medulloblastoma_v9_2023:behavior:c4]  items=[523]  anchor=eod_public-3.3:tables/behavior.json
+  Medulloblastoma [V9: 2023+] > Behavior ICD-O-3
+0: Benign
+1: Uncertain Benign/Malig
+2: In Situ
+3: Malignant Primary
+
+[seer_rsa_eod:medulloblastoma_v9_2023:tumor_size_summary_63115:c12]  items=[756]  anchor=eod_public-3.3:tables/tumor_size_summary_63115.json
+  Medulloblastoma [V9: 2023+] > Tumor Size Summary
+000: No mass/tumor found
+001: 1 mm or described as less than 1 mm
+002-988: Exact size in millimeters (2 mm to 988 mm)
+989: 989 millimeters or larger
+990: Microscopic focus or foci only and no size of focus is given
+999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable
+
+[seer_rsa_eod:medulloblastoma_v9_2023:nodes_exam_dna_95635:c23]  items=[830]  anchor=eod_public-3.3:tables/nodes_exam_dna_95635.json
+  Medulloblastoma [V9: 2023+] > Regional Nodes Examined
+99: Not applicable
+
+[seer_rsa_eod:medulloblastoma_v9_2023:grade_clinical_78613:c34]  items=[3843]  anchor=eod_public-3.3:tables/grade_clinical_78613.json
+  Medulloblastoma [V9: 2023+] > Grade Clinical
+1: WHO Grade I: Circumscribed tumors of low proliferative potential associated with the possibility of cure …
+2: WHO Grade II: Infiltrative tumors with low proliferative potential with increased risk of progression or …
+3: WHO Grade III: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated …
+4: WHO Grade IV: Tumors with histologic and/or molecular genetic evidence of malignancy that are associated …
+L: Stated as "low grade" NOS
+H: Stated as "high grade" NOS
+A: Well differentiated
+B: Moderately differentiated
+C: Poorly differentiated
+D: Undifferentiated, anaplastic
+9: Grade cannot be assessed (GX); Unknown
+
+========================================================================

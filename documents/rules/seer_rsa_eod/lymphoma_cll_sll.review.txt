@@ -1,0 +1,56 @@
+========================================================================
+SEER*RSA STAGING INGEST REVIEW REPORT
+========================================================================
+Schema: lymphoma_cll_sll
+Source: https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/eod_public-3.3.zip
+Units emitted: 30  |  accepted: 30  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     14
+  instruction    16
+
+Accepted units by NAACCR item:
+     523 4
+     756 4
+     764 4
+     820 4
+     830 4
+    3843 4
+    3844 4
+
+Applicability predicates carried by this schema's units (2):
+  {'sites': ['C000-C440', 'C442-C689', 'C691-C694', 'C698-C699', 'C739-C750', 'C754-C809'], 'histologies': ['9823'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C700-C729', 'C751-C753'], 'histologies': ['9823'], 'behaviors': ['3'], 'dx_date_min': '2018-01-01'}
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED CODE TABLES (up to 4 of 14)
+------------------------------------------------------------------------
+
+[seer_rsa_eod:lymphoma_cll_sll:behavior:c3]  items=[523]  anchor=eod_public-3.3:tables/behavior.json
+  Lymphoma-CLL/SLL > Behavior ICD-O-3
+0: Benign
+1: Uncertain Benign/Malig
+2: In Situ
+3: Malignant Primary
+
+[seer_rsa_eod:lymphoma_cll_sll:tumor_size_summary_dna_13275:c8]  items=[756]  anchor=eod_public-3.3:tables/tumor_size_summary_dna_13275.json
+  Lymphoma-CLL/SLL > Tumor Size Summary
+999: Not applicable
+
+[seer_rsa_eod:lymphoma_cll_sll:nodes_exam_dna_95635:c15]  items=[830]  anchor=eod_public-3.3:tables/nodes_exam_dna_95635.json
+  Lymphoma-CLL/SLL > Regional Nodes Examined
+99: Not applicable
+
+[seer_rsa_eod:lymphoma_cll_sll:ss2018_lymphoma_27031:c20]  items=[764]  anchor=eod_public-3.3:tables/ss2018_lymphoma_27031.json
+  Lymphoma-CLL/SLL > Summary Stage 2018: Lymphoma
+1: **Localized only** Nodal Lymphomas - Single lymph node region involved - Involvement of multiple nodal …
+2: **Regional by direct extension only** Bulky disease present Nodal Lymphomas - Two or more lymph node …
+7: **Distant site(s)/lymph node(s) involved** - Distant involvement + Diffuse or disseminated involvement of …
+9: Unknown if extension or metastasis
+
+========================================================================

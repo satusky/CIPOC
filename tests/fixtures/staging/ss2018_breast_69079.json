@@ -1,0 +1,36 @@
+{
+  "id": "ss2018_breast_69079",
+  "algorithm": "eod_public",
+  "version": "3.3",
+  "name": "SS2018: Breast",
+  "title": "Summary Stage 2018: Breast",
+  "subtitle": "Summary Stage 2018",
+  "notes": "**Breast**\n\n8000-8700, 8720-8790 [except C500], 8982-8983",
+  "last_modified": "2024-05-18T11:08:46.476Z",
+  "definition": [
+    {
+      "key": "ss2018",
+      "name": "SS2018",
+      "type": "INPUT"
+    },
+    {
+      "key": "description",
+      "name": "Description",
+      "type": "DESCRIPTION"
+    }
+  ],
+  "rows": [
+    [
+      "0",
+      "**In situ, intraepithelial, noninvasive** \n- In situ: noninfiltrating; intraepithelial\n- Intraductal WITHOUT infiltration\n- Lobular neoplasia, grade 3 (LIN 3)\n- Paget disease, in situ"
+    ],
+    [
+      "1",
+      "**Localized only (localized, NOS)**\n- Confined to breast tissue and fat including nipple and/or areola\n- Paget disease WITH or WITHOUT underlying tumor"
+    ],
+    [
+      "9",
+      "Unknown if extension or metastasis"
+    ]
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": "histology",
+  "algorithm": "eod_public",
+  "version": "3.3",
+  "name": "Histology",
+  "title": "Valid ICD-O-3 Histology Codes",
+  "notes": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+  "last_modified": "2021-03-22T20:10:10.785Z",
+  "definition": [
+    {
+      "key": "hist",
+      "name": "Histology",
+      "type": "INPUT"
+    }
+  ],
+  "rows": [
+    [
+      "8000-8005"
+    ],
+    [
+      "8010-8015"
+    ],
+    [
+      "8020-8023"
+    ],
+    [
+      "8030-8035"
+    ]
+  ]
+}

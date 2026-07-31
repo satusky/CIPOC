@@ -1,0 +1,92 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:melanoma_gum_other:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Malignant Melanoma of Gum, NOS",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/melanoma_gum_other.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C039"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C039 Gum, NOS\n\n**Note 1:** This schema is based on the UICC chapter *Malignant Melanoma of Upper Aerodigestive Tract,* pages 51-53.\n\n**Note 2:** In addition to directly assigning TNM, Summary Stage 2000 (SS2000) must be captured.  If directly assigning SS2000, use the *Gum (Gingiva), Retromolar area* chapter on page 40 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=40).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_tnm:melanoma_gum_other:nodes_pos_fpa:c2",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Malignant Melanoma of Gum, NOS",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "tnm-2.1:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C039"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative.\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in patient record",
+    "codes": {
+      "00": "All nodes examined negative.",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_tnm:melanoma_gum_other:nodes_pos_fpa:i3",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Malignant Melanoma of Gum, NOS",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "tnm-2.1:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C039"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.",
+    "codes": null,
+    "notes": null
+  }
+]

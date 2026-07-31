@@ -141,25 +141,29 @@ class StoreIndexTests(unittest.TestCase):
                 f"item {item.item_id} dx_date_min disagrees with the data dictionary",
             )
 
-    def test_targets_are_items_no_compiled_manual_already_covers(self):
+    def test_targets_are_items_no_seer_manual_already_covers(self):
         """The premise of this compile: STORE is filling gaps, not competing.
 
         resolve_precedence prefers SEER over every other family for any kind SEER
-        also covers, so a CoC-family target that a SEER manual already carries
-        would compile and then be dropped at runtime.
+        also covers, so a CoC-family target that a *SEER-family* manual already
+        carries would compile and then be dropped at runtime. Only SEER manuals
+        are checked, because only they can shadow this one: seer_rsa_eod covers
+        3843/3844 as well, but under family 'SEER-RSA' the two coexist and both
+        reach the extractor.
         """
         if not RULES_DIR.exists():
             self.skipTest("compiled rule store not present")
+        manifest = json.loads((RULES_DIR / "manifest.json").read_text())
         covered: set[int] = set()
         for path in RULES_DIR.rglob("*.json"):
             if path.name == "manifest.json" or path.suffixes != [".json"]:
                 continue
-            if path.parent.name == MANUAL:
+            if manifest.get(path.parent.name, {}).get("family") != "SEER":
                 continue
             for unit in json.loads(path.read_text()):
                 covered.update(unit.get("item_ids") or [])
         overlap = sorted(covered & {t.item_id for t in TARGETS})
-        self.assertEqual(overlap, [], f"targets already covered elsewhere: {overlap}")
+        self.assertEqual(overlap, [], f"targets already covered by a SEER manual: {overlap}")
 
 
 class StoreDriverPlanTests(unittest.TestCase):

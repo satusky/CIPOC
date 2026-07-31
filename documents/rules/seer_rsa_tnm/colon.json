@@ -1,0 +1,119 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:colon:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Colon (excluding Appendix, Gastrointestinal Stromal Tumor, and Neuroendocrine Tumor)",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/colon.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C180",
+        "C182-C189"
+      ],
+      "histologies": [
+        "8000-8152",
+        "8154-8231",
+        "8243-8245",
+        "8247",
+        "8248",
+        "8250-8934",
+        "8940-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C180 Cecum\nC182 Ascending colon\nC183 Hepatic flexure of colon\nC184 Transverse colon\nC185 Splenic flexure of colon\nC186 Descending colon\nC187 Sigmoid colon\nC188 Overlapping lesion of colon\nC189 Colon, NOS\n\n**Note 1:** This schema is based on the UICC chapter *Colon and Rectum,* pages 100-105.\n* Primary sites C188 and C189 are listed in the chapter heading but are not specified in the anatomic subsites in this chapter of the UICC manual; however, they are included in this schema and TNM staged if appropriate histology criteria are met\n\n**Note 2:** In addition to directly assigning TNM, Summary Stage 2000 (SS2000) must be captured.  If directly assigning SS2000, use the *Colon* chapter on page 94 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=94).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_tnm:colon:nodes_pos_fpa:c2",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Colon (excluding Appendix, Gastrointestinal Stromal Tumor, and Neuroendocrine Tumor)",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "tnm-2.1:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C180",
+        "C182-C189"
+      ],
+      "histologies": [
+        "8000-8152",
+        "8154-8231",
+        "8243-8245",
+        "8247",
+        "8248",
+        "8250-8934",
+        "8940-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative.\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in patient record",
+    "codes": {
+      "00": "All nodes examined negative.",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_tnm:colon:nodes_pos_fpa:i3",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Colon (excluding Appendix, Gastrointestinal Stromal Tumor, and Neuroendocrine Tumor)",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "tnm-2.1:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C180",
+        "C182-C189"
+      ],
+      "histologies": [
+        "8000-8152",
+        "8154-8231",
+        "8243-8245",
+        "8247",
+        "8248",
+        "8250-8934",
+        "8940-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.",
+    "codes": null,
+    "notes": null
+  }
+]

@@ -1,0 +1,31 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:respiratory_other:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Other and Ill-Defined Respiratory Sites and Intrathoracic Organs",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/respiratory_other.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C390",
+        "C398-C399"
+      ],
+      "histologies": [
+        "8000-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C390  Upper respiratory tract, NOS\nC398  Overlapping lesion of respiratory system and intrathoracic organs\nC399  Ill-defined sites within respiratory system\n\n**Note:** TNM is not defined for this schema. If directly assigning Summary Stage 2000 (SS2000), use the *Other & Ill-Defined Respiratory Site &  Intrathoracic Organs* chapter on page 164 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=164).",
+    "codes": null,
+    "notes": null
+  }
+]

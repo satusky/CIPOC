@@ -1,0 +1,484 @@
+[
+  {
+    "rule_id": "seer_rsa_eod:liver:schema:i1",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Liver",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/liver.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C220"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "8000-8700, 8720-8790\n\nC220 Liver\n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 22 *Liver*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other EOD Schemas with Liver sites**\n* **GIST**: 8935-8936\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Soft Tissue Abdomen and Thoracic**: 8710-8714, 8800-8803, 8810-8921, 8932-8934, 8940-8990, 9000-9016, 9030-9043, 9045-9138, 9141-9230, 9240-9580, 9582 \n* **Soft Tissue Other**: 8992\n* **Soft Tissue Rare**: 8804-8806, 8930-8931, 8991, 9020, 9044, 9231, 9581: *Soft Tissue Rare*",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:liver:behavior:c2",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Liver",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "code_table",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C220"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Behavior ICD-O-3 (4 codes)\n0: Benign\n1: Uncertain Benign/Malig\n2: In Situ\n3: Malignant Primary",
+    "codes": {
+      "0": "Benign",
+      "1": "Uncertain Benign/Malig",
+      "2": "In Situ",
+      "3": "Malignant Primary"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:liver:behavior:i3",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Liver",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C220"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:liver:tumor_size_summary_47973:c4",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Liver",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_47973.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C220"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (6 codes)\n000: No mass/tumor found\n001: 1 mm or described as less than 1 mm\n002-988: Exact size in millimeters (2 mm to 988 mm)\n989: 989 millimeters or larger\n990: Microscopic focus or foci only and no size of focus is given\n999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm",
+      "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+      "989": "989 millimeters or larger",
+      "990": "Microscopic focus or foci only and no size of focus is given",
+      "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:liver:tumor_size_summary_47973:i5",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Liver",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_47973.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C220"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "For this schema, Tumor Size is used with EOD Primary Tumor to derive EOD T. \n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:liver:nodes_pos_fpa:c6",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Liver",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C220"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in medical record",
+    "codes": {
+      "00": "All nodes examined negative",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:liver:nodes_pos_fpa:i7",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Liver",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C220"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:liver:nodes_exam_76029:c8",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Liver",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C220"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (8 codes)\n00: No nodes examined\n01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)\n90: 90 or more nodes examined\n95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed\n96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated\n97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated\n98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown\n99: Unknown if nodes were examined; not applicable or negative Not documented in medical record",
+    "codes": {
+      "00": "No nodes examined",
+      "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+      "90": "90 or more nodes examined",
+      "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+      "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+      "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+      "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+      "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:liver:nodes_exam_76029:i9",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Liver",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C220"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:liver:ss2018_liver_84469:c10",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Liver",
+      "Summary Stage 2018: Liver"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_liver_84469.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C220"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018: Liver (7 codes)\n0: **In situ: noninvasive, intraepithelial**\n1: **Localized only (localized, NOS)** - Confined to liver, NOS - Single tumor (one lobe) WITH or WITHOUT vascular invasion - Multiple (satellite) nodules/tumor confined to one lobe WITH or WITHOUT vascular invasion\n2: **Regional by direct extension only** - Diaphragm - Extrahepatic bile duct(s) - Extrahepatic blood vessel(s) + Hepatic artery + Portal vein + Vena cava - Gallbladder - Ligament(s) + Coronary + Falciform + Hepatoduodenal + Hepatogastric + Round (of liver) + Triangular - Omentum (lesser and omentum, NOS) (See code 7 for greater omentum) - Peritoneum, NOS + Parietal + Visceral - Major vascular invasion, NOS - More than one lobe involved by contiguous growth (single lesion) + WITH or WITHOUT vascular invasion - Multiple (satellite) nodules/ tumors in more than one lobe of liver or on surface of parenchyma + WITH or WITHOUT vascular invasion\n3: **Regional lymph node(s) involved only** - Caval - Celiac axis - Hepatic, NOS + Hepatic artery + Hepatic pedicle + Inferior vena cava + Porta hepatis (portal) (hilar) [in hilus of liver]Hepatoduodenal ligament - Periportal - Portal vein - Regional lymp …",
+    "codes": {
+      "0": "**In situ: noninvasive, intraepithelial**",
+      "1": "**Localized only (localized, NOS)**\n- Confined to liver, NOS\n- Single tumor (one lobe) WITH or WITHOUT vascular invasion\n- Multiple (satellite) nodules/tumor confined to one lobe WITH or WITHOUT vascular invasion",
+      "2": "**Regional by direct extension only**\n- Diaphragm\n- Extrahepatic bile duct(s)\n- Extrahepatic blood vessel(s)\n  + Hepatic artery\n  + Portal vein\n  + Vena cava\n- Gallbladder\n- Ligament(s)\n  + Coronary\n  + Falciform \n  + Hepatoduodenal\n  + Hepatogastric\n  + Round (of liver)\n  + Triangular\n- Omentum (lesser and omentum, NOS) (See code 7 for greater omentum)\n- Peritoneum, NOS\n  + Parietal \n  + Visceral\n- Major vascular invasion, NOS\n- More than one lobe involved by contiguous growth (single lesion)\n   + WITH or WITHOUT vascular invasion\n- Multiple (satellite) nodules/ tumors in more than one lobe of liver or on surface of parenchyma \n    + WITH or WITHOUT vascular invasion",
+      "3": "**Regional lymph node(s) involved only**\n- Caval\n- Celiac axis\n- Hepatic, NOS\n    + Hepatic artery\n    + Hepatic pedicle\n    + Inferior vena cava\n    + Porta hepatis (portal) (hilar) [in hilus of liver]Hepatoduodenal ligament\n- Periportal\n- Portal vein \n- Regional lymph node(s), NOS\n  + Lymph node(s), NOS",
+      "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+      "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n  + Greater omentum (See code 2 for lesser omentum and omentum, NOS)\n  + Pancreas\n  + Pleura\n  + Stomach \n- Distant lymph node(s), NOS\n  + Aortic (para-aortic, periaortic)\n  + Cardiac\n  + Coronary artery\n  + Diaphragmatic, NOS\n  + Inferior phrenic nodes\n  + Lateral (aortic) (lumbar)\n  + Pericardial (pericardiac)\n  + Peripancreatic (near head of pancreas only)\n  + Posterior mediastinal (tracheoesophageal) including juxtaphrenic nodes\n  + Renal artery\n  + Retroperitoneal, NOS\n- Distant metastasis, NOS\n  + Carcinomatosis \n  + Distant metastasis WITH or WITHOUT distant lymph node(s)",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:liver:ss2018_liver_84469:i11",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Liver",
+      "Summary Stage 2018: Liver"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_liver_84469.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C220"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Liver**\n\n8000-8700, 8720-8790\n\nC220\nC220 Liver\n\n**Note 1:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 22 *Liver*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other Summary Stage Chapters with Liver sites**\n* **GIST**: 8935-8936\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Soft Tissue**: 8710-8714, 8800-8934, 8940-9138, 9141-9582\n\n**Note 3:** **Segments of the Liver** \n* The liver is divided into several lobes as defined below. In the absence of other tumor involvement (lymph node involvement or distant metastasis), code the lobe or segment involvement as follows: \n* If multiple lobes (such as the Caudate lobe and the Left Lobe) are involved, code 2 (Regional). If multiple segments (such as 5 and 6 in the right lobe) in the same lobe are involved, this would be multiple tumors within one lobe, code 1 (Localized).\n  * Caudate lobe: Segment 1\n  * Quadrate lobe: Segment 4b\n  * Left lobe: Segments 2, 3, 4a\n  * Right lobe: Segments 5, 6, 7, 8",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:liver:grade_clinical_73056:c12",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Liver",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_73056.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C220"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (5 codes)\n1: G1: Well differentiated\n2: G2: Moderately differentiated\n3: G3: Poorly differentiated\n4: G4: Undifferentiated\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Well differentiated",
+      "2": "G2: Moderately differentiated",
+      "3": "G3: Poorly differentiated",
+      "4": "G4: Undifferentiated",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:liver:grade_clinical_73056:i13",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Liver",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_73056.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C220"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Clinical must not be blank. \n\n**Note 2:** Assign the highest grade from the primary tumor assessed during the clinical time frame. \n\n**Note 3:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 4:** G4 includes anaplastic.\n\n**Note 5:** Code 9 (unknown) when\n* Grade from primary site is not documented\n* Clinical workup is not done (for example, cancer is an incidental finding during surgery for another condition)\n* Grade checked \"not applicable\" on CAP Protocol (if available) and no other grade information is available\n\n**Note 6:** If there is only one grade available and it cannot be determined if it is clinical or pathological, assume it is a Grade Clinical and code appropriately per Grade Clinical categories for that site, and then code unknown (9) for Grade Pathological, and blank for Grade Post Therapy Clin (yc) and Grade Post Therapy Path (yp).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:liver:grade_pathological_31963:c14",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Liver",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_31963.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C220"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (5 codes)\n1: G1: Well differentiated\n2: G2: Moderately differentiated\n3: G3: Poorly differentiated\n4: G4: Undifferentiated\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Well differentiated",
+      "2": "G2: Moderately differentiated",
+      "3": "G3: Poorly differentiated",
+      "4": "G4: Undifferentiated",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:liver:grade_pathological_31963:i15",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Liver",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_31963.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C220"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Pathological must not be blank.\n\n**Note 2:** There is a preferred grading system for this schema. If the clinical grade given uses the preferred grading system and the pathological grade does not use the preferred grading system, do not record the Grade Clinical in the Grade Pathological field. Assign Grade Pathological 9. \n* *Example: * Biopsy of primary site shows a moderately differentiated adenocarcinoma. The surgical resection states a high-grade adenocarcinoma. \n    - Code Grade Clinical as 2 since Moderately differentiated (G2) is the preferred grading system\n     - Code Grade Pathological as 9 since the preferred grading system was not used and the Generic Grade Categories do not apply to this grade table\n\n**Note 3:** Assign the highest grade from the primary tumor.  \n\n**Note 4:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 5:** G4 includes anaplastic.\n\n**Note 6:** Use the grade from the **clinical work up** from the primary tumor in different scenarios based on behavior or surgical resection\n* **Behavior**\n  - Tumor behavior for the clinical and the pathological diagnoses are the same AND the clinical grade is the highest grade \n   - Tumor behavior for clinical diagnosis is invasive, and the tumor behavior for the pathological diagnosis is in situ\n* **Surgical Resection**\n   - Surgical resection is done of the primary tumor and there is no grade documented from the surgical resection\n    - Surgical resection is done of the primary tumor and there is no residual cancer\n* **No Surgical Resection**\n    - Surgical resection of the primary tumor has not been done, but there is positive microscopic confirmation of distant metastases during the clinical time frame\n\n**Note 7:** Code 9 (unknown) when\n* Grade from primary site is not documented\n* No resection of the primary site (see exception in Note 6, Surgical resection, last bullet)\n* Neo-adjuvant therapy is followed by a resection (see Grade Post Therapy Path (yp))\n* Grade checked “not applicable” on CAP Protocol (if available) and no other grade information is available\n* Clinical case only (see Grade Clinical)\n* There is only one grade available, and it cannot be determined if it is clinical, pathological, post therapy clinical or post therapy pathological",
+    "codes": null,
+    "notes": null
+  }
+]

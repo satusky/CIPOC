@@ -1,0 +1,70 @@
+========================================================================
+SEER*RSA STAGING INGEST REVIEW REPORT
+========================================================================
+Schema: merkel_cell_skin
+Source: https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/eod_public-3.3.zip
+Units emitted: 45  |  accepted: 45  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     21
+  instruction    24
+
+Accepted units by NAACCR item:
+     523 6
+     756 6
+     764 6
+     820 6
+     830 6
+    3843 6
+    3844 6
+
+Applicability predicates carried by this schema's units (3):
+  {'sites': ['C000-C006', 'C008-C009', 'C440-C449', 'C600-C602', 'C608-C609', 'C632'], 'histologies': ['8041', '8190', '8247'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C510-C512', 'C518-C519', 'C809'], 'histologies': ['8190', '8247'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C510-C512', 'C518-C519'], 'histologies': ['8041'], 'dx_date_min': '2018-01-01', 'dx_date_max': '2023-12-31'}
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED CODE TABLES (up to 4 of 21)
+------------------------------------------------------------------------
+
+[seer_rsa_eod:merkel_cell_skin:behavior:c4]  items=[523]  anchor=eod_public-3.3:tables/behavior.json
+  Merkel Cell Skin > Behavior ICD-O-3
+0: Benign
+1: Uncertain Benign/Malig
+2: In Situ
+3: Malignant Primary
+
+[seer_rsa_eod:merkel_cell_skin:tumor_size_summary_47973:c12]  items=[756]  anchor=eod_public-3.3:tables/tumor_size_summary_47973.json
+  Merkel Cell Skin > Tumor Size Summary
+000: No mass/tumor found
+001: 1 mm or described as less than 1 mm
+002-988: Exact size in millimeters (2 mm to 988 mm)
+989: 989 millimeters or larger
+990: Microscopic focus or foci only and no size of focus is given
+999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable
+
+[seer_rsa_eod:merkel_cell_skin:nodes_exam_76029:c23]  items=[830]  anchor=eod_public-3.3:tables/nodes_exam_76029.json
+  Merkel Cell Skin > Regional Nodes Examined
+00: No nodes examined
+01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)
+90: 90 or more nodes examined
+95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed
+96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated
+97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated
+98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented …
+99: Unknown if nodes were examined; not applicable or negative Not documented in medical record
+
+[seer_rsa_eod:merkel_cell_skin:grade_clinical_standard_94331:c34]  items=[3843]  anchor=eod_public-3.3:tables/grade_clinical_standard_94331.json
+  Merkel Cell Skin > Grade Clinical - Standard
+A: Well differentiated
+B: Moderately differentiated
+C: Poorly differentiated
+D: Undifferentiated, anaplastic
+9: Grade cannot be assessed; Unknown
+
+========================================================================

@@ -1,0 +1,29 @@
+========================================================================
+SEER*RSA STAGING INGEST REVIEW REPORT
+========================================================================
+Schema: heme_retic
+Source: https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/tnm-2.1.zip
+Units emitted: 3  |  accepted: 3  |  quarantined: 0
+
+Accepted units by kind:
+  instruction    3
+
+Accepted units by NAACCR item:
+  (none item-specific)
+
+Applicability predicates carried by this schema's units (3):
+  {'sites': ['C000-C809'], 'histologies': ['9740-9809', '9840-9992'], 'dx_date_min': '2016-01-01'}
+  {'sites': ['C420', 'C421', 'C424'], 'histologies': ['9811-9818', '9823', '9827', '9837'], 'dx_date_min': '2016-01-01'}
+  {'sites': ['C000-C440', 'C442-C689', 'C691-C694', 'C698-C809'], 'histologies': ['9820', '9826', '9831-9834'], 'dx_date_min': '2016-01-01'}
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED CODE TABLES (up to 4 of 0)
+------------------------------------------------------------------------
+(none)
+
+========================================================================

@@ -1,0 +1,48 @@
+========================================================================
+SEER*RSA STAGING INGEST REVIEW REPORT
+========================================================================
+Schema: liver
+Source: https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/tnm-2.1.zip
+Units emitted: 6  |  accepted: 6  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     2
+  instruction    4
+
+Accepted units by NAACCR item:
+     820 4
+
+Applicability predicates carried by this schema's units (2):
+  {'sites': ['C220'], 'histologies': ['8000-8157', '8162-8175', '8190-9136', '9141-9582', '9700-9701'], 'dx_date_min': '2016-01-01'}
+  {'sites': ['C221'], 'histologies': ['8170-8175'], 'dx_date_min': '2016-01-01'}
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED CODE TABLES (up to 4 of 2)
+------------------------------------------------------------------------
+
+[seer_rsa_tnm:liver:nodes_pos_fpa:c3]  items=[820]  anchor=tnm-2.1:tables/nodes_pos_fpa.json
+  Liver > Regional Nodes Positive
+00: All nodes examined negative.
+01-89: 1 - 89 nodes positive (code exact number of nodes positive)
+90: 90 or more nodes positive
+95: Positive aspiration or core biopsy of lymph node(s)
+97: Positive nodes - number unspecified
+98: No nodes examined
+99: Unknown if nodes are positive; not applicable Not documented in patient record
+
+[seer_rsa_tnm:liver:nodes_pos_fpa:c4]  items=[820]  anchor=tnm-2.1:tables/nodes_pos_fpa.json
+  Liver > Regional Nodes Positive
+00: All nodes examined negative.
+01-89: 1 - 89 nodes positive (code exact number of nodes positive)
+90: 90 or more nodes positive
+95: Positive aspiration or core biopsy of lymph node(s)
+97: Positive nodes - number unspecified
+98: No nodes examined
+99: Unknown if nodes are positive; not applicable Not documented in patient record
+
+========================================================================

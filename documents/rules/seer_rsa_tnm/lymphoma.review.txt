@@ -1,0 +1,28 @@
+========================================================================
+SEER*RSA STAGING INGEST REVIEW REPORT
+========================================================================
+Schema: lymphoma
+Source: https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/tnm-2.1.zip
+Units emitted: 2  |  accepted: 2  |  quarantined: 0
+
+Accepted units by kind:
+  instruction    2
+
+Accepted units by NAACCR item:
+  (none item-specific)
+
+Applicability predicates carried by this schema's units (2):
+  {'sites': ['C000-C440', 'C442-C689', 'C691-C694', 'C698-C809'], 'histologies': ['9590-9699', '9702-9726', '9727', '9735', '9737', '9738'], 'dx_date_min': '2016-01-01'}
+  {'sites': ['C000-C419', 'C422-C423', 'C440', 'C442-C689', 'C691-C694', 'C698-C809'], 'histologies': ['9811-9818', '9823', '9827', '9837'], 'dx_date_min': '2016-01-01'}
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED CODE TABLES (up to 4 of 0)
+------------------------------------------------------------------------
+(none)
+
+========================================================================

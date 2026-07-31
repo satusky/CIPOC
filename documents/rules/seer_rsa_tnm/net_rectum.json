@@ -1,0 +1,104 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:net_rectum:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Neuroendocrine Tumors of Rectum and Rectosigmoid Junction",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/net_rectum.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C199",
+        "C209"
+      ],
+      "histologies": [
+        "8153",
+        "8240-8242",
+        "8246",
+        "8249"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C199 Rectosigmoid junction\nC209 Rectum, NOS\n\n**Note 1:** This schema is based on the UICC chapter *Gastric, Small & Large Intestinal Carcinoid Tumours,* pages 94-99.\n\n**Note 2:** For this schema, TNM only stages well-differentiated neuroendocrine tumors. Note that the \"concept\" of well-differentiated is reflected in the histology code. The grade code is not needed in order to select the correct schema, but does need to be coded.\n\n**Note 3:** In addition to directly assigning TNM, Summary Stage 2000 (SS2000) must be captured.  If directly assigning SS2000, use the *Rectum* chapter on page 100 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=100).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_tnm:net_rectum:nodes_pos_fpa:c2",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Neuroendocrine Tumors of Rectum and Rectosigmoid Junction",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "tnm-2.1:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C199",
+        "C209"
+      ],
+      "histologies": [
+        "8153",
+        "8240-8242",
+        "8246",
+        "8249"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative.\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in patient record",
+    "codes": {
+      "00": "All nodes examined negative.",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_tnm:net_rectum:nodes_pos_fpa:i3",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Neuroendocrine Tumors of Rectum and Rectosigmoid Junction",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "tnm-2.1:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C199",
+        "C209"
+      ],
+      "histologies": [
+        "8153",
+        "8240-8242",
+        "8246",
+        "8249"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.",
+    "codes": null,
+    "notes": null
+  }
+]

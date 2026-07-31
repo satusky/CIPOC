@@ -1,0 +1,516 @@
+[
+  {
+    "rule_id": "seer_rsa_eod:primary_cutaneous_lymphoma_non_mf_ss:schema:i1",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Primary Cutaneous Lymphoma (excluding MF and SS)",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/primary_cutaneous_lymphoma_non_mf_ss.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C440",
+        "C442-C449",
+        "C510",
+        "C609",
+        "C632"
+      ],
+      "histologies": [
+        "9597",
+        "9680",
+        "9708-9709",
+        "9712",
+        "9718-9719",
+        "9726"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "9597, 9680, 9708-9709, 9712, 9718-9719, 9726 \n\nC440 Skin of lip, NOS\nC442 External ear\nC443 Skin of other and unspecified parts of face\nC444 Skin of scalp and neck\nC445 Skin of trunk\nC446 Skin of upper limb and shoulder\nC447 Skin of lower limb and hip\nC448 Overlapping lesion of skin\nC449 Skin, NOS\nC510 Labium majus\nC609 Penis\nC632 Scrotum, NOS\n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 81 *Primary Cutaneous Lymphomas*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Mycosis Fungoides schema** \n* See the *Mycosis Fungoides* schema for Mycosis Fungoides (9700) and Sezary syndrome (9701).\n\n**Note 3:** **The preferred histology terms listed in this schema are from the 2024 WHO Classification of Tumours, Haematolymphoid tumours, 5th edition.**\n\n* 9597: Primary cutaneous follicle center lymphoma (PCFCL)\n* 9680: Primary cutaneous diffuse large B-cell lymphoma, leg type (PCLBCL-LT) \n* 9708: Subcutaneous panniculitis-like T-cell lymphoma (SPTCL)\n* 9709: Primary cutaneous peripheral T-cell lymphoma (NOS) (pcPTCL)\n* 9712: Intravascular (large) B-cell lymphoma (IVLBCL)\n* 9718: Primary cutaneous anaplastic large cell lymphoma (C-ALCL)\n* 9719: Extranodal NK-/T-cell lymphoma (ENKTL)\n* 9726: Primary cutaneous gamma-delta T-cell lymphoma (PCGD-TCL)",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:primary_cutaneous_lymphoma_non_mf_ss:tumor_size_summary_47973:c2",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Primary Cutaneous Lymphoma (excluding MF and SS)",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_47973.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C440",
+        "C442-C449",
+        "C510",
+        "C609",
+        "C632"
+      ],
+      "histologies": [
+        "9597",
+        "9680",
+        "9708-9709",
+        "9712",
+        "9718-9719",
+        "9726"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (6 codes)\n000: No mass/tumor found\n001: 1 mm or described as less than 1 mm\n002-988: Exact size in millimeters (2 mm to 988 mm)\n989: 989 millimeters or larger\n990: Microscopic focus or foci only and no size of focus is given\n999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm",
+      "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+      "989": "989 millimeters or larger",
+      "990": "Microscopic focus or foci only and no size of focus is given",
+      "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:primary_cutaneous_lymphoma_non_mf_ss:tumor_size_summary_47973:i3",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Primary Cutaneous Lymphoma (excluding MF and SS)",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_47973.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C440",
+        "C442-C449",
+        "C510",
+        "C609",
+        "C632"
+      ],
+      "histologies": [
+        "9597",
+        "9680",
+        "9708-9709",
+        "9712",
+        "9718-9719",
+        "9726"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "For this schema, Tumor Size is used with EOD Primary Tumor to derive EOD T. \n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:primary_cutaneous_lymphoma_non_mf_ss:nodes_pos_fpa:c4",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Primary Cutaneous Lymphoma (excluding MF and SS)",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C440",
+        "C442-C449",
+        "C510",
+        "C609",
+        "C632"
+      ],
+      "histologies": [
+        "9597",
+        "9680",
+        "9708-9709",
+        "9712",
+        "9718-9719",
+        "9726"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in medical record",
+    "codes": {
+      "00": "All nodes examined negative",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:primary_cutaneous_lymphoma_non_mf_ss:nodes_pos_fpa:i5",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Primary Cutaneous Lymphoma (excluding MF and SS)",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C440",
+        "C442-C449",
+        "C510",
+        "C609",
+        "C632"
+      ],
+      "histologies": [
+        "9597",
+        "9680",
+        "9708-9709",
+        "9712",
+        "9718-9719",
+        "9726"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:primary_cutaneous_lymphoma_non_mf_ss:nodes_exam_76029:c6",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Primary Cutaneous Lymphoma (excluding MF and SS)",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C440",
+        "C442-C449",
+        "C510",
+        "C609",
+        "C632"
+      ],
+      "histologies": [
+        "9597",
+        "9680",
+        "9708-9709",
+        "9712",
+        "9718-9719",
+        "9726"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (8 codes)\n00: No nodes examined\n01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)\n90: 90 or more nodes examined\n95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed\n96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated\n97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated\n98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown\n99: Unknown if nodes were examined; not applicable or negative Not documented in medical record",
+    "codes": {
+      "00": "No nodes examined",
+      "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+      "90": "90 or more nodes examined",
+      "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+      "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+      "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+      "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+      "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:primary_cutaneous_lymphoma_non_mf_ss:nodes_exam_76029:i7",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Primary Cutaneous Lymphoma (excluding MF and SS)",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C440",
+        "C442-C449",
+        "C510",
+        "C609",
+        "C632"
+      ],
+      "histologies": [
+        "9597",
+        "9680",
+        "9708-9709",
+        "9712",
+        "9718-9719",
+        "9726"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:primary_cutaneous_lymphoma_non_mf_ss:ss2018_primary_cutaneous_lymphomas_4605:c8",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Primary Cutaneous Lymphoma (excluding MF and SS)",
+      "Summary Stage 2018: Primary Cutaneous Lymphomas (excluding MF and SS)"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_primary_cutaneous_lymphomas_4605.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C440",
+        "C442-C449",
+        "C510",
+        "C609",
+        "C632"
+      ],
+      "histologies": [
+        "9597",
+        "9680",
+        "9708-9709",
+        "9712",
+        "9718-9719",
+        "9726"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018: Primary Cutaneous Lymphomas (excluding MF and SS) (6 codes)\n1: **Localized only** - Solitary lesion - Solitary skin involvement\n2: **Regional by direct extension only** - Multiple lesions confined to one or two contiguous body regions - Multiple lesions, NOS - Regional skin involvement\n3: **Regional lymph node(s) involved only** - Central - Peripheral node region that drains an area of current or prior skin involvement - Regional lymph node(s), NOS + Lymph node(s), NOS\n4: **Regional by BOTH direct extension AND regional lymph node(s) involved** - Codes (2) + (3)\n7: **Distant site(s)/lymph node(s) involved** - Distant site(s) (including further contiguous extension) + Blood/peripheral blood + Bone marrow + Extracutaneous non-lymph node disease present + Generalized skin involvement + Multiple lesions confined to discontiguous body regions + Multiple lesions confined to three or more contiguous body regions + Visceral (non-cutaneous) metastasis - Distant lymph node(s), NOS - Distant metastasis, NOS + Carcinomatosis + Distant metastasis WITH or WITHOUT distant lymph node(s)\n9: Unknown if extension or metastasis",
+    "codes": {
+      "1": "**Localized only**\n- Solitary lesion\n- Solitary skin involvement",
+      "2": "**Regional by direct extension only**\n- Multiple lesions confined to one or two contiguous body regions\n- Multiple lesions, NOS\n- Regional skin involvement",
+      "3": "**Regional lymph node(s) involved only** \n- Central\n- Peripheral node region that drains an area of current or prior skin involvement \n- Regional lymph node(s), NOS\n  + Lymph node(s), NOS",
+      "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+      "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n  + Blood/peripheral blood\n  + Bone marrow\n  + Extracutaneous non-lymph node disease present\n  + Generalized skin involvement\n  + Multiple lesions confined to discontiguous body regions\n  + Multiple lesions confined to three or more contiguous body regions\n  + Visceral (non-cutaneous) metastasis\n\n- Distant lymph node(s), NOS\n- Distant metastasis, NOS\n   + Carcinomatosis\n  + Distant metastasis WITH or WITHOUT distant lymph node(s)",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:primary_cutaneous_lymphoma_non_mf_ss:ss2018_primary_cutaneous_lymphomas_4605:i9",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Primary Cutaneous Lymphoma (excluding MF and SS)",
+      "Summary Stage 2018: Primary Cutaneous Lymphomas (excluding MF and SS)"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_primary_cutaneous_lymphomas_4605.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C440",
+        "C442-C449",
+        "C510",
+        "C609",
+        "C632"
+      ],
+      "histologies": [
+        "9597",
+        "9680",
+        "9708-9709",
+        "9712",
+        "9718-9719",
+        "9726"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Primary Cutaneous Lymphomas (excluding MF and SS)**\n\n9597, 9680, 9708-9709, 9712, 9718-9719, 9726 \n\nC440, C442-C449, C510, C609, C632\nC440 Skin of lip, NOS\nC442 External ear\nC443 Skin of other and unspecified parts of face\nC444 Skin of scalp and neck\nC445 Skin of trunk\nC446 Skin of upper limb and shoulder\nC447 Skin of lower limb and hip\nC448 Overlapping lesion of skin\nC449 Skin, NOS\nC510 Labium majus\nC609 Penis\nC632 Scrotum, NOS\n\n**Note 1:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 81 *Primary Cutaneous Lymphomas*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Not applicable codes** \n* Code 0 is not applicable for this chapter.\n\n**Note 3:** **Mycosis Fungoides** \n* See the *Mycosis Fungoides* chapter for Mycosis Fungoides (9700) and Sezary syndrome (9701).\n\n**Note 4:** **The preferred histology terms listed below are from the 2024 WHO Classification of Tumours, Haematolymphoid tumours, 5th edition.**\n\n* 9597: Primary cutaneous follicle center lymphoma (PCFCL)\n* 9680: Primary cutaneous diffuse large B-cell lymphoma, leg type (PCLBCL-LT) \n* 9708: Subcutaneous panniculitis-like T-cell lymphoma (SPTCL)\n* 9709: Primary cutaneous peripheral T-cell lymphoma (NOS) (pcPTCL)\n* 9712: Intravascular (large) B-cell lymphoma (IVLBCL)\n* 9718: Primary cutaneous anaplastic large cell lymphoma (C-ALCL)\n* 9719: Extranodal NK-/T-cell lymphoma (ENKTL)\n* 9726: Primary cutaneous gamma-delta T-cell lymphoma (PCGD-TCL)\n\n**Note 5:** **Peripheral blood or bone marrow involvement** \n* If there is peripheral blood or bone marrow involvement, code 7.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:primary_cutaneous_lymphoma_non_mf_ss:grade_clinical_18316:c10",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Primary Cutaneous Lymphoma (excluding MF and SS)",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_18316.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C440",
+        "C442-C449",
+        "C510",
+        "C609",
+        "C632"
+      ],
+      "histologies": [
+        "9597",
+        "9680",
+        "9708-9709",
+        "9712",
+        "9718-9719",
+        "9726"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (1 codes)\n8: Not applicable",
+    "codes": {
+      "8": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:primary_cutaneous_lymphoma_non_mf_ss:grade_clinical_18316:i11",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Primary Cutaneous Lymphoma (excluding MF and SS)",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_18316.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C440",
+        "C442-C449",
+        "C510",
+        "C609",
+        "C632"
+      ],
+      "histologies": [
+        "9597",
+        "9680",
+        "9708-9709",
+        "9712",
+        "9718-9719",
+        "9726"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:** Grade (cell indicator) is no longer applicable for this hematopoietic neoplasm.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:primary_cutaneous_lymphoma_non_mf_ss:grade_pathological_73388:c12",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Primary Cutaneous Lymphoma (excluding MF and SS)",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_73388.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C440",
+        "C442-C449",
+        "C510",
+        "C609",
+        "C632"
+      ],
+      "histologies": [
+        "9597",
+        "9680",
+        "9708-9709",
+        "9712",
+        "9718-9719",
+        "9726"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (1 codes)\n8: Not applicable",
+    "codes": {
+      "8": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:primary_cutaneous_lymphoma_non_mf_ss:grade_pathological_73388:i13",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Primary Cutaneous Lymphoma (excluding MF and SS)",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_73388.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C440",
+        "C442-C449",
+        "C510",
+        "C609",
+        "C632"
+      ],
+      "histologies": [
+        "9597",
+        "9680",
+        "9708-9709",
+        "9712",
+        "9718-9719",
+        "9726"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:** Grade (cell indicator) is no longer applicable for this hematopoietic neoplasm.",
+    "codes": null,
+    "notes": null
+  }
+]

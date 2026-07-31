@@ -1,0 +1,141 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:esophagus:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Esophagus",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/esophagus.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C150-C155",
+        "C158-C159"
+      ],
+      "histologies": [
+        "8000-8934",
+        "8940-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C150  Cervical esophagus\nC151  Thoracic esophagus\nC152  Abdominal esophagus\nC153  Upper third of esophagus\nC154  Middle third of esophagus\nC155  Lower third of esophagus\nC158  Overlapping lesion of esophagus\nC159  Esophagus, NOS\n\n**Note 1:** This schema is based on the UICC chapter *Oesophagus including Oesophagogastric Junction,* pages 66-72.\n* Primary sites C151, C152, C158, and C159 are listed in the chapter heading but are not specified in the anatomic subsites in this chapter of the UICC manual; however, they are included in this schema and TNM staged if appropriate histology criteria are met\n\n**Note 2:**  The cardia/gastroesophageal junction (EGJ), and the proximal 5 centimeters (cm) of the fundus and body of the stomach (C160-C162) have been removed from the Stomach chapter and added to the Esophagus chapter effective with TNM 7th Edition. A new schema EsophagusGEJunction, was created to accomodate this change. Tumors arising at the EGJ, or arising in the stomach within 5 cm of the EGJ and crossing the EGJ are staged using the Esophagus GE Junction schema. All other cancers with a midpoint in the stomach lying more than 5 cm distal to the EGJ, or those within 5 cm of the EGJ but not extending into the EGJ or esophagus, are staged using the stomach schema.\n\n**Note 3:**  There are two widely used but incompatible systems of dividing the esophagus into subsites, one using anatomic landmarks and the other using using thirds of the total length.  Each of these two systems has been assigned topography codes in ICD-O-3; codes C150-C152 for the former, and C153-C155 for the latter.  \n* As explained on page 23 of ICD-O-3, \"The terms cervical, thoracic, and abdominal are radiographic and intraoperative descriptors; upper, middle, and lower third are endoscopic and clinical descriptors\"  \n* In actual practice by physicians, the terms and codes for the upper, middle, and lower thirds are often applied to sub-sections of the thoracic esophagus, and the abdominal portion can be classified as part of the lower thoracic esophagus\n\n**Note 4:**  Anatomic Limits of Esophagus\n* Cervical Esophagus (C150):  From the lower border of the cricoid cartilage to the thoracic inlet (suprasternal notch), about 18 cm from the incisors.\n* Thoracic  Esophagus (C151) and Abdominal Esophagus (C152)\n  * Upper thoracic portion (C153): From the thoracic inlet to the level of the tracheal bifurcation (18-24 cm)\n  * Mid-thoracic portion (C154): From the tracheal bifurcation midway to the EGJ (24-32 cm)\n  * Lower thoracic portion (C155): From midway between the tracheal bifurcation and the EGJ to the EGJ including the abdominal esophagus (32-40 cm)\n\n**Note 5:**  Effective with TNM 7th Edition\n* Histologic grade is required for stage grouping\n* There are separate stage groupings for squamous cell carcinoma and adenocarcinoma. Since squamous cell carcinoma typically has a poorer prognosis than adenocarcinoma, a tumor of mixed histopathologic type or a type that is not otherwise specified should be classified as squamous cell carcinoma\n\n**Note 6:** In addition to directly assigning TNM, Summary Stage 2000 (SS2000) must be captured.  If directly assigning SS2000, use the *Esophagus* chapter on page 74 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=74).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_tnm:esophagus:behavior:c2",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Esophagus",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "tnm-2.1:tables/behavior.json",
+    "kind": "code_table",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C150-C155",
+        "C158-C159"
+      ],
+      "histologies": [
+        "8000-8934",
+        "8940-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "Behavior ICD-O-3 (4 codes)\n0: Benign\n1: Uncertain Benign/Malig\n2: In Situ\n3: Malignant Primary",
+    "codes": {
+      "0": "Benign",
+      "1": "Uncertain Benign/Malig",
+      "2": "In Situ",
+      "3": "Malignant Primary"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_tnm:esophagus:nodes_pos_fpa:c3",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Esophagus",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "tnm-2.1:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C150-C155",
+        "C158-C159"
+      ],
+      "histologies": [
+        "8000-8934",
+        "8940-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative.\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in patient record",
+    "codes": {
+      "00": "All nodes examined negative.",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_tnm:esophagus:nodes_pos_fpa:i4",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Esophagus",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "tnm-2.1:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C150-C155",
+        "C158-C159"
+      ],
+      "histologies": [
+        "8000-8934",
+        "8940-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.",
+    "codes": null,
+    "notes": null
+  }
+]

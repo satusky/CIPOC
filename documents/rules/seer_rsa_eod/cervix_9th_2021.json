@@ -1,0 +1,617 @@
+[
+  {
+    "rule_id": "seer_rsa_eod:cervix_9th_2021:schema:i1",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Cervix Uteri [V9: 2021+]",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/cervix_9th_2021.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C530-C531",
+        "C538-C539"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8980",
+        "9110"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2021-01-01",
+      "dx_date_max": null
+    },
+    "text": "8000-8700, 8720-8790, 8980, 9110\n\nC530 Endocervix\nC531 Exocervix\nC538 Overlapping lesion of cervix\nC539 Cervix uteri\n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Cervix Uteri, from the AJCC Cancer Staging System Version 9 (2020). Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other EOD Schemas with Cervix sites**\n* **Cervix Sarcoma**: 8710-8714, 8800-8803, 8805, 8810-8814, 8816-8858, 8860-8900, 8902-8910, 8921-8941, 8951-8976, 8981-8990, 8992-9016, 9030-9043, 9045-9105, 9111, 9121-9132, 9135-9138, 9141-9175, 9181-9221, 9230, 9240-9365, 9370-9580, 9582\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Soft Tissue Abdomen and Thoracic**: 8950\n* **Soft Tissue Other**: 8992\n* **Soft Tissue Rare**: 8804, 8806, 8815, 8859, 8891, 8901, 8912, 8920, 9020, 9044, 9120, 9133, 9180, 9222, 9231, 9366-9368, 9581",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:cervix_9th_2021:behavior:c2",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Cervix Uteri [V9: 2021+]",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "code_table",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C530-C531",
+        "C538-C539"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8980",
+        "9110"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2021-01-01",
+      "dx_date_max": null
+    },
+    "text": "Behavior ICD-O-3 (4 codes)\n0: Benign\n1: Uncertain Benign/Malig\n2: In Situ\n3: Malignant Primary",
+    "codes": {
+      "0": "Benign",
+      "1": "Uncertain Benign/Malig",
+      "2": "In Situ",
+      "3": "Malignant Primary"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:cervix_9th_2021:behavior:i3",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Cervix Uteri [V9: 2021+]",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C530-C531",
+        "C538-C539"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8980",
+        "9110"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2021-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:cervix_9th_2021:tumor_size_summary_47973:c4",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Cervix Uteri [V9: 2021+]",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_47973.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C530-C531",
+        "C538-C539"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8980",
+        "9110"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2021-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (6 codes)\n000: No mass/tumor found\n001: 1 mm or described as less than 1 mm\n002-988: Exact size in millimeters (2 mm to 988 mm)\n989: 989 millimeters or larger\n990: Microscopic focus or foci only and no size of focus is given\n999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm",
+      "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+      "989": "989 millimeters or larger",
+      "990": "Microscopic focus or foci only and no size of focus is given",
+      "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:cervix_9th_2021:tumor_size_summary_47973:i5",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Cervix Uteri [V9: 2021+]",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_47973.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C530-C531",
+        "C538-C539"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8980",
+        "9110"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2021-01-01",
+      "dx_date_max": null
+    },
+    "text": "For this schema, Tumor Size is used with EOD Primary Tumor to derive EOD T. \n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:cervix_9th_2021:nodes_pos_fpa:c6",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Cervix Uteri [V9: 2021+]",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C530-C531",
+        "C538-C539"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8980",
+        "9110"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2021-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in medical record",
+    "codes": {
+      "00": "All nodes examined negative",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:cervix_9th_2021:nodes_pos_fpa:i7",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Cervix Uteri [V9: 2021+]",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C530-C531",
+        "C538-C539"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8980",
+        "9110"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2021-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:cervix_9th_2021:nodes_exam_76029:c8",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Cervix Uteri [V9: 2021+]",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C530-C531",
+        "C538-C539"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8980",
+        "9110"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2021-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (8 codes)\n00: No nodes examined\n01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)\n90: 90 or more nodes examined\n95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed\n96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated\n97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated\n98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown\n99: Unknown if nodes were examined; not applicable or negative Not documented in medical record",
+    "codes": {
+      "00": "No nodes examined",
+      "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+      "90": "90 or more nodes examined",
+      "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+      "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+      "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+      "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+      "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:cervix_9th_2021:nodes_exam_76029:i9",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Cervix Uteri [V9: 2021+]",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C530-C531",
+        "C538-C539"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8980",
+        "9110"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2021-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:cervix_9th_2021:ss2018_cervix_64954:c10",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Cervix Uteri [V9: 2021+]",
+      "Summary Stage 2018: Cervix"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_cervix_64954.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C530-C531",
+        "C538-C539"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8980",
+        "9110"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2021-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018: Cervix (7 codes)\n0: **In situ, intraepithelial, noninvasive** - Cancer in situ WITH endocervical gland involvement - Cervical intraepithelial neoplasia (CIN) Grade III - Preinvasive\n1: **Localized only (localized, NOS)** * Clinically visible lesion (macroscopic), including superficial invasion * Confined to cervix uteri or uterus, NOS, except corpus uteri, NOS (see code 2 for corpus uteri) + Not clinically visible or unknown if clinically visible * Measured stromal invasion less than 5 mm or less measured from the based of the epithelium AND horizontal spread of 7.0 mm or less FIGO Stage I (IA1, IA2, IA NOS, IB1, IB2, IB3, IB NOS, I NOS)\n2: **Regional by direct extension only** * Bladder wall * Bladder, NOS excluding mucosa (see code 7 for bladder mucosa) * Bullous edema of bladder mucosa * Confined to corpus uteri, size, depth and horizontal spread unknown * Corpus uteri, NOS * Cul de sac (rectouterine pouch) * Fallopian tube(s) * \"Frozen pelvis\" (clinically described) * Hydronephrosis or nonfunctioning kidney * Invasion beyond uterus, NOS * Ligament(s) (broad, cardinal, uterosacral) * Ovary(ies) * Parametrial (paracervical soft tissue) invasion * Pelvic wall(s …",
+    "codes": {
+      "0": "**In situ, intraepithelial, noninvasive**\n- Cancer in situ WITH endocervical gland involvement\n- Cervical intraepithelial neoplasia (CIN) Grade III\n- Preinvasive",
+      "1": "**Localized only (localized, NOS)**\n\n* Clinically visible lesion (macroscopic), including superficial invasion\n* Confined to cervix uteri or uterus, NOS, except corpus uteri, NOS (see code 2 for corpus uteri)\n  + Not clinically visible or unknown if clinically visible\n* Measured stromal invasion less than 5 mm or less measured from the based of the epithelium AND horizontal spread of 7.0 mm or less\n\nFIGO Stage I (IA1, IA2, IA NOS, IB1, IB2, IB3, IB NOS, I NOS)",
+      "2": "**Regional by direct extension only**\n\n* Bladder wall\n* Bladder, NOS excluding mucosa (see code 7 for bladder mucosa)\n* Bullous edema of bladder mucosa\n* Confined to corpus uteri, size, depth and horizontal spread unknown\n* Corpus uteri, NOS \n* Cul de sac (rectouterine pouch) \n* Fallopian tube(s)\n* \"Frozen pelvis\" (clinically described)\n* Hydronephrosis or nonfunctioning kidney\n* Invasion beyond uterus, NOS\n* Ligament(s) (broad, cardinal, uterosacral)\n* Ovary(ies)\n* Parametrial (paracervical soft tissue) invasion\n* Pelvic wall(s)\n* Rectal wall\n* Rectum, NOS excluding mucosa (see code 7 for rectal mucosa)\n* Upper two-thirds of vagina including fornices\n* Ureter (intra- and extramural)\n* Urethra\n* Vagina (lower third (not extending into pelvic wall), NOS)\n* Vaginal wall, NOS\n* Vulva\n\nFIGO Stage II (IIA, IIB, II NOS)\nFIGO Stage III (IIIA, IIIB, III NOS)",
+      "3": "**Regional lymph node(s) involved only**\n\n- Para-aortic\n  + Aortic\n  + Lateral aortic/lateral lumbar\n  + Periaortic\n\n\n- Pelvic\n  + Iliac, NOS\n     + Common\n     + External \n     + Internal (hypogastric) (obturator)\n   + Paracervical\n   + Parametrial\n   + Sacral, NOS\n      + Lateral (laterosacral)\n      + Middle (promontorial) (Gerota's node)\n      + Presacral\n      + Uterosacral\n\n\n- Regional lymph node(s), NOS\n  + Lymph node(s), NOS\n\nFIGO Stage IIIC (IIIC1, IIIC2, IIIC NOS)\n+ Localized tumor WITH regional lymph node involvement",
+      "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+      "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n  + Adnexa\n  + Bladder mucosa\n  + Peritoneal spread\n  + Rectal mucosa\n  + Sigmoid colon\n  + Small intestine\n  + Uterine serosa\n\n\n- Distant lymph node(s), NOS\n  + Inguinal, NOS\n    + Inguinofemoral (groin)\n    + Node of Cloquet or Rosenmuller (highest deep inguinal)\n    + Superficial inguinal89654\n  + Mediastinal\n  + Scalene\n  + Supraclavicular\n\n\n- Distant metastasis, NOS\n  + Carcinomatosis \n  + Distant metastasis WITH or WITHOUT distant lymph node(s)\n\n\n FIGO Stage IV (IVA, IVB, IV NOS)",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:cervix_9th_2021:ss2018_cervix_64954:i11",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Cervix Uteri [V9: 2021+]",
+      "Summary Stage 2018: Cervix"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_cervix_64954.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C530-C531",
+        "C538-C539"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8980",
+        "9110"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2021-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Cervix**\n\n8000-8700, 8710-8803, 8805, 8810-8814, 8816-8858, 8860-8900, 8902-8910, 8921-8941, 8951-8976, 8980-8990, 8992-9016, 9030-9043, 9045-9111, 9121-9132, 9135-9138, 9141-9175, 9181-9221, 9230, 9240-9365, 9370-9580, 9582\n\nC530-C531, C538-C539\nC530 Endocervix\nC531 Exocervix\nC538 Overlapping lesion of cervix\nC539 Cervix uteri\n\n**Note 1:** **Sources used in the development of this chapter** \n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 52 *Cervix Uteri*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n* Cervix Uteri, from the AJCC Cancer Staging System Version 9 (2020). Used with permission of the American College of Surgeons, Chicago, Illinois\n* Chapter 54 *Corpus Uteri-Sarcoma,* in the AJCC Cancer Staging Manual, Eight Edition (2017) published by Spring International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois\n\n**Note 2:** **Other Summary Stage Chapters with Cervix sites** \n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Soft Tissue**: 8815, 8859, 8901, 8912, 8920, 8950, 9120, 9133, 9180, 9222, 9366-9368, 9581\n\n**Note 3:** **Isolated tumor cells** \n* Isolated tumor cells (ITCs) are defined as single tumor cells or small clusters not greater than 0.2 mm, usually detected by immunohistochemical (IHC) or molecular methods. ITCs do not usually show evidence of malignant activity (e.g., proliferation or stromal reaction). \n* Lymph nodes with ITCs only are **not** counted as positive nodes for Summary Stage\n\n**Note 4:** **Para-aortic nodes** \n* Para-aortic nodes are now regional instead of distant.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:cervix_9th_2021:grade_clinical_6485:c12",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Cervix Uteri [V9: 2021+]",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_6485.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C530-C531",
+        "C538-C539"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8980",
+        "9110"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2021-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (4 codes)\n1: G1: Well differentiated\n2: G2: Moderately differentiated\n3: G3: Poorly differentiated\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Well differentiated",
+      "2": "G2: Moderately differentiated",
+      "3": "G3: Poorly differentiated",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:cervix_9th_2021:grade_clinical_6485:i13",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Cervix Uteri [V9: 2021+]",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_6485.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C530-C531",
+        "C538-C539"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8980",
+        "9110"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2021-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Clinical must not be blank\n\n**Note 2:** Assign the highest grade from the primary tumor assessed during the clinical time frame. \n\n**Note 3:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 4:** G3 includes undifferentiated and anaplastic.\n\n**Note 5:** Code 9 (unknown) when\n* Grade from primary site is not documented\n* Clinical workup is not done (for example, cancer is an incidental finding during surgery for another condition)\n* Grade checked \"not applicable\" on CAP Protocol (if available) and no other grade information is available\n\n**Note 6:** If there is only one grade available and it cannot be determined if it is clinical or pathological, assume it is a Grade Clinical and code appropriately per Grade Clinical categories for that site, and then code unknown (9) for Grade Pathological, and blank for Grade Post Therapy Clin (yc) and Grade Post Therapy Path (yp).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:cervix_9th_2021:grade_pathological_84704:c14",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Cervix Uteri [V9: 2021+]",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_84704.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C530-C531",
+        "C538-C539"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8980",
+        "9110"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2021-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (4 codes)\n1: G1: Well differentiated\n2: G2: Moderately differentiated\n3: G3: Poorly differentiated\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Well differentiated",
+      "2": "G2: Moderately differentiated",
+      "3": "G3: Poorly differentiated",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:cervix_9th_2021:grade_pathological_84704:i15",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Cervix Uteri [V9: 2021+]",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_84704.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C530-C531",
+        "C538-C539"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8980",
+        "9110"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2021-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Pathological must not be blank.\n\n**Note 2:** There is a preferred grading system for this schema. If the clinical grade given uses the preferred grading system and the pathological grade does not use the preferred grading system, do not record the Grade Clinical in the Grade Pathological field. Assign Grade Pathological 9.\n* *Example:* Biopsy of primary site shows a moderately differentiated adenocarcinoma. The surgical resection states a high-grade adenocarcinoma. \n    - Code Grade Clinical as 2 since Moderately differentiated (G2) is the preferred grading system\n     - Code Grade Pathological as 9 since the preferred grading system was not used and the Generic Grade Categories do not apply to this grade table\n\n**Note 3:** Assign the highest grade from the primary tumor.  \n\n**Note 4:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 5:** G3 includes undifferentiated and anaplastic.\n\n**Note 6:** Use the grade from the **clinical work up** from the primary tumor in different scenarios based on behavior or surgical resection\n* **Behavior**\n  - Tumor behavior for the clinical and the pathological diagnoses are the same AND the clinical grade is the highest grade \n   - Tumor behavior for clinical diagnosis is invasive, and the tumor behavior for the pathological diagnosis is in situ\n* **Surgical Resection**\n   - Surgical resection is done of the primary tumor and there is no grade documented from the surgical resection\n    - Surgical resection is done of the primary tumor and there is no residual cancer\n* **No surgical resection**\n    - Surgical resection of the primary tumor has not been done, but there is positive microscopic confirmation of distant metastases during the clinical time frame\n\n**Note 7:** Code 9 (unknown) when\n* Grade from primary site is not documented\n* No resection of the primary site (see exception in Note 6, Surgical resection, last bullet)\n* Neo-adjuvant therapy is followed by a resection (see Grade Post Therapy Path (yp))\n* Grade checked “not applicable” on CAP Protocol (if available) and no other grade information is available\n* Clinical case only (see Grade Clinical)\n* There is only one grade available and it cannot be determined if it is clinical, pathological, post therapy clinical or post therapy pathological",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:cervix_9th_2021:figo_stage_cervix_46535:c16",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Cervix Uteri [V9: 2021+]",
+      "FIGO Stage Cervix"
+    ],
+    "anchor": "eod_public-3.3:tables/figo_stage_cervix_46535.json",
+    "kind": "code_table",
+    "item_ids": [
+      3836
+    ],
+    "applies_to": {
+      "sites": [
+        "C530-C531",
+        "C538-C539"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8980",
+        "9110"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2021-01-01",
+      "dx_date_max": null
+    },
+    "text": "FIGO Stage Cervix (25 codes)\n1: FIGO Stage I\n1A: FIGO Stage IA\n1A1: FIGO Stage IA1\n1A2: FIGO Stage IA2\n1B: FIGO Stage IB\n1B1: FIGO Stage IB1\n1B2: FIGO Stage IB2\n1B3: FIGO Stage IB3\n2: FIGO Stage II\n2A: FIGO Stage IIA\n2A1: FIGO Stage IIA1\n2A2: FIGO Stage IIA2\n2B: FIGO Stage IIB\n3: FIGO Stage III\n3A: FIGO Stage IIIA\n3B: FIGO Stage IIIB\n3C: FIGO Stage IIIC\n3C1: FIGO Stage IIIC1\n3C2: FIGO Stage IIIC2\n4: FIGO Stage IV\n4A: FIGO Stage IVA\n4B: FIGO Stage IVB\n97: Not applicable: Carcinoma in situ (intraepithelial, noninvasive, preinvasive)\n98: Not applicable: Information not collected for this case (If this item is required by your standard setter, use of code 98 will result in an edit error.)\n99: Not documented in medical record FIGO stage not assessed or unknown if assessed",
+    "codes": {
+      "1": "FIGO Stage I",
+      "1A": "FIGO Stage IA",
+      "1A1": "FIGO Stage IA1",
+      "1A2": "FIGO Stage IA2",
+      "1B": "FIGO Stage IB",
+      "1B1": "FIGO Stage IB1",
+      "1B2": "FIGO Stage IB2",
+      "1B3": "FIGO Stage IB3",
+      "2": "FIGO Stage II",
+      "2A": "FIGO Stage IIA",
+      "2A1": "FIGO Stage IIA1",
+      "2A2": "FIGO Stage IIA2",
+      "2B": "FIGO Stage IIB",
+      "3": "FIGO Stage III",
+      "3A": "FIGO Stage IIIA",
+      "3B": "FIGO Stage IIIB",
+      "3C": "FIGO Stage IIIC",
+      "3C1": "FIGO Stage IIIC1",
+      "3C2": "FIGO Stage IIIC2",
+      "4": "FIGO Stage IV",
+      "4A": "FIGO Stage IVA",
+      "4B": "FIGO Stage IVB",
+      "97": "Not applicable: Carcinoma in situ (intraepithelial, noninvasive, preinvasive)",
+      "98": "Not applicable:  Information not collected for this case\n(If this item is required by your standard setter, use of code 98 will result in an edit error.)",
+      "99": "Not documented in medical record\nFIGO stage not assessed or unknown if assessed"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:cervix_9th_2021:figo_stage_cervix_46535:i17",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Cervix Uteri [V9: 2021+]",
+      "FIGO Stage Cervix"
+    ],
+    "anchor": "eod_public-3.3:tables/figo_stage_cervix_46535.json",
+    "kind": "instruction",
+    "item_ids": [
+      3836
+    ],
+    "applies_to": {
+      "sites": [
+        "C530-C531",
+        "C538-C539"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8980",
+        "9110"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2021-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** **Physician Statement**\n* There must be a statement about FIGO stage from the managing physician in order to code this data item.\n  * Do not code FIGO stage based on the pathology report\n  * Do not code FIGO stage based only on T, N, M\n  * If \"FIGO\" is not included with a stated stage, then do not assume it is a FIGO stage\n\n**Note 2:** **FIGO Stage vs FIGO Grade** \n* FIGO stage is not the same thing as FIGO grade. Only code FIGO stage in this field, do not code FIGO grade.\n* Code FIGO grade in the grade fields\n\n**Note 3:** **Multiple FIGO stages**\n* If there is more than one FIGO stage provided from the clinical and pathological work up, code the most extensive FIGO stage.\n\n**Note 4:** **FIGO Stage 0 (in-situ)**\n* The FIGO stage definitions do not include Stage 0 (Tis).\n* Code 97 for any non-invasive neoplasm (behavior /2)",
+    "codes": null,
+    "notes": null
+  }
+]

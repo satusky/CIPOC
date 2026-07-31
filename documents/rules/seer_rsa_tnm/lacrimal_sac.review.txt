@@ -1,0 +1,27 @@
+========================================================================
+SEER*RSA STAGING INGEST REVIEW REPORT
+========================================================================
+Schema: lacrimal_sac
+Source: https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/tnm-2.1.zip
+Units emitted: 1  |  accepted: 1  |  quarantined: 0
+
+Accepted units by kind:
+  instruction    1
+
+Accepted units by NAACCR item:
+  (none item-specific)
+
+Applicability predicates carried by this schema's units (1):
+  {'sites': ['C695'], 'histologies': ['8000-8713', '8800-9136', '9141-9508', '9520-9582', '9700-9701'], 'dx_date_min': '2016-01-01'}
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED CODE TABLES (up to 4 of 0)
+------------------------------------------------------------------------
+(none)
+
+========================================================================

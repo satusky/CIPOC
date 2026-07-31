@@ -1,0 +1,63 @@
+========================================================================
+SEER*RSA STAGING INGEST REVIEW REPORT
+========================================================================
+Schema: bile_ducts_intrahepat
+Source: https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/tnm-2.1.zip
+Units emitted: 8  |  accepted: 8  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     4
+  instruction    4
+
+Accepted units by NAACCR item:
+     523 2
+     820 4
+
+Applicability predicates carried by this schema's units (2):
+  {'sites': ['C221'], 'histologies': ['8000-8162', '8180-9136', '9141-9582', '9700-9701'], 'dx_date_min': '2016-01-01'}
+  {'sites': ['C220'], 'histologies': ['8160', '8161', '8180'], 'dx_date_min': '2016-01-01'}
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED CODE TABLES (up to 4 of 4)
+------------------------------------------------------------------------
+
+[seer_rsa_tnm:bile_ducts_intrahepat:behavior:c3]  items=[523]  anchor=tnm-2.1:tables/behavior.json
+  Intrahepatic Bile Ducts > Behavior ICD-O-3
+0: Benign
+1: Uncertain Benign/Malig
+2: In Situ
+3: Malignant Primary
+
+[seer_rsa_tnm:bile_ducts_intrahepat:behavior:c4]  items=[523]  anchor=tnm-2.1:tables/behavior.json
+  Intrahepatic Bile Ducts > Behavior ICD-O-3
+0: Benign
+1: Uncertain Benign/Malig
+2: In Situ
+3: Malignant Primary
+
+[seer_rsa_tnm:bile_ducts_intrahepat:nodes_pos_fpa:c5]  items=[820]  anchor=tnm-2.1:tables/nodes_pos_fpa.json
+  Intrahepatic Bile Ducts > Regional Nodes Positive
+00: All nodes examined negative.
+01-89: 1 - 89 nodes positive (code exact number of nodes positive)
+90: 90 or more nodes positive
+95: Positive aspiration or core biopsy of lymph node(s)
+97: Positive nodes - number unspecified
+98: No nodes examined
+99: Unknown if nodes are positive; not applicable Not documented in patient record
+
+[seer_rsa_tnm:bile_ducts_intrahepat:nodes_pos_fpa:c6]  items=[820]  anchor=tnm-2.1:tables/nodes_pos_fpa.json
+  Intrahepatic Bile Ducts > Regional Nodes Positive
+00: All nodes examined negative.
+01-89: 1 - 89 nodes positive (code exact number of nodes positive)
+90: 90 or more nodes positive
+95: Positive aspiration or core biopsy of lymph node(s)
+97: Positive nodes - number unspecified
+98: No nodes examined
+99: Unknown if nodes are positive; not applicable Not documented in patient record
+
+========================================================================

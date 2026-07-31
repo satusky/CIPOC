@@ -1,0 +1,953 @@
+[
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:schema:i1",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/plasma_cell_myeloma.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C000-C699",
+        "C739-C750",
+        "C754-C809"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**9732: Plasma cell myeloma (PCM)**\n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 82 *Plasma Cell Myeloma and Plasma Cell Disorder*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Stage Definitions** \n* TNM data elements are not defined for this schema. TNM Stage Group is defined for multiple myeloma only (see Note 3)  \n\n**Note 3:** **Additional data items for Staging** \n* The *Revised International Staging System (R-ISS)* is being used to stage plasma cell myeloma/multiple myeloma (9732). \n* The following variables must be collected at the time of diagnosis for staging:\n  * High Risk Cytogenetics [NAACCR Data Item #3857]\n  * LDH Pretreatment Level [NAACCR Data Item #3932]\n  * Serum Albumin Pretreatment Level [NAACCR Data Item #3930]\n  * Serum Beta-2 Microglobulin Pretreatment Level [NAACCR Data Item #3931]",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:schema:i2",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/plasma_cell_myeloma.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C700-C729",
+        "C751-C753"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": [
+        "3"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**9732: Plasma cell myeloma (PCM)**\n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 82 *Plasma Cell Myeloma and Plasma Cell Disorder*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Stage Definitions** \n* TNM data elements are not defined for this schema. TNM Stage Group is defined for multiple myeloma only (see Note 3)  \n\n**Note 3:** **Additional data items for Staging** \n* The *Revised International Staging System (R-ISS)* is being used to stage plasma cell myeloma/multiple myeloma (9732). \n* The following variables must be collected at the time of diagnosis for staging:\n  * High Risk Cytogenetics [NAACCR Data Item #3857]\n  * LDH Pretreatment Level [NAACCR Data Item #3932]\n  * Serum Albumin Pretreatment Level [NAACCR Data Item #3930]\n  * Serum Beta-2 Microglobulin Pretreatment Level [NAACCR Data Item #3931]",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:behavior:c3",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "code_table",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C000-C699",
+        "C739-C750",
+        "C754-C809"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Behavior ICD-O-3 (4 codes)\n0: Benign\n1: Uncertain Benign/Malig\n2: In Situ\n3: Malignant Primary",
+    "codes": {
+      "0": "Benign",
+      "1": "Uncertain Benign/Malig",
+      "2": "In Situ",
+      "3": "Malignant Primary"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:behavior:c4",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "code_table",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729",
+        "C751-C753"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": [
+        "3"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Behavior ICD-O-3 (4 codes)\n0: Benign\n1: Uncertain Benign/Malig\n2: In Situ\n3: Malignant Primary",
+    "codes": {
+      "0": "Benign",
+      "1": "Uncertain Benign/Malig",
+      "2": "In Situ",
+      "3": "Malignant Primary"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:behavior:i5",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C000-C699",
+        "C739-C750",
+        "C754-C809"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:behavior:i6",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729",
+        "C751-C753"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": [
+        "3"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:tumor_size_summary_dna_13275:c7",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_dna_13275.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C000-C699",
+        "C739-C750",
+        "C754-C809"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (1 codes)\n999: Not applicable",
+    "codes": {
+      "999": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:tumor_size_summary_dna_13275:c8",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_dna_13275.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729",
+        "C751-C753"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": [
+        "3"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (1 codes)\n999: Not applicable",
+    "codes": {
+      "999": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:tumor_size_summary_dna_13275:i9",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_dna_13275.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C000-C699",
+        "C739-C750",
+        "C754-C809"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:tumor_size_summary_dna_13275:i10",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_dna_13275.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729",
+        "C751-C753"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": [
+        "3"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:nodes_pos_dna_91511:c11",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_dna_91511.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C000-C699",
+        "C739-C750",
+        "C754-C809"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (1 codes)\n99: Not applicable",
+    "codes": {
+      "99": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:nodes_pos_dna_91511:c12",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_dna_91511.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729",
+        "C751-C753"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": [
+        "3"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (1 codes)\n99: Not applicable",
+    "codes": {
+      "99": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:nodes_pos_dna_91511:i13",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_dna_91511.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C000-C699",
+        "C739-C750",
+        "C754-C809"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:nodes_pos_dna_91511:i14",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_dna_91511.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729",
+        "C751-C753"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": [
+        "3"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:nodes_exam_dna_95635:c15",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_dna_95635.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C000-C699",
+        "C739-C750",
+        "C754-C809"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (1 codes)\n99: Not applicable",
+    "codes": {
+      "99": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:nodes_exam_dna_95635:c16",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_dna_95635.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729",
+        "C751-C753"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": [
+        "3"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (1 codes)\n99: Not applicable",
+    "codes": {
+      "99": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:nodes_exam_dna_95635:i17",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_dna_95635.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C000-C699",
+        "C739-C750",
+        "C754-C809"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:nodes_exam_dna_95635:i18",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_dna_95635.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729",
+        "C751-C753"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": [
+        "3"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:ss2018_44993:c19",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Summary Stage 2018: Myeloma and Plasma Cell Disorders"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_44993.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C000-C699",
+        "C739-C750",
+        "C754-C809"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018: Myeloma and Plasma Cell Disorders (4 codes)\n1: **Localized only** - Single plasmacytoma occurring in bone (osseous or medullary) (9731) + WITH or WITHOUT soft tissue extension - Single plasmacytoma, NOS (9734) + Single plasmacytoma occurring outside of bone (extraosseous or extramedullary) (9734)\n3: **Regional lymph node(s) involved only** - Extraosseous plasmacytomas only (9734) + Regional lymph node(s), NOS * Lymph node(s), NOS\n7: **Distant site(s)/lymph node(s) involved** - Lymphoplasmacytic lymphoma (9671) - Plasma cell myeloma (9732) + Multiple myeloma + Myeloma, NOS + Multiple extraosseous or extramedullary plasmacytomas + Multiple osseous or medullary plasmacytomas + Multiple plasmacytomas, NOS - Waldenstrom Macroglobulinemia (9761)\n9: Unknown if extension or metastasis (applicable for 9731 and 9734 only)",
+    "codes": {
+      "1": "**Localized only**\n- Single plasmacytoma occurring in bone (osseous or medullary) (9731)\n  + WITH or WITHOUT soft tissue extension\n\n- Single plasmacytoma, NOS (9734)\n  + Single plasmacytoma occurring outside of bone (extraosseous or extramedullary) (9734)",
+      "3": "**Regional lymph node(s) involved only**\n- Extraosseous plasmacytomas only (9734)\n  + Regional lymph node(s), NOS\n     * Lymph node(s), NOS",
+      "7": "**Distant site(s)/lymph node(s) involved**\n- Lymphoplasmacytic lymphoma (9671)\n- Plasma cell myeloma (9732)\n  + Multiple myeloma\n  + Myeloma, NOS\n  + Multiple extraosseous or extramedullary plasmacytomas \n  + Multiple osseous or medullary plasmacytomas \n  + Multiple plasmacytomas, NOS\n\n- Waldenstrom Macroglobulinemia (9761)",
+      "9": "Unknown if extension or metastasis (applicable for 9731 and 9734 only)"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:ss2018_44993:c20",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Summary Stage 2018: Myeloma and Plasma Cell Disorders"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_44993.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729",
+        "C751-C753"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": [
+        "3"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018: Myeloma and Plasma Cell Disorders (4 codes)\n1: **Localized only** - Single plasmacytoma occurring in bone (osseous or medullary) (9731) + WITH or WITHOUT soft tissue extension - Single plasmacytoma, NOS (9734) + Single plasmacytoma occurring outside of bone (extraosseous or extramedullary) (9734)\n3: **Regional lymph node(s) involved only** - Extraosseous plasmacytomas only (9734) + Regional lymph node(s), NOS * Lymph node(s), NOS\n7: **Distant site(s)/lymph node(s) involved** - Lymphoplasmacytic lymphoma (9671) - Plasma cell myeloma (9732) + Multiple myeloma + Myeloma, NOS + Multiple extraosseous or extramedullary plasmacytomas + Multiple osseous or medullary plasmacytomas + Multiple plasmacytomas, NOS - Waldenstrom Macroglobulinemia (9761)\n9: Unknown if extension or metastasis (applicable for 9731 and 9734 only)",
+    "codes": {
+      "1": "**Localized only**\n- Single plasmacytoma occurring in bone (osseous or medullary) (9731)\n  + WITH or WITHOUT soft tissue extension\n\n- Single plasmacytoma, NOS (9734)\n  + Single plasmacytoma occurring outside of bone (extraosseous or extramedullary) (9734)",
+      "3": "**Regional lymph node(s) involved only**\n- Extraosseous plasmacytomas only (9734)\n  + Regional lymph node(s), NOS\n     * Lymph node(s), NOS",
+      "7": "**Distant site(s)/lymph node(s) involved**\n- Lymphoplasmacytic lymphoma (9671)\n- Plasma cell myeloma (9732)\n  + Multiple myeloma\n  + Myeloma, NOS\n  + Multiple extraosseous or extramedullary plasmacytomas \n  + Multiple osseous or medullary plasmacytomas \n  + Multiple plasmacytomas, NOS\n\n- Waldenstrom Macroglobulinemia (9761)",
+      "9": "Unknown if extension or metastasis (applicable for 9731 and 9734 only)"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:ss2018_44993:i21",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Summary Stage 2018: Myeloma and Plasma Cell Disorders"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_44993.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C000-C699",
+        "C739-C750",
+        "C754-C809"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Myeloma and Plasma Cell Disorders**\n\n**The preferred histology terms listed in this schema are from the 2024 WHO Classification of Tumours, Haematolymphoid Tumours, 5th edition.**\n\n* 9671: Lymphoplasmacytic lymphoma (LPL) *(EXCEPT C441, C690, C695-C696)*\n  * C700-C729, C751-C753 (2018-2022 only) (See Note 2)\n* 9731: Solitary plasmacytoma of bone (SPB)\n* 9732: Plasma Cell Myeloma (PCM)\n* 9734: Extramedullary plasmacytoma (EMP) *(EXCEPT C441, C690, C695-C696)*\n* 9761: Waldenstrom macroglobulinemia (WM)\n\n**Note 1:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 82 *Plasma Cell Myeloma and Plasma Cell Disorder*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Histologies moved to Brain, CNS, Intracranial Gland** \n* For the histology listed below, this has moved to the Brain, CNS Other, and Intracranial Gland Summary Stage chapters starting with 2023 diagnoses. If you have one of these cases for 2018-2022, then this is the appropriate chapter. If you have one of these cases diagnosed on January 1, 2023, forward, see the appropriate chapter\n* 9671 \n   * **Brain**: C700, C710-C719\n    * **CNS Other**: C701, C709, C720-C725, C728-C729\n    * **Intracranial Gland**: C751-C753\n\n**Note 3:** **Not applicable codes** \n* Codes 0, 2, and 4 are not applicable for this chapter.\n\n**Note 4:** **Definition of Plasma cell myeloma** \n* Plasma cell myeloma/multiple myeloma (9732) is a widely disseminated plasma cell neoplasm, characterized by a single clone of plasma cells derived from B cells that grows in the bone marrow. It is always coded to 7 for systemic involvement.\n\n**Note 5:** **Lymphoplasmacytic lymphoma** \n* Lymphoplasmacytic lymphoma (9671) and Waldenstrom Macroglobulinemia (9761) are now collected with the plasma cell disorders. \n* These are systemic diseases and should always be coded 7.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:ss2018_44993:i22",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Summary Stage 2018: Myeloma and Plasma Cell Disorders"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_44993.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729",
+        "C751-C753"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": [
+        "3"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Myeloma and Plasma Cell Disorders**\n\n**The preferred histology terms listed in this schema are from the 2024 WHO Classification of Tumours, Haematolymphoid Tumours, 5th edition.**\n\n* 9671: Lymphoplasmacytic lymphoma (LPL) *(EXCEPT C441, C690, C695-C696)*\n  * C700-C729, C751-C753 (2018-2022 only) (See Note 2)\n* 9731: Solitary plasmacytoma of bone (SPB)\n* 9732: Plasma Cell Myeloma (PCM)\n* 9734: Extramedullary plasmacytoma (EMP) *(EXCEPT C441, C690, C695-C696)*\n* 9761: Waldenstrom macroglobulinemia (WM)\n\n**Note 1:** **Sources used in the development of this chapter**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 82 *Plasma Cell Myeloma and Plasma Cell Disorder*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Histologies moved to Brain, CNS, Intracranial Gland** \n* For the histology listed below, this has moved to the Brain, CNS Other, and Intracranial Gland Summary Stage chapters starting with 2023 diagnoses. If you have one of these cases for 2018-2022, then this is the appropriate chapter. If you have one of these cases diagnosed on January 1, 2023, forward, see the appropriate chapter\n* 9671 \n   * **Brain**: C700, C710-C719\n    * **CNS Other**: C701, C709, C720-C725, C728-C729\n    * **Intracranial Gland**: C751-C753\n\n**Note 3:** **Not applicable codes** \n* Codes 0, 2, and 4 are not applicable for this chapter.\n\n**Note 4:** **Definition of Plasma cell myeloma** \n* Plasma cell myeloma/multiple myeloma (9732) is a widely disseminated plasma cell neoplasm, characterized by a single clone of plasma cells derived from B cells that grows in the bone marrow. It is always coded to 7 for systemic involvement.\n\n**Note 5:** **Lymphoplasmacytic lymphoma** \n* Lymphoplasmacytic lymphoma (9671) and Waldenstrom Macroglobulinemia (9761) are now collected with the plasma cell disorders. \n* These are systemic diseases and should always be coded 7.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:grade_clinical_18316:c23",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_18316.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C000-C699",
+        "C739-C750",
+        "C754-C809"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (1 codes)\n8: Not applicable",
+    "codes": {
+      "8": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:grade_clinical_18316:c24",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_18316.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729",
+        "C751-C753"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": [
+        "3"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (1 codes)\n8: Not applicable",
+    "codes": {
+      "8": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:grade_clinical_18316:i25",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_18316.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C000-C699",
+        "C739-C750",
+        "C754-C809"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:** Grade (cell indicator) is no longer applicable for this hematopoietic neoplasm.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:grade_clinical_18316:i26",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_18316.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729",
+        "C751-C753"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": [
+        "3"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:** Grade (cell indicator) is no longer applicable for this hematopoietic neoplasm.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:grade_pathological_73388:c27",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_73388.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C000-C699",
+        "C739-C750",
+        "C754-C809"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (1 codes)\n8: Not applicable",
+    "codes": {
+      "8": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:grade_pathological_73388:c28",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_73388.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729",
+        "C751-C753"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": [
+        "3"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (1 codes)\n8: Not applicable",
+    "codes": {
+      "8": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:grade_pathological_73388:i29",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_73388.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C000-C699",
+        "C739-C750",
+        "C754-C809"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:** Grade (cell indicator) is no longer applicable for this hematopoietic neoplasm.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:plasma_cell_myeloma:grade_pathological_73388:i30",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Plasma Cell Myeloma",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_73388.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C700-C729",
+        "C751-C753"
+      ],
+      "histologies": [
+        "9732"
+      ],
+      "behaviors": [
+        "3"
+      ],
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:** Grade (cell indicator) is no longer applicable for this hematopoietic neoplasm.",
+    "codes": null,
+    "notes": null
+  }
+]

@@ -1,0 +1,33 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:cns_other:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Other Parts of Central Nervous System",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/cns_other.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C701",
+        "C709",
+        "C720-C725",
+        "C728-C729"
+      ],
+      "histologies": [
+        "8000-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C701  Spinal meninges\nC709  Meninges, NOS\nC720  Spinal cord\nC721  Cauda equina\nC722  Olfactory nerve\nC723  Optic nerve\nC724  Acoustic nerve\nC725  Cranial nerve, NOS\nC728  Overlapping lesion of brain and central nervous system\nC729  Nervous system, NOS\n\n**Note 1:** TNM opted not to recommend a TNM scheme in 7th edition.\n\n**Note 2:** TNM is not defined for this schema. If directly assigning Summary Stage 2000 (SS2000), use the *Other Parts of Central Nervous System* chapter on page 274 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=274).",
+    "codes": null,
+    "notes": null
+  }
+]

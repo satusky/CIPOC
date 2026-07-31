@@ -1,0 +1,62 @@
+========================================================================
+SEER*RSA STAGING INGEST REVIEW REPORT
+========================================================================
+Schema: plasma_cell_disorders
+Source: https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/eod_public-3.3.zip
+Units emitted: 60  |  accepted: 60  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     28
+  instruction    32
+
+Accepted units by NAACCR item:
+     523 8
+     756 8
+     764 8
+     820 8
+     830 8
+    3843 8
+    3844 8
+
+Applicability predicates carried by this schema's units (4):
+  {'sites': ['C000-C440', 'C442-C689', 'C691-C694', 'C698-C699', 'C739-C750', 'C754-C809'], 'histologies': ['9671', '9734'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C000-C699', 'C739-C750', 'C754-C809'], 'histologies': ['9731', '9761'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C700-C729', 'C751-C753'], 'histologies': ['9731', '9734', '9761'], 'behaviors': ['3'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C700-C729', 'C751-C753'], 'histologies': ['9671'], 'behaviors': ['3'], 'dx_date_min': '2018-01-01', 'dx_date_max': '2022-12-31'}
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED CODE TABLES (up to 4 of 28)
+------------------------------------------------------------------------
+
+[seer_rsa_eod:plasma_cell_disorders:behavior:c5]  items=[523]  anchor=eod_public-3.3:tables/behavior.json
+  Plasma Cell Disorders > Behavior ICD-O-3
+0: Benign
+1: Uncertain Benign/Malig
+2: In Situ
+3: Malignant Primary
+
+[seer_rsa_eod:plasma_cell_disorders:tumor_size_summary_dna_13275:c16]  items=[756]  anchor=eod_public-3.3:tables/tumor_size_summary_dna_13275.json
+  Plasma Cell Disorders > Tumor Size Summary
+999: Not applicable
+
+[seer_rsa_eod:plasma_cell_disorders:nodes_exam_17543:c31]  items=[830]  anchor=eod_public-3.3:tables/nodes_exam_17543.json
+  Plasma Cell Disorders > Regional Nodes Examined
+00: No nodes examined
+01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)
+90: 90 or more nodes examined
+95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed
+96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated
+97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated
+98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented …
+99: Unknown if nodes are positive; not applicable Not documented in medical record Use for codes 9731 …
+
+[seer_rsa_eod:plasma_cell_disorders:grade_clinical_18316:c46]  items=[3843]  anchor=eod_public-3.3:tables/grade_clinical_18316.json
+  Plasma Cell Disorders > Grade Clinical
+8: Not applicable
+
+========================================================================

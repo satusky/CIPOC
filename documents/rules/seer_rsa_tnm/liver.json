@@ -1,0 +1,194 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:liver:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Liver",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/liver.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C220"
+      ],
+      "histologies": [
+        "8000-8157",
+        "8162-8175",
+        "8190-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C220 Liver\nC221 Intrahepatic bile duct \n\n**Note 1:** This schema is based on the UICC chapter *Liver-Hepatocellular Carcinoma* pages 110-113.\n* Primary site C221 with histologies 8170-8175 is not listed in this chapter of the UICC manual; however, it is included in this schema, but is not TNM staged\n\n**Note 2:** For primary site C220 and cholangiocarcinoma histologies (M-8160, 8161, and 8180), see the Bile DuctsIntraHepat schema.\n\n**Note 3:** Although the presence of cirrhosis is an important prognostic factor, it does not affect the TNM classification, being an independent prognostic variable.\n\n**Note 4:** In addition to directly assigning TNM, Summary Stage 2000 (SS2000) must be captured.  If directly assigning SS2000, use the *Liver and Intrahepatic Bile Ducts* chapter on page 108 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=108).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_tnm:liver:schema:i2",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Liver",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/liver.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C221"
+      ],
+      "histologies": [
+        "8170-8175"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C220 Liver\nC221 Intrahepatic bile duct \n\n**Note 1:** This schema is based on the UICC chapter *Liver-Hepatocellular Carcinoma* pages 110-113.\n* Primary site C221 with histologies 8170-8175 is not listed in this chapter of the UICC manual; however, it is included in this schema, but is not TNM staged\n\n**Note 2:** For primary site C220 and cholangiocarcinoma histologies (M-8160, 8161, and 8180), see the Bile DuctsIntraHepat schema.\n\n**Note 3:** Although the presence of cirrhosis is an important prognostic factor, it does not affect the TNM classification, being an independent prognostic variable.\n\n**Note 4:** In addition to directly assigning TNM, Summary Stage 2000 (SS2000) must be captured.  If directly assigning SS2000, use the *Liver and Intrahepatic Bile Ducts* chapter on page 108 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=108).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_tnm:liver:nodes_pos_fpa:c3",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Liver",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "tnm-2.1:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C220"
+      ],
+      "histologies": [
+        "8000-8157",
+        "8162-8175",
+        "8190-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative.\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in patient record",
+    "codes": {
+      "00": "All nodes examined negative.",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_tnm:liver:nodes_pos_fpa:c4",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Liver",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "tnm-2.1:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C221"
+      ],
+      "histologies": [
+        "8170-8175"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative.\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in patient record",
+    "codes": {
+      "00": "All nodes examined negative.",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_tnm:liver:nodes_pos_fpa:i5",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Liver",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "tnm-2.1:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C220"
+      ],
+      "histologies": [
+        "8000-8157",
+        "8162-8175",
+        "8190-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_tnm:liver:nodes_pos_fpa:i6",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Liver",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "tnm-2.1:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C221"
+      ],
+      "histologies": [
+        "8170-8175"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.",
+    "codes": null,
+    "notes": null
+  }
+]

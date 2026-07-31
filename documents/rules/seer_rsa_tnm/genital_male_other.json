@@ -1,0 +1,31 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:genital_male_other:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Other and Unspecified Male Genital Organs (excluding Scrotum, Kaposi Sarcoma and Lymphoma)",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/genital_male_other.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C630-C631",
+        "C637-C639"
+      ],
+      "histologies": [
+        "8000-9136",
+        "9141-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C630  Epididymis\nC631  Spermatic cord\nC637  Other specified parts of male genital organs\nC638  Overlapping lesion of male genital organs\nC639  Male genital organs, NOS\n\n**Note 1:**  Laterality must be coded for C630-C631.\n\n**Note 2:**  Melanoma, mycosis fungoides, or Sezary disease of all sites listed is coded using this schema. Kaposi sarcoma of all sites is included in the Kaposi sarcoma schema, and lymphomas of all sites are included in the lymphoma schema.\n\n**Note 3:** TNM is not defined for this schema. If directly assigning Summary Stage 2000 (SS2000), use the *Other and Unspecified Male Genital Organs* chapter on page 236 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=236).",
+    "codes": null,
+    "notes": null
+  }
+]

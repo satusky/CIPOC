@@ -1,0 +1,885 @@
+[
+  {
+    "rule_id": "seer_rsa_eod:fallopian_tube:schema:i1",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Fallopian Tube",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/fallopian_tube.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C570"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8806",
+        "8810",
+        "8815",
+        "8822",
+        "8825",
+        "8890",
+        "8930-8931",
+        "8933",
+        "8935-8936",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "8000-8700, 8720-8790, 8806, 8810, 8815, 8822, 8825, 8890, 8930-8931, 8933, 8935-8936, 8950, 8960, 8980, 9000, 9050, 9052, 9060, 9070-9071, 9073, 9080, 9085, 9090-9091, 9100, 9110-9111\n\nC570 Fallopian tube \n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 55 *Ovary, Fallopian Tube, and Primary Peritoneal Carcinoma*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other EOD Schemas with Fallopian tube sites**\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Soft Tissue Other**: 8710-8714, 8800-8805, 8811-8814, 8816-8818, 8820-8821, 8823-8824, 8826-8881, 8891-8905, 8910-8921, 8932, 8934, 8940-8941, 8951-8959, 8963-8976, 8981-8992, 9010-9016, 9020, 9030-9045, 9051, 9053-9055, 9061-9065, 9072, 9081-9084, 9086, 9101-9105, 9120-9133, 9135-9138, 9141-9175, 9180-9222, 9230-9231, 9240-9368, 9370-9582",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:fallopian_tube:behavior:c2",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Fallopian Tube",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "code_table",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C570"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8806",
+        "8810",
+        "8815",
+        "8822",
+        "8825",
+        "8890",
+        "8930-8931",
+        "8933",
+        "8935-8936",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Behavior ICD-O-3 (4 codes)\n0: Benign\n1: Uncertain Benign/Malig\n2: In Situ\n3: Malignant Primary",
+    "codes": {
+      "0": "Benign",
+      "1": "Uncertain Benign/Malig",
+      "2": "In Situ",
+      "3": "Malignant Primary"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:fallopian_tube:behavior:i3",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Fallopian Tube",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C570"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8806",
+        "8810",
+        "8815",
+        "8822",
+        "8825",
+        "8890",
+        "8930-8931",
+        "8933",
+        "8935-8936",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:fallopian_tube:tumor_size_summary_63115:c4",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Fallopian Tube",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_63115.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C570"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8806",
+        "8810",
+        "8815",
+        "8822",
+        "8825",
+        "8890",
+        "8930-8931",
+        "8933",
+        "8935-8936",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (6 codes)\n000: No mass/tumor found\n001: 1 mm or described as less than 1 mm\n002-988: Exact size in millimeters (2 mm to 988 mm)\n989: 989 millimeters or larger\n990: Microscopic focus or foci only and no size of focus is given\n999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable",
+    "codes": {
+      "000": "No mass/tumor found",
+      "001": "1 mm or described as less than 1 mm",
+      "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+      "989": "989 millimeters or larger",
+      "990": "Microscopic focus or foci only and no size of focus is given",
+      "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:fallopian_tube:tumor_size_summary_63115:i5",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Fallopian Tube",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_63115.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C570"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8806",
+        "8810",
+        "8815",
+        "8822",
+        "8825",
+        "8890",
+        "8930-8931",
+        "8933",
+        "8935-8936",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:fallopian_tube:nodes_pos_fpa:c6",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Fallopian Tube",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C570"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8806",
+        "8810",
+        "8815",
+        "8822",
+        "8825",
+        "8890",
+        "8930-8931",
+        "8933",
+        "8935-8936",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in medical record",
+    "codes": {
+      "00": "All nodes examined negative",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:fallopian_tube:nodes_pos_fpa:i7",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Fallopian Tube",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C570"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8806",
+        "8810",
+        "8815",
+        "8822",
+        "8825",
+        "8890",
+        "8930-8931",
+        "8933",
+        "8935-8936",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:fallopian_tube:nodes_exam_76029:c8",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Fallopian Tube",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C570"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8806",
+        "8810",
+        "8815",
+        "8822",
+        "8825",
+        "8890",
+        "8930-8931",
+        "8933",
+        "8935-8936",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (8 codes)\n00: No nodes examined\n01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)\n90: 90 or more nodes examined\n95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed\n96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated\n97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated\n98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown\n99: Unknown if nodes were examined; not applicable or negative Not documented in medical record",
+    "codes": {
+      "00": "No nodes examined",
+      "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+      "90": "90 or more nodes examined",
+      "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+      "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+      "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+      "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+      "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:fallopian_tube:nodes_exam_76029:i9",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Fallopian Tube",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C570"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8806",
+        "8810",
+        "8815",
+        "8822",
+        "8825",
+        "8890",
+        "8930-8931",
+        "8933",
+        "8935-8936",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:fallopian_tube:ss2018_fallopian_tube_83058:c10",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Fallopian Tube",
+      "Summary Stage 2018: Fallopian Tube"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_fallopian_tube_83058.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C570"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8806",
+        "8810",
+        "8815",
+        "8822",
+        "8825",
+        "8890",
+        "8930-8931",
+        "8933",
+        "8935-8936",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018: Fallopian Tube (7 codes)\n0: **In situ: noninvasive, intraepithelial** - Limited to tubal mucosa - Preinvasive - Serous tubal intraepithelial carcinoma (STIC)\n1: **Localized only (localized, NOS)** Limited to one or both fallopian tubes WITHOUT or UNKNOWN - Tumor on fallopian tube surface - Malignant cells in ascites or peritoneal washings Confined to fallopian tube, NOS Localized, NOS FIGO Stage I (IA, IB, INOS)\n2: **Regional by direct extension only** Limited to one or both fallopian tubes WITH - Tumor on fallopian tube surface - Malignant cells in ascites or peritoneal washings - Pelvic extension, NOS (below pelvic brim) Extension to and/or discontinuous metastasis to any of the following - Adnexa, NOS - Adjacent (pelvic) peritoneum - Bladder - Bladder serosa - Corpus uteri - Cul de sac (rectouterine pouch) - Ligament(s) (broad, ovarian, round, suspensory) - Mesosalpinx (Mesovarium) - Ovary(ies) - Parametrium - Pelvic wall - Rectosigmoid - Rectum - Sigmoid colon (including sigmoid mesentery) - Ureter (pelvic portion) - Uterus, NOS FIGO Stage IC2, IC3 FIGO Stage II (IIA, IIB, IINOS)\n3: **Regional lymph node(s) involved only** - Intrabdominal - Para-aortic, NOS …",
+    "codes": {
+      "0": "**In situ: noninvasive, intraepithelial** \n- Limited to tubal mucosa\n- Preinvasive\n- Serous tubal intraepithelial carcinoma (STIC)",
+      "1": "**Localized only (localized, NOS)**\n\nLimited to one or both fallopian tubes WITHOUT or UNKNOWN\n- Tumor on fallopian tube surface\n - Malignant cells in ascites or peritoneal washings \n\nConfined to fallopian tube, NOS\nLocalized, NOS\n\nFIGO Stage I (IA, IB, INOS)",
+      "2": "**Regional by direct extension only**\n\nLimited to one or both fallopian tubes WITH\n- Tumor on fallopian tube surface\n- Malignant cells in ascites or peritoneal washings \n- Pelvic extension, NOS (below pelvic brim)\n\nExtension to and/or discontinuous metastasis to any of the following\n- Adnexa, NOS\n- Adjacent (pelvic) peritoneum\n- Bladder\n- Bladder serosa \n- Corpus uteri\n- Cul de sac (rectouterine pouch)\n- Ligament(s) (broad, ovarian, round, suspensory)\n- Mesosalpinx (Mesovarium)\n- Ovary(ies)\n- Parametrium\n- Pelvic wall\n- Rectosigmoid\n- Rectum\n- Sigmoid colon (including sigmoid mesentery)\n- Ureter (pelvic portion)\n- Uterus, NOS\n\nFIGO Stage IC2, IC3\nFIGO Stage II (IIA, IIB, IINOS)",
+      "3": "**Regional lymph node(s) involved only**\n- Intrabdominal \n- Para-aortic, NOS\n  + Aortic\n  + Lateral aortic/lateral lumbar\n  + Periaortic\n- Pelvic, NOS\n  + Iliac, NOS\n     + Common\n     + External\n     + Internal (hypogastric) (obturator)\n   + Paracervical\n   + Parametrial\n   + Sacral, NOS\n      + Lateral (laterosacral)\n      + Middle (promontorial) (Gerota's node)\n      + Presacral\n      + Uterosacral\n- Retroperitoneal, NOS\n- Regional lymph node(s), NOS\n  + Lymph node(s), NOS\n\nFIGO Stage IIIA1 (IIIA1i, IIIA1ii, IIIA1 NOS)\n* Localized tumor WITH regional lymph node involvement",
+      "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+      "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n  * Abdominal mesentery\n  * Diaphragm\n  * Gallbladder\n  * Intestine, large (except rectum, rectosigmoid and sigmoid colon, see code 2)\n  * Kidneys\n  * Liver (capsular or parenchymal involvement)\n  * Omentum (infracolic, NOS)\n  * Pancreas\n  * Pericolic gutter\n  * Peritoneum, NOS\n  * Peritoneal implants beyond pelvis\n  * Pleural effusion with positive cytology\n  * Small intestine\n  * Spleen (capsular or parenchymal involvement)\n  * Stomach\n  * Ureters (outside pelvis)\n- Distant lymph node(s), NOS\n  + Inguinal, NOS\n     + Inguinofemoral (groin)\n     + Node of Cloquet or Rosenmuller (highest deep inguinal)\n     + Superficial inguinal (femoral)\n- Distant metastasis, NOS\n  * Carcinomatosis (involvement of multiple parenchymal organs)\n    + WITH or WITHOUT distant lymph node(s) OR pleural effusion\n  * Distant metastasis WITH or WITHOUT distant lymph node(s)\n\nFIGO Stage III (IIIA, IIIA2, IIIB, IIIC, III NOS)\nFIGO Stage IV (IVA, IVB, IV NOS)",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:fallopian_tube:ss2018_fallopian_tube_83058:i11",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Fallopian Tube",
+      "Summary Stage 2018: Fallopian Tube"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_fallopian_tube_83058.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C570"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8806",
+        "8810",
+        "8815",
+        "8822",
+        "8825",
+        "8890",
+        "8930-8931",
+        "8933",
+        "8935-8936",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Fallopian Tube**\n\n8000-8700, 8720-8790, 8806, 8810, 8815, 8822, 8825, 8890, 8930-8931, 8933, 8935-8936, 8950, 8960, 8980, 9000, 9050, 9052, 9060, 9070-9071, 9073, 9080, 9085, 9090-9091, 9100, 9110\n\nC570\nC570 Fallopian tube \n\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 55 *Ovary, Fallopian Tube, and Primary Peritoneal Carcinoma*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Other EOD Schemas with Fallopian tube sites**\n* **Kaposi Sarcoma**: 9140\n* **Mycosis Fungoides**: 9700-9701\n* **Soft Tissue**: 8710-8714, 8800-8805, 8811-8814, 8816-8818, 8820-8821, 8823-8824, 8826-8881, 8891-8905, 8910-8921, 8932, 8934, 8940-8941, 8951-8959, 8963-8976, 8981-8992, 9010-9016, 9020, 9030-9045, 9051, 9053-9055, 9061-9065, 9072, 9081-9084, 9086, 9101-9105, 9120-9133, 9135-9138, 9141-9175, 9180-9222, 9230-9231, 9240-9368, 9370-9582\n\n**Note 3:** **Ascites, NOS**\n*  Ascites, NOS should be excluded as a staging element. \n\n**Note 4:** **Isolated tumor cells**\n* Isolated tumor cells (ITCs) are defined as single tumor cells or small clusters not greater than 0.2 mm, usually detected by immunohistochemical (IHC) or molecular methods. ITCs do not usually show evidence of malignant activity (e.g., proliferation or stromal reaction). \n* Lymph nodes with ITCs only are **not** counted as positive nodes for Summary Stage\n\n**Note 5:** **Peritoneal implants, NOS** \n* Peritoneal implants outside the pelvis must be microscopically confirmed. Peritoneal implants may also be called seeding, salting, talcum powder appearance, or studding.\n\n**Note 6:** **Pelvic or abdominal implants** \n* If implants are mentioned, determine whether they are in the pelvis or in the abdomen and code appropriately to regional by direct extension or to distant. If not stated, code to distant.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:fallopian_tube:grade_clinical_69174:c12",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Fallopian Tube",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_69174.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C570"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8806",
+        "8810",
+        "8815",
+        "8822",
+        "8825",
+        "8890",
+        "8930-8931",
+        "8933",
+        "8935-8936",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (7 codes)\n1: G1: Well differentiated\n2: G2: Moderately differentiated\n3: G3: Poorly differentiated, undifferentiated\nB: GB: Borderline Tumor\nL: Low grade\nH: High grade\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Well differentiated",
+      "2": "G2: Moderately differentiated",
+      "3": "G3: Poorly differentiated, undifferentiated",
+      "B": "GB: Borderline Tumor",
+      "L": "Low grade",
+      "H": "High grade",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:fallopian_tube:grade_clinical_69174:i13",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Fallopian Tube",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_69174.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C570"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8806",
+        "8810",
+        "8815",
+        "8822",
+        "8825",
+        "8890",
+        "8930-8931",
+        "8933",
+        "8935-8936",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Clinical must not be blank.\n\n**Note 2:** Assign the highest grade from the primary tumor assessed during the clinical time frame. \n\n**Note 3:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 4:** The grading system for this Staging System is based on histology\n* Immature teratomas and serous carcinomas: Use codes L,  H,  or 9. This include the following ICD-O-3 codes: 8441/2, 8441/3, 8460/3, 8461/3, 8474/3, 9080/3\n* All other histologies: Code 1-3 if a nuclear grade is documented, otherwise code 9\n* If your registry collects ovarian borderline tumors (/1), code “B” for grade\n\n**Note 5:** G3 includes anaplastic.\n\n**Note 6:** Code 9 (unknown) when \n* Grade from primary site is not documented\n* Clinical work is not done (for example, cancer is an incidental finding during surgery for another condition)\n* Grade checked \"not applicable\" on CAP Protocol (if available) and no other grade information is available\n\n**Note 7:** If there is only one grade available and it cannot be determined if it is clinical or pathological, assume it is a Grade Clinical and code appropriately per Grade Clinical categories for that site, and then code unknown (9) for Grade Pathological, and blank for Grade Post Therapy Clin (yc) and Grade Post Therapy Path (yp).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:fallopian_tube:grade_pathological_42127:c14",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Fallopian Tube",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_42127.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C570"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8806",
+        "8810",
+        "8815",
+        "8822",
+        "8825",
+        "8890",
+        "8930-8931",
+        "8933",
+        "8935-8936",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (7 codes)\n1: G1: Well differentiated\n2: G2: Moderately differentiated\n3: G3: Poorly differentiated, undifferentiated\nB: GB: Borderline Tumor\nL: Low grade\nH: High grade\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Well differentiated",
+      "2": "G2: Moderately differentiated",
+      "3": "G3: Poorly differentiated, undifferentiated",
+      "B": "GB: Borderline Tumor",
+      "L": "Low grade",
+      "H": "High grade",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:fallopian_tube:grade_pathological_42127:i15",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Fallopian Tube",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_42127.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C570"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8806",
+        "8810",
+        "8815",
+        "8822",
+        "8825",
+        "8890",
+        "8930-8931",
+        "8933",
+        "8935-8936",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Pathological must not be blank.\n\n**Note 2:** There is a preferred grading system for this schema. If the clinical grade given uses the preferred grading system and the pathological grade does not use the preferred grading system, do not record the Grade Clinical in the Grade Pathological field. \n* *Example:* Ovarian biopsy reports states moderately differentiated adenocarcinoma.  The surgical resection states a high grade adenocarcinoma. Assign Grade Pathological using the H code \n   - Code Grade Clinical as 2 since Moderately differentiated (G2) is the preferred grading system\n   - Code Grade Pathological as H since the preferred grading system was not used and there is a code available for “high grade” only\n\n**Note 3:** Assign the highest grade from the primary tumor.  \n\n**Note 4:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 5:** The grading system for this Staging System is based on histology\n* Immature teratomas and serous carcinomas: Use codes L,  H,  or 9. This include the following ICD-O-3 codes: 8441/2, 8441/3, 8460/3, 8461/3, 8474/3, 9080/3\n* All other histologies: Code 1-3 if a nuclear grade is documented, otherwise code 9\n* If your registry collects ovarian borderline tumors (/1), code “B” for grade\n\n**Note 6:** G3 includes anaplastic.\n\n**Note 7:** Use the grade from the **clinical work up** from the primary tumor in different scenarios based on behavior or surgical resection\n* **Behavior**\n  - Tumor behavior for the clinical and the pathological diagnoses are the same AND the clinical grade is the highest grade \n   - Tumor behavior for clinical diagnosis is invasive, and the tumor behavior for the pathological diagnosis is in situ\n* **Surgical Resection**\n   - Surgical resection is done of the primary tumor and there is no grade documented from the surgical resection\n    - Surgical resection is done of the primary tumor and there is no residual cancer\n* **No surgical resection**\n    - Surgical resection of the primary tumor has not been done, but there is positive microscopic confirmation of distant metastases during the clinical time frame\n\n**Note 8:** Code 9 (unknown) when \n* Grade from primary site is not documented\n* No resection of the primary site (see exception in Note 7, Surgical resection, last bullet)\n* Neo-adjuvant therapy is followed by a resection (see Grade Post Therapy Path (yp))\n* Grade checked “not applicable” on CAP Protocol (if available) and no other grade information is available\n* Clinical case only (see Grade Clinical)\n* There is only one grade available and it cannot be determined if it is clinical, pathological, post therapy clinical or post therapy pathological",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:fallopian_tube:figo_stage_30513:i17",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Fallopian Tube",
+      "FIGO Stage  Ovary, Fallopian Tube, and Primary Peritoneal Carcinoma"
+    ],
+    "anchor": "eod_public-3.3:tables/figo_stage_30513.json",
+    "kind": "instruction",
+    "item_ids": [
+      3836
+    ],
+    "applies_to": {
+      "sites": [
+        "C570"
+      ],
+      "histologies": [
+        "8000-8700",
+        "8720-8790",
+        "8806",
+        "8810",
+        "8815",
+        "8822",
+        "8825",
+        "8890",
+        "8930-8931",
+        "8933",
+        "8935-8936",
+        "8950",
+        "8960",
+        "8980",
+        "9000",
+        "9050",
+        "9052",
+        "9060",
+        "9070-9071",
+        "9073",
+        "9080",
+        "9085",
+        "9090-9091",
+        "9100",
+        "9110-9111"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** **Physician Statement**\n* There must be a statement about FIGO stage from the managing physician in order to code this data item.\n  * Do not code FIGO stage based on the pathology report\n  * Do not code FIGO stage based only on T, N, M\n  * If \"FIGO\" is not included with a stated stage, then do not assume it is a FIGO stage\n\n**Note 2:** **FIGO Stage vs FIGO Grade** \n* FIGO stage is not the same thing as FIGO grade. Only code FIGO stage in this field, do not code FIGO grade.\n* Code FIGO grade in the grade fields\n\n**Note 3:** **Multiple FIGO stages**\n* If there is more than one FIGO stage provided from the clinical and pathological work up, code the most extensive FIGO stage.\n\n**Note 4:** **HGSC, STIC, LGSC, and SIC (8441/2)** \n* For High-grade serous carcinoma **(HGSC)** (8441/2) or serous tubal intraepithelial carcinoma **(STIC)** (8441/2), assign the FIGO stage based on the managing physician's documentation of FIGO. (See Note 1).  \n* If FIGO stage for HGSC or STIC is not documented by the managing physician, code unknown (code 99)\n  * Do not code 97 (in situ) for HGSC or STIC since FIGO does not have a Stage 0\n* If diagnosis is low grade serous intraepithelial carcinoma **(LGSC)** (8441/2) or serous intraepithelial carcinoma **(SIC)** (no grade stated) (8441/2), code 97\n\n**Note 5:** **Remaining in situ histologies**\n* Code 97 for any remaining in situ histologies (/2) since the FIGO stage definitions do not include Stage 0.",
+    "codes": null,
+    "notes": null
+  }
+]

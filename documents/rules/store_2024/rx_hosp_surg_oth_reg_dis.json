@@ -1,36 +1,5 @@
 [
   {
-    "rule_id": "store_2024:rx_hosp_surg_oth_reg_dis:surgical_procedureother_site_at:t1",
-    "source_doc": "store_2024",
-    "section_path": [
-      "Surgical Procedure/Other Site at this Facility"
-    ],
-    "anchor": "L8138-L8143:surgical-procedureother-site-at-this-facility",
-    "kind": "code_table",
-    "item_ids": [
-      674
-    ],
-    "applies_to": {
-      "sites": null,
-      "histologies": null,
-      "behaviors": null,
-      "sex": null,
-      "dx_date_min": "1997-01-01",
-      "dx_date_max": null
-    },
-    "text": "| 674 | 1 | 0-5, 9 |  |  |",
-    "codes": {
-      "0": "0",
-      "1": "1",
-      "2": "2",
-      "3": "3",
-      "4": "4",
-      "5": "5",
-      "9": "9"
-    },
-    "notes": null
-  },
-  {
     "rule_id": "store_2024:rx_hosp_surg_oth_reg_dis:description:d1",
     "source_doc": "store_2024",
     "section_path": [

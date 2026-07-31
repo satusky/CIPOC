@@ -1,0 +1,470 @@
+[
+  {
+    "rule_id": "seer_rsa_eod:melanoma_iris:schema:i1",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Malignant Melanoma of Iris (excluding Ciliary Body)",
+      "Schema notes"
+    ],
+    "anchor": "eod_public-3.3:schemas/melanoma_iris.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C694"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "8720-8790\n\nC694 Iris [excluding ciliary body] \n\t\n**Note 1:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 67 *Uveal Melanoma*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.\n\n**Note 2:** **Schema Discriminator** \n* Schema Discriminator 1: Melanoma Ciliary Body/Melanoma Iris* is used to discriminate between Melanoma Ciliary Body and Melanoma Iris which are coded to ICD-O-3 code C694.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:melanoma_iris:behavior:c2",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Malignant Melanoma of Iris (excluding Ciliary Body)",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "code_table",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C694"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Behavior ICD-O-3 (4 codes)\n0: Benign\n1: Uncertain Benign/Malig\n2: In Situ\n3: Malignant Primary",
+    "codes": {
+      "0": "Benign",
+      "1": "Uncertain Benign/Malig",
+      "2": "In Situ",
+      "3": "Malignant Primary"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:melanoma_iris:behavior:i3",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Malignant Melanoma of Iris (excluding Ciliary Body)",
+      "Behavior ICD-O-3"
+    ],
+    "anchor": "eod_public-3.3:tables/behavior.json",
+    "kind": "instruction",
+    "item_ids": [
+      523
+    ],
+    "applies_to": {
+      "sites": [
+        "C694"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:melanoma_iris:tumor_size_summary_dna_13275:c4",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Malignant Melanoma of Iris (excluding Ciliary Body)",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_dna_13275.json",
+    "kind": "code_table",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C694"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Tumor Size Summary (1 codes)\n999: Not applicable",
+    "codes": {
+      "999": "Not applicable"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:melanoma_iris:tumor_size_summary_dna_13275:i5",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Malignant Melanoma of Iris (excluding Ciliary Body)",
+      "Tumor Size Summary"
+    ],
+    "anchor": "eod_public-3.3:tables/tumor_size_summary_dna_13275.json",
+    "kind": "instruction",
+    "item_ids": [
+      756
+    ],
+    "applies_to": {
+      "sites": [
+        "C694"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:melanoma_iris:nodes_pos_fpa:c6",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Malignant Melanoma of Iris (excluding Ciliary Body)",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "code_table",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C694"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Positive (7 codes)\n00: All nodes examined negative\n01-89: 1 - 89 nodes positive (code exact number of nodes positive)\n90: 90 or more nodes positive\n95: Positive aspiration or core biopsy of lymph node(s)\n97: Positive nodes - number unspecified\n98: No nodes examined\n99: Unknown if nodes are positive; not applicable Not documented in medical record",
+    "codes": {
+      "00": "All nodes examined negative",
+      "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+      "90": "90 or more nodes positive",
+      "95": "Positive aspiration or core biopsy of lymph node(s)",
+      "97": "Positive nodes - number unspecified",
+      "98": "No nodes examined",
+      "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:melanoma_iris:nodes_pos_fpa:i7",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Malignant Melanoma of Iris (excluding Ciliary Body)",
+      "Regional Nodes Positive"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_pos_fpa.json",
+    "kind": "instruction",
+    "item_ids": [
+      820
+    ],
+    "applies_to": {
+      "sites": [
+        "C694"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:melanoma_iris:nodes_exam_76029:c8",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Malignant Melanoma of Iris (excluding Ciliary Body)",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "code_table",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C694"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Regional Nodes Examined (8 codes)\n00: No nodes examined\n01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)\n90: 90 or more nodes examined\n95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed\n96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated\n97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated\n98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown\n99: Unknown if nodes were examined; not applicable or negative Not documented in medical record",
+    "codes": {
+      "00": "No nodes examined",
+      "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+      "90": "90 or more nodes examined",
+      "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+      "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+      "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+      "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+      "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:melanoma_iris:nodes_exam_76029:i9",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Malignant Melanoma of Iris (excluding Ciliary Body)",
+      "Regional Nodes Examined"
+    ],
+    "anchor": "eod_public-3.3:tables/nodes_exam_76029.json",
+    "kind": "instruction",
+    "item_ids": [
+      830
+    ],
+    "applies_to": {
+      "sites": [
+        "C694"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note:**  Record this field even if there has been preoperative treatment.\n\nSee the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:melanoma_iris:ss2018_melanoma_choroid_ciliary_body_iris_21929:c10",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Malignant Melanoma of Iris (excluding Ciliary Body)",
+      "Summary Stage 2018: Melanoma Uvea"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_melanoma_choroid_ciliary_body_iris_21929.json",
+    "kind": "code_table",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C694"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Summary Stage 2018: Melanoma Uvea (7 codes)\n0: **In situ: noninvasive, intraepithelial**\n1: **Localized only (localized, NOS)** - Choroid and Ciliary Body + Any tumor size category WITH or WITHOUT ciliary body involvement * WITHOUT or UNKNOWN extraocular extension + Limited to choroid or ciliary body, NOS - Iris + Tumor confluent with or extending into ciliary body, choroid or both * WITH or WITHOUT secondary glaucoma unknown * WITH scleral extension + Limited to iris, NOS\n2: **Regional by direct extension only** - All sites + Local invasion, NOS - Choroid and Ciliary Body + Extraocular extension - Iris + Extrascleral extension Further contiguous extension\n3: **Regional lymph node(s) involved only** - Discrete tumor deposits in orbit not contiguous to the eye + WITH or WITHOUT positive regional lymph node(s) - Cervical, NOS - Mandibular, NOS + Submandibular (submaxillary) - Parotid, NOS + Infra-auricular + Preauricular - Regional lymph node(s), NOS + Lymph node(s), NOS\n4: **Regional by BOTH direct extension AND regional lymph node(s) involved** - Codes (2) + (3)\n7: **Distant site(s)/lymph node(s) involved** - Distant site(s) - Distant lymph node(s), NOS - Distant metastasis, NOS + …",
+    "codes": {
+      "0": "**In situ: noninvasive, intraepithelial**",
+      "1": "**Localized only (localized, NOS)**\n- Choroid and Ciliary Body\n  + Any tumor size category WITH or WITHOUT ciliary body involvement\n     * WITHOUT or UNKNOWN extraocular extension\n  + Limited to choroid or ciliary body, NOS\n- Iris\n  + Tumor confluent with or extending into ciliary body, choroid or both\n     * WITH or WITHOUT secondary glaucoma unknown\n     * WITH scleral extension\n  + Limited to iris, NOS",
+      "2": "**Regional by direct extension only**\n- All sites\n  + Local invasion, NOS\n- Choroid and Ciliary Body\n  + Extraocular extension \n- Iris\n  + Extrascleral extension\n\nFurther contiguous extension",
+      "3": "**Regional lymph node(s) involved only**\n- Discrete tumor deposits in orbit not contiguous to the eye\n  + WITH or WITHOUT positive regional lymph node(s)\n- Cervical, NOS\n- Mandibular, NOS\n   + Submandibular (submaxillary)\n- Parotid, NOS\n  + Infra-auricular\n  + Preauricular \n- Regional lymph node(s), NOS\n   + Lymph node(s), NOS",
+      "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+      "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) \n- Distant lymph node(s), NOS\n- Distant metastasis, NOS\n  + Carcinomatosis \n  + Distant metastasis WITH or WITHOUT distant lymph node(s)",
+      "9": "Unknown if extension or metastasis"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:melanoma_iris:ss2018_melanoma_choroid_ciliary_body_iris_21929:i11",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Malignant Melanoma of Iris (excluding Ciliary Body)",
+      "Summary Stage 2018: Melanoma Uvea"
+    ],
+    "anchor": "eod_public-3.3:tables/ss2018_melanoma_choroid_ciliary_body_iris_21929.json",
+    "kind": "instruction",
+    "item_ids": [
+      764
+    ],
+    "applies_to": {
+      "sites": [
+        "C694"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Melanoma Uvea**\n\n8720-8790\n\nC693-C694\nC693 Choroid \nC694 Ciliary Body, Iris\n\t\n**Note:** **Sources used in the development of this schema**\n* SEER Extent of Disease 1988: Codes and Coding Instructions (3rd Edition, 1998) (https://seer.cancer.gov/archive/manuals/EOD10Dig.3rd.pdf)\n* SEER Summary Staging Manual-2000: Codes and Coding Instructions (https://seer.cancer.gov/tools/ssm/ssm2000/)\n* Collaborative Stage Data Collection System, version 02.05:  https://cancerstaging.org/cstage/Pages/default.aspx \n* Chapter 67 *Uveal Melanoma*, in the AJCC Cancer Staging Manual, Eighth Edition (2017) published by Springer International Publishing. Used with permission of the American College of Surgeons, Chicago, Illinois.",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:melanoma_iris:grade_clinical_54911:c12",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Malignant Melanoma of Iris (excluding Ciliary Body)",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_54911.json",
+    "kind": "code_table",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C694"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Clinical (8 codes)\n1: G1: Spindle cell melanoma (>90% spindle cells)\n2: G2: Mixed cell melanoma (>10% epithelioid cells and <90% spindle cells)\n3: G3: Epithelioid cell melanoma (>90% epithelioid cells)\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Spindle cell melanoma (>90% spindle cells)",
+      "2": "G2: Mixed cell melanoma (>10% epithelioid cells and <90% spindle cells)",
+      "3": "G3: Epithelioid cell melanoma (>90% epithelioid cells)",
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:melanoma_iris:grade_clinical_54911:i13",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Malignant Melanoma of Iris (excluding Ciliary Body)",
+      "Grade Clinical"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_clinical_54911.json",
+    "kind": "instruction",
+    "item_ids": [
+      3843
+    ],
+    "applies_to": {
+      "sites": [
+        "C694"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Clinical must not be blank.\n\n**Note 2:** Assign the highest grade from the primary tumor assessed during the clinical time frame. \n\n**Note 3:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 4:** Codes 1-3 take priority over A-D. \n\n**Note 5:** For this grading system, the CAP Checklist refers to this as “histologic type,” instead of grade. \n\n**Note 6:** Code 9 (unknown) when \n* Grade from primary site is not documented\n* Clinical workup is not done (for example, cancer is an incidental finding during surgery for another condition)\n* Grade checked \"not applicable\" on CAP Protocol (if available) and no other grade information is available\n\n**Note 7:** If there is only one grade available and it cannot be determined if it is clinical or pathological, assume it is a Grade Clinical and code appropriately per Grade Clinical categories for that site, and then code unknown (9) for Grade Pathological, and blank for Grade Post Therapy Clin (yc) and Grade Post Therapy Path (yp).",
+    "codes": null,
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:melanoma_iris:grade_pathological_46618:c14",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Malignant Melanoma of Iris (excluding Ciliary Body)",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_46618.json",
+    "kind": "code_table",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C694"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "Grade Pathological (8 codes)\n1: G1: Spindle cell melanoma (>90% spindle cells)\n2: G2: Mixed cell melanoma (>10% epithelioid cells and <90% spindle cells)\n3: G3: Epithelioid cell melanoma (>90% epithelioid cells)\nA: Well differentiated\nB: Moderately differentiated\nC: Poorly differentiated\nD: Undifferentiated, anaplastic\n9: Grade cannot be assessed (GX); Unknown",
+    "codes": {
+      "1": "G1: Spindle cell melanoma (>90% spindle cells)",
+      "2": "G2: Mixed cell melanoma (>10% epithelioid cells and <90% spindle cells)",
+      "3": "G3: Epithelioid cell melanoma (>90% epithelioid cells)",
+      "A": "Well differentiated",
+      "B": "Moderately differentiated",
+      "C": "Poorly differentiated",
+      "D": "Undifferentiated, anaplastic",
+      "9": "Grade cannot be assessed (GX); Unknown"
+    },
+    "notes": null
+  },
+  {
+    "rule_id": "seer_rsa_eod:melanoma_iris:grade_pathological_46618:i15",
+    "source_doc": "seer_rsa_eod",
+    "section_path": [
+      "Malignant Melanoma of Iris (excluding Ciliary Body)",
+      "Grade Pathological"
+    ],
+    "anchor": "eod_public-3.3:tables/grade_pathological_46618.json",
+    "kind": "instruction",
+    "item_ids": [
+      3844
+    ],
+    "applies_to": {
+      "sites": [
+        "C694"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2018-01-01",
+      "dx_date_max": null
+    },
+    "text": "**Note 1:** Grade Pathological must not be blank.\n\n**Note 2:** There is a preferred grading system for this schema. If the clinical grade given uses the preferred grading system and the pathological grade does not use the preferred grading system, do not record the Grade Clinical in the Grade Pathological field. Assign Grade Pathological using the applicable generic grade codes (A-D).\n* *Example: *: Biopsy of iris shows a mixed cell melanoma, G2. The surgical resection states a moderately differentiated melanoma.\n    - Code Grade Clinical as 2 since G2 is documented and this is the preferred grading system\n    - Code Grade Pathological as B (moderately differentiated), per the Coding Guidelines for Generic Grade Categories\n\n**Note 3:** Assign the highest grade from the primary tumor.  \n\n**Note 4:** If there are multiple tumors with different grades abstracted as one primary, code the highest grade.\n\n**Note 5:** Codes 1-3 take priority over A-D. \n\n**Note 6:** For this grading system, the CAP Checklist refers to this as \"histologic type,\" instead of grade. \n\n**Note 7:** Use the grade from the **clinical work up** from the primary tumor in different scenarios based on behavior or surgical resection\n* **Behavior**\n  - Tumor behavior for the clinical and the pathological diagnoses are the same AND the clinical grade is the highest grade \n   - Tumor behavior for clinical diagnosis is invasive, and the tumor behavior for the pathological diagnosis is in situ\n* **Surgical Resection**\n   - Surgical resection is done of the primary tumor and there is no grade documented from the surgical resection\n    - Surgical resection is done of the primary tumor and there is no residual cancer\n* **No surgical resection**\n    - Surgical resection of the primary tumor has not been done, but there is positive microscopic confirmation of distant metastases during the clinical time frame\n\n**Note 8:** Code 9 (unknown) when \n* Grade from primary site is not documented\n* No resection of the primary site (see exception in Note 7, Surgical resection, last bullet)\n* Neo-adjuvant therapy is followed by a resection (see Grade Post Therapy Path (yp))\n* Grade checked “not applicable” on CAP Protocol (if available) and no other grade information is available\n* Clinical case only (see Grade Clinical)\n* There is only one grade available, and it cannot be determined if it is clinical, pathological, post therapy clinical or post therapy pathological",
+    "codes": null,
+    "notes": null
+  }
+]

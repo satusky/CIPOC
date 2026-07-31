@@ -1,0 +1,31 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:melanoma_eye_other:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Malignant Melanoma of Other Eye (excluding Conjunctiva, Choroid, Ciliary Body, and Iris)",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/melanoma_eye_other.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C691",
+        "C692",
+        "C695",
+        "C698-C699"
+      ],
+      "histologies": [
+        "8720-8790"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C691  Cornea\nC692  Retina\nC695  Lacrimal gland\nC698  Overlapping lesion of eye and adnexa\nC699  Eye, NOS\n\n**Note 1:**  Laterality must be coded for this site.\n\n**Note 2:** This schema includes only melanomas of the sites listed above.\n\n**Note 3:** TNM is not defined for this schema. If directly assigning Summary Stage 2000 (SS2000), use the *Melanoma of the Cornea, Retina, Choroid, Ciliary Body, Eyeball, and Overlapping and Other Eye* chapter on page 262 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=262).",
+    "codes": null,
+    "notes": null
+  }
+]

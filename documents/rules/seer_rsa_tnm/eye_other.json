@@ -1,0 +1,33 @@
+[
+  {
+    "rule_id": "seer_rsa_tnm:eye_other:schema:i1",
+    "source_doc": "seer_rsa_tnm",
+    "section_path": [
+      "Cornea, Retina, Choroid, Ciliary Body, Iris, Overlapping Lesion of Eye, and Other Eye (excluding Melanoma and Retinoblastoma)",
+      "Schema notes"
+    ],
+    "anchor": "tnm-2.1:schemas/eye_other.json",
+    "kind": "instruction",
+    "item_ids": [],
+    "applies_to": {
+      "sites": [
+        "C691-C694",
+        "C698-C699"
+      ],
+      "histologies": [
+        "8000-8713",
+        "8800-9136",
+        "9141-9508",
+        "9520-9582",
+        "9700-9701"
+      ],
+      "behaviors": null,
+      "sex": null,
+      "dx_date_min": "2016-01-01",
+      "dx_date_max": null
+    },
+    "text": "C691  Cornea, NOS\nC692  Retina\nC693  Choroid\nC694  Ciliary body\nC698  Overlapping lesion of eye and adnexa\nC699  Eye, NOS\n\n**Note 1:**  Laterality must be coded for this site.\n\n**Note 2:** Melanomas and retinoblastomas are not included in this schema.\n\n**Note 3:** TNM is not defined for this schema. If directly assigning Summary Stage 2000 (SS2000), use the *Cornea, Retina, Choroid, Ciliary Body* chapter on page 260 of the [SS2000 on-line manual](https://seer.cancer.gov/tools/ssm/ssm2000/SSSM2000-122012.pdf#page=260).",
+    "codes": null,
+    "notes": null
+  }
+]

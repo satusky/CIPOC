@@ -1,0 +1,80 @@
+========================================================================
+SEER*RSA STAGING INGEST REVIEW REPORT
+========================================================================
+Schema: soft_tissue_head_neck
+Source: https://github.com/imsweb/staging-client-java/releases/download/v11.9.4/eod_public-3.3.zip
+Units emitted: 120  |  accepted: 120  |  quarantined: 0
+
+Accepted units by kind:
+  code_table     56
+  instruction    64
+
+Accepted units by NAACCR item:
+     523 16
+     756 16
+     764 16
+     820 16
+     830 16
+    3843 16
+    3844 16
+
+Applicability predicates carried by this schema's units (8):
+  {'sites': ['C000-C002', 'C006'], 'histologies': ['8710-8714', '8800-8803', '8810-8905', '8912', '8921', '8932-8934', '8941-8981', '8983-8990', '9000-9016', '9030-9043', '9045-9111', '9121-9138', '9141-9230', '9240-9580', '9582'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C003-C005', 'C008-C009', 'C020-C023', 'C028-C050', 'C058-C069'], 'histologies': ['8710-8714', '8800-8803', '8810-8905', '8912', '8921', '8932-8934', '8940-8981', '8983-8990', '9000-9016', '9030-9043', '9045-9111', '9121-9138', '9141-9230', '9240-9580', '9582'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C019', 'C024', 'C051-C052', 'C090-C148', 'C150', 'C153', 'C158', 'C301', 'C312-C329', 'C739', 'C750', 'C754-C759'], 'histologies': ['8710-8714', '8800-8803', '8810-8905', '8912', '8921', '8932-8934', '8940-8990', '9000-9016', '9030-9043', '9045-9111', '9121-9138', '9141-9230', '9240-9580', '9582'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C079-C089'], 'histologies': ['8710-8714', '8800-8803', '8810-8905', '8912', '8921', '8932-8934', '8940', '8950-8973', '8975-8976', '8981', '8983-8990', '9000-9016', '9030-9043', '9045-9111', '9121-9138', '9141-9230', '9240-9580', '9582'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C300', 'C310-C311'], 'histologies': ['8710-8714', '8800-8803', '8810-8905', '8912', '8921', '8932-8934', '8940', '8950-8981', '8983-8990', '9000-9016', '9030-9043', '9045-9111', '9121-9138', '9141-9230', '9240-9580', '9582'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C470', 'C490'], 'histologies': ['8000-8803', '8810-8905', '8912', '8921', '8932-8934', '8940-8990', '9000-9016', '9030-9043', '9045-9111', '9121-9138', '9141-9230', '9240-9580', '9582'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C722', 'C724-C725', 'C751-C753'], 'histologies': ['8711', '8800-8802', '8810-8811', '8815', '8825', '8832-8833', '8840', '8850', '8852', '8854', '8858-8859', '8890', '8901', '8912', '9040-9041', '9043', '9133', '9136', '9180', '9222', '9251', '9364', '9366-9368', '9540', '9542', '9561', '9580'], 'behaviors': ['3'], 'dx_date_min': '2018-01-01'}
+  {'sites': ['C722', 'C724-C725', 'C751-C753'], 'histologies': ['8710', '8712-8714', '8803', '8812-8814', '8816-8824', '8826-8831', '8834-8836', '8841-8842', '8851', '8853', '8855-8857', '8860-8881', '8891-8898', '8902-8905', '8921', '8932-8934', '8940-8990', '9000-9016', '9030', '9042', '9045-9063', '9065', '9072-9073', '9081-9083', '9086-9091', '9101-9111', '9121-9132', '9135', '9137-9138', '9141-9175', '9181-9213', '9221', '9230', '9240-9250', '9252-9361', '9363', '9365', '9370-9373', '9541', '9550', '9560', '9562-9571', '9582'], 'behaviors': ['3'], 'dx_date_min': '2018-01-01', 'dx_date_max': '2022-12-31'}
+
+------------------------------------------------------------------------
+QUARANTINED (0)
+------------------------------------------------------------------------
+(none)
+
+------------------------------------------------------------------------
+SAMPLED CODE TABLES (up to 4 of 56)
+------------------------------------------------------------------------
+
+[seer_rsa_eod:soft_tissue_head_neck:behavior:c9]  items=[523]  anchor=eod_public-3.3:tables/behavior.json
+  Soft Tissue Head and Neck > Behavior ICD-O-3
+0: Benign
+1: Uncertain Benign/Malig
+2: In Situ
+3: Malignant Primary
+
+[seer_rsa_eod:soft_tissue_head_neck:tumor_size_summary_full_31213:c31]  items=[756]  anchor=eod_public-3.3:tables/tumor_size_summary_full_31213.json
+  Soft Tissue Head and Neck > Tumor Size Summary
+000: No mass/tumor found
+001: 1 mm or described as less than 1 mm
+002-988: Exact size in millimeters (2 mm to 988 mm)
+989: 989 millimeters or larger
+990: Microscopic focus or foci only and no size of focus is given
+998: Alternate descriptions of tumor size for specific sites: Familial/multiple polyposis: - Rectosigmoid …
+999: Unknown Size not stated Not documented in medical record Size of tumor cannot be assessed Not applicable
+
+[seer_rsa_eod:soft_tissue_head_neck:nodes_exam_76029:c61]  items=[830]  anchor=eod_public-3.3:tables/nodes_exam_76029.json
+  Soft Tissue Head and Neck > Regional Nodes Examined
+00: No nodes examined
+01-89: 1 - 89 nodes examined (code exact number of regional lymph nodes examined)
+90: 90 or more nodes examined
+95: No regional nodes removed, but aspiration or core biopsy of regional nodes performed
+96: Regional lymph node removal documented as sampling and number of nodes unknown/not stated
+97: Regional lymph node removal documented as dissection and number of nodes unknown/not stated
+98: Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented …
+99: Unknown if nodes were examined; not applicable or negative Not documented in medical record
+
+[seer_rsa_eod:soft_tissue_head_neck:grade_clinical_41135:c91]  items=[3843]  anchor=eod_public-3.3:tables/grade_clinical_41135.json
+  Soft Tissue Head and Neck > Grade Clinical
+1: G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3 Stated as FNCLCC …
+2: G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5 Stated as FNCLCC Grade 2
+3: G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8 Stated as FNCLCC …
+A: Well differentiated
+B: Moderately differentiated
+C: Poorly differentiated
+D: Undifferentiated, anaplastic
+H: Stated as "high grade" only
+9: Grade cannot be assessed (GX); Unknown
+
+========================================================================

@@ -1,0 +1,39 @@
+{
+  "id": "primary_site",
+  "algorithm": "eod_public",
+  "version": "3.3",
+  "name": "Primary Site",
+  "title": "Primary Site",
+  "notes": "See the [SEER Program Coding Manual](https://seer.cancer.gov/tools/codingmanuals/index.html) for coding instructions.",
+  "last_modified": "2020-05-19T17:03:14.269Z",
+  "definition": [
+    {
+      "key": "site",
+      "name": "Primary Site",
+      "type": "INPUT"
+    },
+    {
+      "key": "desc",
+      "name": "Description",
+      "type": "DESCRIPTION"
+    }
+  ],
+  "rows": [
+    [
+      "C000",
+      "External upper lip"
+    ],
+    [
+      "C001",
+      "External lower lip"
+    ],
+    [
+      "C002",
+      "External lip, NOS"
+    ],
+    [
+      "C003",
+      "Inner aspect, upper lip"
+    ]
+  ]
+}

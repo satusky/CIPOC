@@ -1,45 +1,5 @@
 [
   {
-    "rule_id": "store_2024:grade_pathological:grade_pathological:t1",
-    "source_doc": "store_2024",
-    "section_path": [
-      "Grade Pathological"
-    ],
-    "anchor": "L4348-L4354:grade-pathological",
-    "kind": "code_table",
-    "item_ids": [
-      3844
-    ],
-    "applies_to": {
-      "sites": null,
-      "histologies": null,
-      "behaviors": null,
-      "sex": null,
-      "dx_date_min": "2018-01-01",
-      "dx_date_max": null
-    },
-    "text": "| Item # | Length | Allowable Values | Required | Date Revised |\n|---|---|---|---|---|\n|  |  |  | Status |  |\n| 3844 | 1 | 1-5, 8, 9, A, B, C, D, E, L, H, M, S | 2018+ | 01/18 |",
-    "codes": {
-      "1": "1",
-      "2": "2",
-      "3": "3",
-      "4": "4",
-      "5": "5",
-      "8": "8",
-      "9": "9",
-      "A": "A",
-      "B": "B",
-      "C": "C",
-      "D": "D",
-      "E": "E",
-      "L": "L",
-      "H": "H",
-      "M": "M",
-      "S": "S"
-    },
-    "notes": null
-  },
-  {
     "rule_id": "store_2024:grade_pathological:description:d1",
     "source_doc": "store_2024",
     "section_path": [
