@@ -285,6 +285,11 @@ class OrchestratorAgent(BaseAgent):
         otherwise finalize. ``plan_extraction`` owns flipping any leftover PENDING
         that can never be extracted (gated/blocked) to a terminal status, so this
         router can branch purely on the outstanding set without looping forever.
+
+        That flip can take more than one pass: ``resolve_leftovers`` emits
+        definitive exclusions first so a group they unblock still gets to run, and
+        only stamps BLOCKED once a pass excludes nothing new. Each such pass makes
+        at least one group terminal, so the loop still converges.
         """
         if state.fatal_blocker is not None or not state.outstanding_item_ids:
             return "finalize_case"

@@ -51,6 +51,7 @@ class NoteFilter(BaseModel):
 class TargetGroup(VariableGroupInfo):
     """A planned extraction group: a variable group plus deterministic orchestration gating."""
     stage: str | None = Field(default=None, description="'initial' runs first and scopes later groups; 'dependent' runs afterward.")
+    depends_on: list[str] | None = Field(default=None, description="group_ids that must all reach a terminal status before this group runs. Sequences groups within a stage; None means the stage ordering alone applies.")
     gate: list[CorpusGate] | None = Field(default=None, description="Corpus conditions that must all hold for the group to be extracted. None or empty means ungated.")
     applies_to: SiteApplicability | None = Field(default=None, description="Site/histology restriction; None means the group applies to all cases.")
     note_filter: NoteFilter | None = Field(default=None, description="Deterministic note-level hard filter narrowing the group's candidate notes before retrieval; None means no per-note filtering.")

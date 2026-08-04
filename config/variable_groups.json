@@ -73,6 +73,7 @@
       "group_id": "site_specific_codes",
       "name": "Site Specific Codes",
       "stage": "dependent",
+      "depends_on": ["histologic_type_and_behavior"],
       "extract_as_group": false,
       "variables": [
         { "item_id": 670, "name": "RX Hosp--Surg Prim Site 03-2022" },
@@ -112,6 +113,7 @@
       "group_id": "other",
       "name": "Other",
       "stage": "dependent",
+      "depends_on": ["histologic_type_and_behavior"],
       "extract_as_group": false,
       "variables": [
         { "item_id": 764, "name": "Summary Stage 2018" },

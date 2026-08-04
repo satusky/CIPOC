@@ -74,9 +74,19 @@ def load_variable_groups(path: str | Path) -> list[TargetGroup]:
     group is self-contained for gating. A group carrying only subgroups (no loose
     variables of its own) yields just those subgroups.
 
+    ``depends_on`` is deliberately *not* inherited: a subgroup is flattened into a
+    peer of its parent, so inheriting it would make a parent that depends on its
+    own subgroup hand that subgroup a self-dependency. The config does exactly
+    that -- ``site_specific_codes`` depends on its ``histologic_type_and_behavior``
+    subgroup.
+
     Only ``item_id`` and ``name`` are read per variable; richer data-dictionary
     and case-scoped metadata is filled later by
     :func:`cipoc.tools.build_variable_group` once case facts are known.
+
+    Raises ``ValueError`` if any ``depends_on`` names an unknown group or the
+    dependency graph contains a cycle. Both would otherwise degrade silently into
+    "no dependency" and make the ordering look like it works.
     """
     with open(path, "r") as f:
         config = json.load(f)
@@ -87,6 +97,7 @@ def load_variable_groups(path: str | Path) -> list[TargetGroup]:
             name=node.get("name"),
             extract_as_group=node.get("extract_as_group", False),
             stage=node.get("stage", stage),
+            depends_on=node.get("depends_on"),
             gate=node.get("gate", gate),
             applies_to=node.get("applies_to"),
             note_filter=node.get("note_filter", note_filter),
@@ -110,7 +121,44 @@ def load_variable_groups(path: str | Path) -> list[TargetGroup]:
                         note_filter=group.get("note_filter"),
                     )
                 )
+    validate_dependencies(groups)
     return groups
+
+
+def validate_dependencies(groups: list[TargetGroup]) -> None:
+    """Raise ``ValueError`` if any ``depends_on`` is unresolvable or cyclic.
+
+    A group carrying only subgroups contributes no plan entry, so naming it is an
+    error the same way a typo is: nothing would ever wait on it.
+    """
+    by_id = {group.group_id: group for group in groups}
+    for group in groups:
+        unknown = [dep for dep in (group.depends_on or []) if dep not in by_id]
+        if unknown:
+            raise ValueError(
+                f"Group '{group.group_id}' depends_on unknown group(s) {unknown}. "
+                f"Known groups: {sorted(by_id)}."
+            )
+
+    # Depth-first walk carrying its own path, so the error names the cycle.
+    UNVISITED, ON_PATH, DONE = 0, 1, 2
+    state = dict.fromkeys(by_id, UNVISITED)
+
+    def visit(group_id: str, path: list[str]) -> None:
+        if state[group_id] == DONE:
+            return
+        if state[group_id] == ON_PATH:
+            cycle = path[path.index(group_id):] + [group_id]
+            raise ValueError(f"Cyclic depends_on: {' -> '.join(cycle)}.")
+        state[group_id] = ON_PATH
+        path.append(group_id)
+        for dep in by_id[group_id].depends_on or []:
+            visit(dep, path)
+        path.pop()
+        state[group_id] = DONE
+
+    for group_id in by_id:
+        visit(group_id, [])
 
 
 @dataclass(frozen=True)
@@ -387,13 +435,40 @@ def group_is_terminal(group: TargetGroup, results: dict[int, CaseVariableResult]
     )
 
 
+def unmet_dependencies(
+    group: TargetGroup,
+    groups: list[TargetGroup],
+    results: dict[int, CaseVariableResult],
+) -> list[TargetGroup]:
+    """The group's ``depends_on`` groups that have not yet reached a terminal status.
+
+    The gate is *terminal*, not *coded*: a dependency that finishes NOT_FOUND or
+    NOT_APPLICABLE still releases its dependents, which then scope against
+    whatever facts are known. Blocking on a fact the notes do not carry would be
+    strictly worse than the widened scope that predates this ordering.
+    """
+    by_id = {other.group_id: other for other in groups}
+    return [
+        by_id[dep]
+        for dep in (group.depends_on or [])
+        if dep in by_id and not group_is_terminal(by_id[dep], results)
+    ]
+
+
 def stage_is_ready(
     group: TargetGroup,
     groups: list[TargetGroup],
     results: dict[int, CaseVariableResult],
 ) -> bool:
-    """Initial groups are always stage-ready; dependents wait until every
-    initial-stage group has reached a terminal status."""
+    """Whether a group's ordering prerequisites are all satisfied.
+
+    Two orderings compose: the coarse stage barrier (dependents wait until every
+    initial-stage group is terminal) and the per-group ``depends_on`` edges, which
+    sequence groups *within* a stage so a scoping fact one group codes is known
+    before a group that scopes on it runs.
+    """
+    if unmet_dependencies(group, groups, results):
+        return False
     if group.stage != DEPENDENT_STAGE:
         return True
     return all(
@@ -440,18 +515,21 @@ def resolve_leftovers(
     Reason precedence is deliberate — site, then gate, then deps:
       * site does not match  -> NOT_APPLICABLE (a definitive exclusion)
       * corpus gate unmet    -> NOT_APPLICABLE (a definitive exclusion)
-      * otherwise            -> BLOCKED, citing the still-pending initial item IDs
-        (the only "dependency" the models express is the initial->dependent stage
-        ordering, so a would-be-eligible group left unrun was blocked on it).
-    """
-    pending_initials = [
-        item_id
-        for group in groups
-        if group.stage == INITIAL_STAGE
-        for item_id in pending_item_ids(group, results)
-    ]
+      * otherwise            -> BLOCKED, citing the items the group waited on:
+        an unmet ``depends_on`` group's pending items when there is one, else the
+        still-pending initial-stage items (the coarse stage barrier).
 
-    updates: dict[int, CaseVariableResult] = {}
+    **Resolution runs in two phases.** A pass that finds any definitive exclusion
+    returns *only* those, leaving the rest PENDING so ``check_state`` re-plans:
+    excluding a group can release a dependent that was waiting on it, and that
+    dependent must get its chance to run rather than being stamped BLOCKED in the
+    same breath. BLOCKED is emitted only on a pass where nothing new was excluded,
+    which is the genuine fixed point. This terminates because every pass either
+    makes a group terminal or ends the loop.
+    """
+    exclusions: dict[int, CaseVariableResult] = {}
+    blocked: dict[int, CaseVariableResult] = {}
+
     for group in groups:
         pending = pending_item_ids(group, results)
         if not pending:
@@ -467,17 +545,36 @@ def resolve_leftovers(
             blockers = []
         else:
             status = VariableStatus.BLOCKED
-            reason = "Prerequisite initial-stage extraction did not complete."
-            blockers = pending_initials
+            unmet = unmet_dependencies(group, groups, results)
+            if unmet:
+                reason = ("Prerequisite group(s) did not complete: "
+                          f"{[other.group_id for other in unmet]}.")
+                blockers = [
+                    item_id
+                    for other in unmet
+                    for item_id in pending_item_ids(other, results)
+                ]
+            else:
+                reason = "Prerequisite initial-stage extraction did not complete."
+                blockers = [
+                    item_id
+                    for other in groups
+                    if other.stage == INITIAL_STAGE
+                    for item_id in pending_item_ids(other, results)
+                ]
 
+        target = exclusions if status == VariableStatus.NOT_APPLICABLE else blocked
         for item_id in pending:
-            updates[item_id] = CaseVariableResult(
+            target[item_id] = CaseVariableResult(
                 item_id=item_id,
                 status=status,
                 reason=reason,
                 blocking_item_ids=blockers if status == VariableStatus.BLOCKED else [],
             )
-    return updates
+
+    # Phase 1: definitive exclusions only, so anything they unblock can still run.
+    # Phase 2 (nothing left to exclude): stamp the genuinely blocked remainder.
+    return exclusions or blocked
 
 
 def _result_from_extraction(extraction: ValidatedVariableOutput) -> CaseVariableResult:
