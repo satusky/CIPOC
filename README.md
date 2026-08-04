@@ -149,6 +149,25 @@ Each agent's `draw(path=...)` renders its compiled graph to a PNG (falling back
 to ASCII when no network is available); rendered diagrams live under
 `src/cipoc/agents/visualization/`.
 
+### Inspect rule applications
+
+Show the final compiled rules that apply to one or more NAACCR item IDs and the
+same case-scoped `VariableGroupInfo` used by the extractor:
+
+```bash
+PYTHONPATH=src python -m scripts.examine_rule_applications \
+    522 523 \
+    --gross-primary-site breast \
+    --date-of-diagnosis 2021-06-01 \
+    --sex female
+```
+
+The positional arguments are one or more integer item IDs. Optional case facts
+are `--primary-site`, `--gross-primary-site`, `--histology`, `--behavior`,
+`--sex`, and `--date-of-diagnosis`. Use `--rules-dir` or `--data-dictionary` to
+override the default `documents/rules` and
+`documents/manuals/naaccr_data_dictionary_v25.json` paths.
+
 ### Smoke checks
 
 There is no formal CI or comprehensive test suite yet; validation is

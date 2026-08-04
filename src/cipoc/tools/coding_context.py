@@ -37,6 +37,7 @@ class RuleStore:
     units: tuple[RuleUnit, ...]
     units_by_item: dict[int, tuple[RuleUnit, ...]]
     general_units: tuple[RuleUnit, ...]
+    source_files_by_rule_id: dict[str, Path]
 
 
 def load_rule_store(rules_dir: str | Path, *, use_cache: bool = True) -> RuleStore:
@@ -48,6 +49,7 @@ def load_rule_store(rules_dir: str | Path, *, use_cache: bool = True) -> RuleSto
     manifest = RuleStoreManifest.model_validate_json((path / "manifest.json").read_text())
 
     units: list[RuleUnit] = []
+    source_files_by_rule_id: dict[str, Path] = {}
     # Only bare `<stem>.json` files are rule lists; compile sidecars carry a
     # compound suffix (`.usage.json`, `.review.json`, ...) and must be skipped.
     rule_files = (
@@ -55,7 +57,11 @@ def load_rule_store(rules_dir: str | Path, *, use_cache: bool = True) -> RuleSto
         if p.name != "manifest.json" and p.suffixes == [".json"]
     )
     for file in sorted(rule_files):
-        units.extend(_RULE_LIST_ADAPTER.validate_json(file.read_text()))
+        file_units = _RULE_LIST_ADAPTER.validate_json(file.read_text())
+        units.extend(file_units)
+        source_files_by_rule_id.update(
+            (unit.rule_id, file) for unit in file_units
+        )
 
     unknown_sources = sorted({u.source_doc for u in units if manifest.get(u.source_doc) is None})
     if unknown_sources:
@@ -79,6 +85,7 @@ def load_rule_store(rules_dir: str | Path, *, use_cache: bool = True) -> RuleSto
         units=tuple(units),
         units_by_item={item: tuple(item_units) for item, item_units in units_by_item.items()},
         general_units=tuple(general_units),
+        source_files_by_rule_id=source_files_by_rule_id,
     )
     if use_cache:
         _STORE_CACHE[path] = store
