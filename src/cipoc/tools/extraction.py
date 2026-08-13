@@ -67,7 +67,6 @@ class VariableValueValidator:
             )
 
         # Date syntax takes precedence over scoped code tables. A malformed table
-        # Date syntax takes precedence over scoped code tables. A malformed table
         # must not turn a format token such as "CCYYMMDD" into an allowable value.
         if self._is_date_variable(variable):
             errors.extend(self._validate_date(value))
@@ -242,9 +241,6 @@ def lookup_variable_info(
         site_data_dictionary_path: Optional tissue-keyed dictionary whose code
             descriptions override the NAACCR entry.
         case_facts: Facts used to select a tissue from the site dictionary.
-        site_data_dictionary_path: Optional tissue-keyed dictionary whose code
-            descriptions override the NAACCR entry.
-        case_facts: Facts used to select a tissue from the site dictionary.
 
     Returns:
         A string representation of a VariableInfo object containing the variable metadata if the item exists,
@@ -270,9 +266,7 @@ def build_variable_group(
     *,
     case_facts: "CaseFacts | None" = None,
     site_data_dictionary_path: str | Path | None = None,
-    site_data_dictionary_path: str | Path | None = None,
 ) -> VariableGroupInfo:
-    """Build NAACCR variable metadata with optional tissue-specific code tables."""
     """Build NAACCR variable metadata with optional tissue-specific code tables."""
     if data_dictionary_path is None:
         raise ValueError("Cannot retrieve variable information. Please supply a data dictionary path.")
