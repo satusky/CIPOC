@@ -245,7 +245,7 @@ def build_corpus_descriptors(note_corpus: dict[int, ProcessedClinicalNote]) -> N
     for note in notes:
         if note.cancer_mentions is not None:
             for mention in note.cancer_mentions:
-                affected_tissues[mention.status].update(mention.affected_tissue)
+                affected_tissues[mention.status].add(mention.affected_tissue)
 
         if note.flags is not None:
             unique_flags.update(note.flags)
@@ -514,7 +514,7 @@ def _result_from_extraction(extraction: ValidatedVariableOutput) -> CaseVariable
 
 # NAACCR item IDs whose coded value is also a case-scoping fact. Populating these
 # after an initial-stage group extracts lets dependent groups be scoped (site
-# applicability, rule reduction) against real coded values instead of only the
+# applicability, dictionary selection) against real coded values instead of only the
 # coarse characterization facts. Laterality (410) has no CaseFacts field, so it is
 # deliberately absent.
 ITEM_ID_TO_CASE_FACT: dict[int, str] = {
