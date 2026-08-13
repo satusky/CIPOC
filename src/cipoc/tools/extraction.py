@@ -24,6 +24,18 @@ _ENTRY_FIELD_MAP = {
 _CODE_COLUMN_NAMES = ("code",)
 _DESCRIPTION_COLUMN_NAMES = ("description",)
 _MISSING = object()
+    "item_name": "name",
+    "description": "description",
+    "item_data_type": "data_type",
+    "item_length": "length",
+    "allowable_values": "allowable_values",
+    "format": "format",
+    "instructions_for_coding": "coding_instructions",
+}
+
+_CODE_COLUMN_NAMES = ("code",)
+_DESCRIPTION_COLUMN_NAMES = ("description",)
+_MISSING = object()
 
 class VariableValueValidator:
     """Deterministically validate an extracted value against variable metadata."""
@@ -54,6 +66,7 @@ class VariableValueValidator:
                 f"Value exceeds the maximum length of {variable.length} characters."
             )
 
+        # Date syntax takes precedence over scoped code tables. A malformed table
         # Date syntax takes precedence over scoped code tables. A malformed table
         # must not turn a format token such as "CCYYMMDD" into an allowable value.
         if self._is_date_variable(variable):
@@ -162,7 +175,7 @@ def _overlay_site_codes(item_entry: dict | None, site_entry: dict | None) -> dic
     return merged
 
 
-def resolve_site_key(case_facts: "CaseFacts | None", site_dictionary: dict) -> str | None:
+def _site_key(case_facts: "CaseFacts | None", site_dictionary: dict) -> str | None:
     """Resolve case facts to a top-level key present in the site dictionary."""
     if case_facts is None:
         return None
@@ -229,6 +242,9 @@ def lookup_variable_info(
         site_data_dictionary_path: Optional tissue-keyed dictionary whose code
             descriptions override the NAACCR entry.
         case_facts: Facts used to select a tissue from the site dictionary.
+        site_data_dictionary_path: Optional tissue-keyed dictionary whose code
+            descriptions override the NAACCR entry.
+        case_facts: Facts used to select a tissue from the site dictionary.
 
     Returns:
         A string representation of a VariableInfo object containing the variable metadata if the item exists,
@@ -241,7 +257,7 @@ def lookup_variable_info(
     if site_data_dictionary_path is not None:
         with open(site_data_dictionary_path, "r") as f:
             site_dictionary = json.load(f)
-        site = resolve_site_key(case_facts, site_dictionary)
+        site = _site_key(case_facts, site_dictionary)
         site_entry = site_dictionary.get(site, {}).get(str(item_id)) if site else None
         item_entry = _overlay_site_codes(item_entry, site_entry)
 
@@ -254,7 +270,9 @@ def build_variable_group(
     *,
     case_facts: "CaseFacts | None" = None,
     site_data_dictionary_path: str | Path | None = None,
+    site_data_dictionary_path: str | Path | None = None,
 ) -> VariableGroupInfo:
+    """Build NAACCR variable metadata with optional tissue-specific code tables."""
     """Build NAACCR variable metadata with optional tissue-specific code tables."""
     if data_dictionary_path is None:
         raise ValueError("Cannot retrieve variable information. Please supply a data dictionary path.")
@@ -269,7 +287,7 @@ def build_variable_group(
     if site_data_dictionary_path is not None:
         with open(site_data_dictionary_path, "r") as f:
             site_dictionary = json.load(f)
-    site = resolve_site_key(case_facts, site_dictionary)
+    site = _site_key(case_facts, site_dictionary)
 
     item_info = []
     for item_id in sorted(set(item_ids)):
