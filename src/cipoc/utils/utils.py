@@ -37,9 +37,9 @@ class DocumentsConfig(BaseModel):
         default=None,
         description="Path to the NAACCR data dictionary JSON.",
     )
-    rules_path: Path | None = Field(
+    site_data_dictionary_path: Path | None = Field(
         default=None,
-        description="Directory holding the compiled manual rule store (manifest.json plus per-manual rule files).",
+        description="Path to the tissue-keyed CIPOC data dictionary JSON.",
     )
     variable_groups_path: Path = Field(
         default=Path("config/variable_groups.json"),
