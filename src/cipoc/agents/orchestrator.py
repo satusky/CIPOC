@@ -172,10 +172,7 @@ class OrchestratorAgent(BaseAgent):
         self._target_group_hierarchy = load_group_hierarchy(variable_groups_path)
         # Config groups carry only item_id/name; the NAACCR dictionary supplies
         # metadata and the tissue-keyed dictionary supplies case-scoped codes.
-        # Config groups carry only item_id/name; the NAACCR dictionary supplies
-        # metadata and the tissue-keyed dictionary supplies case-scoped codes.
         self._data_dictionary_path = self._config.documents().data_dictionary_path
-        self._site_data_dictionary_path = self._config.documents().site_data_dictionary_path
         self._site_data_dictionary_path = self._config.documents().site_data_dictionary_path
 
     # --- Graph wiring (compiled once per instance) ---
