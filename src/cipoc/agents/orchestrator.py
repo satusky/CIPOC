@@ -13,7 +13,7 @@ from langgraph.graph.message import add_messages
 from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
-from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_rule_store, load_variable_groups, prefilter_notes, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key
+from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_variable_groups, prefilter_notes, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report
 from cipoc.utils import CipocConfig, run_with_progress
 from cipoc.models import (
     Case,
@@ -170,12 +170,10 @@ class OrchestratorAgent(BaseAgent):
         variable_groups_path = self._config.documents().variable_groups_path
         self._target_variables = load_variable_groups(variable_groups_path)
         self._target_group_hierarchy = load_group_hierarchy(variable_groups_path)
-        # Config groups carry only item_id/name; dictionaries and the rule store
-        # supply metadata, site-specific codes, and coding instructions.
+        # Config groups carry only item_id/name; the NAACCR dictionary supplies
+        # metadata and the tissue-keyed dictionary supplies case-scoped codes.
         self._data_dictionary_path = self._config.documents().data_dictionary_path
         self._site_data_dictionary_path = self._config.documents().site_data_dictionary_path
-        rules_path = getattr(self._config.documents(), "rules_path", None)
-        self._rule_store = load_rule_store(rules_path) if rules_path is not None else None
 
     # --- Graph wiring (compiled once per instance) ---
     def _wire_graph(self, workflow: StateGraph) -> None:
@@ -263,37 +261,17 @@ class OrchestratorAgent(BaseAgent):
         digests = build_corpus_digests(state.note_corpus)
         case_facts = state.case_facts
         if case_facts is None or case_facts.gross_primary_site is None:
-            site_dictionary = {}
-            site_dictionary_path = getattr(self, "_site_data_dictionary_path", None)
-            if site_dictionary_path is not None:
-                with open(site_dictionary_path, "r") as file:
-                    site_dictionary = json.load(file)
             for status in ("current", "recent", "historical"):
-                affected_tissues = (descriptors.affected_tissues or {}).get(
-                    status, set()
-                )
-                if isinstance(affected_tissues, str):
-                    affected_tissues = [affected_tissues]
                 tissues = {
                     tissue.strip()
-                    for tissue in affected_tissues
+                    for tissue in (descriptors.affected_tissues or {}).get(status, set())
                     if tissue.strip()
                 }
                 if not tissues:
                     continue
-                if site_dictionary:
-                    resolved_sites = {
-                        resolve_site_key(
-                            CaseFacts(gross_primary_site=tissue), site_dictionary
-                        )
-                        for tissue in tissues
-                    }
-                    resolved_sites.discard(None)
-                else:
-                    resolved_sites = tissues
-                if len(resolved_sites) == 1:
+                if len(tissues) == 1:
                     case_facts = (case_facts or CaseFacts()).model_copy(
-                        update={"gross_primary_site": resolved_sites.pop()}
+                        update={"gross_primary_site": tissues.pop()}
                     )
                 break
         return {
@@ -323,7 +301,7 @@ class OrchestratorAgent(BaseAgent):
         return "plan_extraction"
 
     def _scope_group(self, group: TargetGroup, case_facts: CaseFacts | None) -> TargetGroup:
-        """Fill data-dictionary metadata and case-scoped coding context while
+        """Fill each variable's data-dictionary metadata and site-scoped codes,
         preserving the group's gating/filter fields.
 
         ``build_variable_group`` returns a plain ``VariableGroupInfo`` (no gating),
@@ -336,7 +314,6 @@ class OrchestratorAgent(BaseAgent):
             self._data_dictionary_path,
             case_facts=case_facts,
             site_data_dictionary_path=self._site_data_dictionary_path,
-            rule_store=self._rule_store,
         )
         enriched_by_id = {variable.item_id: variable for variable in enriched.variables}
         return group.model_copy(

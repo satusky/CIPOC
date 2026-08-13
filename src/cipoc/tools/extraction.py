@@ -9,24 +9,21 @@ from cipoc.models import VariableInfo, VariableGroupInfo, VariableOutput
 
 if TYPE_CHECKING:
     from cipoc.models import CaseFacts
-    from cipoc.tools.coding_context import RuleStore
 
 
 _ENTRY_FIELD_MAP = {
-    "name": ("item_name", "Data Item Name"),
-    "description": ("description", "Description"),
-    "data_type": ("item_data_type", "Data Type"),
-    "length": ("item_length", "Length"),
-    "allowable_values": ("allowable_values", "Allowable Values"),
-    "format": ("format", "Format"),
-    "coding_instructions": ("instructions_for_coding", "Instructions for Coding"),
+    "item_name": "name",
+    "description": "description",
+    "item_data_type": "data_type",
+    "item_length": "length",
+    "allowable_values": "allowable_values",
+    "format": "format",
+    "instructions_for_coding": "coding_instructions",
 }
 
-_CODE_FIELD_NAMES = ("allowed_codes", "Code Descriptions")
 _CODE_COLUMN_NAMES = ("code",)
 _DESCRIPTION_COLUMN_NAMES = ("description",)
 _MISSING = object()
-
 
 class VariableValueValidator:
     """Deterministically validate an extracted value against variable metadata."""
@@ -153,11 +150,7 @@ def _normalize_text(value):
 
 
 def _entry_codes(entry: dict | None):
-    if entry:
-        for field in _CODE_FIELD_NAMES:
-            if field in entry:
-                return entry[field]
-    return _MISSING
+    return entry["allowed_codes"] if entry and "allowed_codes" in entry else _MISSING
 
 
 def _overlay_site_codes(item_entry: dict | None, site_entry: dict | None) -> dict | None:
@@ -169,7 +162,7 @@ def _overlay_site_codes(item_entry: dict | None, site_entry: dict | None) -> dic
     return merged
 
 
-def resolve_site_key(case_facts: "CaseFacts | None", site_dictionary: dict) -> str | None:
+def _site_key(case_facts: "CaseFacts | None", site_dictionary: dict) -> str | None:
     """Resolve case facts to a top-level key present in the site dictionary."""
     if case_facts is None:
         return None
@@ -203,11 +196,7 @@ def _variable_info(item_id: int, item_entry: dict | None) -> VariableInfo | None
         return None
 
     fields = {
-        field: next(
-            (item_entry[column] for column in columns if column in item_entry),
-            None,
-        )
-        for field, columns in _ENTRY_FIELD_MAP.items()
+        field: item_entry.get(column) for column, field in _ENTRY_FIELD_MAP.items()
     }
     codes = _entry_codes(item_entry)
     fields["valid_codes"] = None if codes is _MISSING else codes
@@ -252,7 +241,7 @@ def lookup_variable_info(
     if site_data_dictionary_path is not None:
         with open(site_data_dictionary_path, "r") as f:
             site_dictionary = json.load(f)
-        site = resolve_site_key(case_facts, site_dictionary)
+        site = _site_key(case_facts, site_dictionary)
         site_entry = site_dictionary.get(site, {}).get(str(item_id)) if site else None
         item_entry = _overlay_site_codes(item_entry, site_entry)
 
@@ -265,9 +254,8 @@ def build_variable_group(
     *,
     case_facts: "CaseFacts | None" = None,
     site_data_dictionary_path: str | Path | None = None,
-    rule_store: "RuleStore | None" = None,
 ) -> VariableGroupInfo:
-    """Build variable metadata with optional site tables and manual-rule scoping."""
+    """Build NAACCR variable metadata with optional tissue-specific code tables."""
     if data_dictionary_path is None:
         raise ValueError("Cannot retrieve variable information. Please supply a data dictionary path.")
 
@@ -277,14 +265,11 @@ def build_variable_group(
     with open(data_dictionary_path, "r") as f:
         data_dictionary = json.load(f)
 
-    if "items" in data_dictionary:
-        data_dictionary = {str(item["item_number"]): item for item in data_dictionary["items"]}
-
     site_dictionary: dict = {}
     if site_data_dictionary_path is not None:
         with open(site_data_dictionary_path, "r") as f:
             site_dictionary = json.load(f)
-    site = resolve_site_key(case_facts, site_dictionary)
+    site = _site_key(case_facts, site_dictionary)
 
     item_info = []
     for item_id in sorted(set(item_ids)):
@@ -293,28 +278,5 @@ def build_variable_group(
         item_entry = _overlay_site_codes(item_entry, site_entry)
         item_info.append(_variable_info(item_id, item_entry))
     variables = [item for item in item_info if item is not None]
-
-    if case_facts is not None and rule_store is not None:
-        from cipoc.tools.coding_context import assemble_coding_instructions, scope_coding_context
-
-        full_codes_by_item = {
-            variable.item_id: variable.valid_codes
-            for variable in variables
-            if isinstance(variable.valid_codes, dict) and variable.valid_codes
-        }
-        contexts = scope_coding_context(
-            [variable.item_id for variable in variables],
-            case_facts,
-            rule_store,
-            full_codes_by_item=full_codes_by_item,
-        )
-        for variable in variables:
-            context = contexts.get(variable.item_id)
-            if context is None:
-                continue
-            instructions, _ = assemble_coding_instructions(context, rule_store.manifest)
-            variable.coding_instructions = instructions
-            if context.reduced_codes is not None:
-                variable.valid_codes = context.reduced_codes
 
     return VariableGroupInfo(variables=variables)
