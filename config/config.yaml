@@ -50,5 +50,5 @@ agents:
 documents:
   documents_path: documents/
   data_dictionary_path: documents/manuals/naaccr_data_dictionary_v25.json
-  rules_path: documents/rules/
+  site_data_dictionary_path: documents/cipoc_data_dictionary.json
   variable_groups_path: config/variable_groups.json
