@@ -1,0 +1,1293 @@
+{
+  "ovary": {
+    "522": {
+      "allowed_codes": [
+        {
+          "code": "8406/0",
+          "description": "Syringocystadenoma papilliferum; Papillary syringadenoma; Papillary syringocystadenoma; Sialadenoma papilliferum"
+        },
+        {
+          "code": "8406/3",
+          "description": "Syringocystadenocarcinoma papilliferum"
+        },
+        {
+          "code": "8407/0",
+          "description": "Syringoma, NOS; Syringomatous tumor of nipple; Syringomatous adenoma of nipple; Infiltrating syringomatous adenoma of nipple"
+        },
+        {
+          "code": "8407/3",
+          "description": "Microcystic adnexal carcinoma; Sclerosing sweat duct carcinoma; Syringomatous carcinoma"
+        },
+        {
+          "code": "8408/0",
+          "description": "Eccrine papillary adenoma"
+        },
+        {
+          "code": "8408/3",
+          "description": "Digital papillary adenocarcinoma; Aggressive digital papillary adenoma; Eccrine papillary adenocarcinoma"
+        },
+        {
+          "code": "8409/0",
+          "description": "Poroma, NOS; Eccrine poroma, NOS; Apocrine poroma"
+        },
+        {
+          "code": "8409/2",
+          "description": "Porocarcinoma in situ"
+        },
+        {
+          "code": "8409/3",
+          "description": "Porocarcinoma, NOS; Eccrine poroma, malignant"
+        },
+        {
+          "code": "8410/0",
+          "description": "Sebaceoma; Sebaceous adenoma; Sebaceous epithelioma"
+        },
+        {
+          "code": "8410/3",
+          "description": "Sebaceous carcinoma; Sebaceous adenocarcinoma"
+        },
+        {
+          "code": "8413/3",
+          "description": "Eccrine adenocarcinoma"
+        },
+        {
+          "code": "8420/0",
+          "description": "Ceruminous adenoma"
+        },
+        {
+          "code": "8420/3",
+          "description": "Ceruminous adenocarcinoma; Ceruminous carcinoma"
+        },
+        {
+          "code": "8430/1",
+          "description": "Mucoepidermoid tumor"
+        },
+        {
+          "code": "8430/3",
+          "description": "Mucoepidermoid carcinoma"
+        },
+        {
+          "code": "8440/0",
+          "description": "Cystadenoma, NOS; Cystoma, NOS"
+        },
+        {
+          "code": "8440/3",
+          "description": "Cystadenocarcinoma, NOS"
+        },
+        {
+          "code": "8441/0",
+          "description": "Serous cystadenoma, NOS; Serous cystoma; Serous microcystic adenoma; Papillary serous cystadenoma, NOS"
+        },
+        {
+          "code": "8441/2",
+          "description": "Serous intraepithelial carcinoma; Serous tubal intraepithelial carcinoma (STIC); Serous endometrial intraepithelial carcinoma"
+        },
+        {
+          "code": "8441/3",
+          "description": "Serous carcinoma, NOS; Serous cystadenocarcinoma, NOS; Serous adenocarcinoma, NOS; Serous papillary adenocarcinoma, NOS; Papillary serous cystadenocarcinoma; Papillary serous adenocarcinoma; Serous surface papillary carcinoma"
+        },
+        {
+          "code": "8442/1",
+          "description": "Serous borderline tumor, NOS; Serous tumor, atypical proliferative; Serous cystadenoma, borderline malignancy; Serous tumor, NOS, of low malignant potential; Serous papillary cystic tumor of borderline malignancy; Atypical proliferative papillary serous tumor; Papillary serous cystadenoma, borderline malignancy; Papillary serous tumor of low malignant potential; Serous surface papillary tumor of borderline malignancy"
+        },
+        {
+          "code": "8443/0",
+          "description": "Clear cell cystadenoma"
+        },
+        {
+          "code": "8450/0",
+          "description": "Papillary cystadenoma, NOS; Papillary cystadenofibroma"
+        },
+        {
+          "code": "8450/3",
+          "description": "Papillary cystadenocarcinoma, NOS; Papillocystic adenocarcinoma"
+        },
+        {
+          "code": "8451/1",
+          "description": "Papillary cystadenoma, borderline malignancy"
+        },
+        {
+          "code": "8452/1",
+          "description": "Solid pseudopapillary tumor of ovary; Papillary cystic tumor; Solid and cystic tumor; Solid and papillary epithelial neoplasm"
+        },
+        {
+          "code": "8452/3",
+          "description": "Solid pseudopapillary neoplasm of the pancreas; Solid pseudopapillary carcinoma"
+        },
+        {
+          "code": "8453/0",
+          "description": "Intraductal Papillary mucinous adenoma; Intraductal Papillary mucinous tumor with intermediate dysplasia; Intraductal Papillary mucinous tumor with low grade dysplasia; Intraductal Papillary mucinous neoplasm with low grade dysplasia; Intraductal Papillary mucinous tumor with moderate dysplasia; Intraductal Papillary mucinous neoplasm with moderate dysplasia"
+        },
+        {
+          "code": "8453/2",
+          "description": "Intraductal Papillary mucinous neoplasm with high grade dysplasia; Intraductal Papillary mucinous carcinoma, non-invasive"
+        },
+        {
+          "code": "8453/3",
+          "description": "Intraductal Papillary mucinous neoplasm with an associated invasive carcinoma; Intraductal Papillary mucinous carcinoma, invasive"
+        },
+        {
+          "code": "8454/0",
+          "description": "Cystic tumor of atrio-ventricular node"
+        },
+        {
+          "code": "8460/2",
+          "description": "Serous borderline tumor, micropapillary variant; Serous carcinoma, non invasive, low grade"
+        },
+        {
+          "code": "8460/3",
+          "description": "Low grade serous carcinoma; Micropapillary serous carcinoma"
+        },
+        {
+          "code": "8461/0",
+          "description": "Serous surface papilloma"
+        },
+        {
+          "code": "8461/3",
+          "description": "High grade serous carcinoma"
+        },
+        {
+          "code": "8470/0",
+          "description": "Mucinous cystadenoma, NOS; Papillary mucinous cystadenoma, NOS; Papillary pseudomucinous cystadenoma, NOS; Pseudomucinous cystadenoma, NOS; Mucinous cystoma; Mucinous cystic neoplasm with intermediate grade dysplasia; Mucinous cystic neoplasm with intermediate grade intraepithelial neoplasia; Mucinous cystic neoplasm with low grade dysplasia; Mucinous cystic neoplasm with low grade intraepithelial neoplasia; Mucinous cystic tumor with intermediate dysplasia; Mucinous cystic tumor with low grade dysplasia; Mucinous cystic tumor with moderate dysplasia"
+        },
+        {
+          "code": "8470/2",
+          "description": "Mucinous cystic neoplasm with high grade dysplasia; Mucinous cystadenocarcinoma, non-invasive; Mucinous cystic tumor with high grade dysplasia; Mucinous cystic neoplasm with high grade intraepithelial neoplasia"
+        },
+        {
+          "code": "8470/3",
+          "description": "Mucinous cystadenocarcinoma, NOS; Pseudomucinous cystadenocarcinoma, NOS; Pseudomucinous adenocarcinoma; Mucinous cystic tumor with an associated invasive carcinoma; Mucinous cystic neoplasm with an associated invasive carcinoma; Papillary mucinous cystadenocarcinoma; Papillary pseudomucinous cystadenocarcinoma"
+        },
+        {
+          "code": "8472/1",
+          "description": "Mucinous cystic tumor of borderline malignancy; Mucinous borderline tumor; Mucinous tumor, NOS, of low malignant potential; Atypical proliferative mucinous tumor; Mucinous cystadenoma, borderline malignancy; Pseudomucinous cystadenoma, borderline malignancy; Papillary mucinous cystadenoma, borderline malignancy; Papillary pseudomucinous cystadenoma, borderline malignancy; Papillary mucinous tumor of low malignant potential"
+        },
+        {
+          "code": "8474/0",
+          "description": "Seromucinous cystadenoma"
+        },
+        {
+          "code": "8474/1",
+          "description": "Seromucinous borderline tumor; Seromucinous tumor, atypical proliferative"
+        },
+        {
+          "code": "8474/3",
+          "description": "Seromucinous carcinoma"
+        },
+        {
+          "code": "8480/0",
+          "description": "Mucinous adenoma; Mucous gland adenoma"
+        },
+        {
+          "code": "8480/1",
+          "description": "Low grade appendiceal mucinous neoplasm"
+        },
+        {
+          "code": "8480/3",
+          "description": "Mucinous adenocarcinoma; Acinar adenocarcinoma, mucinous variant; Colloid adenocarcinoma; Colloid carcinoma; Gelatinous adenocarcinoma; Gelatinous carcinoma; Mucinous carcinoma; Mucoid adenocarcinoma; Mucoid carcinoma; Mucous adenocarcinoma; Mucous carcinoma; Pseudomyxoma peritonei with unknown primary site; Mucinous tubular and spindle cell carcinoma"
+        },
+        {
+          "code": "8480/6",
+          "description": "Pseudomyxoma peritonei"
+        },
+        {
+          "code": "8481/3",
+          "description": "Mucin-producing adenocarcinoma; Mucin-producing carcinoma; Mucin-secreting adenocarcinoma; Mucin-secreting carcinoma"
+        },
+        {
+          "code": "8482/3",
+          "description": "Mucinous carcinoma, gastric type; Mucinous adenocarcinoma, endocervical type"
+        },
+        {
+          "code": "8490/3",
+          "description": "Signet ring cell carcinoma; Signet ring cell adenocarcinoma; Acinar adenocarcinoma, signet ring-like variant; Mucinous carcinoma, signet ring cell type; Poorly cohesive carcinoma; Signet ring cell/histiocytoid carcinoma"
+        },
+        {
+          "code": "8490/6",
+          "description": "Metastatic signet ring cell carcinoma; Krukenberg tumor"
+        },
+        {
+          "code": "8500/2",
+          "description": "Intraductal carcinoma, noninfiltrating, NOS; Intraductal adenocarcinoma, noninfiltrating, NOS; Intraductal carcinoma, NOS; Ductal carcinoma in situ, NOS; DCIS, NOS; DIN 3; Ductal intraepithelial neoplasia 3; Cystic hypersecretory carcinoma, intraductal"
+        },
+        {
+          "code": "8500/3",
+          "description": "Infiltrating duct carcinoma, NOS; Invasive breast carcinoma of no special type; Duct adenocarcinoma, NOS; Duct carcinoma, NOS; Ductal carcinoma, NOS; Duct cell carcinoma; Infiltrating duct adenocarcinoma; Basal-like carcinoma of breast; Adenocarcinoma of mammary gland type; Adenocarcinoma of anogenital mammary-like glands; Carcinoma of the male breast"
+        },
+        {
+          "code": "8501/2",
+          "description": "Comedocarcinoma, noninfiltrating; Ductal carcinoma in situ, comedo type; DCIS, comedo type"
+        },
+        {
+          "code": "8501/3",
+          "description": "Comedocarcinoma, NOS"
+        },
+        {
+          "code": "8502/3",
+          "description": "Secretory carcinoma; Juvenile carcinoma of breast"
+        },
+        {
+          "code": "8503/0",
+          "description": "Intraductal papilloma; Duct adenoma, NOS; Ductal papilloma; Intraductal papillary neoplasm, NOS; Intracystic papillary neoplasm with low grade intraepithelial neoplasia; Intracystic papillary neoplasm with intermediate grade intraepithelial neoplasia; Intraglandular papillary neoplasm with low grade intraepithelial neoplasia; Intraductal papillary neoplasm with intermediate grade neoplasia; Intraductal papillary neoplasm with low grade intraepithelial neoplasia; Intraductal tubular-papillary neoplasm, low grade; Intraductal papilloma with atypical ductal hyperplasia"
+        },
+        {
+          "code": "8503/2",
+          "description": "Noninfiltrating intraductal papillary adenocarcinoma; Intraductal papillary adenocarcinoma, NOS; Intraductal papillary carcinoma, NOS; DCIS, papillary; Ductal carcinoma in situ, papillary; Noninfiltrating intraductal papillary carcinoma; Intraductal papilloma with DCIS; Intraductal papillary neoplasm with high grade intraepithelial neoplasia; Intracystic papillary neoplasm with high grade intraepithelial neoplasia; Intracystic papillary tumor with high grade dysplasia; Intracystic papillary tumor with high grade intraepithelial neoplasia; Intraductal papillary neoplasm with high grade dysplasia; Intraductal papillary tumor with high grade dysplasia; Intraductal papillary tumor with high grade intraepithelial neoplasia; Intraductal tubular-papillary neoplasm, high grade; Intraductal tubulopapillary neoplasm"
+        },
+        {
+          "code": "8503/3",
+          "description": "Intraductal papillary adenocarcinoma with invasion; Infiltrating papillary adenocarcinoma; Infiltrating and papillary adenocarcinoma; Papillary carcinoma of breast; Intraductal papillary neoplasm with associated invasive carcinoma; Intracystic papillary neoplasm with associated invasive carcinoma"
+        },
+        {
+          "code": "8504/0",
+          "description": "Intracystic papillary adenoma; Intracystic papilloma"
+        },
+        {
+          "code": "8504/2",
+          "description": "Encapsulated papillary carcinoma; Noninfiltrating intracystic carcinoma; Encysted papillary carcinoma; Intracystic papillary carcinoma; Intracystic carcinoma, NOS; Intracystic papillary adenocarcinoma"
+        },
+        {
+          "code": "8504/3",
+          "description": "Encapsulated papillary carcinoma with invasion; Encysted papillary carcinoma with invasion; Intracystic papillary carcinoma with invasion"
+        },
+        {
+          "code": "8505/0",
+          "description": "Intraductal papillomatosis, NOS; Diffuse intraductal papillomatosis"
+        },
+        {
+          "code": "8506/0",
+          "description": "Adenoma of nipple; Subareolar duct papillomatosis"
+        },
+        {
+          "code": "8507/2",
+          "description": "Intraductal micropapillary carcinoma; Ductal carcinoma in situ, micropapillary; Intraductal carcinoma,  clinging, high grade"
+        },
+        {
+          "code": "8507/3",
+          "description": "Invasive micropapillary carcinoma of breast; Micropapillary carcinoma of breast"
+        },
+        {
+          "code": "8508/3",
+          "description": "Cystic hypersecretory carcinoma"
+        },
+        {
+          "code": "8509/2",
+          "description": "Solid papillary carcinoma in situ; Endocrine mucin-producing sweat gland carcinoma in situ"
+        },
+        {
+          "code": "8509/3",
+          "description": "Solid papillary carcinoma with invasion; Endocrine mucin-producing sweat gland carcinoma"
+        },
+        {
+          "code": "8510/3",
+          "description": "Medullary carcinoma, NOS; Medullary adenocarcinoma; Medullary-like carcinoma"
+        },
+        {
+          "code": "8512/3",
+          "description": "Medullary carcinoma with lymphoid stroma"
+        },
+        {
+          "code": "8513/3",
+          "description": "Atypical medullary carcinoma"
+        },
+        {
+          "code": "8514/3",
+          "description": "Duct carcinoma, desmoplastic type"
+        },
+        {
+          "code": "8519/2",
+          "description": "Lobular carcinoma in situ, pleomorphic; LCIS, pleomorphic"
+        },
+        {
+          "code": "8520/2",
+          "description": "Lobular carcinoma in situ, NOS; LCIS, NOS; Lobular carcinoma, noninfiltrating; Lobular carcinoma in situ, classic; Intraductal papilloma with lobular carcinoma in situ"
+        },
+        {
+          "code": "8520/3",
+          "description": "Lobular carcinoma, NOS; Infiltrating lobular carcinoma, NOS; Lobular adenocarcinoma; Tubulolobular carcinoma; Lobular carcinoma, pleomorphic"
+        },
+        {
+          "code": "8521/3",
+          "description": "Infiltrating ductular carcinoma"
+        },
+        {
+          "code": "8522/2",
+          "description": "Intraductal carcinoma and lobular carcinoma in situ"
+        },
+        {
+          "code": "8522/3",
+          "description": "Infiltrating duct and lobular carcinoma; Lobular and ductal carcinoma; Intraductal and lobular carcinoma; Infiltrating duct and lobular carcinoma in situ; Infiltrating lobular carcinoma and ductal carcinoma in situ"
+        },
+        {
+          "code": "8523/3",
+          "description": "Infiltrating duct mixed with other types of carcinoma; Infiltrating duct and colloid carcinoma; Infiltrating duct and cribriform carcinoma; Infiltrating duct and mucinous carcinoma; Infiltrating duct and tubular carcinoma"
+        },
+        {
+          "code": "8524/3",
+          "description": "Infiltrating lobular mixed with other types of carcinoma"
+        },
+        {
+          "code": "8525/3",
+          "description": "Polymorphous adenocarcinoma; Polymorphous carcinoma; Terminal duct adenocarcinoma"
+        },
+        {
+          "code": "8530/3",
+          "description": "Inflammatory carcinoma; Inflammatory adenocarcinoma"
+        },
+        {
+          "code": "8540/3",
+          "description": "Paget disease, mammary; Paget disease of breast; Paget disease of nipple"
+        },
+        {
+          "code": "8541/3",
+          "description": "Paget disease and infiltrating duct carcinoma of breast"
+        },
+        {
+          "code": "8542/3",
+          "description": "Paget disease, extramammary"
+        },
+        {
+          "code": "8543/3",
+          "description": "Paget disease and intraductal carcinoma of breast"
+        },
+        {
+          "code": "8550/0",
+          "description": "Acinar cell adenoma; Acinar adenoma; Acinic cell adenoma"
+        },
+        {
+          "code": "8550/1",
+          "description": "Acinar cell tumor; Acinic cell tumor"
+        },
+        {
+          "code": "8550/3",
+          "description": "Acinar cell carcinoma; Acinar adenocarcinoma, NOS; Acinar carcinoma; Acinic cell adenocarcinoma"
+        },
+        {
+          "code": "8551/3",
+          "description": "Acinar cell cystadenocarcinoma; Acinar adenocarcinoma of the lung"
+        },
+        {
+          "code": "8552/3",
+          "description": "Mixed acinar-ductal carcinoma"
+        },
+        {
+          "code": "8560/0",
+          "description": "Mixed squamous cell and glandular papilloma; Tubulosquamous polyp"
+        },
+        {
+          "code": "8560/3",
+          "description": "Adenosquamous carcinoma; Mixed adenocarcinoma and epidermoid carcinoma; Mixed adenocarcinoma and squamous cell carcinoma; Squamoid eccrine ductal carcinoma"
+        },
+        {
+          "code": "8561/0",
+          "description": "Adenolymphoma; Papillary cystadenoma lymphomatosum; Warthin tumor"
+        },
+        {
+          "code": "8562/3",
+          "description": "Epithelial-myoepithelial carcinoma"
+        },
+        {
+          "code": "8563/0",
+          "description": "Lymphadenoma"
+        },
+        {
+          "code": "8570/3",
+          "description": "Adenocarcinoma with squamous metaplasia; Adenoacanthoma; Endometrioid carcinoma with squamous differentiation"
+        },
+        {
+          "code": "8571/3",
+          "description": "Adenocarcinoma with cartilaginous and osseous metaplasia; Adenocarcinoma with cartilaginous metaplasia; Adenocarcinoma with chondroid differentiation; Adenocarcinoma with osseous metaplasia"
+        },
+        {
+          "code": "8572/3",
+          "description": "Adenocarcinoma with spindle cell metaplasia; Acinar adenocarcinoma, sarcomatoid variant; Fibromatosis-like metaplastic carcinoma"
+        },
+        {
+          "code": "8573/3",
+          "description": "Adenocarcinoma with apocrine metaplasia; Carcinoma with apocrine metaplasia"
+        },
+        {
+          "code": "8574/3",
+          "description": "Adenocarcinoma with neuroendocrine differentiation; Carcinoma with neuroendocrine differentiation; Adenocarcinoma admixed with neuroendocrine carcinoma"
+        },
+        {
+          "code": "8575/3",
+          "description": "Metaplastic carcinoma, NOS"
+        },
+        {
+          "code": "8576/3",
+          "description": "Hepatoid adenocarcinoma; Hepatoid carcinoma"
+        },
+        {
+          "code": "8580/0",
+          "description": "Microscopic thymoma; Thymoma, benign"
+        },
+        {
+          "code": "8580/1",
+          "description": "Micronodular thymoma with lymphoid stroma"
+        },
+        {
+          "code": "8580/3",
+          "description": "Thymoma, NOS; Intrapulmonary thymoma; Sclerosing thymoma; Metaplastic thymoma"
+        },
+        {
+          "code": "8581/3",
+          "description": "Thymoma, type A; Thymoma, medullary; Thymoma, spindle cell"
+        },
+        {
+          "code": "8582/3",
+          "description": "Thymoma, type AB; Thymoma, mixed type"
+        },
+        {
+          "code": "8583/3",
+          "description": "Thymoma, type B1; Thymoma, lymphocyte-rich; Thymoma, lymphocytic; Thymoma, organoid; Thymoma, predominantly cortical"
+        },
+        {
+          "code": "8584/3",
+          "description": "Thymoma, type B2; Thymoma, cortical"
+        },
+        {
+          "code": "8585/3",
+          "description": "Thymoma, type B3; Thymoma, atypical; Thymoma, epithelial; Well differentiated thymic carcinoma"
+        },
+        {
+          "code": "8586/3",
+          "description": "Thymic carcinoma, NOS; Thymoma, type C"
+        },
+        {
+          "code": "8587/0",
+          "description": "Ectopic hamartomatous thymoma"
+        },
+        {
+          "code": "8588/3",
+          "description": "Spindle epithelial tumor with thymus-like element; SETTLE; Spindle epithelial tumor with thymus-like differentiation"
+        },
+        {
+          "code": "8589/3",
+          "description": "Intrathyroid thymic carcinoma; Carcinoma showing thymus-like element; Carcinoma showing thymus-like differentiation; CASTLE"
+        },
+        {
+          "code": "8590/0",
+          "description": "Sex cord-stromal tumor, benign; Signet-ring stromal tumor; Microcystic stromal tumor"
+        },
+        {
+          "code": "8590/1",
+          "description": "Sex cord-gonadal stromal tumor, NOS; Gonadal stromal tumor, NOS; Sex cord tumor, NOS; Sex cord-stromal tumor, NOS; Ovarian stromal tumor; Testicular stromal tumor; Uterine tumor resembling ovarian sex cord tumor"
+        },
+        {
+          "code": "8591/1",
+          "description": "Sex cord-gonadal stromal tumor, incompletely differentiated; Sex cord-stromal tumor, unclassified"
+        },
+        {
+          "code": "8592/1",
+          "description": "Sex cord-gonadal stromal tumor, mixed forms; Sex cord-gonadal stromal tumor, mixed"
+        },
+        {
+          "code": "8593/1",
+          "description": "Stromal tumor with minor sex cord elements"
+        },
+        {
+          "code": "8594/1",
+          "description": "Mixed germ cell-sex cord-stromal tumor, NOS; Mixed germ cell-sex cord-stromal tumor, unclassified"
+        },
+        {
+          "code": "8600/0",
+          "description": "Thecoma, NOS; Theca cell tumor"
+        },
+        {
+          "code": "8600/3",
+          "description": "Thecoma, malignant"
+        },
+        {
+          "code": "8601/0",
+          "description": "Thecoma, luteinized"
+        },
+        {
+          "code": "8602/0",
+          "description": "Sclerosing stromal tumor"
+        },
+        {
+          "code": "8610/0",
+          "description": "Luteoma, NOS; Luteinoma"
+        },
+        {
+          "code": "8620/1",
+          "description": "Adult granulosa cell tumor of testis; Granulosa cell tumor of testis, NOS"
+        },
+        {
+          "code": "8620/3",
+          "description": "Adult granulosa cell tumor of ovary; Granulosa cell tumor, adult type; Granulosa cell carcinoma; Granulosa cell tumor, sarcomatoid"
+        },
+        {
+          "code": "8621/1",
+          "description": "Granulosa cell-theca cell tumor; Theca cell-granulosa cell tumor"
+        },
+        {
+          "code": "8622/0",
+          "description": "Granulosa cell tumor of the testis, juvenile"
+        },
+        {
+          "code": "8622/1",
+          "description": "Granulosa cell tumor, juvenile"
+        },
+        {
+          "code": "8623/1",
+          "description": "Sex cord tumor with annular tubules"
+        },
+        {
+          "code": "8630/0",
+          "description": "Androblastoma, benign; Arrhenoblastoma, benign"
+        },
+        {
+          "code": "8630/1",
+          "description": "Androblastoma, NOS; Arrhenoblastoma, NOS"
+        },
+        {
+          "code": "8630/3",
+          "description": "Androblastoma, malignant; Arrhenoblastoma, malignant"
+        },
+        {
+          "code": "8631/0",
+          "description": "Sertoli-Leydig cell tumor, well differentiated"
+        },
+        {
+          "code": "8631/1",
+          "description": "Sertoli-Leydig cell tumor of intermediate differentiation; Sertoli-Leydig cell tumor, moderately differentiated; Sertoli-Leydig cell tumor, NOS"
+        },
+        {
+          "code": "8631/3",
+          "description": "Sertoli-Leydig cell tumor, poorly differentiated; Sertoli-Leydig cell tumor, sarcomatoid"
+        },
+        {
+          "code": "8632/1",
+          "description": "Gynandroblastoma"
+        },
+        {
+          "code": "8633/1",
+          "description": "Sertoli-Leydig cell tumor, retiform"
+        },
+        {
+          "code": "8634/1",
+          "description": "Sertoli-Leydig cell tumor, intermediate differentiation, with heterologous elements; Sertoli-Leydig cell tumor, moderately differentiated, with heterologous elements; Sertoli-Leydig cell tumor, retiform, with heterologous elements"
+        },
+        {
+          "code": "8634/3",
+          "description": "Sertoli-Leydig cell tumor, poorly differentiated, with heterologous elements"
+        },
+        {
+          "code": "8640/1",
+          "description": "Sertoli cell tumor, NOS; Tubular androblastoma, NOS; Pick tubular adenoma; Sertoli cell adenoma; Testicular adenoma"
+        },
+        {
+          "code": "8640/3",
+          "description": "Sertoli cell carcinoma"
+        },
+        {
+          "code": "8641/0",
+          "description": "Sertoli cell tumor with lipid storage; Folliculome lipidique; Lipid-rich Sertoli cell tumor; Tubular androblastoma with lipid storage"
+        },
+        {
+          "code": "8642/1",
+          "description": "Large cell calcifying Sertoli cell tumor"
+        },
+        {
+          "code": "8643/1",
+          "description": "Intratubular large cell hyalinizing Sertoli cell neoplasia"
+        },
+        {
+          "code": "8650/0",
+          "description": "Leydig cell tumor of the ovary, NOS"
+        },
+        {
+          "code": "8650/1",
+          "description": "Leydig cell tumor of the testis, NOS; Interstitial cell tumor, NOS"
+        },
+        {
+          "code": "8650/3",
+          "description": "Leydig cell tumor, malignant; Interstitial cell tumor, malignant"
+        },
+        {
+          "code": "8660/0",
+          "description": "Hilus cell tumor; Hilar cell tumor"
+        },
+        {
+          "code": "8670/0",
+          "description": "Lipid cell tumor of ovary; Steroid cell tumor, NOS; Lipoid cell tumor of ovary; Masculinovoblastoma"
+        },
+        {
+          "code": "8670/3",
+          "description": "Steroid cell tumor, malignant"
+        },
+        {
+          "code": "8671/0",
+          "description": "Adrenal rest tumor"
+        },
+        {
+          "code": "8680/3",
+          "description": "Paraganglioma, NOS"
+        },
+        {
+          "code": "8681/3",
+          "description": "Sympathetic paraganglioma"
+        },
+        {
+          "code": "8682/3",
+          "description": "Parasympathetic paraganglioma"
+        },
+        {
+          "code": "8683/0",
+          "description": "Gangliocytic paraganglioma"
+        },
+        {
+          "code": "8690/3",
+          "description": "Middle ear paraganglioma; Glomus jugulare tumor, NOS; Jugular paraganglioma; Jugulotympanic paraganglioma"
+        },
+        {
+          "code": "8691/3",
+          "description": "Aortic body tumor; Aortic body paraganglioma; Aorticopulmonary paraganglioma"
+        },
+        {
+          "code": "8692/3",
+          "description": "Carotid body paraganglioma; Carotid body tumor"
+        },
+        {
+          "code": "8693/3",
+          "description": "Extra-adrenal paraganglioma, NOS; Nonchromaffin paraganglioma, NOS; Laryngeal paraganglioma; Vagal paraganglioma; Chemodectoma; Composite paraganglioma"
+        },
+        {
+          "code": "8700/3",
+          "description": "Pheochromocytoma, NOS; Adrenal medullary paraganglioma; Chromaffin paraganglioma; Chromaffin tumor; Chromaffinoma; Composite pheochromocytoma; Pheochromoblastoma"
+        },
+        {
+          "code": "8720/0",
+          "description": "Pigmented nevus, NOS; Nevus, NOS; Melanocytic nevus; Hairy nevus; Nevus spilus; Meyerson nevus; Deep penetrating nevus; Combined nevus; Genital nevus; Conjunctival nevus"
+        },
+        {
+          "code": "8720/2",
+          "description": "Melanoma in situ"
+        },
+        {
+          "code": "8720/3",
+          "description": "Malignant melanoma, NOS; Melanoma, NOS; Nevoid melanoma; Melanoma, meningeal"
+        },
+        {
+          "code": "8721/3",
+          "description": "Nodular melanoma"
+        },
+        {
+          "code": "8722/0",
+          "description": "Balloon cell nevus"
+        },
+        {
+          "code": "8722/3",
+          "description": "Balloon cell melanoma"
+        },
+        {
+          "code": "8723/0",
+          "description": "Halo nevus; Regressing nevus"
+        },
+        {
+          "code": "8723/3",
+          "description": "Malignant melanoma, regressing"
+        },
+        {
+          "code": "8725/0",
+          "description": "Neuronevus"
+        },
+        {
+          "code": "8726/0",
+          "description": "Magnocellular nevus; Melanocytoma, eyeball; Melanocytoma, NOS"
+        },
+        {
+          "code": "8727/0",
+          "description": "Dysplastic nevus"
+        },
+        {
+          "code": "8728/0",
+          "description": "Meningeal melanocytosis; Diffuse melanocytosis"
+        },
+        {
+          "code": "8728/1",
+          "description": "Meningeal melanocytoma"
+        },
+        {
+          "code": "8728/3",
+          "description": "Meningeal melanomatosis"
+        },
+        {
+          "code": "8730/0",
+          "description": "Nonpigmented nevus; Achromic nevus"
+        },
+        {
+          "code": "8730/3",
+          "description": "Amelanotic melanoma"
+        },
+        {
+          "code": "8740/0",
+          "description": "Junctional nevus, NOS; Intraepidermal nevus; Junction nevus"
+        },
+        {
+          "code": "8740/3",
+          "description": "Malignant melanoma in junctional nevus"
+        },
+        {
+          "code": "8741/2",
+          "description": "Precancerous melanosis, NOS"
+        },
+        {
+          "code": "8741/3",
+          "description": "Malignant melanoma in precancerous melanosis"
+        },
+        {
+          "code": "8742/0",
+          "description": "Lentiginous melanocytic nevus; Simple lentigo; Lentigo simplex"
+        },
+        {
+          "code": "8742/2",
+          "description": "Lentigo maligna; Hutchinson melanotic freckle, NOS"
+        },
+        {
+          "code": "8742/3",
+          "description": "Lentigo maligna melanoma; Malignant melanoma in Hutchinson melanotic freckle"
+        },
+        {
+          "code": "8743/3",
+          "description": "Low cumulative sun damage melanoma; Superficial spreading melanoma"
+        },
+        {
+          "code": "8744/0",
+          "description": "Acral nevus"
+        },
+        {
+          "code": "8744/3",
+          "description": "Acral melanoma; Acral lentiginous melanoma, malignant"
+        },
+        {
+          "code": "8745/3",
+          "description": "Desmoplastic melanoma; Desmoplastic melanoma, amelanotic; Neurotropic melanoma, malignant"
+        },
+        {
+          "code": "8746/3",
+          "description": "Mucosal lentiginous melanoma"
+        },
+        {
+          "code": "8750/0",
+          "description": "Dermal nevus; Intradermal nevus; Stromal nevus"
+        },
+        {
+          "code": "8760/0",
+          "description": "Compound nevus; Dermal and epidermal nevus"
+        },
+        {
+          "code": "8761/0",
+          "description": "Congenital melanocytic nevus, NOS"
+        },
+        {
+          "code": "8761/1",
+          "description": "Giant pigmented nevus, NOS; Intermediate and giant congenital nevus"
+        },
+        {
+          "code": "8761/3",
+          "description": "Malignant melanoma arising in giant congenital nevus; Malignant melanoma in giant pigmented nevus; Malignant melanoma in congenital melanocytic nevus"
+        },
+        {
+          "code": "8762/1",
+          "description": "Proliferative dermal lesion in congenital nevus; Proliferative nodule in congenital melanocytic nevus"
+        },
+        {
+          "code": "8770/0",
+          "description": "Epithelioid and spindle cell nevus; Juvenile melanoma; Juvenile nevus; Spitz nevus; Spiz nevus, atypical; Pigmented spindle cell nevus of Reed; Pigmented spindle cell Spitz nevus"
+        },
+        {
+          "code": "8770/3",
+          "description": "Malignant Spitz tumor; Mixed epithelioid and spindle cell melanoma; Spitz melanoma; Spitzoid melanoma"
+        },
+        {
+          "code": "8771/0",
+          "description": "Epithelioid cell nevus"
+        },
+        {
+          "code": "8771/3",
+          "description": "Epithelioid cell melanoma"
+        },
+        {
+          "code": "8772/0",
+          "description": "Spindle cell nevus, NOS"
+        },
+        {
+          "code": "8772/3",
+          "description": "Spindle cell melanoma, NOS"
+        },
+        {
+          "code": "8773/3",
+          "description": "Spindle cell melanoma, type A"
+        },
+        {
+          "code": "8774/3",
+          "description": "Spindle cell melanoma, type B"
+        },
+        {
+          "code": "8780/0",
+          "description": "Blue nevus, NOS; Jadassohn blue nevus"
+        },
+        {
+          "code": "8780/1",
+          "description": "Pigmented epithelioid melanocytoma; Blue nevus, epithelioid"
+        },
+        {
+          "code": "8780/3",
+          "description": "Blue nevus, malignant; Melanoma arising in blue nevus"
+        },
+        {
+          "code": "8790/0",
+          "description": "Cellular blue nevus"
+        },
+        {
+          "code": "8806/3",
+          "description": "Desmoplastic small round cell tumor"
+        },
+        {
+          "code": "8810/0",
+          "description": "Fibroma, NOS; Desmoplastic fibroblastoma; Gardner fibroma; Nuchal fibroma; Collagenous fibroma; Plaque-like CD34-positive dermal fibroma"
+        },
+        {
+          "code": "8810/1",
+          "description": "Cellular fibroma"
+        },
+        {
+          "code": "8810/3",
+          "description": "Fibrosarcoma, NOS"
+        },
+        {
+          "code": "8815/0",
+          "description": "Solitary fibrous tumor/Hemangiopericytoma, grade 1; Hemangiopericytoma, benign"
+        },
+        {
+          "code": "8815/1",
+          "description": "Solitary fibrous tumor, NOS; Hemangiopericytoma, NOS; Localized fibrous tumor; Solitary fibrous tumor/Hemangiopericytoma, grade 2; Hemangiopericytic meningioma"
+        },
+        {
+          "code": "8815/3",
+          "description": "Solitary fibrous tumor, malignant; Solitary fibrous tumor/Hemangiopericytoma, grade 3; Hemangiopericytoma, malignant"
+        },
+        {
+          "code": "8822/1",
+          "description": "Abdominal fibromatosis; Abdominal desmoid; Mesenteric fibromatosis; Retroperitoneal fibromatosis"
+        },
+        {
+          "code": "8825/0",
+          "description": "Myofibroblastoma"
+        },
+        {
+          "code": "8825/1",
+          "description": "Myofibroblastic tumor, NOS; Inflammatory myofibroblastic tumor"
+        },
+        {
+          "code": "8825/3",
+          "description": "Myofibroblastic sarcoma"
+        },
+        {
+          "code": "8890/0",
+          "description": "Leiomyoma, NOS; Fibroid uterus; Fibromyoma; Leiomyofibroma; Lipoleiomyoma; Lipomatous leiomyoma; Plexiform leiomyoma; Leiomyoma, apoplectic; Leiomyoma, hydropic; Myolipoma; Cotyledonoid leiomyoma; Dissecting leiomyoma"
+        },
+        {
+          "code": "8890/1",
+          "description": "Leiomyomatosis, NOS; Leiomyomatosis, peritonealis disseminata; Intravascular leiomyomatosis; Intravenous leiomyomatosis"
+        },
+        {
+          "code": "8890/3",
+          "description": "Leiomyosarcoma, NOS"
+        },
+        {
+          "code": "8930/0",
+          "description": "Endometrial stromal nodule"
+        },
+        {
+          "code": "8930/3",
+          "description": "Endometrial stromal sarcoma, NOS; Endometrial sarcoma, NOS; Endometrial stromal sarcoma, high grade; Endometrioid stromal sarcoma, high grade"
+        },
+        {
+          "code": "8931/3",
+          "description": "Endometrial stromal sarcoma, low grade; Endolymphatic stromal myosis; Endometrioid stromal sarcoma, low grade; Endometrial stromatosis; Stromal endometriosis; Stromal myosis, NOS"
+        },
+        {
+          "code": "8933/3",
+          "description": "Adenosarcoma"
+        },
+        {
+          "code": "8935/0",
+          "description": "Stromal tumor, benign"
+        },
+        {
+          "code": "8935/1",
+          "description": "Stromal tumor, NOS; Metanephric stromal tumor; Stromal tumor of uncertain malignant potential"
+        },
+        {
+          "code": "8935/3",
+          "description": "Stromal sarcoma, NOS"
+        },
+        {
+          "code": "8936/3",
+          "description": "Gastrointestinal stromal tumor; GIST, malignant; Gastrointestinal stromal sarcoma; Gastrointestinal autonomic nerve tumor; GANT; Gastrointestinal pacemaker cell tumor"
+        },
+        {
+          "code": "8950/3",
+          "description": "Mullerian mixed tumor"
+        },
+        {
+          "code": "8960/1",
+          "description": "Mesoblastic nephroma"
+        },
+        {
+          "code": "8960/3",
+          "description": "Nephroblastoma, NOS; Nephroma, NOS; Wilms tumor"
+        },
+        {
+          "code": "8980/3",
+          "description": "Carcinosarcoma, NOS"
+        },
+        {
+          "code": "9000/0",
+          "description": "Brenner tumor, NOS"
+        },
+        {
+          "code": "9000/1",
+          "description": "Brenner tumor, borderline malignancy; Borderline Brenner tumor; Brenner tumor, atypical proliferative; Brenner tumor, proliferating"
+        },
+        {
+          "code": "9000/3",
+          "description": "Brenner tumor, malignant"
+        },
+        {
+          "code": "9050/0",
+          "description": "Mesothelioma, benign"
+        },
+        {
+          "code": "9050/3",
+          "description": "Mesothelioma, malignant; Mesothelioma, NOS"
+        },
+        {
+          "code": "9052/0",
+          "description": "Epithelioid mesothelioma, benign; Well differentiated papillary mesothelioma, benign; Mesothelial papilloma"
+        },
+        {
+          "code": "9052/1",
+          "description": "Well differentiated papillary mesothelioma of the pleura"
+        },
+        {
+          "code": "9052/3",
+          "description": "Epithelioid mesothelioma, malignant; Epithelioid mesothelioma, NOS"
+        },
+        {
+          "code": "9060/3",
+          "description": "Dysgerminoma"
+        },
+        {
+          "code": "9070/3",
+          "description": "Embryonal carcinoma, NOS; Embryonal adenocarcinoma"
+        },
+        {
+          "code": "9071/3",
+          "description": "Yolk sac tumor, NOS; Embryonal carcinoma, infantile; Yolk sac tumor, pre-pubertal type; Endodermal sinus tumor; Orchioblastoma; Polyvesicular vitelline tumor; Hepatoid yolk sac tumor; Yolk sac tumor, post-pubertal type"
+        },
+        {
+          "code": "9073/1",
+          "description": "Gonadoblastoma; Gonocytoma"
+        },
+        {
+          "code": "9080/0",
+          "description": "Teratoma, benign; Adult teratoma, NOS; Cystic teratoma, NOS; Adult cystic teratoma; Mature teratoma, NOS; Teratoma, differentiated"
+        },
+        {
+          "code": "9080/1",
+          "description": "Teratoma, NOS; Solid teratoma; Germ cell tumor, regressed; Immature teratoma of the lung; Immature teratoma of the thymus; Immature teratoma of the thyroid"
+        },
+        {
+          "code": "9080/3",
+          "description": "Teratoma, malignant, NOS; Embryonal teratoma; Teratoblastoma, malignant; Immature teratoma, malignant; Immature teratoma, NOS"
+        },
+        {
+          "code": "9085/3",
+          "description": "Mixed germ cell tumor; Mixed teratoma and seminoma"
+        },
+        {
+          "code": "9090/0",
+          "description": "Struma ovarii, NOS"
+        },
+        {
+          "code": "9090/3",
+          "description": "Struma ovarii, malignant"
+        },
+        {
+          "code": "9091/1",
+          "description": "Strumal carcinoid; Struma ovarii and carcinoid"
+        },
+        {
+          "code": "9100/0",
+          "description": "Hydatidiform mole, NOS; Complete hydatidiform mole; Hydatid mole"
+        },
+        {
+          "code": "9100/1",
+          "description": "Invasive hydatidiform mole; Invasive mole, NOS; Chorioadenoma, NOS; Chorioadenoma destruens; Malignant hydatidiform mole"
+        },
+        {
+          "code": "9100/3",
+          "description": "Choriocarcinoma, NOS; Chorioepithelioma; Chorionepithelioma"
+        },
+        {
+          "code": "9110/0",
+          "description": "Adenoma of rete ovarii; Mesonephroma, benign; Mesonephric adenoma; Wolffian duct adenoma"
+        },
+        {
+          "code": "9110/1",
+          "description": "Wolffian tumor; Wolffian duct tumor; Mesonephric tumor, NOS"
+        },
+        {
+          "code": "9110/3",
+          "description": "Mesonephroma, malignant; Mesonephroma, NOS; Mesonephric adenocarcinoma; Wolffian duct carcinoma; Adenocarcinoma of rete ovarii"
+        }
+      ]
+    },
+    "672": {
+      "naaccr_version": "24",
+      "item_number": 672,
+      "item_name": "RX Hosp--Scope Reg LN Sur",
+      "item_data_type": "digits",
+      "item_length": 1,
+      "year_implemented": 1997.0,
+      "version_implemented": "5.1",
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "rxHospScopeRegLnSur",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Hospital-Specific",
+      "source_of_standard": "CoC",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Describes the removal, biopsy, or aspiration of regional lymph node(s) performed at the reporting facility for diagnosis and/or staging or as a part of the first course of therapy.",
+      "rationale": "This item is important for evaluating quality of care and treatment practices relating to initial diagnosis, staging and/or first course of therapy. If central registries wish to study the treatment given at particular facilities, the facility-level treatment fields must be used. The summary treatment fields, conversely, combine information for all reporting facilities that provide first course of treatment for the tumor. Facility-specific fields allow studies of detailed referral patterns and treatment by type of healthcare setting. Knowing the extent of treatment given at a particular facility also helps resolve consolidation issues. If central registries wish to study the treatment given at particular reporting facilities, the reporting facility-level treatment fields must be used. The summary treatment fields, conversely, combine information across all reporting facilities that provide first course of treatment for the tumor. Reporting facility-specific fields allow studies of detailed referral patterns and treatment by type of reporting facility. Knowing the extent of treatment given at a particular reporting facility also helps resolve coding issues.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": "Refer to the most recent version of *STORE* for instructions that should be applied to all surgically treated cases for all types of cancers. The treatment of breast and skin cancers are where the distinction between sentinel lymph node biopsies (SLNBx) and more extensive dissection of regional lymph nodes is most frequently encountered. For all other sites, non-sentinel regional node dissections are typical, and codes 2, 6 and 7 are infrequently used",
+      "npcr_collect": ".",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": ".",
+      "alternate_names": [
+        "'Scope of Regional Lymph Node Surgery at this Facility (CoC)'"
+      ],
+      "format": null,
+      "code_description": null,
+      "code_note": "*Note:* One important use of registry data is the tracking of treatment patterns over time. To compare contemporary treatment to previously published treatment based on former codes, or to data unmodified from pre-1998 definitions, the ability to differentiate surgeries in which four or more regional lymph nodes are removed is desirable. However, it is very important to note that the distinction between codes 4 and 5 is made to permit comparison of current surgical procedures with procedures coded in the past when the removal of fewer than 4 nodes was not reflected in surgery codes. It is not intended to reflect clinical significance when applied to a particular surgical procedure. It is important to avoid inferring, by data presentation or other methods, that one category is preferable to another within the intent of these items.",
+      "allowable_values": "0-7, 9",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "0",
+          "description": "No regional lymph nodes removed. No lymph nodes found in the pathologic specimen. Diagnosed at autopsy."
+        },
+        {
+          "code": "1",
+          "description": "Biopsy or aspiration of regional lymph node, NOS."
+        },
+        {
+          "code": "2",
+          "description": "Sentinel lymph node biopsy."
+        },
+        {
+          "code": "3",
+          "description": "Regional lymph node(s) removed and the number of nodes removed is unknown or not stated; the procedure is not specified as sentinel node biopsy. Regional lymph nodes removed, NOS."
+        },
+        {
+          "code": "4",
+          "description": "1 to 3 regional lymph nodes removed."
+        },
+        {
+          "code": "5",
+          "description": "4 or more regional lymph nodes removed."
+        },
+        {
+          "code": "6",
+          "description": "Sentinel node biopsy and code 3, 4, or 5 at same time or timing not stated."
+        },
+        {
+          "code": "7",
+          "description": "Sentinel node biopsy and code 3, 4, or 5 at different times."
+        },
+        {
+          "code": "9",
+          "description": "Unknown or not applicable. It is unknown whether regional lymph node surgery was performed. Death certificate only case; unknown or ill-defined primary site; hematopoietic, reticuloendothelial, ummunoproliferative or myeloproliferative disease."
+        }
+      ]
+    },
+    "674": {
+      "naaccr_version": "24",
+      "item_number": 674,
+      "item_name": "RX Hosp--Surg Oth Reg/Dis",
+      "item_data_type": "digits",
+      "item_length": 1,
+      "year_implemented": 1997.0,
+      "version_implemented": "5.1",
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "rxHospSurgOthRegDis",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Hospital-Specific",
+      "source_of_standard": "CoC",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Records the surgical removal of distant lymph nodes or other tissue(s)/organ(s) beyond the primary site performed at this facility as a part of first course of treatment.",
+      "rationale": "The removal of non-primary tissue documents the extent of surgical treatment and is useful in evaluating the extent of metastatic involvement.   \n  \nIf central registries wish to study the treatment given at particular facilities, the facility-level treatment fields must be used. The summary treatment fields, conversely, combine information for all reporting facilities that provide first course of treatment for the tumor. Facility-specific fields allow studies of detailed referral patterns and treatment by type of healthcare setting. Knowing what part of the treatment was given at a particular facility also helps resolve consolidation issues.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": "Refer to the most recent version of *STORE* for additional instructions.",
+      "npcr_collect": ".",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": ".",
+      "alternate_names": [
+        "'Surgery of Other Regional Site(s)",
+        " Distant Site(s)",
+        " or Distant Lymph Node(s) at this Facility (CoC)'\n 'Surgical Procedure/Other Site at this Facility'"
+      ],
+      "format": null,
+      "code_description": null,
+      "code_note": null,
+      "allowable_values": "0-5, 9",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "0",
+          "description": "None; no non-primary site resection was performed. Diagnosed at autopsy."
+        },
+        {
+          "code": "1",
+          "description": "Non-primary surgical procedure performed, unknown if whether site is regional or distant."
+        },
+        {
+          "code": "2",
+          "description": "Non-primary surgical procedure to other regional sites"
+        },
+        {
+          "code": "3",
+          "description": "Non-primary surgical procedure to *distant lymph node(s)*."
+        },
+        {
+          "code": "4",
+          "description": "Non-primary surgical procedure to distant site."
+        },
+        {
+          "code": "5",
+          "description": "Any combination of codes 2, 3, or 4."
+        },
+        {
+          "code": "9",
+          "description": "Unknown; it is unknown whether any surgical procedure of a non-primary site was performed. Death certificate only."
+        }
+      ]
+    },
+    "676": {
+      "naaccr_version": "24",
+      "item_number": 676,
+      "item_name": "RX Hosp--Reg LN Removed",
+      "item_data_type": "digits",
+      "item_length": 2,
+      "year_implemented": 1997.0,
+      "version_implemented": "5.1",
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "rxHospRegLnRemoved",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Hospital-Specific",
+      "source_of_standard": "CoC",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Describes number of regional lymph nodes removed at the reporting facility as part of the first course of treatment.",
+      "rationale": "If central registries wish to study the treatment given at particular facilities, the facility-level treatment fields must be used. The summary treatment fields, conversely, combine information for all reporting facilities that provide first course of treatment for the tumor. Facility-specific fields allow studies of detailed referral patterns and treatment by type of healthcare setting. Knowing the extent of treatment given at a particular facility also helps resolve consolidation issues.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": "Refer to ROADS for additional coding instructions.",
+      "npcr_collect": ".",
+      "coc_collect": "RH",
+      "seer_collect": ".",
+      "cccr_collect": ".",
+      "alternate_names": [
+        "'Number of Regional Lymph Nodes Examined at This Facility (CoC)'\n 'RX Hosp--Reg LN Examined'"
+      ],
+      "format": "Right justified, zero filled",
+      "code_description": null,
+      "code_note": "*Note:* As of January 1, 2003, this data item is no longer required or recommended by CoC. However, the item was collected in the past and it is recommended that historic data be retained.",
+      "allowable_values": "00-90, 95-99",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "00",
+          "description": "No regional lymph nodes removed"
+        },
+        {
+          "code": "01",
+          "description": "One regional lymph node removed"
+        },
+        {
+          "code": "02",
+          "description": "Two regional lymph nodes removed"
+        },
+        {
+          "code": "..",
+          "description": "None"
+        },
+        {
+          "code": "90",
+          "description": "Ninety or more regional lymph nodes removed"
+        },
+        {
+          "code": "95",
+          "description": "No regional lymph node(s) removed, but aspiration of regional lymph node(s) was performed"
+        },
+        {
+          "code": "96",
+          "description": "Regional lymph node removal documented as a sampling and number of lymph nodes unknown/not stated"
+        },
+        {
+          "code": "97",
+          "description": "Regional lymph node removal documented as a dissection and number of lymph nodes unknown/not stated"
+        },
+        {
+          "code": "98",
+          "description": "Regional lymph nodes surgically removed, but number of lymph nodes unknown/not stated and not documented as sampling or dissection"
+        },
+        {
+          "code": "99",
+          "description": "Unknown; not stated; death certificate-only"
+        }
+      ]
+    }
+  }
+}
