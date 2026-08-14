@@ -14,7 +14,6 @@ from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
 from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_variable_groups, prefilter_notes, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key
-from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_variable_groups, prefilter_notes, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report
 from cipoc.utils import CipocConfig, run_with_progress
 from cipoc.models import (
     Case,
@@ -272,6 +271,11 @@ class OrchestratorAgent(BaseAgent):
         digests = build_corpus_digests(state.note_corpus)
         case_facts = state.case_facts
         if case_facts is None or case_facts.gross_primary_site is None:
+            site_dictionary = {}
+            site_dictionary_path = getattr(self, "_site_data_dictionary_path", None)
+            if site_dictionary_path is not None:
+                with open(site_dictionary_path, "r") as file:
+                    site_dictionary = json.load(file)
             for status in ("current", "recent", "historical"):
                 tissues = {
                     tissue.strip()
@@ -280,9 +284,19 @@ class OrchestratorAgent(BaseAgent):
                 }
                 if not tissues:
                     continue
-                if len(tissues) == 1:
+                if site_dictionary:
+                    resolved_sites = {
+                        resolve_site_key(
+                            CaseFacts(gross_primary_site=tissue), site_dictionary
+                        )
+                        for tissue in tissues
+                    }
+                    resolved_sites.discard(None)
+                else:
+                    resolved_sites = tissues
+                if len(resolved_sites) == 1:
                     case_facts = (case_facts or CaseFacts()).model_copy(
-                        update={"gross_primary_site": tissues.pop()}
+                        update={"gross_primary_site": resolved_sites.pop()}
                     )
                 break
         return {
