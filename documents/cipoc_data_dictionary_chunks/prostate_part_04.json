@@ -1,0 +1,178 @@
+{
+  "prostate": {
+    "3843": {
+      "naaccr_version": "24",
+      "item_number": 3843,
+      "item_name": "Grade Clinical",
+      "item_data_type": "text",
+      "item_length": 1,
+      "year_implemented": 2018.0,
+      "version_implemented": "18",
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "gradeClinical",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Stage/Prognostic Factors",
+      "source_of_standard": "NAACCR",
+      "date_created": null,
+      "date_modified": null,
+      "description": "This data item records the grade of a solid primary tumor before any treatment (surgical resection or initiation of any treatment including neoadjuvant).   \n  \nFor cases diagnosed January 1 2018 and later this data item along with Grade Pathological and Grade Post-Neoadjuvant replaces NAACCR Data Item Grade 440 as well as SSF\u2019s for cancer sites with alternative grading systems (e.g. breast Bloom-Richardson prostate Gleason).",
+      "rationale": "Grade is a measure of the aggressiveness of the tumor. Grade and cell type are important prognostic indicators for many cancers. For some sites, grade is required to assign the clinical stage group.   \n  \nFor those cases that are eligible AJCC staging, the recommended grading system is specified in the AJCC Chapter. The AJCC Chapter-specific grading systems (codes 1-5) take priority over the generic grade definitions (codes A-E, L, H, 9). For those cases that are not eligible for AJCC staging, if the recommended grading system is not documented, the generic grade definitions would apply.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": "Refer to the most recent version of the SSDI Manual for additional site-specific instructions",
+      "npcr_collect": "R",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": "R",
+      "alternate_names": null,
+      "format": null,
+      "code_description": null,
+      "code_note": "Each Site-Specific Data Item (SSDI) applies only to selected primary sites, histologies, and years of diagnosis. Depending on applicability and standard-setter requirements, SSDIs may be left blank. Leave blank for cases diagnosed prior to 2018.",
+      "allowable_values": "1-5, 8, 9, A, B, C, D, E, L, H, M, S",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "1",
+          "description": "Grade Group 1: Gleason score less than or equal to 6"
+        },
+        {
+          "code": "2",
+          "description": "Grade Group 2: Gleason score 7\nGleason pattern 3+4"
+        },
+        {
+          "code": "3",
+          "description": "Grade Group 3: Gleason score 7\nGleason pattern 4+3"
+        },
+        {
+          "code": "4",
+          "description": "Grade Group 4: Gleason score 8"
+        },
+        {
+          "code": "5",
+          "description": "Grade Group 5: Gleason score 9 or 10"
+        },
+        {
+          "code": "A",
+          "description": "Well differentiated"
+        },
+        {
+          "code": "B",
+          "description": "Moderately differentiated"
+        },
+        {
+          "code": "C",
+          "description": "Poorly differentiated"
+        },
+        {
+          "code": "D",
+          "description": "Undifferentiated, anaplastic"
+        },
+        {
+          "code": "E",
+          "description": "Stated as \"Gleason score 7\" with no patterns documented or \nAny Gleason patterns combination equal to 7 not specified in 2 or 3"
+        },
+        {
+          "code": "9",
+          "description": "Grade cannot be assessed; Unknown"
+        }
+      ]
+    },
+    "3844": {
+      "naaccr_version": "24",
+      "item_number": 3844,
+      "item_name": "Grade Pathological",
+      "item_data_type": "text",
+      "item_length": 1,
+      "year_implemented": 2018.0,
+      "version_implemented": "18",
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "gradePathological",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Stage/Prognostic Factors",
+      "source_of_standard": "NAACCR",
+      "date_created": null,
+      "date_modified": null,
+      "description": "This data item records the grade of a solid primary tumor that has been resected and for which no neoadjuvant therapy was administered. If AJCC staging is being assigned the tumor must have met the surgical resection requirements in the AJCC manual. This may include the grade from the clinical workup.   \n  \nRecord the highest grade documented from any microscopic specimen of the primary site whether from the clinical workup or the surgical resection.   \n  \nFor cases diagnosed January 1 2018 and later this data item along with Grade Clinical and Grade Post-Neoadjuvant replaces NAACCR Data Item Grade 440 as well as SSF\u2019s for cancer sites with alternative grading systems (e.g. breast Bloom-Richardson prostate Gleason).",
+      "rationale": "Grade is a measure of the aggressiveness of the tumor. Grade and cell type are important prognostic indicators for many cancers. For some sites, grade is required to assign the pathological stage group.   \n  \nFor those cases that are eligible AJCC staging, the recommended grading system is specified in the AJCC Chapter. The AJCC Chapter-specific grading systems (codes 1-5) take priority over the generic grade definitions (codes A-E, L, H, 9). For those cases that are not eligible for AJCC staging, if the recommended grading system is not documented, the generic grade definitions would apply.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": "Refer to the most recent version of the SSDI Manual for additional site-specific instructions",
+      "npcr_collect": "R",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": "R",
+      "alternate_names": null,
+      "format": null,
+      "code_description": null,
+      "code_note": "Each Site-Specific Data Item (SSDI) applies only to selected primary sites, histologies, and years of diagnosis. Depending on applicability and standard-setter requirements, SSDIs may be left blank. Leave blank for cases diagnosed prior to 2018.",
+      "allowable_values": "1-5, 8, 9, A, B, C, D, E, L, H, M, S",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "1",
+          "description": "Grade Group 1: Gleason score less than or equal to 6"
+        },
+        {
+          "code": "2",
+          "description": "Grade Group 2: Gleason score 7\nGleason pattern 3+4"
+        },
+        {
+          "code": "3",
+          "description": "Grade Group 3: Gleason score 7\nGleason pattern 4+3"
+        },
+        {
+          "code": "4",
+          "description": "Grade Group 4: Gleason score 8"
+        },
+        {
+          "code": "5",
+          "description": "Grade Group 5: Gleason score 9 or 10"
+        },
+        {
+          "code": "A",
+          "description": "Well differentiated"
+        },
+        {
+          "code": "B",
+          "description": "Moderately differentiated"
+        },
+        {
+          "code": "C",
+          "description": "Poorly differentiated"
+        },
+        {
+          "code": "D",
+          "description": "Undifferentiated, anaplastic"
+        },
+        {
+          "code": "E",
+          "description": "Stated as \"Gleason score 7\" with no patterns documented or \nAny Gleason patterns combination equal to 7 not specified in 2 or 3"
+        },
+        {
+          "code": "9",
+          "description": "Grade cannot be assessed; Unknown"
+        }
+      ]
+    }
+  }
+}
