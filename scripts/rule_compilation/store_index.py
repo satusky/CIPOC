@@ -67,7 +67,7 @@ class StoreItem:
     the item's NAACCR implementation date, not the manual's: it is what keeps a
     2018-implemented item applicable to a 2019 case compiled from the 2024
     edition. ``tests/test_store_compile.py`` cross-checks it against the data
-    dictionary's 'Year Implemented'.
+    dictionary's `year_implemented`.
     """
 
     item_id: int
