@@ -4,6 +4,7 @@ from .extraction import (
     VariableValueValidator,
     lookup_variable_info,
     build_variable_group,
+    resolve_site_key,
 )
 from .orchestration import (
     load_variable_groups,
@@ -40,6 +41,7 @@ __all__ = [
     "VariableValueValidator",
     "lookup_variable_info",
     "build_variable_group",
+    "resolve_site_key",
     "load_variable_groups",
     "load_group_hierarchy",
     "GroupNode",
