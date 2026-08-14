@@ -162,7 +162,7 @@ def _overlay_site_codes(item_entry: dict | None, site_entry: dict | None) -> dic
     return merged
 
 
-def _site_key(case_facts: "CaseFacts | None", site_dictionary: dict) -> str | None:
+def resolve_site_key(case_facts: "CaseFacts | None", site_dictionary: dict) -> str | None:
     """Resolve case facts to a top-level key present in the site dictionary."""
     if case_facts is None:
         return None
@@ -241,7 +241,7 @@ def lookup_variable_info(
     if site_data_dictionary_path is not None:
         with open(site_data_dictionary_path, "r") as f:
             site_dictionary = json.load(f)
-        site = _site_key(case_facts, site_dictionary)
+        site = resolve_site_key(case_facts, site_dictionary)
         site_entry = site_dictionary.get(site, {}).get(str(item_id)) if site else None
         item_entry = _overlay_site_codes(item_entry, site_entry)
 
@@ -269,7 +269,7 @@ def build_variable_group(
     if site_data_dictionary_path is not None:
         with open(site_data_dictionary_path, "r") as f:
             site_dictionary = json.load(f)
-    site = _site_key(case_facts, site_dictionary)
+    site = resolve_site_key(case_facts, site_dictionary)
 
     item_info = []
     for item_id in sorted(set(item_ids)):
