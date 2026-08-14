@@ -17,7 +17,7 @@ The response schema contains one required field for each concept listed above. F
 whether cancer is present, default to true.
 - confidence: your confidence in the presence/absence judgment for that concept.
 - evidence: verbatim text span(s) from the note supporting a positive finding, using the \
-clinical note's note_id as each span's note_id; leave empty \
+clinical note's note_id as each span's note_id. You **must** provide one or more evidence spans when a concept is present; leave empty \
 when the concept is absent.
 
 Populate every required concept field in the response schema.
