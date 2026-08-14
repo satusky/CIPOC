@@ -51,4 +51,5 @@ documents:
   documents_path: documents/
   data_dictionary_path: documents/manuals/naaccr_data_dictionary_v25.json
   site_data_dictionary_path: documents/cipoc_data_dictionary.json
-  variable_groups_path: config/variable_groups.json
+  # variable_groups_path: config/variable_groups.json
+  variable_groups_path: config/initial_extraction_test.json
