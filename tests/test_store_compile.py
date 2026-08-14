@@ -132,7 +132,7 @@ class StoreIndexTests(unittest.TestCase):
         """
         dictionary = json.loads(DATA_DICTIONARY.read_text())
         for item in TARGETS:
-            implemented = dictionary[str(item.item_id)]["Year Implemented"]
+            implemented = dictionary[str(item.item_id)]["year_implemented"]
             if implemented is None:
                 continue  # STORE marks these "All Years"; the project floor stands
             self.assertEqual(
