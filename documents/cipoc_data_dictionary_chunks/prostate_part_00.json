@@ -1,0 +1,1459 @@
+{
+  "prostate": {
+    "390": {
+      "naaccr_version": "24",
+      "item_number": 390,
+      "item_name": "Date of Diagnosis",
+      "item_data_type": "date",
+      "item_length": 8,
+      "year_implemented": null,
+      "version_implemented": null,
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "dateOfDiagnosis",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Cancer Identification",
+      "source_of_standard": "SEER/CoC",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Date of initial diagnosis by a recognized medical practitioner for the tumor being reported whether clinically or microscopically confirmed. See **Data Descriptor Table**(https://apps.naaccr.org/data-dictionary/data-dictionary/version=24/chapter-view/data-descriptor-table/) for date format.\r\n\r\nFor more discussion on determining date of diagnosis consult the _SEER Program Coding and Staging Manual_(http://seer.cancer.gov/tools/codingmanuals/) or CoC _STORE_(http://www.facs.org/cancer/coc/fordsmanual.html) manual.",
+      "rationale": null,
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": null,
+      "npcr_collect": "R",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": "R",
+      "alternate_names": [
+        "'Date of Initial Diagnosis (CoC)'"
+      ],
+      "format": "YYYYMMDD",
+      "code_description": null,
+      "code_note": null,
+      "allowable_values": "Valid date",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": []
+    },
+    "400": {
+      "naaccr_version": "24",
+      "item_number": 400,
+      "item_name": "Primary Site",
+      "item_data_type": "text",
+      "item_length": 4,
+      "year_implemented": null,
+      "version_implemented": null,
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "primarySite",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Cancer Identification",
+      "source_of_standard": "SEER/CoC",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Code for the primary site of the tumor being reported using either ICD-O-2 or ICD-O-3. NAACCR adopted ICD-O-2 as the standard coding system for tumors diagnosed beginning January 1, 1992. In addition, NAACCR recommended that tumors diagnosed prior to 1992 be converted to ICD-O-2. The topography (primary site) codes did not change between ICD-O-2 and ICD-O-3.",
+      "rationale": null,
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": "See ICD-O-2,^14^ or ICD-O-3,^13^ Topography Section, for the codes for primary site",
+      "npcr_collect": "R",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": "R",
+      "alternate_names": [
+        "'IDC-O-2/3 Topography (CCCR)'"
+      ],
+      "format": "C followed by 3 digits, no special characters, no embedded blanks",
+      "code_description": null,
+      "code_note": "*Note:* See data item Site (73-91) ICD-O-1 1960 for ICD-O-1 cases.",
+      "allowable_values": "Refer to ICD-O-3 (decimals are dropped)",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "C619",
+          "description": "Prostate gland"
+        }
+      ]
+    },
+    "410": {
+      "naaccr_version": "24",
+      "item_number": 410,
+      "item_name": "Laterality",
+      "item_data_type": "digits",
+      "item_length": 1,
+      "year_implemented": null,
+      "version_implemented": null,
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "laterality",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Cancer Identification",
+      "source_of_standard": "SEER/CoC",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Code for the side of a paired organ, or the side of the body on which the reportable tumor originated. This applies to the primary site only.",
+      "rationale": null,
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": null,
+      "npcr_collect": "R",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": "R",
+      "alternate_names": [
+        "'Laterality at Diagnosis (SEER)'"
+      ],
+      "format": null,
+      "code_description": null,
+      "code_note": null,
+      "allowable_values": "0-5, 9",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "0",
+          "description": "Not a paired site"
+        },
+        {
+          "code": "1",
+          "description": "Right: origin of primary"
+        },
+        {
+          "code": "2",
+          "description": "Left: origin of primary"
+        },
+        {
+          "code": "3",
+          "description": "Only one side involved, right or left origin unspecified"
+        },
+        {
+          "code": "4",
+          "description": "Bilateral involvement at time of diagnosis, lateral origin unknown for a single primary; or both ovaries involved simultaneously, single histology; bilateral retinoblastomas; bilateral Wilms' tumors"
+        },
+        {
+          "code": "5",
+          "description": "Paired site: midline tumor"
+        },
+        {
+          "code": "9",
+          "description": "Paired site, but no information concerning laterality"
+        }
+      ]
+    },
+    "522": {
+      "naaccr_version": "24",
+      "item_number": 522,
+      "item_name": "Histologic Type ICD-O-3",
+      "item_data_type": "digits",
+      "item_length": 4,
+      "year_implemented": 2001.0,
+      "version_implemented": "9",
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "histologicTypeIcdO3",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Cancer Identification",
+      "source_of_standard": "SEER/CoC",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Codes for the histologic type of the tumor being reported using ICD-O-3. NAACCR adopted ICD-O-3 as the standard coding system for tumors diagnosed in 2001 and later and recommended that prior tumors be converted from ICD-O-2. Effective with 2010 diagnoses this item also includes histology codes as per the 2008 WHO Hematopoietic/Lymphoid publication^39^ which are listed on pages 3-5 of the NAACCR 2010 Implementation Guidelines. \\<http://www.naaccr.org/StandardsandRegistryOperations/ImplementationGuidelines.aspx\\>.\r\n\r\nNote: See Histology (92-00) ICD-O-2 \\420\\ for ICD-O-2 codes. Effective with 2010 diagnoses this item also includes histology codes as per the 2008 WHO Hematopoietic/Lymphoid publication ^39^ which are listed on pages 3-5 of the NAACCR 2010 Implementation Guidelines. http://www.naaccr.org/LinkClick.aspx?fileticket=U-3o31G2Lik%3d&tabid=126&mid=466(http://www.naaccr.org/LinkClick.aspx?fileticket=U-3o31G2Lik%3d&tabid=126&mid=466%20)",
+      "rationale": null,
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": "See ICD-O-3,^14^ Morphology Section and the SEER Hematopoietic database",
+      "npcr_collect": "R",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": "R",
+      "alternate_names": [
+        "'ICD-O-3 Histology (CCCR)'"
+      ],
+      "format": null,
+      "code_description": null,
+      "code_note": "**Clarification of Required Status**\r\n\r\nThis data item is required by all standard-setting organizations for tumors diagnosed on or after January 1 2001 and recommended (by conversion from ICD-O-2 codes when conversion algorithms and tables are available) for tumors diagnosed before 2001.\r\n\r\nWhen the histologic type is coded according to ICD-O-3 the histology code must be reported in Histologic Type ICD-O-3 \\522\\ with behavior coded in Behavior Code ICD-O-3 \\523\\.\r\n\r\nFor information on required status for related data items for histologic type and behavior when coded according to ICD-O-2 see Histology (92-00) ICD-O-2 \\420\\ and Behavior (92-00) ICD-O-2 \\430\\.",
+      "allowable_values": "8000-9989, Refer to ICD-O-3",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "8000/0",
+          "description": "Neoplasm, benign; Tumor, benign; Unclassified tumor, benign"
+        },
+        {
+          "code": "8000/1",
+          "description": "Neoplasm, uncertain whether benign or malignant; Neoplasm, NOS; Tumor, NOS; Unclassified tumor, borderline malignancy; Unclassified tumor, uncertain whether benign or malignant"
+        },
+        {
+          "code": "8000/3",
+          "description": "Neoplasm, malignant; Blastoma, NOS; Tumor, malignant, NOS; Cancer; Malignancy; Unclassified tumor, malignant"
+        },
+        {
+          "code": "8000/6",
+          "description": "Neoplasm, metastatic; Neoplasm, secondary; Tumor embolus; Tumor, metastatic; Tumor, secondary"
+        },
+        {
+          "code": "8000/9",
+          "description": "Neoplasm, malignant, uncertain whether primary or metastatic; Unclassified tumor, malignant, uncertain whether primary or metastatic"
+        },
+        {
+          "code": "8001/0",
+          "description": "Tumor cells, benign"
+        },
+        {
+          "code": "8001/1",
+          "description": "Tumor cells, uncertain whether benign or malignant; Tumor cells, NOS"
+        },
+        {
+          "code": "8001/3",
+          "description": "Tumor cells, malignant"
+        },
+        {
+          "code": "8002/3",
+          "description": "Malignant tumor, small cell type"
+        },
+        {
+          "code": "8003/3",
+          "description": "Malignant tumor, giant cell type"
+        },
+        {
+          "code": "8004/3",
+          "description": "Malignant tumor, spindle cell type; Malignant tumor, fusiform cell type"
+        },
+        {
+          "code": "8005/0",
+          "description": "Clear cell tumor, NOS"
+        },
+        {
+          "code": "8005/3",
+          "description": "Malignant tumor, clear cell type"
+        },
+        {
+          "code": "8010/0",
+          "description": "Epithelial tumor, benign"
+        },
+        {
+          "code": "8010/2",
+          "description": "Carcinoma in situ, NOS; Intraepithelial carcinoma, NOS"
+        },
+        {
+          "code": "8010/3",
+          "description": "Carcinoma, NOS; Epithelial tumor, malignant; Heterotopia-associated carcinoma"
+        },
+        {
+          "code": "8010/6",
+          "description": "Carcinoma, metastatic, NOS; Secondary carcinoma"
+        },
+        {
+          "code": "8010/9",
+          "description": "Carcinomatosis"
+        },
+        {
+          "code": "8011/0",
+          "description": "Epithelioma, benign"
+        },
+        {
+          "code": "8011/3",
+          "description": "Epithelioma, malignant; Epithelioma, NOS"
+        },
+        {
+          "code": "8012/3",
+          "description": "Large cell carcinoma, NOS"
+        },
+        {
+          "code": "8013/3",
+          "description": "Large cell neuroendocrine carcinoma; Combined large cell neuroendocrine carcinoma"
+        },
+        {
+          "code": "8014/3",
+          "description": "Large cell carcinoma with rhabdoid phenotype"
+        },
+        {
+          "code": "8015/3",
+          "description": "Glassy cell carcinoma"
+        },
+        {
+          "code": "8020/3",
+          "description": "Carcinoma, undifferentiated, NOS; Carcinoma, poorly differentiated, NOS; Anaplastic undifferentiated carcinoma; Dedifferentiated carcinoma"
+        },
+        {
+          "code": "8021/3",
+          "description": "Carcinoma, anaplastic, NOS"
+        },
+        {
+          "code": "8022/3",
+          "description": "Pleomorphic carcinoma"
+        },
+        {
+          "code": "8023/3",
+          "description": "Nuclear protein in testis (NUT) associated carcinoma; NUT carcinoma; NUT midline carcinoma"
+        },
+        {
+          "code": "8030/3",
+          "description": "Giant cell and spindle cell carcinoma"
+        },
+        {
+          "code": "8031/3",
+          "description": "Giant cell carcinoma"
+        },
+        {
+          "code": "8032/3",
+          "description": "Spindle cell carcinoma, NOS"
+        },
+        {
+          "code": "8033/3",
+          "description": "Pseudosarcomatous carcinoma; Sarcomatoid carcinoma"
+        },
+        {
+          "code": "8034/3",
+          "description": "Polygonal cell carcinoma"
+        },
+        {
+          "code": "8035/3",
+          "description": "Carcinoma with osteoclast-like giant cells; Squamous carcinoma with osteoclast-like giant cells; Undifferentiated carcinoma with osteoclast-like giant cells"
+        },
+        {
+          "code": "8040/0",
+          "description": "Tumorlet, benign; Diffuse idiopathic neuroendocrine cell hyperplasia"
+        },
+        {
+          "code": "8040/1",
+          "description": "Tumorlet, NOS"
+        },
+        {
+          "code": "8041/3",
+          "description": "Small cell carcinoma, NOS; Reserve cell carcinoma; Round cell carcinoma; Small cell neuroendocrine carcinoma; Small cell carcinoma, pulmonary type"
+        },
+        {
+          "code": "8042/3",
+          "description": "Oat cell carcinoma"
+        },
+        {
+          "code": "8043/3",
+          "description": "Small cell carcinoma, fusiform cell"
+        },
+        {
+          "code": "8044/3",
+          "description": "Small cell carcinoma, intermediate cell; Small cell carcinoma, hypercalcemic type"
+        },
+        {
+          "code": "8045/3",
+          "description": "Combined small cell carcinoma; Mixed small cell carcinoma; Combined small cell-adenocarcinoma; Combined small cell-large cell carcinoma; Combined small cell-squamous cell carcinoma"
+        },
+        {
+          "code": "8046/3",
+          "description": "Non-small cell carcinoma"
+        },
+        {
+          "code": "8050/0",
+          "description": "Papilloma, NOS"
+        },
+        {
+          "code": "8050/2",
+          "description": "Papillary carcinoma in situ"
+        },
+        {
+          "code": "8050/3",
+          "description": "Papillary carcinoma, NOS"
+        },
+        {
+          "code": "8051/0",
+          "description": "Verrucous papilloma"
+        },
+        {
+          "code": "8051/3",
+          "description": "Verrucous carcinoma, NOS; Verrucous epidermoid carcinoma; Verrucous squamous cell carcinoma"
+        },
+        {
+          "code": "8052/0",
+          "description": "Squamous cell papilloma, NOS; Keratotic papilloma; Squamous papilloma; Benign keratosis, NOS; Seborrhoeic keratosis; Solar lentigo; Lichen planus-like keratosis"
+        },
+        {
+          "code": "8052/2",
+          "description": "Papillary squamous cell carcinoma, non-invasive; Papillary squamous cell carcinoma in situ"
+        },
+        {
+          "code": "8052/3",
+          "description": "Papillary squamous cell carcinoma; Papillary epidermoid carcinoma"
+        },
+        {
+          "code": "8053/0",
+          "description": "Squamous cell papilloma, inverted"
+        },
+        {
+          "code": "8054/0",
+          "description": "Warty dyskeratoma"
+        },
+        {
+          "code": "8054/3",
+          "description": "Warty carcinoma; Condylomatous carcinoma; Warty-basaloid carcinoma"
+        },
+        {
+          "code": "8060/0",
+          "description": "Squamous papillomatosis; Papillomatosis, NOS"
+        },
+        {
+          "code": "8070/0",
+          "description": "Actinic keratosis; Arsenical keratosis; PUVA keratosis"
+        },
+        {
+          "code": "8070/2",
+          "description": "Squamous cell carcinoma in situ, NOS; Epidermoid carcinoma in situ, NOS; Intraepidermal carcinoma, NOS; Intraepithelial squamous cell carcinoma"
+        },
+        {
+          "code": "8070/3",
+          "description": "Squamous cell carcinoma, NOS; Squamous cell carcinoma, usual type; Epidermoid carcinoma, NOS; Squamous carcinoma; Squamous cell epithelioma"
+        },
+        {
+          "code": "8070/6",
+          "description": "Squamous cell carcinoma, metastatic, NOS"
+        },
+        {
+          "code": "8071/2",
+          "description": "Differentiated intraepithelial neoplasia; Differentiated penile intraepithelial neoplasia (PeIN); Differentiated vulvar intraepithelial neoplasia (VIN)"
+        },
+        {
+          "code": "8071/3",
+          "description": "Squamous cell carcinoma, keratinizing, NOS; Epidermoid carcinoma, keratinizing; Squamous cell carcinoma, large cell, keratinizing; Keratoacanthoma"
+        },
+        {
+          "code": "8072/0",
+          "description": "Large cell acanthoma"
+        },
+        {
+          "code": "8072/3",
+          "description": "Squamous cell carcinoma, large cell, nonkeratinizing, NOS; Epidermoid carcinoma, large cell, nonkeratinizing; Squamous cell carcinoma, nonkeratinizing, NOS"
+        },
+        {
+          "code": "8073/3",
+          "description": "Squamous cell carcinoma, small cell, nonkeratinizing; Epidermoid carcinoma, small cell, nonkeratinizing"
+        },
+        {
+          "code": "8074/3",
+          "description": "Squamous cell carcinoma, spindle cell; Epidermoid carcinoma, spindle cell; Squamous cell carcinoma, sarcomatoid; Pseudovascular squamous cell carcinoma"
+        },
+        {
+          "code": "8075/3",
+          "description": "Squamous cell carcinoma, adenoid; Squamous cell carcinoma, acantholytic; Squamous cell carcinoma, pseudoglandular"
+        },
+        {
+          "code": "8076/2",
+          "description": "Squamous cell carcinoma in situ with questionable stromal invasion; Epidermoid carcinoma in situ with questionable stromal invasion"
+        },
+        {
+          "code": "8076/3",
+          "description": "Squamous cell carcinoma, microinvasive"
+        },
+        {
+          "code": "8077/0",
+          "description": "Squamous intraepithelial neoplasia, low grade; Squamous intraepithelial neoplasia, grade I; Low grade squamous intraepithelial lesion; Anal intraepithelial neoplasia, low grade; Cervical intraepithelial neoplasia, low grade; Esophageal squamous intraepithelial neoplasia (dysplasia), low grade"
+        },
+        {
+          "code": "8077/2",
+          "description": "Squamous intraepithelial neoplasia, high grade; Squamous intraepithelial neoplasia, grade II; Squamous intraepithelial neoplasia, grade III; Squamous dysplasia, high grade; High grade squamous intraepithelial lesion; Anal intraepithelial neoplasia, grade III; AIN III; Cervical intraepithelial neoplasia, grade III; CIN III, NOS; CIN III with severe dysplasia; Esophageal squamous intraepithelial neoplasia (dysplasia), high grade; Vaginal intraepithelial neoplasia, grade III; VAIN III; Vulvar intraepithelial neoplasia, grade III; VIN III"
+        },
+        {
+          "code": "8078/3",
+          "description": "Squamous cell carcinoma with horn formation"
+        },
+        {
+          "code": "8080/2",
+          "description": "Queyrat erythroplasia"
+        },
+        {
+          "code": "8081/2",
+          "description": "Bowen disease; Intraepidermal squamous cell carcinoma, Bowen type"
+        },
+        {
+          "code": "8082/3",
+          "description": "Lymphoepithelial carcinoma; Lymphoepithelioma; Lymphoepithelioma-like carcinoma; Schmincke tumor"
+        },
+        {
+          "code": "8083/3",
+          "description": "Basaloid squamous cell carcinoma; Papillary-basaloid carcinoma"
+        },
+        {
+          "code": "8084/0",
+          "description": "Clear cell acanthoma"
+        },
+        {
+          "code": "8084/3",
+          "description": "Squamous cell carcinoma, clear cell type"
+        },
+        {
+          "code": "8085/3",
+          "description": "Squamous cell carcinoma, HPV-positive"
+        },
+        {
+          "code": "8086/3",
+          "description": "Squamous cell carcinoma, HPV-negative"
+        },
+        {
+          "code": "8090/1",
+          "description": "Basal cell tumor"
+        },
+        {
+          "code": "8090/3",
+          "description": "Basal cell carcinoma, NOS; Basal cell epithelioma; Rodent ulcer; Pigmented basal cell carcinoma; Basal cell carcinoma with adnexal differentiation"
+        },
+        {
+          "code": "8091/3",
+          "description": "Superficial basal cell carcinoma; Multifocal superficial basal cell carcinoma; Multicentric basal cell carcinoma"
+        },
+        {
+          "code": "8092/3",
+          "description": "Infiltrating basal cell carcinoma, NOS; Infiltrating basal cell carcinoma, non-sclerosing; Infiltrating basal cell carcinoma, sclerosing; Basal cell carcinoma, desmoplastic type; Basal cell carcinoma, morpheic; Basal cell carcinoma, sarcomatoid"
+        },
+        {
+          "code": "8093/3",
+          "description": "Basal cell carcinoma, fibroepithelial; Fibroepithelioma, NOS; Fibroepithelioma of Pinkus type; Fibroepithelial basal cell carcinoma, Pinkus type; Pinkus tumor"
+        },
+        {
+          "code": "8094/3",
+          "description": "Basosquamous carcinoma; Mixed basal-squamous cell carcinoma"
+        },
+        {
+          "code": "8095/3",
+          "description": "Metatypical carcinoma"
+        },
+        {
+          "code": "8096/0",
+          "description": "Intraepidermal epithelioma of Jadassohn"
+        },
+        {
+          "code": "8097/3",
+          "description": "Basal cell carcinoma, nodular; Basal cell carcinoma, micronodular"
+        },
+        {
+          "code": "8098/3",
+          "description": "Adenoid basal carcinoma"
+        },
+        {
+          "code": "8100/0",
+          "description": "Trichoepithelioma; Brooke tumor; Epithelioma adenoides cysticum; Trichoblastoma; Trichogerminoma"
+        },
+        {
+          "code": "8100/3",
+          "description": "Trichoblastic carcinoma; Trichoblastic carcinosarcoma"
+        },
+        {
+          "code": "8101/0",
+          "description": "Trichofolliculoma"
+        },
+        {
+          "code": "8102/0",
+          "description": "Trichilemmoma"
+        },
+        {
+          "code": "8102/3",
+          "description": "Trichilemmocarcinoma; Trichilemmal carcinoma"
+        },
+        {
+          "code": "8103/0",
+          "description": "Pilar tumor"
+        },
+        {
+          "code": "8103/1",
+          "description": "Proliferating trichilemmal cyst; Proliferating trichilemmal tumor"
+        },
+        {
+          "code": "8104/0",
+          "description": "Pilar sheath acanthoma; Tumor of the follicular infundibulum"
+        },
+        {
+          "code": "8110/0",
+          "description": "Pilomatricoma, NOS; Pilomatrixoma, NOS; Calcifying epithelioma of Malherbe; Melanocytic matricoma"
+        },
+        {
+          "code": "8110/3",
+          "description": "Pilomatrical carcinoma; Pilomatrix carcinoma; Matrical carcinoma; Pilomatricoma, malignant; Pilomatrixoma, malignant"
+        },
+        {
+          "code": "8120/0",
+          "description": "Urothelial papilloma, NOS; Transitional cell papilloma, benign; Transitional papilloma; Transitional cell papilloma, NOS; Papilloma of bladder"
+        },
+        {
+          "code": "8120/2",
+          "description": "Urothelial carcinoma in situ; Transitional cell carcinoma in situ"
+        },
+        {
+          "code": "8120/3",
+          "description": "Transitional cell carcinoma, NOS; Urothelial carcinoma, NOS; Transitional carcinoma; Squamotransitional carcinoma"
+        },
+        {
+          "code": "8121/0",
+          "description": "Sinonasal papilloma, exophytic; Schneiderian papilloma, NOS; Sinonasal papilloma, NOS; Sinonasal papilloma, fungiform; Urothelial papilloma, inverted; Transitional papilloma, inverted, NOS; Transitional cell papilloma, inverted, NOS"
+        },
+        {
+          "code": "8121/1",
+          "description": "Sinonasal papilloma, inverted; Columnar cell papilloma; Cylindrical cell papilloma; Schneiderian papilloma, oncocytic; Schneiderian papilloma, inverted; Sinonasal papilloma, oncocytic"
+        },
+        {
+          "code": "8121/3",
+          "description": "Schneiderian carcinoma; Cylindrical cell carcinoma"
+        },
+        {
+          "code": "8122/3",
+          "description": "Urothelial carcinoma, sarcomatoid ; Urothelial carcinoma, spindle cell; Transitional cell carcinoma, spindle cell; Transitional cell carcinoma, sarcomatoid"
+        },
+        {
+          "code": "8123/3",
+          "description": "Basaloid carcinoma"
+        },
+        {
+          "code": "8124/3",
+          "description": "Cloacogenic carcinoma"
+        },
+        {
+          "code": "8130/1",
+          "description": "Papillary urothelial neoplasm of low malignant potential; Papillary transitional cell neoplasm of low malignant potential"
+        },
+        {
+          "code": "8130/2",
+          "description": "Papillary urothelial carcinoma, non-invasive; Papillary transitional cell carcinoma, non-invasive"
+        },
+        {
+          "code": "8130/3",
+          "description": "Papillary transitional cell carcinoma; Papillary urothelial carcinoma"
+        },
+        {
+          "code": "8131/3",
+          "description": "Urothelial carcinoma, micropapillary; Transitional cell carcinoma, micropapillary"
+        },
+        {
+          "code": "8140/0",
+          "description": "Adenoma, NOS"
+        },
+        {
+          "code": "8140/1",
+          "description": "Atypical adenoma; Bronchial adenoma, NOS"
+        },
+        {
+          "code": "8140/2",
+          "description": "Adenocarcinoma in situ, NOS"
+        },
+        {
+          "code": "8140/3",
+          "description": "Adenocarcinoma, NOS; Adenocarcinoma, usual type; Carcinoma of Skene, Cowper and Littre Glands; Endolymphatic sac tumor; Parathyroid carcinoma; Acinar adenocarcinoma of prostate"
+        },
+        {
+          "code": "8140/6",
+          "description": "Adenocarcinoma, metastatic, NOS"
+        },
+        {
+          "code": "8141/3",
+          "description": "Scirrhous adenocarcinoma; Carcinoma with productive fibrosis; Scirrhous carcinoma"
+        },
+        {
+          "code": "8142/3",
+          "description": "Linitis plastica"
+        },
+        {
+          "code": "8143/3",
+          "description": "Superficial spreading adenocarcinoma"
+        },
+        {
+          "code": "8144/0",
+          "description": "Adenoma, intestinal type"
+        },
+        {
+          "code": "8144/3",
+          "description": "Adenocarcinoma, intestinal type; Adenocarcinoma, enteric; Carcinoma, intestinal type; Mucinous carcinoma, intestinal type"
+        },
+        {
+          "code": "8145/3",
+          "description": "Carcinoma, diffuse type; Adenocarcinoma, diffuse type"
+        },
+        {
+          "code": "8146/0",
+          "description": "Monomorphic adenoma"
+        },
+        {
+          "code": "8147/0",
+          "description": "Basal cell adenoma"
+        },
+        {
+          "code": "8147/3",
+          "description": "Basal cell adenocarcinoma; Basal cell carcinoma of the prostate"
+        },
+        {
+          "code": "8148/0",
+          "description": "Glandular intraepithelial neoplasia, low grade; Glandular intraepithelial neoplasia, grade I; Glandular intraepithelial neoplasia, grade II; Biliary intraepithelial neoplasia, low grade; Esophageal glandular dysplasia (intraepithelial neoplasia), low grade"
+        },
+        {
+          "code": "8148/2",
+          "description": "Glandular intraepithelial neoplasia, high grade; Glandular intraepithelial neoplasia, grade III; Flat intraepithelial neoplasia, high grade; Biliary intraepithelial neoplasia, high grade; Biliary intraepithelial neoplasia, grade 3 (BilIN-3); Esophageal glandular dysplasia (intraepithelial neoplasia), high grade; Esophageal intraepithelial neoplasia, high grade; Prostatic intraepithelial neoplasia, grade III; PIN III; Prostatic intraepithelial neoplasia, high grade"
+        },
+        {
+          "code": "8149/0",
+          "description": "Canalicular adenoma"
+        },
+        {
+          "code": "8150/0",
+          "description": "Pancreatic neuroendocrine microadenoma; Pancreatic endocrine tumor, benign; Islet cell tumor, benign; Pancreatic microadenoma"
+        },
+        {
+          "code": "8150/3",
+          "description": "Pancreatic neuroendocrine tumor, nonfunctioning; Pancreatic endocrine tumor, nonfunctioning; Pancreatic endocrine tumor, NOS; Islet cell adenoma; Islet cell adenomatosis; Nesidioblastoma; Islet cell tumor, NOS; Islet cell adenocarcinoma; Islet cell carcinoma"
+        },
+        {
+          "code": "8151/3",
+          "description": "Insulinoma, NOS; Beta cell adenoma; Beta cell tumor, malignant"
+        },
+        {
+          "code": "8152/3",
+          "description": "Glucagonoma, NOS; Alpha cell tumor, NOS; Enteroglucagonoma, NOS; Glucagon-like peptide-producing tumor; L-cell tumor; Pancreatic peptide and pancreatic peptide-like peptide within terminal tyrosine amide producing tumor; PP/PYY producing tumor"
+        },
+        {
+          "code": "8153/3",
+          "description": "Gastrinoma, NOS; G cell tumor, NOS; Gastrin cell tumor"
+        },
+        {
+          "code": "8154/3",
+          "description": "Mixed neuroendocrine non-neuroendocrine neoplasm (MiNEN); Mixed pancreatic endocrine and exocrine tumor, malignant; Mixed islet cell and exocrine adenocarcinoma; Mixed acinar-endocrine carcinoma; Mixed acinar-neuroendocrine carcinoma; Mixed acinar-endocrine-ductal carcinoma; Mixed ductal-endocrine carcinoma; Mixed ductal-neuroendocrine carcinoma; Mixed endocrine and exocrine adenocarcinoma"
+        },
+        {
+          "code": "8155/3",
+          "description": "Vipoma, NOS"
+        },
+        {
+          "code": "8156/3",
+          "description": "Somatostatinoma, NOS; Somatostatin cell tumor, NOS"
+        },
+        {
+          "code": "8158/3",
+          "description": "ACTH-producing tumor; Endocrine tumor, functioning, NOS"
+        },
+        {
+          "code": "8160/0",
+          "description": "Bile duct adenoma; Cholangioma"
+        },
+        {
+          "code": "8160/3",
+          "description": "Cholangiocarcinoma; Bile duct adenocarcinoma; Bile duct carcinoma"
+        },
+        {
+          "code": "8161/0",
+          "description": "Bile duct cystadenoma"
+        },
+        {
+          "code": "8161/3",
+          "description": "Bile duct cystadenocarcinoma"
+        },
+        {
+          "code": "8162/3",
+          "description": "Klatskin tumor"
+        },
+        {
+          "code": "8163/0",
+          "description": "Pancreatobiliary neoplasm, non-invasive; Non-invasive pancreatobiliary papillary neoplasm with low grade dysplasia; Non-invasive pancreatobiliary papillary neoplasm with low grade intraepithelial neoplasia"
+        },
+        {
+          "code": "8163/2",
+          "description": "Papillary neoplasm, pancreatobiliary type, with high grade intraepithelial neoplasia; Non-invasive pancreatobiliary papillary neoplasm with high grade dysplasia; Non-invasive pancreatobiliary papillary neoplasm with high grade intraepithelial neoplasia"
+        },
+        {
+          "code": "8163/3",
+          "description": "Pancreatobiliary type carcinoma; Adenocarcinoma, pancreatobiliary type"
+        },
+        {
+          "code": "8170/0",
+          "description": "Liver cell adenoma; Hepatocellular adenoma; Hepatoma, benign"
+        },
+        {
+          "code": "8170/3",
+          "description": "Hepatocellular carcinoma, NOS; Hepatoma, NOS; Hepatocarcinoma; Hepatoma, malignant; Liver cell carcinoma"
+        },
+        {
+          "code": "8171/3",
+          "description": "Hepatocellular carcinoma, fibrolamellar"
+        },
+        {
+          "code": "8172/3",
+          "description": "Hepatocellular carcinoma, scirrhous; Sclerosing hepatic carcinoma"
+        },
+        {
+          "code": "8173/3",
+          "description": "Hepatocellular carcinoma, spindle cell variant; Hepatocellular carcinoma, sarcomatoid"
+        },
+        {
+          "code": "8174/3",
+          "description": "Hepatocellular carcinoma, clear cell type"
+        },
+        {
+          "code": "8175/3",
+          "description": "Hepatocellular carcinoma, pleomorphic type"
+        },
+        {
+          "code": "8180/3",
+          "description": "Combined hepatocellular carcinoma and cholangiocarcinoma; Hepatocholangiocarcinoma; Mixed hepatocellular and bile duct carcinoma"
+        },
+        {
+          "code": "8190/0",
+          "description": "Trabecular adenoma"
+        },
+        {
+          "code": "8190/3",
+          "description": "Trabecular adenocarcinoma; Trabecular carcinoma"
+        },
+        {
+          "code": "8191/0",
+          "description": "Embryonal adenoma"
+        },
+        {
+          "code": "8200/0",
+          "description": "Eccrine dermal cylindroma; Cylindroma of skin; Cylindroma of breast; Turban tumor"
+        },
+        {
+          "code": "8200/3",
+          "description": "Adenoid cystic carcinoma; Cylindroma, NOS; Adenocarcinoma, cylindroid; Adenocystic carcinoma; Bronchial adenoma, cylindroid; Thymic carcinoma with adenoid cystic carcinoma-like features"
+        },
+        {
+          "code": "8201/2",
+          "description": "Cribriform carcinoma in situ; Ductal carcinoma in situ, cribriform type"
+        },
+        {
+          "code": "8201/3",
+          "description": "Cribriform carcinoma, NOS; Ductal carcinoma, cribriform type; Cribriform comedo type carcinoma; Adenocarcinoma, cribriform comedo type"
+        },
+        {
+          "code": "8202/0",
+          "description": "Microcystic adenoma"
+        },
+        {
+          "code": "8204/0",
+          "description": "Lactating adenoma"
+        },
+        {
+          "code": "8210/0",
+          "description": "Adenomatous polyp, NOS; Polypoid adenoma"
+        },
+        {
+          "code": "8210/2",
+          "description": "Adenocarcinoma in situ in adenomatous polyp; Adenocarcinoma in situ in polyp, NOS; Carcinoma in situ in polyp, NOS; Adenocarcinoma in situ in polypoid adenoma; Adenocarcinoma in situ in tubular adenoma; Carcinoma in situ in adenomatous polyp"
+        },
+        {
+          "code": "8210/3",
+          "description": "Adenocarcinoma in adenomatous polyp; Adenocarcinoma in polyp, NOS; Carcinoma in polyp, NOS; Adenocarcinoma in polypoid adenoma; Adenocarcinoma in tubular adenoma; Carcinoma in adenomatous polyp"
+        },
+        {
+          "code": "8211/0",
+          "description": "Tubular adenoma, NOS"
+        },
+        {
+          "code": "8211/3",
+          "description": "Tubular adenocarcinoma; Tubular carcinoma"
+        },
+        {
+          "code": "8212/0",
+          "description": "Flat adenoma"
+        },
+        {
+          "code": "8213/0",
+          "description": "Serrated adenoma, NOS; Traditional serrated adenoma; Mixed adenomatous and hyperplastic polyp; Sessile serrated adenoma, NOS; Sessile serrated polyp; Traditional sessile serrated adenoma"
+        },
+        {
+          "code": "8213/3",
+          "description": "Serrated adenocarcinoma"
+        },
+        {
+          "code": "8214/3",
+          "description": "Parietal cell carcinoma; Parietal cell adenocarcinoma"
+        },
+        {
+          "code": "8215/3",
+          "description": "Adenocarcinoma of anal glands; Adenocarcinoma of anal ducts"
+        },
+        {
+          "code": "8220/0",
+          "description": "Adenomatous polyposis coli; Adenomatosis, NOS; Familial polyposis coli"
+        },
+        {
+          "code": "8220/3",
+          "description": "Adenocarcinoma in adenomatous polyposis coli"
+        },
+        {
+          "code": "8221/0",
+          "description": "Multiple adenomatous polyps"
+        },
+        {
+          "code": "8221/3",
+          "description": "Adenocarcinoma in multiple adenomatous polyps"
+        },
+        {
+          "code": "8230/2",
+          "description": "Ductal carcinoma in situ, solid type; Intraductal carcinoma, solid type"
+        },
+        {
+          "code": "8230/3",
+          "description": "Solid carcinoma, NOS; Solid adenocarcinoma, NOS; Solid carcinoma with mucin formation; Solid adenocarcinoma with mucin formation"
+        },
+        {
+          "code": "8231/3",
+          "description": "Carcinoma simplex"
+        },
+        {
+          "code": "8240/3",
+          "description": "Neuroendocrine tumor, NOS; Carcinoid tumor, NOS; Carcinoid, NOS; Bronchial adenoma, carcinoid; Neuroendocrine carcinoma, low grade; Neuroendocrine carcinoma, well differentiated; Neuroendocrine tumor, grade 1; Typical carcinoid"
+        },
+        {
+          "code": "8241/3",
+          "description": "Enterochromaffin cell carcinoid; Argentaffinoma, malignant; Carcinoid tumor, argentaffin, malignant; EC cell carcinoid; Serotonin producing carcinoid; Serotonin producing tumor"
+        },
+        {
+          "code": "8242/3",
+          "description": "Enterochromaffin-like cell tumor, malignant; ECL cell carcinoid, malignant"
+        },
+        {
+          "code": "8243/3",
+          "description": "Goblet cell carcinoid; Mucinous carcinoid; Mucocarcinoid tumor"
+        },
+        {
+          "code": "8244/3",
+          "description": "Mixed adenoneuroendocrine carcinoma; Combined carcinoid and adenocarcinoma; Mixed carcinoid and adenocarcinoma; Composite carcinoid; MANEC; Mixed carcinoid-adenocarcinoma"
+        },
+        {
+          "code": "8245/1",
+          "description": "Tubular carcinoid"
+        },
+        {
+          "code": "8245/3",
+          "description": "Adenocarcinoid tumor"
+        },
+        {
+          "code": "8246/3",
+          "description": "Neuroendocrine carcinoma, NOS; Poorly differentiated neuroendocrine neoplasm"
+        },
+        {
+          "code": "8247/3",
+          "description": "Merkel cell carcinoma; Merkel cell tumor; Primary cutaneous neuroendocrine carcinoma"
+        },
+        {
+          "code": "8248/1",
+          "description": "Apudoma"
+        },
+        {
+          "code": "8249/3",
+          "description": "Neuroendocrine tumor, grade 2; Atypical carcinoid tumor; Neuroendocrine carcinoma, moderately differentiated; Neuroendocrine tumor, grade 3"
+        },
+        {
+          "code": "8250/0",
+          "description": "Atypical adenomatous hyperplasia"
+        },
+        {
+          "code": "8250/1",
+          "description": "Pulmonary adenomatosis"
+        },
+        {
+          "code": "8250/2",
+          "description": "Adenocarcinoma in situ of the lung, non-mucinous"
+        },
+        {
+          "code": "8250/3",
+          "description": "Lepidic adenocarcinoma; Bronchiolo-alveolar adenocarcinoma, NOS; Bronchiolo-alveolar carcinoma, NOS; Alveolar cell carcinoma; Bronchiolar adenocarcinoma; Bronchiolar carcinoma"
+        },
+        {
+          "code": "8251/0",
+          "description": "Alveolar adenoma"
+        },
+        {
+          "code": "8251/3",
+          "description": "Alveolar adenocarcinoma; Alveolar carcinoma"
+        },
+        {
+          "code": "8252/3",
+          "description": "Bronchiolo-alveolar carcinoma, non-mucinous; Bronchiolo-alveolar carcinoma, Clara cell; Bronchiolo-alveolar carcinoma, type II pneumocyte"
+        },
+        {
+          "code": "8253/2",
+          "description": "Adenocarcinoma in situ of the lung, mucinous"
+        },
+        {
+          "code": "8253/3",
+          "description": "Adenocarcinoma of the lung, mucinous; Bronchiolo-alveolar carcinoma, mucinous; Bronchiolo-alveolar carcinoma, goblet cell type"
+        },
+        {
+          "code": "8254/3",
+          "description": "Adenocarcinoma of the lung, mixed mucinous and non-mucinous; Bronchiolo-alveolar carcinoma, mixed mucinous and non-mucinous; Bronchiolo-alveolar carcinoma, Clara cell and goblet cell type; Bronchiolo-alveolar carcinoma, indeterminate type; Bronchiolo-alveolar carcinoma, type II pneumocyte and goblet cell type"
+        },
+        {
+          "code": "8255/3",
+          "description": "Adenocarcinoma with mixed subtypes; Adenocarcinoma combined with other types of carcinoma"
+        },
+        {
+          "code": "8256/3",
+          "description": "Minimally invasive adenocarcinoma, non-mucinous"
+        },
+        {
+          "code": "8257/3",
+          "description": "Minimally invasive adenocarcinoma, mucinous"
+        },
+        {
+          "code": "8260/0",
+          "description": "Papillary adenoma, NOS; Glandular papilloma"
+        },
+        {
+          "code": "8260/1",
+          "description": "Aggressive papillary tumor"
+        },
+        {
+          "code": "8260/3",
+          "description": "Papillary adenocarcinoma, NOS; Papillary carcinoma of thyroid; Papillary renal cell carcinoma"
+        },
+        {
+          "code": "8261/0",
+          "description": "Villous adenoma, NOS; Villous papilloma"
+        },
+        {
+          "code": "8261/2",
+          "description": "Adenocarcinoma in situ in villous adenoma"
+        },
+        {
+          "code": "8261/3",
+          "description": "Adenocarcinoma in villous adenoma"
+        },
+        {
+          "code": "8262/3",
+          "description": "Villous adenocarcinoma"
+        },
+        {
+          "code": "8263/0",
+          "description": "Tubulovillous adenoma, NOS; Villoglandular adenoma; Papillotubular adenoma; Tubulo-papillary adenoma"
+        },
+        {
+          "code": "8263/2",
+          "description": "Adenocarcinoma in situ in tubulovillous adenoma"
+        },
+        {
+          "code": "8263/3",
+          "description": "Adenocarcinoma in tubulovillous adenoma; Villoglandular carcinoma; Villoglandular variant of endometrioid adenocarcinoma; Papillotubular adenocarcinoma; Tubulopapillary adenocarcinoma"
+        },
+        {
+          "code": "8264/0",
+          "description": "Papillomatosis, glandular; Biliary papillomatosis"
+        },
+        {
+          "code": "8265/3",
+          "description": "Micropapillary carcinoma, NOS; Micropapillary adenocarcinoma"
+        },
+        {
+          "code": "8270/0",
+          "description": "Chromophobe adenoma"
+        },
+        {
+          "code": "8270/3",
+          "description": "Chromophobe carcinoma; Chromophobe adenocarcinoma"
+        },
+        {
+          "code": "8271/0",
+          "description": "Lactotroph adenoma; Prolactinoma"
+        },
+        {
+          "code": "8272/0",
+          "description": "Pituitary adenoma, NOS; Corticotroph adenoma; Null cell adenoma; Plurihormonal adenoma; Gonodotroph adenoma; Somatotroph adenoma; Thyrotroph adenoma; Pituitary adenoma, ectopic"
+        },
+        {
+          "code": "8272/3",
+          "description": "Pituitary carcinoma, NOS"
+        },
+        {
+          "code": "8273/3",
+          "description": "Pituitary blastoma"
+        },
+        {
+          "code": "8280/0",
+          "description": "Acidophil adenoma; Eosinophil adenoma"
+        },
+        {
+          "code": "8280/3",
+          "description": "Acidophil carcinoma; Acidophil adenocarcinoma; Eosinophil adenocarcinoma; Eosinophil carcinoma"
+        },
+        {
+          "code": "8281/0",
+          "description": "Mixed acidophil-basophil adenoma"
+        },
+        {
+          "code": "8281/3",
+          "description": "Mixed acidophil-basophil carcinoma"
+        },
+        {
+          "code": "8290/0",
+          "description": "Oxyphilic adenoma; Oncocytic adenoma; Oncocytoma; Follicular adenoma, oxyphilic cell; Hurthle cell adenoma; Hurthle cell tumor; Spindle cell oncocytoma; Oncocytic papillary cystadenoma"
+        },
+        {
+          "code": "8290/3",
+          "description": "Oxyphilic adenocarcinoma; Oncocytic adenocarcinoma; Oncocytic carcinoma; Hurthle cell carcinoma; Hurthle cell adenocarcinoma; Follicular carcinoma, oxyphilic cell"
+        },
+        {
+          "code": "8300/0",
+          "description": "Basophil adenoma; Mucoid cell adenoma"
+        },
+        {
+          "code": "8300/3",
+          "description": "Basophil carcinoma; Basophil adenocarcinoma; Mucoid cell adenocarcinoma"
+        },
+        {
+          "code": "8310/0",
+          "description": "Clear cell adenoma"
+        },
+        {
+          "code": "8310/3",
+          "description": "Clear cell adenocarcinoma, NOS; Clear cell carcinoma; Clear cell adenocarcinoma, mesonephroid; Clear cell renal cell carcinoma, NOS"
+        },
+        {
+          "code": "8311/1",
+          "description": "Hypernephroid tumor"
+        },
+        {
+          "code": "8311/3",
+          "description": "Hereditary leiomyomatosis and renal cell carcinoma (HRCC)-associated renal cell carcinoma; MiT Family translocation carcinoma; Succinate dehydrogenase deficient renal cell carcinoma"
+        },
+        {
+          "code": "8312/3",
+          "description": "Renal cell carcinoma, NOS; Renal cell adenocarcinoma; Renal cell carcinoma, unclassified; Grawitz tumor; Hypernephroma"
+        },
+        {
+          "code": "8313/0",
+          "description": "Clear cell adenofibroma; Clear cell cystadenofibroma"
+        },
+        {
+          "code": "8313/1",
+          "description": "Clear cell borderline tumor; Clear cell tumor, atypical proliferative; Clear cell cystic tumor of borderline malignancy; Clear cell adenofibroma of borderline malignancy; Clear cell cystadenofibroma of borderline malignancy"
+        },
+        {
+          "code": "8313/3",
+          "description": "Clear cell adenocarcinofibroma; Clear cell cystadenocarcinofibroma"
+        },
+        {
+          "code": "8314/3",
+          "description": "Lipid-rich carcinoma"
+        },
+        {
+          "code": "8315/3",
+          "description": "Glycogen-rich carcinoma; Glycogen-rich clear cell carcinoma"
+        },
+        {
+          "code": "8316/1",
+          "description": "Multilocular cystic renal neoplasm of low malignant potential "
+        },
+        {
+          "code": "8316/3",
+          "description": "Cyst-associated renal cell carcinoma; Acquired cystic disease associated renal cell carcinoma; Tubulocystic renal cell carcinoma"
+        },
+        {
+          "code": "8317/3",
+          "description": "Renal cell carcinoma, chromophobe type; Chromophobe cell renal carcinoma; Hybrid oncocytic chromophobe tumor"
+        },
+        {
+          "code": "8318/3",
+          "description": "Renal cell carcinoma, sarcomatoid; Renal cell carcinoma, spindle cell"
+        },
+        {
+          "code": "8319/3",
+          "description": "Collecting duct carcinoma; Bellini duct carcinoma; Renal carcinoma, collecting duct type"
+        },
+        {
+          "code": "8320/3",
+          "description": "Granular cell carcinoma; Granular cell adenocarcinoma"
+        },
+        {
+          "code": "8321/0",
+          "description": "Chief cell adenoma"
+        },
+        {
+          "code": "8322/0",
+          "description": "Water-clear cell adenoma"
+        },
+        {
+          "code": "8322/3",
+          "description": "Water-clear cell adenocarcinoma; Water-clear cell carcinoma"
+        },
+        {
+          "code": "8323/0",
+          "description": "Mixed cell adenoma"
+        },
+        {
+          "code": "8323/1",
+          "description": "Clear cell papillary renal cell carcinoma"
+        },
+        {
+          "code": "8323/3",
+          "description": "Mixed cell adenocarcinoma"
+        },
+        {
+          "code": "8324/0",
+          "description": "Lipoadenoma; Adenolipoma"
+        },
+        {
+          "code": "8325/0",
+          "description": "Metanephric adenoma"
+        },
+        {
+          "code": "8330/0",
+          "description": "Follicular adenoma, NOS"
+        },
+        {
+          "code": "8330/1",
+          "description": "Atypical follicular adenoma"
+        },
+        {
+          "code": "8330/3",
+          "description": "Follicular carcinoma, NOS; Follicular adenocarcinoma, NOS"
+        },
+        {
+          "code": "8331/3",
+          "description": "Follicular adenocarcinoma, well differentiated; Follicular carcinoma, well differentiated"
+        },
+        {
+          "code": "8332/3",
+          "description": "Follicular adenocarcinoma, trabecular; Follicular carcinoma, trabecular; Follicular adenocarcinoma, moderately differentiated; Follicular carcinoma, moderately differentiated"
+        },
+        {
+          "code": "8333/0",
+          "description": "Microfollicular adenoma, NOS; Fetal adenoma"
+        },
+        {
+          "code": "8333/3",
+          "description": "Fetal adenocarcinoma"
+        },
+        {
+          "code": "8334/0",
+          "description": "Macrofollicular adenoma; Colloid adenoma"
+        },
+        {
+          "code": "8335/1",
+          "description": "Follicular tumor of uncertain malignant potential; Follicular carcinoma, encapsulated "
+        },
+        {
+          "code": "8335/3",
+          "description": "Follicular carcinoma, minimally invasive"
+        },
+        {
+          "code": "8336/1",
+          "description": "Hyalinizing trabecular tumor; Hyalinizing trabecular adenoma"
+        },
+        {
+          "code": "8337/3",
+          "description": "Poorly differentiated thyroid carcinoma; Insular carcinoma"
+        },
+        {
+          "code": "8339/3",
+          "description": "Follicular carcinoma, encapsulated, angioinvasive"
+        },
+        {
+          "code": "8340/3",
+          "description": "Papillary carcinoma, follicular variant; Papillary adenocarcinoma, follicular variant; Papillary and follicular adenocarcinoma; Papillary and follicular carcinoma"
+        },
+        {
+          "code": "8341/3",
+          "description": "Papillary microcarcinoma"
+        },
+        {
+          "code": "8342/3",
+          "description": "Papillary carcinoma, oncocytic variant; Papillary carcinoma, oxyphilic cell"
+        },
+        {
+          "code": "8343/3",
+          "description": "Papillary carcinoma, encapsulated of thyroid"
+        },
+        {
+          "code": "8344/3",
+          "description": "Papillary carcinoma, columnar cell; Papillary carcinoma, tall cell"
+        },
+        {
+          "code": "8345/3",
+          "description": "Medullary thyroid carcinoma; C cell carcinoma; Parafollicular cell carcinoma; Medullary carcinoma with amyloid stroma"
+        },
+        {
+          "code": "8346/3",
+          "description": "Mixed medullary-follicular carcinoma"
+        },
+        {
+          "code": "8347/3",
+          "description": "Mixed medullary-papillary carcinoma"
+        },
+        {
+          "code": "8348/1",
+          "description": "Well differentiated tumor of uncertain malignant potential"
+        },
+        {
+          "code": "8349/1",
+          "description": "Non-invasive follicular thyroid neoplasm with papillary-like nuclear features (NIFTP)"
+        },
+        {
+          "code": "8350/3",
+          "description": "Nonencapsulated sclerosing carcinoma; Nonencapsulated sclerosing adenocarcinoma; Nonencapsulated sclerosing tumor; Papillary carcinoma, diffuse sclerosing"
+        },
+        {
+          "code": "8360/1",
+          "description": "Multiple endocrine adenomas; Endocrine adenomatosis"
+        },
+        {
+          "code": "8361/0",
+          "description": "Juxtaglomerular tumor; Juxtaglomerular cell tumor; Reninoma"
+        },
+        {
+          "code": "8370/0",
+          "description": "Adrenal cortical adenoma, NOS; Adrenal cortical tumor, NOS; Adrenal cortical tumor, benign"
+        },
+        {
+          "code": "8370/3",
+          "description": "Adrenal cortical carcinoma; Adrenal cortical adenocarcinoma; Adrenal cortical tumor, malignant"
+        },
+        {
+          "code": "8371/0",
+          "description": "Adrenal cortical adenoma, compact cell"
+        },
+        {
+          "code": "8372/0",
+          "description": "Adrenal cortical adenoma, pigmented; Black adenoma; Pigmented adenoma"
+        },
+        {
+          "code": "8373/0",
+          "description": "Adrenal cortical adenoma, clear cell"
+        },
+        {
+          "code": "8374/0",
+          "description": "Adrenal cortical adenoma, glomerulosa cell"
+        },
+        {
+          "code": "8375/0",
+          "description": "Adrenal cortical adenoma, mixed cell"
+        },
+        {
+          "code": "8380/0",
+          "description": "Endometrioid adenoma, NOS; Endometrioid cystadenoma, NOS"
+        },
+        {
+          "code": "8380/1",
+          "description": "Endometrioid adenoma, borderline malignancy; Endometrioid tumor, borderline; Atypical proliferative endometrioid tumor; Endometrioid cystadenoma, borderline malignancy; Endometrioid tumor of low malignant potential"
+        },
+        {
+          "code": "8380/2",
+          "description": "Endometrioid intraepithelial neoplasia; Atypical hyperplasia of the endometrium"
+        },
+        {
+          "code": "8380/3",
+          "description": "Endometrioid adenocarcinoma, NOS; Endometrioid carcinoma, NOS; Endometrioid cystadenocarcinoma"
+        },
+        {
+          "code": "8381/0",
+          "description": "Endometrioid adenofibroma, NOS; Endometrioid cystadenofibroma, NOS"
+        },
+        {
+          "code": "8381/1",
+          "description": "Endometrioid adenofibroma, borderline malignancy; Endometrioid cystadenofibroma, borderline malignancy"
+        },
+        {
+          "code": "8381/3",
+          "description": "Endometrioid adenofibroma, malignant; Endometrioid cystadenofibroma, malignant"
+        },
+        {
+          "code": "8382/3",
+          "description": "Endometrioid adenocarcinoma, secretory variant"
+        },
+        {
+          "code": "8383/3",
+          "description": "Endometrioid adenocarcinoma, ciliated cell variant"
+        },
+        {
+          "code": "8384/3",
+          "description": "Adenocarcinoma, endocervical type"
+        },
+        {
+          "code": "8390/0",
+          "description": "Skin appendage adenoma; Adnexal tumor, benign; Skin appendage tumor, benign"
+        },
+        {
+          "code": "8390/3",
+          "description": "Adnexal adenocarcinoma, NOS; Skin appendage carcinoma; Adnexal carcinoma"
+        },
+        {
+          "code": "8391/0",
+          "description": "Follicular fibroma; Fibrofolliculoma; Perifollicular fibroma; Trichodiscoma; Spindle cell predominant trichodiscoma"
+        },
+        {
+          "code": "8392/0",
+          "description": "Syringofibroadenoma"
+        },
+        {
+          "code": "8400/0",
+          "description": "Sweat gland adenoma; Syringadenoma, NOS; Sweat gland tumor, benign"
+        },
+        {
+          "code": "8400/1",
+          "description": "Sweat gland tumor, NOS"
+        },
+        {
+          "code": "8400/3",
+          "description": "Sweat gland adenocarcinoma; Sweat gland carcinoma; Sweat gland tumor, malignant"
+        },
+        {
+          "code": "8401/0",
+          "description": "Apocrine adenoma; Apocrine cystadenoma"
+        },
+        {
+          "code": "8401/3",
+          "description": "Apocrine adenocarcinoma; Apocrine carcinoma"
+        },
+        {
+          "code": "8402/0",
+          "description": "Hidradenoma, NOS; Nodular hidradenoma; Clear cell hidradenoma; Eccrine acrospiroma"
+        },
+        {
+          "code": "8402/3",
+          "description": "Hidradenocarcinoma; Nodular hidradenoma, malignant"
+        },
+        {
+          "code": "8403/0",
+          "description": "Spiradenoma, NOS; Eccrine spiradenoma"
+        },
+        {
+          "code": "8403/3",
+          "description": "Malignant eccrine spiradenoma; Malignant neoplasm arising from pre-existing spiradenoma; Malignant neoplasm arising from pre-existing cylindroma; Malignant neoplasm arising from pre-existing spiradenocylindroma"
+        },
+        {
+          "code": "8404/0",
+          "description": "Hidrocystoma; Hidrocystadenoma; Eccrine cystadenoma"
+        },
+        {
+          "code": "8405/0",
+          "description": "Papillary hidradenoma; Hidradenoma papilliferum"
+        }
+      ]
+    }
+  }
+}

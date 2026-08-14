@@ -1,0 +1,823 @@
+{
+  "colon": {
+    "710": {
+      "naaccr_version": "24",
+      "item_number": 710,
+      "item_name": "RX Hosp--Hormone",
+      "item_data_type": "digits",
+      "item_length": 2,
+      "year_implemented": null,
+      "version_implemented": null,
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "rxHospHormone",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Hospital-Specific",
+      "source_of_standard": "CoC",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Records whether systemic hormonal agents were administered as first-course treatment at this facility or the reason they were not given. Hormone therapy consists of a group of drugs that may affect the long-term control of a cancer\u2019s growth. It is not usually used as a curative measure.",
+      "rationale": "Systemic therapy may involve the administration of one or a combination of agents. This data item allows for the evaluation of hormonal agents given as part of the first course of therapy. Furthermore, it is useful to know the reason hormone therapy was not administered when evaluating quality of care for certain tumors.   \n  \nIf central registries wish to study the treatment given at particular facilities, the facility-level treatment fields must be used. The summary treatment fields, conversely, combine information for all reporting facilities that provide first course of treatment for the tumor. Facility-specific fields allow studies of detailed referral patterns and treatment by type of healthcare setting. Knowing what part of the treatment was given at a particular facility also helps resolve consolidation issues.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": "Refer to the most recent version of *STORE* for additional instructions.",
+      "npcr_collect": ".",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": ".",
+      "alternate_names": [
+        "'Hormone Therapy at this Facility (CoC)'"
+      ],
+      "format": "Right justified, zero filled",
+      "code_description": null,
+      "code_note": "*Note*: Codes 02-03 entered under the *ROADS* rules for tumors diagnosed prior to January 1 2003 should have been converted to the appropriate code in the new field RX SUMM--Transplnt/Endocr 3250 implemented with *FORDS*. Endocrine surgery and endocrine radiation therapy are no longer coded as Hormone Therapy for tumors diagnosed on or after January 1 2003.",
+      "allowable_values": "00, 01, 82, 85-88, 99",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "00",
+          "description": "None, hormone therapy was not part of the planned first course of therapy. Diagnosed at autopsy."
+        },
+        {
+          "code": "01",
+          "description": "Hormone therapy was administered as first course therapy."
+        },
+        {
+          "code": "82",
+          "description": "Hormone therapy was not recommended/administered because it was contraindicated due to patient risk factors (comorbid conditions, advanced age) or there was progression of disease prior to administration."
+        },
+        {
+          "code": "85",
+          "description": "Hormone therapy was not administered because the patient died prior to planned or recommended therapy."
+        },
+        {
+          "code": "86",
+          "description": "Hormone therapy was not administered. It was recommended by the patient's physician, but was not administered as part of first-course therapy. No reason was stated in the patient record."
+        },
+        {
+          "code": "87",
+          "description": "Hormone therapy was not administered. It was recommended by the patient's physician, but was refused by the patient, or the patient's family member or guardian. The refusal was noted in the patient record."
+        },
+        {
+          "code": "88",
+          "description": "Hormone therapy was recommended, but it is unknown if it was administered."
+        },
+        {
+          "code": "99",
+          "description": "It is unknown whether hormone therapy was recommended or administered because it is not stated in the patient record; death certificate-only cases."
+        }
+      ]
+    },
+    "720": {
+      "naaccr_version": "24",
+      "item_number": 720,
+      "item_name": "RX Hosp--BRM",
+      "item_data_type": "digits",
+      "item_length": 2,
+      "year_implemented": null,
+      "version_implemented": null,
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "rxHospBrm",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Hospital-Specific",
+      "source_of_standard": "CoC",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Records whether immunotherapeutic agents (biologic response modifiers) were administered as first-course treatment at this facility or the reason they were not given. Immunotherapy consists of biological or chemical agents that alter the immune system or change the host\u2019s response to tumor cells.",
+      "rationale": "Systemic therapy may involve the administration of one or a combination of agents. This data item allows for the evaluation of immunotherapeutic agents given as part of the first course of therapy. Furthermore, it is useful to know the reason immunotherapy was not administered when evaluating quality of care.  \n  \nIf central registries wish to study the treatment given at particular facilities, the facility-level treatment fields must be used. The summary treatment fields, conversely, combine information for all facilities that provide first course of treatment for the tumor. Facility-specific fields allow studies of detailed referral patterns and treatment by type of healthcare setting. Knowing what part of the treatment was given at a particular facility also helps resolve consolidation issues.",
+      "clarification": null,
+      "general_notes": "*Note*: Prior to 2013, targeted therapies that invoke an immune response, such as Herceptin, had been coded as chemotherapy. Effective with cases diagnosed January 1, 2013, and forward these therapies are classified as biological response modifiers. Coding instructions for these changes have been added to the remarks field for the applicable drugs in the SEER\\*RX Interactive Drug Database ( <http://seer.cancer.gov/tools/seerrx/>).",
+      "instructions_for_coding": "Refer to the most recent *STORE* and SEER Rx for complete coding instructions.",
+      "npcr_collect": ".",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": ".",
+      "alternate_names": [
+        "'Immunotherapy at this Facility (CoC)'"
+      ],
+      "format": "Right justified, zero filled",
+      "code_description": null,
+      "code_note": "*Note:* For tumors diagnosed on or after January 1 2003 information on bone marrow and stem cell transplants is no longer coded under this item. *ROADS* codes 02-06 should not be used in this field. For diagnosed on or after January 1 2003 this information should be coded in the new field RX SUMM--Transplnt/Endocr 3250.",
+      "allowable_values": "00, 01, 82, 85-88, 99",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "00",
+          "description": "None, immunotherapy was not part of the planned first course of therapy; not customary therapy for this cancer. Diagnosed at autopsy."
+        },
+        {
+          "code": "01",
+          "description": "Immunotherapy administered as first course therapy."
+        },
+        {
+          "code": "82",
+          "description": "Immunotherapy was not recommended/administered because it was contraindicated due to patient risk factors (comorbid conditions, advanced age, etc.) or there was progression of disease prior to administration."
+        },
+        {
+          "code": "85",
+          "description": "Immunotherapy was not administered because the patient died prior to planned or recommended therapy."
+        },
+        {
+          "code": "86",
+          "description": "Immunotherapy was not administered. It was recommended by the patient's physician but was not administered as part of the first-course of therapy. No reason was noted in the patient record."
+        },
+        {
+          "code": "87",
+          "description": "Immunotherapy was not administered. It was recommended by the patient's physician but was refused by the patient or the patient's family or guardian. The refusal was noted in the patient record."
+        },
+        {
+          "code": "88",
+          "description": "Immunotherapy was recommended, but it is unknown if it was administered."
+        },
+        {
+          "code": "99",
+          "description": "It is unknown if immunotherapy was recommended or administered because it was not stated in the patient record. Death certificate-only case."
+        }
+      ]
+    },
+    "740": {
+      "naaccr_version": "24",
+      "item_number": 740,
+      "item_name": "RX Hosp--DX/Stg Proc",
+      "item_data_type": "digits",
+      "item_length": 2,
+      "year_implemented": null,
+      "version_implemented": null,
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "rxHospDxStgProc",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Hospital-Specific",
+      "source_of_standard": "CoC",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Identifies the surgical procedure(s) performed in an effort to diagnose and/or stage disease at this facility.",
+      "rationale": "This data item is used to track the use of surgical procedure resources that are not considered treatment.  \n  \nIf central registries wish to study the procedures performed at particular facilities, the facility-level fields must be used. The summary fields, conversely, combine information for all facilities that provide first course of treatment for the tumor. Facility-specific fields allow studies of detailed referral patterns and diagnostic/staging procedures by type of healthcare setting. Knowing what part of the diagnostic or staging process was performed at a particular facility also helps resolve consolidation issues.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": "Refer to the most recent version of *STORE* for additional instructions.",
+      "npcr_collect": ".",
+      "coc_collect": "R",
+      "seer_collect": ".",
+      "cccr_collect": ".",
+      "alternate_names": [
+        "'Non Cancer-Directed Surgery at this Facility (CoC)'\n 'RX Hosp--DX/Stg/Pall Proc'\n 'Surgical Diagnostic & Staging Procedure at this Facility (1996-2002)'"
+      ],
+      "format": "Right justified, zero filled",
+      "code_description": null,
+      "code_note": "*Note*: This item has been used for tumors diagnosed in 1996 and later. For cases diagnosed before 1996 this item may have been converted from the *DAM* and cases with surgery would have been converted to 09 in this field. For cases diagnosed between 1996 and 2002 this field may have described palliative care according to coding rules in *ROADS*. For tumors diagnosed on or after January 1 2003 palliative care is coded in a new field RX Hosp--Palliative Proc 3280.",
+      "allowable_values": "00-07, 09",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "00",
+          "description": "No surgical diagnostic or staging procedure was performed."
+        },
+        {
+          "code": "01",
+          "description": "A biopsy (incisional, needle, or aspiration) was done to a site other than the primary site. No exploratory procedure was done."
+        },
+        {
+          "code": "02",
+          "description": "A biopsy (incisional, needle, or aspiration) was done of the primary site or biopsy of a lymph node was done to diagnose or stage lymphoma."
+        },
+        {
+          "code": "03",
+          "description": "A surgical exploration only. The patient was not biopsied or treated during the procedure."
+        },
+        {
+          "code": "04",
+          "description": "A surgical procedure with a bypass was performed, but no biopsy was done."
+        },
+        {
+          "code": "05",
+          "description": "An exploratory procedure was performed, and a biopsy of either the primary site or another site was done."
+        },
+        {
+          "code": "06",
+          "description": "A bypass procedure was performed, and a biopsy of either the primary site or another site was done."
+        },
+        {
+          "code": "07",
+          "description": "A procedure was done, but the type of procedure is unknown."
+        },
+        {
+          "code": "09",
+          "description": "No information about whether a diagnostic or staging procedure was performed."
+        }
+      ]
+    },
+    "756": {
+      "naaccr_version": "24",
+      "item_number": 756,
+      "item_name": "Tumor Size Summary",
+      "item_data_type": "digits",
+      "item_length": 3,
+      "year_implemented": 2016.0,
+      "version_implemented": "16",
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "tumorSizeSummary",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Stage/Prognostic Factors",
+      "source_of_standard": "NPCR/CoC",
+      "date_created": null,
+      "date_modified": null,
+      "description": "This data item records the most accurate measurement of a solid primary tumor, usually measured on the surgical resection specimen.",
+      "rationale": "Tumor size is one indication of the extent of disease. As such, it is used by both clinicians and researchers. Tumor size that is independent of stage is also useful for quality assurance efforts.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": "See the most recent version of the** **STORE**(https://www.facs.org/quality-programs/cancer/ncdb/registrymanuals/cocmanuals) **manual** **for additional instructions.",
+      "npcr_collect": "R",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": ".",
+      "alternate_names": null,
+      "format": null,
+      "code_description": null,
+      "code_note": null,
+      "allowable_values": "000-990, 998, 999",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "000",
+          "description": "No mass/tumor found"
+        },
+        {
+          "code": "001",
+          "description": "1 mm or described as less than 1 mm"
+        },
+        {
+          "code": "002-988",
+          "description": "Exact size in millimeters (2 mm to 988 mm)"
+        },
+        {
+          "code": "989",
+          "description": "989 millimeters or larger"
+        },
+        {
+          "code": "990",
+          "description": "Microscopic focus or foci only and no size of focus is given"
+        },
+        {
+          "code": "998",
+          "description": "Alternate descriptions of tumor size for specific sites:\n\nFamilial/multiple polyposis:\n- Rectosigmoid and rectum (C19.9, C20.9)\n- Colon (C18.0, C18.2-C18.9)\n\nIf no size is documented:\nCircumferential:\n- Esophagus (C15.0-C15.5, C15.8-C15.9)\n\nDiffuse; widespread: 3/4s or more; linitis plastica:\n- Stomach and Esophagus GE Junction (C16.0-C16.6, C16.8-C16.9)\n\nDiffuse, entire lung or NOS:\n- Lung and main stem bronchus (C34.0-C34.3, C34.8-C34.9)\n\nDiffuse:\n- Breast (C50.0-C50.6, C50.8-C50.9)"
+        },
+        {
+          "code": "999",
+          "description": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+        }
+      ]
+    },
+    "764": {
+      "naaccr_version": "24",
+      "item_number": 764,
+      "item_name": "Summary Stage 2018",
+      "item_data_type": "digits",
+      "item_length": 1,
+      "year_implemented": 2018.0,
+      "version_implemented": "16",
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "summaryStage2018",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Stage/Prognostic Factors",
+      "source_of_standard": "SEER",
+      "date_created": null,
+      "date_modified": null,
+      "description": "This item stores the directly assigned Summary Stage 2018. Effective for cases diagnosed 1/1/2018+.",
+      "rationale": "The SEER program has collected staging information on cases since its inception in 1973. Summary Stage groups cases into broad categories of in situ, local, regional, and distant. Summary Stage can be used to evaluate disease spread at diagnosis, treatment patterns and outcomes over time.",
+      "clarification": null,
+      "general_notes": "_Note_: This data item was included in Standards Volume II, Version 16; however, it was not implemented until 2018.",
+      "instructions_for_coding": null,
+      "npcr_collect": "R",
+      "coc_collect": ".",
+      "seer_collect": "R*",
+      "cccr_collect": ".",
+      "alternate_names": [
+        "'Directly Assigned SS2018'"
+      ],
+      "format": null,
+      "code_description": null,
+      "code_note": "\\*Applicable for the following SS2018 chapters: Brain, CNS Other, Intracranial Gland.\r\n\r\n_Note_: For SS2018, code 5 for \u201cRegional, NOS\u201d can no longer be coded. Code 5 (Regional, NOS) is still applicable.",
+      "allowable_values": "0-4, 7-9",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "0",
+          "description": "**In situ, intraepithelial, noninvasive**"
+        },
+        {
+          "code": "1",
+          "description": "**Localized only (localized, NOS)**\n\nAll sites (C180, C182-C189)\n- Confined to colon, rectum, rectosigmoid, NOS\n- Confined to polyp (head, stalk, NOS)\n- Extension through wall, NOS\n- Intraluminal extension to colon and/or anal canal/anus (rectum only)\n- Invasion of\n  + Intramucosal, NOS\n  + Lamina propria\n  + Mucosa, NOS\n  + Muscularis mucosae\n  + Muscularis, NOS\n  + Muscularis propria\n     + Rectum (C209): WITH or WITHOUT intraluminal extension to colon and/or anal canal/anus\n - Perimuscular tissue invaded\n - Submucosa (superficial invasion)\n- Subserosal tissue/(sub)serosal fat invaded\n- Transmural, NOS\n- Wall, NOS\n\nPeritonealized or non-peritonealized: Invasion into pericolorectal tissues and/or pericolonic adipose tissue ONLY\n*(do not apply these instructions to structures listed under ALL SITES)*\n * Non-peritonealized site or segment of colon (*see Note 6*) or UNKNOWN if peritonealized\n * Includes invasion of pericolic or perirectal fat tissues\n * For peritonealized sites or segments, see code 2)"
+        },
+        {
+          "code": "2",
+          "description": "**Regional by direct extension only**\n\nAll sites (C180, C182-C189)\n+ Abdominal wall**\n+ Adherent to other organs or structures clinically with no microscopic examination\n+ Adjacent (connective) tissue(s), NOS\n+ Fat, NOS\n+ Mesentery (including mesenteric fat, mesocolon)\n+ Mesothelium\n+ Retroperitoneum (excluding fat)\n+ Serosa\n+ Small intestine\n+ Tumor found in adhesion(s) if microscopic examination performed\n+ Tunica serosa\n+ Visceral peritoneum\n\nCecum (C180)\n+ Greater omentum\n\nAscending colon (C182)\n+ Kidney, right\n+ Liver, right lobe\n+ Retroperitoneal fat\n+ Ureter, right\n\nTransverse colon and flexures (C183, C184, C185)\n+ Bile ducts\n+ Gallbladder\n+ Gastrocolic ligament\n+ Greater omentum \n+ Kidney\n+ Liver\n+ Pancreas\n+ Spleen\n+ Stomach\n\nDescending colon (C186)\n+ Kidney, left\n+ Pelvic wall\n+ Retroperitoneal fat\n+ Spleen\n+ Ureter, left\n\nSigmoid colon (C187)\n+ Pelvic wall \n \nRectosigmoid (C199)\n+ Cul de sac (rectouterine pouch)\n+ Pelvic wall\n+ Small intestine\n\nRectum (C209)\n+ Anus\n+ Bladder (males only)\n+ Cul de sac (rectouterine pouch)\n+ Ductus deferens\n+ Pelvic wall\n+ Prostate\n+ Rectovaginal septum\n+ Rectovesical fat (males only)\n+ Seminal vesicle(s)\n+ Skeletal muscles of pelvic floor\n+ Vagina\n\nPeritonealized or non-peritonealized: Invasion into pericolorectal tissues and/or pericolonic adipose tissue ONLY \n*(do not apply these instructions to structures listed under ALL SITES, or the specific subsites)*\n * Peritonealized site or segment of colon (*see Note 6*) or stated as peritonealized in pathology report\n * Includes invasion of pericolic or perirectal fat tissues\n * For non-peritonealized sites or segments, or UNKNOWN if peritonealized, see code 1) (*see Note 7*)"
+        },
+        {
+          "code": "3",
+          "description": "**Regional lymph node(s) involved only**\n\nAll sites (C180, C182-C189)\n+ Colic, NOS\n+ Epicolic (adjacent to bowel wall)\n+ Mesenteric, NOS\n+ Mesocolic, NOS\n+ Paracolic\n+ Pericolic\n+ Tumor deposits (TD) in the subserosa, mesentery, mesorectal  or nonperitonealized pericolic or perirectal tissues WITHOUT regional nodal metastasis\n+ Regional lymph node(s), NOS\n   * Lymph node(s), NOS\n\nCecum (C180) \n+ Cecal, NOS\n   * Anterior cecal (prececal)\n   * Posterior cecal (retrocecal)\n+ Colic (right)\n+ Ileocolic\n+ Periappendiceal\n\nAscending colon (C182)\n+ Colic (middle-right branch, right)\n+ Ileocolic\n\nHepatic flexure (C183)\n+ Colic (middle, right)\n+ Ileocolic\n\nTransverse colon (C184)\n+ Colic (middle)\n\nSplenic flexure (C185)\n+ Colic (left, middle)\n+ Mesenteric (inferior)\n\nDescending colon (C186)\n+ Colic (left)\n+ Mesenteric (inferior)\n+ Sigmoid\n\nSigmoid colon (C187)\n+ Colic (left)\n+ Mesenteric (inferior)\n+ Rectal (superior) (hemorrhoidal)\n+ Rectosigmoid\n+ Sigmoid (sigmoidal) (sigmoid mesenteric)\n+ Superior rectal (hemorrhoidal)\n\nRectosigmoid (C199)\n+ Hemorrhoidal (middle, superior)\n+ Mesenteric (inferior)\n+ Mesorectal\n+ Pericolic\n+ Perirectal\n+ Rectal (middle, superior) \n+ Sigmoid (mesenteric)\n\nRectum (C209)\n+ Hemorrhoidal (middle, superior)\n+ Iliac (hypogastric, internal, obturator) (see code 7 for common, external, NOS)\n+ Mesenteric (inferior)\n+ Mesorectal\n+ Perirectal\n+ Rectal (inferior)\n+ Sacral, NOS\n   * Lateral sacral (laterosacral)\n   * Middle sacral (promontorial) (Gerota's node)\n   * Presacral\n+ Sigmoidal (sigmoid mesenteric)"
+        },
+        {
+          "code": "4",
+          "description": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)"
+        },
+        {
+          "code": "7",
+          "description": "**Distant site(s)/lymph node(s) involved**\n\nDistant site(s) (including further contiguous extension)\n\nAll sites (C180, C182-C189)\n+ Adrenal (suprarenal) gland\n+ Bladder\n+ Diaphragm\n+ Fallopian tube\n+ Fistula to skin\n+ Gallbladder\n+ Other segment(s) of colon via serosa\n+ Ovary(ies)\n + Uterus\n\nCecum (C180)\n+ Kidney, right\n+ Liver\n+ Ureter, right\n\nTransverse colon and flexures (C183-C185)\n+ Ureter\n\nSigmoid colon (C187)\n+ Cul de sac (rectouterine pouch)\n+ Ureter\n\nRectosigmoid (C199)\n+ Bladder\n+ Colon via serosa\n+ Fallopian tube\n+ Ovary\n+ Prostate\n+ Skeletal muscles of pelvic floor\n+ Ureter\n+ Vagina\n\nRectum (C209)\n+ Bladder (for females only)\n+ Bone(s) of pelvis \n+ Cervix\n+ Perineum, perianal skin\n+ Sacral plexus\n+ Sacrum\n+ Ureter\n+ Urethra\n+ Uterus\n\nDistant lymph node(s), NOS\n+ Colon\n  * Iliac (common, external, hypogastric, internal, obturator, NOS)\n  * Inferior mesenteric (cecum, ascending colon, hepatic flexure, transverse colon)\n  * Para-aortic\n  * Retroperitoneal \n  * Superior mesenteric\n + Rectosigmoid\n   * Hemorrhoidal, inferior (rectosigmoid)\n   * Iliac (common, external, hypogastric, internal, obturator, NOS)\n   * Rectal, inferior \n   * Superior mesenteric\n+ Rectum\n   * Colic (left) (rectum)\n   * Iliac (common, external, NOS) (see code 3 for hypogastric, internal, obturator)\n   * Superior mesenteric\n\nDistant metastasis, NOS \n+ Carcinomatosis\n+ Peritoneal surface metastasis (peritoneum)\n+ Distant metastasis WITH or WITHOUT distant lymph node(s)"
+        },
+        {
+          "code": "9",
+          "description": "Unknown if extension or metastasis"
+        }
+      ]
+    },
+    "820": {
+      "naaccr_version": "24",
+      "item_number": 820,
+      "item_name": "Regional Nodes Positive",
+      "item_data_type": "digits",
+      "item_length": 2,
+      "year_implemented": null,
+      "version_implemented": null,
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "regionalNodesPositive",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Stage/Prognostic Factors",
+      "source_of_standard": "SEER/CoC",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Records the exact number of regional nodes examined by the pathologist and found to contain metastases. Beginning with tumors diagnosed on or after January 1 2004 this item is a component of the Collaborative Stage system. For tumors diagnosed from 1988 through 2003 this item was part of the 10-digit EOD 779 detailed site-specific codes for anatomic EOD.",
+      "rationale": "This data item is necessary for pathologic staging, and it serves as a quality measure for pathology reports and the extent of the surgical evaluation and treatment of the patient.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": null,
+      "npcr_collect": "R",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": "R*",
+      "alternate_names": [
+        "'Number of Positive Regional Lymph Nodes (SEER)'\n 'Pathologic Review of Regional Lymph Nodes (SEER)'\n 'Regional Lymph Nodes Positive'"
+      ],
+      "format": "Right justified, zero filled",
+      "code_description": null,
+      "code_note": "*Note:* See Chapter V, Unresolved Issues, for a discussion of coding differences between CoC and SEER.",
+      "allowable_values": "00-90, 95, 97-99",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "00",
+          "description": "All nodes examined negative."
+        },
+        {
+          "code": "01-89",
+          "description": "1 - 89 nodes positive (code exact number of nodes positive)"
+        },
+        {
+          "code": "90",
+          "description": "90 or more nodes positive"
+        },
+        {
+          "code": "95",
+          "description": "Positive aspiration or core biopsy of lymph node(s)"
+        },
+        {
+          "code": "97",
+          "description": "Positive nodes - number unspecified"
+        },
+        {
+          "code": "98",
+          "description": "No nodes examined"
+        },
+        {
+          "code": "99",
+          "description": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+        },
+        {
+          "code": "00",
+          "description": "All nodes examined negative"
+        },
+        {
+          "code": "99",
+          "description": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+        }
+      ]
+    },
+    "830": {
+      "naaccr_version": "24",
+      "item_number": 830,
+      "item_name": "Regional Nodes Examined",
+      "item_data_type": "digits",
+      "item_length": 2,
+      "year_implemented": null,
+      "version_implemented": null,
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "regionalNodesExamined",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Stage/Prognostic Factors",
+      "source_of_standard": "SEER/CoC",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Records the total number of regional lymph nodes that were removed and examined by the pathologist. Beginning with tumors diagnosed on or after January 1, 2004, this item is a component of the Collaborative Stage system.",
+      "rationale": "This data item serves as a quality measure of the pathologic and surgical evaluation and treatment of the patient.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": null,
+      "npcr_collect": "R",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": "R*",
+      "alternate_names": [
+        "'Number of Regional Lymph Nodes Examined (SEER)'\n 'Pathologic Review of Regional Lymph Nodes (SEER)'\n 'Regional Lymph Nodes Examined'"
+      ],
+      "format": "Right justified, zero filled",
+      "code_description": null,
+      "code_note": null,
+      "allowable_values": "00-90, 95-99",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "00",
+          "description": "No nodes examined"
+        },
+        {
+          "code": "01-89",
+          "description": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)"
+        },
+        {
+          "code": "90",
+          "description": "90 or more nodes examined"
+        },
+        {
+          "code": "95",
+          "description": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed"
+        },
+        {
+          "code": "96",
+          "description": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated"
+        },
+        {
+          "code": "97",
+          "description": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated"
+        },
+        {
+          "code": "98",
+          "description": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown"
+        },
+        {
+          "code": "99",
+          "description": "Unknown if nodes were examined; not applicable or negative \nNot documented in patient record"
+        },
+        {
+          "code": "99",
+          "description": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+        }
+      ]
+    },
+    "832": {
+      "naaccr_version": "24",
+      "item_number": 832,
+      "item_name": "Date of Sentinel Lymph Node Biopsy",
+      "item_data_type": "date",
+      "item_length": 8,
+      "year_implemented": 2018.0,
+      "version_implemented": "18",
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "dateSentinelLymphNodeBiopsy",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Stage/Prognostic Factors",
+      "source_of_standard": "CoC",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Records the date of the sentinel lymph node(s) biopsy procedure. This data item is required for CoC-accredited facilities as of cases diagnosed 01/01/2018 and later. **This data item is required for breast and melanoma cases only.** ",
+      "rationale": "It is a known fact that sentinel lymph node biopsies have been under-reported. Additionally, the timing and results of sentinel lymph node biopsy procedures are used in quality of care measures. This data item can be used to more accurately assess the date of the sentinel lymph node biopsy procedure separate from the date of a subsequent regional node dissection procedure, if performed.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": null,
+      "npcr_collect": ".",
+      "coc_collect": "RS",
+      "seer_collect": "R*",
+      "cccr_collect": ".",
+      "alternate_names": null,
+      "format": "YYYYMMDD",
+      "code_description": null,
+      "code_note": null,
+      "allowable_values": "Valid dates",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": []
+    },
+    "1112": {
+      "naaccr_version": "24",
+      "item_number": 1112,
+      "item_name": "Mets at DX-Bone",
+      "item_data_type": "digits",
+      "item_length": 1,
+      "year_implemented": 2016.0,
+      "version_implemented": "16",
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "metsAtDxBone",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Stage/Prognostic Factors",
+      "source_of_standard": "SEER",
+      "date_created": null,
+      "date_modified": null,
+      "description": "This field identifies whether bone is an involved metastatic site. The six Mets at Dx-Metastatic Sites fields provide information on specific metastatic sites for data analysis.",
+      "rationale": "Information on site of metastatic disease at diagnosis has prognostic implications to survival among patients with initial late stage disease. Capturing data on where the patient\u2019s metastatic lesions (including the number of locations) will be an important variable to include when looking at survival. Survival among metastatic patients is becoming increasingly important for cancer survivors.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": null,
+      "npcr_collect": ".",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": "R",
+      "alternate_names": null,
+      "format": null,
+      "code_description": null,
+      "code_note": null,
+      "allowable_values": "0, 1, 8, 9",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "0",
+          "description": "None; no bone metastases"
+        },
+        {
+          "code": "1",
+          "description": "Yes; distant bone metastases"
+        },
+        {
+          "code": "8",
+          "description": "Not applicable"
+        },
+        {
+          "code": "9",
+          "description": "Unknown whether bone is an involved metastatic site. Not documented in patient record."
+        }
+      ]
+    },
+    "1113": {
+      "naaccr_version": "24",
+      "item_number": 1113,
+      "item_name": "Mets at DX-Brain",
+      "item_data_type": "digits",
+      "item_length": 1,
+      "year_implemented": 2016.0,
+      "version_implemented": "16",
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "metsAtDxBrain",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Stage/Prognostic Factors",
+      "source_of_standard": "SEER",
+      "date_created": null,
+      "date_modified": null,
+      "description": "This field identifies whether brain is an involved metastatic site. The six Mets at Dx-Metastatic Sites fields provide information on specific metastatic sites for data analysis.",
+      "rationale": "Information on site of metastatic disease at diagnosis has prognostic implications to survival among patients with initial late stage disease. Capturing data on where the patient\u2019s metastatic lesions (including the number of locations) will be an important variable to include when looking at survival. Survival among metastatic patients is becoming increasingly important for cancer survivors.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": null,
+      "npcr_collect": ".",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": "R",
+      "alternate_names": null,
+      "format": null,
+      "code_description": null,
+      "code_note": null,
+      "allowable_values": "0, 1, 8, 9",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "0",
+          "description": "None; no brain metastses"
+        },
+        {
+          "code": "1",
+          "description": "Yes; distant brain metastases"
+        },
+        {
+          "code": "8",
+          "description": "Not applicable"
+        },
+        {
+          "code": "9",
+          "description": "Unknown whether brain is involved metastatic site. Not documented in patient record."
+        }
+      ]
+    },
+    "1114": {
+      "naaccr_version": "24",
+      "item_number": 1114,
+      "item_name": "Mets at Dx-Distant LN",
+      "item_data_type": "digits",
+      "item_length": 1,
+      "year_implemented": 2016.0,
+      "version_implemented": "16",
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "metsAtDxDistantLn",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Stage/Prognostic Factors",
+      "source_of_standard": "SEER",
+      "date_created": null,
+      "date_modified": null,
+      "description": "This field identifies whether distant lymph node(s) are an involved metastatic site. The six Mets at Dx-Metastatic Sites fields provide information on specific metastatic sites for data analysis.",
+      "rationale": "Information on site of metastatic disease at diagnosis has prognostic implications to survival among patients with initial late stage disease. Capturing data on where the patient\u2019s metastatic lesions (including the number of locations) will be an important variable to include when looking at survival. Survival among metastatic patients is becoming increasingly important for cancer survivors.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": null,
+      "npcr_collect": ".",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": "R",
+      "alternate_names": null,
+      "format": null,
+      "code_description": null,
+      "code_note": null,
+      "allowable_values": "0, 1, 8, 9",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "0",
+          "description": "None; no distant lymph node metastases"
+        },
+        {
+          "code": "1",
+          "description": "Yes; distant lymph node metastases"
+        },
+        {
+          "code": "8",
+          "description": "Not applicable"
+        },
+        {
+          "code": "9",
+          "description": "Unknown whether distant lymph node(s) are involved metastatic site. Not documented in patient record."
+        }
+      ]
+    },
+    "1115": {
+      "naaccr_version": "24",
+      "item_number": 1115,
+      "item_name": "Mets at DX-Liver",
+      "item_data_type": "digits",
+      "item_length": 1,
+      "year_implemented": 2016.0,
+      "version_implemented": "16",
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "metsAtDxLiver",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Stage/Prognostic Factors",
+      "source_of_standard": "SEER",
+      "date_created": null,
+      "date_modified": null,
+      "description": "This field identifies whether liver is an involved metastatic site. The six Mets at Dx-Metastatic Sites fields provide information on specific metastatic sites for data analysis.",
+      "rationale": "Information on site of metastatic disease at diagnosis has prognostic implications to survival among patients with initial late stage disease. Capturing data on where the patient\u2019s metastatic lesions (including the number of locations) will be an important variable to include when looking at survival. Survival among metastatic patients is becoming increasingly important for cancer survivors.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": null,
+      "npcr_collect": ".",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": "R",
+      "alternate_names": null,
+      "format": null,
+      "code_description": null,
+      "code_note": null,
+      "allowable_values": "0, 1, 8, 9",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "0",
+          "description": "None; no liver metastases"
+        },
+        {
+          "code": "1",
+          "description": "Yes; distant liver metastases"
+        },
+        {
+          "code": "8",
+          "description": "Not applicable"
+        },
+        {
+          "code": "9",
+          "description": "Unknown whether liver is involved metastatic site. Not documented in patient record."
+        }
+      ]
+    }
+  }
+}
