@@ -69,7 +69,7 @@ initialize ──► scan_notes ──► characterize_corpus ──► check_st
   relevance to the group's variables.
 - **Extract** — `ExtractorAgent` codes the group's variables from the retrieved
   notes, validating each value against the data dictionary (with a repair loop
-  for invalid extractions) and case-scoped coding rules.
+  for invalid extractions). Code descriptions are scoped by gross primary site.
 - **Loop & finalize** — newly coded scoping facts feed the next planning pass;
   when nothing remains eligible (or a fatal blocker is hit), the run finalizes
   into a `Case` with per-variable results and a review report flagging errors,
@@ -97,8 +97,8 @@ environment at load time.
   `base_url`, `api_key`, `max_concurrency`, reasoning effort, `retry`).
 - `agents:` — optional per-agent overrides (e.g. `extractor`, `note_scanner`,
   `note_retriever`, `orchestrator`), merged on top of the `llm` defaults.
-- `documents:` — paths to the NAACCR data dictionary, the compiled rule store,
-  and the variable-group definitions.
+- `documents:` — paths to the NAACCR and tissue-keyed data dictionaries and the
+  variable-group definitions.
 
 Only the OpenAI-compatible provider is active (targeting Databricks/Azure
 OpenAI-compatible endpoints). Set credentials via environment variables rather
@@ -159,31 +159,14 @@ fixture-based smoke checks plus deterministic unit tests
 PYTHONPATH=src python -m py_compile src/cipoc/agents/orchestrator.py
 ```
 
-## Rule compilation
+## Site-scoped data dictionary
 
-The extractor scopes coding to case-specific rules drawn from a committed rule
-store under `documents/rules/`. That store is produced offline by the pipeline in
-`scripts/rule_compilation/`, which compiles source manuals (SEER, STORE, Solid
-Tumor Rules, FORDS, SPCSM) into validated `RuleUnit` records:
-
-```
-segment (pure) → tag (LLM) → validate (pure) → report + write
-```
-
-These scripts run **outside** the runtime package — the runtime never imports
-them. Compilation is idempotent and resumable; only accepted units are written,
-and quarantined units plus a spot-check sample go to a review report that must be
-eyeballed before the output is trusted.
-
-```bash
-# Compile one chapter of one manual
-PYTHONPATH=src python -m scripts.rule_compilation.compile_manual \
-    --manual solid_tumor_rules --site-group breast \
-    --root-heading "Breast Equivalent Terms"
-
-# Run every pending compile listed in config/variable_groups.json
-PYTHONPATH=src python -m scripts.rule_compilation.compile_pending --run
-```
+Variable metadata comes from the NAACCR dictionary configured by
+`documents.data_dictionary_path`. When case facts identify a supported gross
+primary site, the corresponding entry in `documents/cipoc_data_dictionary.json`
+replaces the variable's unscoped `allowed_codes`. Unknown sites and items not
+present in the site dictionary retain their NAACCR values. Runtime extraction
+does not load or compile rules from `documents/rules/`.
 
 ## Repository layout
 
@@ -205,7 +188,7 @@ src/cipoc/
 ├── tools/
 │   ├── extraction.py      # Data-dictionary lookup + variable value validation
 │   ├── orchestration.py   # Deterministic gating/filtering/roll-up helpers
-│   └── coding_context.py  # Rule store loading + case-scoped coding instructions
+│   └── coding_context.py  # Legacy compiled-rule utilities (not used at runtime)
 └── utils/
     ├── utils.py           # YAML config loader + CipocConfig
     ├── progress_tracking.py  # run_with_progress graph runner
@@ -215,7 +198,8 @@ config/          # config.yaml + variable_groups.json
 documents/
 ├── manuals/     # NAACCR data dictionary + source manuals (gitignored, not in a clone)
 ├── markdown/    # markdown-converted manuals the rule compilers read
-└── rules/       # compiled rule store (manifest.json + per-manual units)
+├── cipoc_data_dictionary.json  # tissue-keyed code descriptions used at runtime
+└── rules/       # legacy compiled rule store (not used at runtime)
 extract_rules/   # site/histology/coding-rule JSONs and conversion helpers
 scripts/         # offline rule-compilation pipeline
 planning/        # design notes and MVP plans (planning/old/ = superseded reference)
@@ -234,7 +218,7 @@ tools. Key groups:
 - **Variables** — `VariableInfo`, `VariableOutput`, `VariableGroupInfo`,
   `VariableGroupOutput`, validated variants, and targeting/gating types
   (`TargetGroup`, `CorpusGate`, `NoteFilter`, `SiteApplicability`).
-- **Rules** — `RuleUnit`, `RuleKind`, `RuleApplicability`, `CaseFacts`,
-  `ScopedVariableContext`, `RuleStoreManifest`.
+- **Scoping** — `CaseFacts` supplies gross and coded primary-site context for
+  selecting tissue-specific data-dictionary values.
 - **Case** — `Case`, `CaseVariableResult`, `VariableStatus`, `CaseReport`,
   `ReviewFlag`/`ReviewFlagType`.
