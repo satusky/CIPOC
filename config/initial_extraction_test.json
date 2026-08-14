@@ -1,0 +1,15 @@
+{
+  "groups": [
+    {
+      "group_id": "initial_llm_extraction",
+      "name": "Initial LLM Extraction",
+      "stage": "initial",
+      "extract_as_group": true,
+      "variables": [
+        { "item_id": 390, "name": "Date of Diagnosis" },
+        { "item_id": 400, "name": "Primary Site" },
+        { "item_id": 410, "name": "Laterality" }
+      ]
+    }
+  ]
+}
