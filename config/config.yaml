@@ -16,6 +16,11 @@ llm:
   base_url: ${AZURE_OPENAI_URL}
   api_key: ${RENCI_AZURE_API_KEY}
 
+  # Databricks gpt-oss currently requires Chat Completions tool calling rather
+  # than OpenAI's Responses/native JSON-schema path.
+  use_responses_api: false
+  structured_output_method: function_calling
+
   # Endpoint-wide concurrency cap. Bounds in-flight requests via a semaphore on
   # the shared model wrapper. This is a property of the endpoint, not the agent:
   # to make it a global cap, build one model from these defaults and inject it

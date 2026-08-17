@@ -169,6 +169,81 @@ class RetryConfigTests(unittest.TestCase):
         self.assertNotIn("retry", config.llm_config("extractor").model_dump())
         self.assertEqual(config.retry_policy("extractor").retry_on, retry_on_transient)
 
+    def test_responses_reasoning_can_be_disabled_for_chat_completions(self):
+        from cipoc.llm import OpenAIConfig
+
+        config = OpenAIConfig(
+            model="gpt-oss-120b",
+            api_key="test",
+            base_url="https://example.com/v1",
+            reasoning=None,
+            reasoning_effort="medium",
+            use_responses_api=False,
+            structured_output_method="function_calling",
+        )
+
+        self.assertIsNone(config.reasoning)
+        self.assertFalse(config.model_dump()["use_responses_api"])
+        self.assertEqual(config.structured_output_method, "function_calling")
+
+
+class StructuredOutputTests(unittest.TestCase):
+    def test_structured_output_uses_function_calling(self):
+        from cipoc.llm import OpenAIAgentModel
+
+        class Runnable:
+            def invoke(self, messages, **kwargs):
+                return messages
+
+        class Model:
+            method = None
+
+            def with_structured_output(self, schema, *, method):
+                self.method = method
+                return Runnable()
+
+        agent = object.__new__(OpenAIAgentModel)
+        agent._model = Model()
+        agent._tools = None
+        agent._semaphore = None
+        agent._structured_output_method = "function_calling"
+
+        self.assertEqual(agent.structured(dict, ["message"]), ["message"])
+        self.assertEqual(agent._model.method, "function_calling")
+
+
+class OpenAIReasoningConfigTests(unittest.TestCase):
+    def test_chat_completions_translates_reasoning_to_effort(self):
+        from cipoc.llm import OpenAIConfig, OpenAIAgentModel
+
+        agent = OpenAIAgentModel(OpenAIConfig(
+            model="gpt-oss-120b",
+            api_key="test",
+            base_url="https://example.com/v1",
+            use_responses_api=False,
+            reasoning={"effort": "high", "summary": "detailed"},
+        ))
+
+        self.assertEqual(agent.model.reasoning_effort, "high")
+        self.assertIsNone(agent.model.reasoning)
+
+    def test_responses_preserves_nested_reasoning(self):
+        from cipoc.llm import OpenAIConfig, OpenAIAgentModel
+
+        agent = OpenAIAgentModel(OpenAIConfig(
+            model="gpt-oss-120b",
+            api_key="test",
+            base_url="https://example.com/v1",
+            use_responses_api=True,
+            reasoning={"effort": "high", "summary": "detailed"},
+        ))
+
+        self.assertEqual(
+            agent.model.reasoning,
+            {"effort": "high", "summary": "detailed"},
+        )
+        self.assertIsNone(agent.model.reasoning_effort)
+
 
 if __name__ == "__main__":
     unittest.main()

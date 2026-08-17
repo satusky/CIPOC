@@ -12,7 +12,7 @@ class OpenAIReasoning(BaseModel):
 
 class OpenAIConfig(LLMConfig):
     provider: str = "openai"
-    reasoning: OpenAIReasoning = Field(description="Reasoning args", default_factory=OpenAIReasoning)
+    reasoning: OpenAIReasoning | None = Field(description="Responses API reasoning args", default_factory=OpenAIReasoning)
     model_config = ConfigDict(extra="allow", protected_namespaces=())
 
 
@@ -23,7 +23,13 @@ class OpenAIAgentModel(BaseAgentModel):
         super().__init__(config, **kwargs)
 
     def _initialize_model(self, **kwargs) -> ChatOpenAI:
-        return ChatOpenAI(**self._model_kwargs(**kwargs))
+        model_kwargs = self._model_kwargs(**kwargs)
+        if model_kwargs.get("use_responses_api") is False:
+            reasoning = model_kwargs.pop("reasoning", None)
+            if reasoning is not None:
+                effort = reasoning.get("effort") if isinstance(reasoning, dict) else reasoning.effort
+                model_kwargs.setdefault("reasoning_effort", effort)
+        return ChatOpenAI(**model_kwargs)
 
 
 if __name__ == "__main__":
