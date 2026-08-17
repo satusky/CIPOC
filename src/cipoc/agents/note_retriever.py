@@ -14,17 +14,17 @@ from .base import BaseAgent
 
 
 class RelevantNoteIDs(BaseModel):
-    note_ids: list[int] = Field(default_factory=list, description="ID values for notes identified as relevant based on the filter criteria.")
+    note_ids: list[int | str] = Field(default_factory=list, description="ID values for notes identified as relevant based on the filter criteria.")
 
 
 # Graph state
 class RetrieverInput(BaseModel):
     requested_variables: VariableGroupInfo = Field(description="The target variable(s) to extract from the clinical notes.")
-    available_digests: dict[int, NoteDigest] = Field(description="Dictionary of clinical note metadata keyed by note ID for identification of relevance of notes for an extraction task. Includes note type, summary, and keywords.")
+    available_digests: dict[int | str, NoteDigest] = Field(description="Dictionary of clinical note metadata keyed by note ID for identification of relevance of notes for an extraction task. Includes note type, summary, and keywords.")
 
 
 class RetrieverOutput(BaseModel):
-    relevant_note_ids: list[int] | None = Field(default=None, description="ID values for notes identified as relevant based on the filter criteria. `None` if no note could plausibly be relevant.")
+    relevant_note_ids: list[int | str] | None = Field(default=None, description="ID values for notes identified as relevant based on the filter criteria. `None` if no note could plausibly be relevant.")
 
 
 class RetrieverState(RetrieverInput, RetrieverOutput):
@@ -81,7 +81,7 @@ class NoteRetrieverAgent(BaseAgent):
         retriever_input: RetrieverInput | dict,
         *,
         progress: bool = True,
-    ) -> list[int] | None:
+    ) -> list[int | str] | None:
         """Select relevant notes for the requested variables; returns their IDs (or None)."""
         result = (
             run_with_progress(

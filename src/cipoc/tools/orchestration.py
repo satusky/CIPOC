@@ -235,7 +235,7 @@ def prefilter_notes(
 
 
 
-def build_corpus_descriptors(note_corpus: dict[int, ProcessedClinicalNote]) -> NoteCorpusDescriptors:
+def build_corpus_descriptors(note_corpus: dict[int | str, ProcessedClinicalNote]) -> NoteCorpusDescriptors:
     notes = list(note_corpus.values())
     dates = sorted([note.date for note in notes])
     types = {note.note_type for note in notes}
@@ -288,7 +288,9 @@ def build_corpus_descriptors(note_corpus: dict[int, ProcessedClinicalNote]) -> N
     )
 
 
-def build_corpus_digests(note_corpus: dict[int, ProcessedClinicalNote]) -> dict[int, NoteDigest]:
+def build_corpus_digests(
+    note_corpus: dict[int | str, ProcessedClinicalNote],
+) -> dict[int | str, NoteDigest]:
     return {
         note_id: NoteDigest(
             note_id=note.note_id,

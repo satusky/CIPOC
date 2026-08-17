@@ -42,7 +42,7 @@ from .note_retriever import NoteRetrieverAgent, RetrieverInput
 
 ORCHESTRATOR_SYSTEM_PROMPT = ""
 
-def index_notes(note_corpus: dict[int, ProcessedClinicalNote]) -> dict[int, str | None]:
+def index_notes(note_corpus: dict[int | str, ProcessedClinicalNote]) -> dict[int | str, str | None]:
     return {note_id: processed_note.summary for note_id, processed_note in note_corpus.items()}
 
 def dict_merge_reducer(left: dict, right: dict) -> dict:
@@ -74,11 +74,11 @@ class CaseState(BaseModel):
         default=None,
         description="Review roll-up assembled at finalization; absent until then.",
     )
-    note_corpus: Annotated[dict[int, ClinicalNote | ProcessedClinicalNote], dict_merge_reducer] = Field(
+    note_corpus: Annotated[dict[int | str, ClinicalNote | ProcessedClinicalNote], dict_merge_reducer] = Field(
         default_factory=dict,
         description="Dictionary of processed clinical notes keyed by note ID."
     )
-    note_digests: dict[int, NoteDigest] = Field(
+    note_digests: dict[int | str, NoteDigest] = Field(
         default_factory=dict,
         description="Dictionary of note digests keyed by note ID. Written once by "
         "characterize_corpus; the extract branch reads a copy under its own "
@@ -114,8 +114,8 @@ class ExtractorBranchInput(BaseModel):
     # Named distinctly from the parent CaseState channels: these are read-only
     # inputs seeded via Send, so keeping the names disjoint stops the subgraph
     # from echoing them back on fan-in (only variable_results should flow back).
-    branch_note_corpus: dict[int, ProcessedClinicalNote]
-    branch_note_digests: dict[int, NoteDigest]
+    branch_note_corpus: dict[int | str, ProcessedClinicalNote]
+    branch_note_digests: dict[int | str, NoteDigest]
 
 
 class ExtractBranchState(ExtractorBranchInput):
@@ -126,7 +126,7 @@ class ExtractBranchState(ExtractorBranchInput):
     inputs deliberately do not share parent channel names, so nothing but
     ``variable_results`` is written back.
     """
-    retrieved_note_ids: list[int] = Field(default_factory=list)
+    retrieved_note_ids: list[int | str] = Field(default_factory=list)
     variable_results: Annotated[dict[int, CaseVariableResult], dict_merge_reducer] = Field(
         default_factory=dict,
     )
@@ -139,7 +139,7 @@ class OrchestratorInput(BaseModel):
     in place during the scan. Everything else (targets, case facts, results) is
     derived during the run, so it is deliberately absent from the input contract.
     """
-    note_corpus: dict[int, ClinicalNote] = Field(default_factory=dict)
+    note_corpus: dict[int | str, ClinicalNote] = Field(default_factory=dict)
     structured_data: dict[int, str] = Field(
         default_factory=dict,
         description="Optional known coded values keyed by NAACCR item ID; seeded as structured-data results, skipping extraction.",
