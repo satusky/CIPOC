@@ -20,6 +20,8 @@ llm:
   # than OpenAI's Responses/native JSON-schema path.
   use_responses_api: false
   structured_output_method: function_calling
+  disabled_params:
+    parallel_tool_calls: null
 
   # Endpoint-wide concurrency cap. Bounds in-flight requests via a semaphore on
   # the shared model wrapper. This is a property of the endpoint, not the agent:
