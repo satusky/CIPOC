@@ -88,13 +88,13 @@ class BaseAgentModel(ABC):
         this rather than ``self.model.with_structured_output(...).invoke(...)``,
         which bypasses the semaphore.
         """
-        runnable = self.model.with_structured_output(
-            schema, method=self._structured_output_method
-        )
+        runnable = self._structured_runnable(schema)
         if self._semaphore is None:
-            return runnable.invoke(messages, **kwargs)
+            result = runnable.invoke(messages, **kwargs)
+            return self._parse_structured_result(schema, result)
         with self._semaphore:
-            return runnable.invoke(messages, **kwargs)
+            result = runnable.invoke(messages, **kwargs)
+            return self._parse_structured_result(schema, result)
 
     async def astructured(self, schema, messages, **kwargs):
         """Async sibling of :meth:`structured` — currently an unguarded passthrough.
@@ -106,7 +106,14 @@ class BaseAgentModel(ABC):
         ``async with self._semaphore:`` here. Until then the sync
         :meth:`structured` path is the bounded one.
         """
-        runnable = self.model.with_structured_output(
+        runnable = self._structured_runnable(schema)
+        result = await runnable.ainvoke(messages, **kwargs)
+        return self._parse_structured_result(schema, result)
+
+    def _structured_runnable(self, schema):
+        return self.model.with_structured_output(
             schema, method=self._structured_output_method
         )
-        return await runnable.ainvoke(messages, **kwargs)
+
+    def _parse_structured_result(self, schema, result):
+        return result
