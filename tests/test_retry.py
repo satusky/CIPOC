@@ -188,7 +188,7 @@ class RetryConfigTests(unittest.TestCase):
 
 
 class StructuredOutputTests(unittest.TestCase):
-    def test_structured_output_uses_function_calling(self):
+    def test_standard_function_calling_uses_langchain_defaults(self):
         from cipoc.llm import OpenAIAgentModel
 
         class Runnable:
@@ -207,13 +207,118 @@ class StructuredOutputTests(unittest.TestCase):
         agent._tools = None
         agent._semaphore = None
         agent._structured_output_method = "function_calling"
+        agent._endpoint_compatibility = "standard"
 
         self.assertEqual(agent.structured(dict, ["message"]), ["message"])
         self.assertEqual(agent._model.method, "function_calling")
 
+    def test_json_schema_parses_text_among_reasoning_blocks(self):
+        from langchain_core.messages import AIMessage
+        from cipoc.agents.note_scanner import NoteSummary
+        from cipoc.llm import OpenAIAgentModel
+
+        class Runnable:
+            def invoke(self, messages, **kwargs):
+                return {
+                    "raw": AIMessage(content=[
+                        {"type": "reasoning", "reasoning": "thinking"},
+                        {
+                            "type": "text",
+                            "text": '{"summary":"summary","keywords":["one","two","three"]}',
+                        },
+                    ]),
+                    "parsed": None,
+                    "parsing_error": ValueError("content is a list"),
+                }
+
+        class Model:
+            include_raw = None
+            schema = None
+
+            def with_structured_output(self, schema, *, method, include_raw=False):
+                self.schema = schema
+                self.include_raw = include_raw
+                return Runnable()
+
+        agent = object.__new__(OpenAIAgentModel)
+        agent._model = Model()
+        agent._tools = None
+        agent._semaphore = None
+        agent._structured_output_method = "json_schema"
+        agent._endpoint_compatibility = "databricks"
+
+        response = agent.structured(NoteSummary, ["message"])
+
+        self.assertEqual(response.summary, "summary")
+        self.assertEqual(response.keywords, ["one", "two", "three"])
+        self.assertTrue(agent._model.include_raw)
+        self.assertIsInstance(agent._model.schema, dict)
+        self.assertEqual(agent._model.schema["title"], "NoteSummary")
+
+    def test_standard_json_schema_uses_native_pydantic_parsing(self):
+        from cipoc.agents.note_scanner import NoteSummary
+        from cipoc.llm import OpenAIAgentModel
+
+        expected = NoteSummary(summary="summary", keywords=["one", "two", "three"])
+
+        class Runnable:
+            def invoke(self, messages, **kwargs):
+                return expected
+
+        class Model:
+            schema = None
+            kwargs = None
+
+            def with_structured_output(self, schema, **kwargs):
+                self.schema = schema
+                self.kwargs = kwargs
+                return Runnable()
+
+        agent = object.__new__(OpenAIAgentModel)
+        agent._model = Model()
+        agent._tools = None
+        agent._semaphore = None
+        agent._structured_output_method = "json_schema"
+        agent._endpoint_compatibility = "standard"
+
+        response = agent.structured(NoteSummary, ["message"])
+
+        self.assertIs(response, expected)
+        self.assertIs(agent._model.schema, NoteSummary)
+        self.assertEqual(agent._model.kwargs, {"method": "json_schema"})
+
 
 class OpenAIReasoningConfigTests(unittest.TestCase):
-    def test_chat_completions_translates_reasoning_to_effort(self):
+    def test_standard_compatibility_is_default_and_not_forwarded(self):
+        from cipoc.llm import OpenAIConfig, OpenAIAgentModel
+
+        config = OpenAIConfig(
+            model="gpt-5.5",
+            api_key="test",
+            base_url="https://api.openai.com/v1",
+        )
+        agent = OpenAIAgentModel(config)
+
+        self.assertEqual(config.endpoint_compatibility, "standard")
+        self.assertEqual(config.structured_output_method, "json_schema")
+        self.assertNotIn("endpoint_compatibility", agent._model_kwargs())
+
+    def test_databricks_compatibility_is_opt_in_and_not_forwarded(self):
+        from cipoc.llm import OpenAIConfig, OpenAIAgentModel
+
+        config = OpenAIConfig(
+            model="gpt-oss-120b",
+            api_key="test",
+            base_url="https://example.com/v1",
+            endpoint_compatibility="databricks",
+            use_responses_api=False,
+        )
+        agent = OpenAIAgentModel(config)
+
+        self.assertEqual(config.endpoint_compatibility, "databricks")
+        self.assertNotIn("endpoint_compatibility", agent._model_kwargs())
+
+    def test_standard_chat_completions_translates_reasoning_to_effort(self):
         from cipoc.llm import OpenAIConfig, OpenAIAgentModel
 
         agent = OpenAIAgentModel(OpenAIConfig(
