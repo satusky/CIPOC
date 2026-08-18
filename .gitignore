@@ -11,5 +11,5 @@ __pycache__
 
 planning/
 tests/test_outputs/
-documents/*/
+documents/
 src/cipoc/agents/visualization/*.html
