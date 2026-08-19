@@ -1,8 +1,10 @@
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import MagicMock, patch
 
 from cipoc.agents.orchestrator import CaseState, OrchestratorAgent
-from cipoc.models import CancerMention, CaseFacts, ConfidenceLevel, ProcessedClinicalNote, TextSpan
+from cipoc.models import CancerMention, CaseFacts, ClinicalNote, ConfidenceLevel, ProcessedClinicalNote, TextSpan
 from cipoc.tools import build_corpus_descriptors, load_variable_groups, site_applies
 
 
@@ -80,6 +82,24 @@ class CorpusCharacterizationTests(unittest.TestCase):
 
         self.assertEqual(update["case_facts"].gross_primary_site, "breast")
 
+    def test_single_cancer_mention_sets_gross_primary_site(self):
+        state = CaseState(note_corpus={1: self.note})
+
+        update = self.agent().characterize_corpus(state)
+
+        self.assertEqual(update["case_facts"].gross_primary_site, "breast")
+
+    @patch("cipoc.agents.orchestrator.build_corpus_descriptors")
+    def test_scalar_affected_tissue_is_not_split_into_characters(self, descriptors):
+        descriptors.return_value = SimpleNamespace(
+            affected_tissues={"current": "breast"}
+        )
+        state = CaseState(note_corpus={1: self.note})
+
+        update = self.agent().characterize_corpus(state)
+
+        self.assertEqual(update["case_facts"].gross_primary_site, "breast")
+
     def test_initial_group_uses_breast_codes_after_characterization(self):
         state = CaseState(note_corpus={1: self.note, 2: self.breast_note})
         agent = self.agent()
@@ -94,6 +114,32 @@ class CorpusCharacterizationTests(unittest.TestCase):
         self.assertEqual(len(primary_site.valid_codes), 9)
         self.assertIn("C504", primary_site.valid_codes)
         self.assertNotIn("C341", primary_site.valid_codes)
+
+
+class OrchestratorRunTests(unittest.TestCase):
+    @patch("cipoc.agents.orchestrator.run_with_progress")
+    def test_progress_can_be_disabled(self, run_with_progress):
+        agent = object.__new__(OrchestratorAgent)
+        agent._graph = MagicMock()
+        agent._graph.invoke.return_value = {}
+
+        result = agent.run(
+            [
+                {
+                    "note_id": 1,
+                    "date": "2025-02-20",
+                    "note_type": "Pathology",
+                    "content": "Left breast core biopsy.",
+                }
+            ],
+            progress=False,
+        )
+
+        run_with_progress.assert_not_called()
+        agent._graph.invoke.assert_called_once()
+        graph_input = agent._graph.invoke.call_args.args[0]
+        self.assertIsInstance(graph_input["note_corpus"][1], ClinicalNote)
+        self.assertEqual(result.variable_results, {})
 
 
 if __name__ == "__main__":

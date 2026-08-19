@@ -179,12 +179,6 @@ class OrchestratorAgent(BaseAgent):
     def _wire_graph(self, workflow: StateGraph) -> None:
         extract_branch = self._build_extract_branch()
 
-        # No node here carries a retry policy. Every LLM call the orchestrator is
-        # responsible for happens inside a subagent's own graph, whose nodes
-        # already retry transient endpoint failures; retrying here as well would
-        # replay a whole scan or extraction — and multiply the attempt count —
-        # for one throttled request. The remaining nodes are deterministic, so a
-        # failure in them is a bug that should surface on the first attempt.
         workflow.add_node("initialize", self.initialize)
         workflow.add_node("scan_notes", self.scan_notes, destinations=("note_branch",))
         workflow.add_node("note_branch", self.note_branch)
@@ -273,9 +267,14 @@ class OrchestratorAgent(BaseAgent):
                 with open(site_dictionary_path, "r") as file:
                     site_dictionary = json.load(file)
             for status in ("current", "recent", "historical"):
+                affected_tissues = (descriptors.affected_tissues or {}).get(
+                    status, set()
+                )
+                if isinstance(affected_tissues, str):
+                    affected_tissues = [affected_tissues]
                 tissues = {
                     tissue.strip()
-                    for tissue in (descriptors.affected_tissues or {}).get(status, set())
+                    for tissue in affected_tissues
                     if tissue.strip()
                 }
                 if not tissues:
@@ -455,25 +454,32 @@ class OrchestratorAgent(BaseAgent):
         self,
         raw_notes: list[dict],
         structured_data: dict[int, str] | None = None,
+        *,
+        progress: bool = True,
     ) -> Case:
         """Extract the configured variable groups from ``raw_notes``.
 
         ``structured_data`` optionally supplies already-known coded values keyed
         by NAACCR item ID; those variables are seeded as structured-data results
-        and skip extraction. Returns the durable ``Case`` snapshot.
+        and skip extraction. Set ``progress`` to false to run without rendering
+        the live progress display. Returns the durable ``Case`` snapshot.
         """
-        final_state = run_with_progress(
-            self._graph,
-            {
-                "note_corpus": {note["note_id"]: ClinicalNote(**note) for note in raw_notes},
-                "structured_data": structured_data or {},
-            },
-            subgraphs=True,
-            description="Orchestrator",
-            target_groups=self._target_variables,
-            group_hierarchy=self._target_group_hierarchy,
-            pause_before_summary=True,
-        )
+        graph_input = {
+            "note_corpus": {note["note_id"]: ClinicalNote(**note) for note in raw_notes},
+            "structured_data": structured_data or {},
+        }
+        if progress:
+            final_state = run_with_progress(
+                self._graph,
+                graph_input,
+                subgraphs=True,
+                description="Orchestrator",
+                target_groups=self._target_variables,
+                group_hierarchy=self._target_group_hierarchy,
+                pause_before_summary=True,
+            )
+        else:
+            final_state = self._graph.invoke(graph_input)
 
         return CaseState(**final_state).to_case()
 

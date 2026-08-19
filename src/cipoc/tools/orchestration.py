@@ -234,7 +234,6 @@ def prefilter_notes(
     return [note for note in notes if note_matches_filter(note, note_filter, anchor=anchor)]
 
 
-
 def build_corpus_descriptors(note_corpus: dict[int | str, ProcessedClinicalNote]) -> NoteCorpusDescriptors:
     notes = list(note_corpus.values())
     dates = sorted([note.date for note in notes])

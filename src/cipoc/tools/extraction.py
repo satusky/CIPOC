@@ -265,6 +265,9 @@ def build_variable_group(
     with open(data_dictionary_path, "r") as f:
         data_dictionary = json.load(f)
 
+    if "items" in data_dictionary:
+        data_dictionary = {str(item["item_number"]): item for item in data_dictionary["items"]}
+
     site_dictionary: dict = {}
     if site_data_dictionary_path is not None:
         with open(site_data_dictionary_path, "r") as f:
