@@ -164,6 +164,7 @@ class FakeNoteScanner:
         mention = CancerMention(
             presence=True,
             confidence=ConfidenceLevel.HIGH,
+            evidence=[TextSpan(note_id=state.note.note_id, text=state.note.content)],
             status="current",
             affected_tissue="breast",
             metastasis=self._script.concepts.get("metastasis", False),
