@@ -9,6 +9,7 @@ from cipoc.agents.note_scanner import (
     concept_findings_model,
 )
 from cipoc.models import (
+    CancerMention,
     ClinicalNote,
     CONCEPT_DESCRIPTIONS,
     TextSpan,
@@ -108,6 +109,42 @@ class ConceptDetectionTests(unittest.TestCase):
         for name, description in CONCEPT_DESCRIPTIONS.items():
             self.assertIn(f'"{name}":', prompt)
             self.assertIn(description, prompt)
+
+
+class CancerMentionSchemaTests(unittest.TestCase):
+    def mention(self, **updates):
+        values = {
+            "presence": True,
+            "confidence": "max",
+            "evidence": [TextSpan(note_id=1, text="invasive breast carcinoma")],
+            "status": "current",
+            "affected_tissue": "breast",
+            "metastasis": False,
+        }
+        values.update(updates)
+        return CancerMention(**values)
+
+    def test_assertion_fields_are_required(self):
+        schema = CancerMention.model_json_schema()
+
+        self.assertTrue(
+            {"presence", "confidence", "evidence"}.issubset(schema["required"])
+        )
+        self.assertTrue(schema["properties"]["presence"]["const"])
+
+    def test_presence_must_be_true(self):
+        with self.assertRaises(ValidationError):
+            self.mention(presence=False)
+
+    def test_evidence_must_not_be_empty(self):
+        with self.assertRaises(ValidationError):
+            self.mention(evidence=[])
+
+    def test_complete_cancer_mention_is_valid(self):
+        mention = self.mention()
+
+        self.assertTrue(mention.presence)
+        self.assertEqual(mention.affected_tissue, "breast")
 
 
 if __name__ == "__main__":
