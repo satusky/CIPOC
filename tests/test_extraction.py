@@ -43,6 +43,29 @@ class VariableValueValidatorTests(unittest.TestCase):
 
         self.assertEqual(errors, [])
 
+    def test_row_oriented_code_table_is_used_for_membership_validation(self):
+        variable = VariableInfo(
+            item_id=1280,
+            valid_codes=[
+                {"code": "C500", "description": "Nipple"},
+                {"code": "C509", "description": "Breast, NOS"},
+            ],
+        )
+
+        errors = self.validator.validate(variable, self.candidate("C50"))
+
+        self.assertIn("Value is not one of the variable's allowable codes.", errors)
+
+    def test_row_oriented_code_table_accepts_a_listed_code(self):
+        variable = VariableInfo(
+            item_id=1280,
+            valid_codes=[{"code": "C500", "description": "Nipple"}],
+        )
+
+        errors = self.validator.validate(variable, self.candidate("C500"))
+
+        self.assertEqual(errors, [])
+
 
 if __name__ == "__main__":
     unittest.main()
