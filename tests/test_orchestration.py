@@ -133,13 +133,32 @@ class OrchestratorRunTests(unittest.TestCase):
                 }
             ],
             progress=False,
+            max_concurrency=32,
         )
 
         run_with_progress.assert_not_called()
         agent._graph.invoke.assert_called_once()
         graph_input = agent._graph.invoke.call_args.args[0]
         self.assertIsInstance(graph_input["note_corpus"][1], ClinicalNote)
+        self.assertEqual(
+            agent._graph.invoke.call_args.kwargs["config"],
+            {"max_concurrency": 32},
+        )
         self.assertEqual(result.variable_results, {})
+
+    @patch("cipoc.agents.orchestrator.run_with_progress", return_value={})
+    def test_max_concurrency_is_forwarded_with_progress(self, run_with_progress):
+        agent = object.__new__(OrchestratorAgent)
+        agent._graph = MagicMock()
+        agent._target_variables = []
+        agent._target_group_hierarchy = []
+
+        agent.run([], max_concurrency=48)
+
+        self.assertEqual(
+            run_with_progress.call_args.kwargs["config"],
+            {"max_concurrency": 48},
+        )
 
 
 if __name__ == "__main__":
