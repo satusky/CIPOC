@@ -33,11 +33,15 @@ class ConceptWithEvidence(BaseModel):
     model_config = ConfigDict(protected_namespaces=())
 
 
-class CancerMention(ConceptWithEvidence):
+class CancerMention(BaseModel):
+    presence: Literal[True] = Field(description="Every reported cancer mention is present in the note.")
+    confidence: ConfidenceLevel = confidence_field()
+    evidence: list[TextSpan] = Field(min_length=1, description="Verbatim text spans supporting the cancer mention.")
     status: CancerStatus = Field(description="Approximate timeframe of cancer case. {'current': ongoing case, 'recent': case resolved <10 years prior, 'historical': case resolved 10+ years prior}")
     affected_tissue: str = Field(description="Primary organ or tissue affected.")
     metastasis: bool = Field(description="Metastases mentioned in the note.")
-
+    model_config = ConfigDict(protected_namespaces=())
+    
 
 class ClinicalNote(BaseModel):
     note_id: int | str = Field(description="ID value for note.")
