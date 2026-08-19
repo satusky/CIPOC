@@ -113,6 +113,29 @@ class RendererSelectionTests(unittest.TestCase):
 
 
 class ProgressRunnerTests(unittest.TestCase):
+    def test_forwards_graph_config(self):
+        graph = _Graph([("values", {"answer": 42})])
+
+        with patch(
+            "cipoc.utils.progress.runner._select_renderer",
+            return_value=_RecordingRenderer(),
+        ):
+            run_with_progress(graph, {}, config={"max_concurrency": 32})
+
+        self.assertEqual(
+            graph.calls,
+            [
+                (
+                    {},
+                    {
+                        "stream_mode": ["values", "tasks"],
+                        "subgraphs": False,
+                        "config": {"max_concurrency": 32},
+                    },
+                )
+            ],
+        )
+
     def test_streams_tasks_and_values_and_returns_last_root_state(self):
         result = {"answer": 42}
         graph = _Graph(
