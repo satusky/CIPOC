@@ -456,22 +456,33 @@ class OrchestratorAgent(BaseAgent):
         structured_data: dict[int, str] | None = None,
         *,
         progress: bool = True,
+        max_concurrency: int | None = None,
     ) -> Case:
         """Extract the configured variable groups from ``raw_notes``.
 
         ``structured_data`` optionally supplies already-known coded values keyed
         by NAACCR item ID; those variables are seeded as structured-data results
         and skip extraction. Set ``progress`` to false to run without rendering
-        the live progress display. Returns the durable ``Case`` snapshot.
+        the live progress display. ``max_concurrency`` controls LangGraph's
+        parallel task limit. Returns the durable ``Case`` snapshot.
         """
+        if max_concurrency is not None and max_concurrency < 1:
+            raise ValueError("max_concurrency must be at least 1.")
+
         graph_input = {
             "note_corpus": {note["note_id"]: ClinicalNote(**note) for note in raw_notes},
             "structured_data": structured_data or {},
         }
+        graph_config = (
+            {"max_concurrency": max_concurrency}
+            if max_concurrency is not None
+            else None
+        )
         if progress:
             final_state = run_with_progress(
                 self._graph,
                 graph_input,
+                config=graph_config,
                 subgraphs=True,
                 description="Orchestrator",
                 target_groups=self._target_variables,
@@ -479,7 +490,7 @@ class OrchestratorAgent(BaseAgent):
                 pause_before_summary=True,
             )
         else:
-            final_state = self._graph.invoke(graph_input)
+            final_state = self._graph.invoke(graph_input, config=graph_config)
 
         return CaseState(**final_state).to_case()
 

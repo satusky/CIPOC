@@ -316,6 +316,7 @@ def run_with_progress(
     graph: CompiledStateGraph,
     graph_input: Any,
     *,
+    config: Mapping[str, Any] | None = None,
     subgraphs: bool = False,
     description: str = "Agent",
     node_kinds: Mapping[str, TaskKind] | None = None,
@@ -355,11 +356,13 @@ def run_with_progress(
             # Progress is optional. A thread creation failure must not prevent
             # the graph itself from running; the caller will render teardown.
             painter.error = error
-        for raw_item in graph.stream(
-            graph_input,
-            stream_mode=["values", "tasks"],
-            subgraphs=subgraphs,
-        ):
+        stream_kwargs = {
+            "stream_mode": ["values", "tasks"],
+            "subgraphs": subgraphs,
+        }
+        if config is not None:
+            stream_kwargs["config"] = config
+        for raw_item in graph.stream(graph_input, **stream_kwargs):
             event = normalize(raw_item, subgraphs=subgraphs)
             if event is None:
                 continue
