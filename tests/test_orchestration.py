@@ -4,7 +4,7 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 from cipoc.agents.orchestrator import CaseState, OrchestratorAgent
-from cipoc.models import CancerMention, CaseFacts, ConfidenceLevel, ProcessedClinicalNote
+from cipoc.models import CancerMention, CaseFacts, ConfidenceLevel, ProcessedClinicalNote, TextSpan
 from cipoc.tools import build_corpus_descriptors, load_variable_groups, site_applies
 
 
@@ -43,7 +43,7 @@ class CorpusCharacterizationTests(unittest.TestCase):
                 CancerMention(
                     presence=True,
                     confidence=ConfidenceLevel.HIGH,
-                    evidence=None,
+                    evidence=[TextSpan(note_id=1, text="Left breast core biopsy.")],
                     status="current",
                     affected_tissue="left breast",
                     metastasis=False,
