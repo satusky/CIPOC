@@ -19,8 +19,10 @@ llm:
   # Databricks gpt-oss uses Chat Completions and returns native structured output
   # in a text content block alongside its reasoning blocks. Compatibility defaults
   # to "standard" when omitted; opt into "databricks" only for affected endpoints.
-  use_responses_api: false
-  endpoint_compatibility: databricks
+  use_responses_api: true
+  endpoint_compatibility: standard
+  # use_responses_api: false
+  # endpoint_compatibility: databricks
   structured_output_method: json_schema
 
   # Endpoint-wide concurrency cap. Bounds in-flight requests via a semaphore on
@@ -48,11 +50,12 @@ llm:
 # Optional per-agent overrides. Keys are agent names from the `agents` module.
 # Only specify the fields you want to change; everything else falls back to `llm`.
 agents:
-  extractor: {}
-    # Example override:
-    # model: gpt-5.5
-    # reasoning:
-    #   effort: high
+  # note_scanner:
+  #   model: gpt-oss-20b
+  #   max_concurrency: 32
+  #   reasoning:
+  #     effort: low
+  #     summary: null
 
 documents:
   documents_path: documents/
