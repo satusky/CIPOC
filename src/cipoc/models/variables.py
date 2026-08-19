@@ -15,7 +15,7 @@ class VariableInfo(BaseModel):
     length: int | None = Field(default=None, description="Maximum field length defined by the data dictionary.")
     allowable_values: str | None = Field(default=None, description="Allowable values defined by the data dictionary.")
     format: str | None = Field(default=None, description="Format for coded value as defined by the data dictionary and/or instructions.")
-    valid_codes: str | dict | None = Field(default=None, description="Valid codes from the data dictionary, optionally scoped by gross primary site.")
+    valid_codes: str | dict | list[dict] | None = Field(default=None, description="Valid codes from the data dictionary, optionally scoped by gross primary site.")
     coding_instructions: str | None = Field(default=None, description="Coding instructions from the NAACCR data dictionary, when present.")
     model_config = ConfigDict(protected_namespaces=())
 
