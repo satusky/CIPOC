@@ -98,6 +98,18 @@ class WebAssetTests(unittest.TestCase):
                     ".headline-fact.pending"):
             self.assertIn(cls, css, f"styles.css missing {cls}")
 
+    def test_app_js_wires_reference_map_layout(self):
+        app_js = (WEB_DIR / "app.js").read_text()
+        for wiring in (
+            "const MAP_POS",
+            "const MAP_HIDE",
+            "function mapStyle",
+            'edge[kind="loop"]',
+            '"taxi-turn": "90%"',
+            'visitedCoarse.add("relevant_notes_gate")',
+        ):
+            self.assertIn(wiring, app_js, f"app.js missing map wiring: {wiring}")
+
 
 class OverviewChartTests(unittest.TestCase):
     def test_chart_is_drawable(self):
@@ -148,6 +160,13 @@ class CoarseMapCoverageTests(unittest.TestCase):
         reported = set(snap["visited_map_nodes"]) | set(snap["details"].keys())
         unmapped = {n for n in reported if n not in coarse}
         self.assertEqual(unmapped, set(), f"fixture nodes with no block: {sorted(unmapped)}")
+
+    def test_extract_wrapper_maps_to_relevant_notes_gate(self):
+        self.assertEqual(map_node_id("extract"), "relevant_notes_gate")
+        self.assertEqual(
+            overview_block_map()["relevant_notes_gate"],
+            "relevant_notes_gate",
+        )
 
 
 if __name__ == "__main__":

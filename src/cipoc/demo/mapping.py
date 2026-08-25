@@ -15,8 +15,10 @@ Two subtleties it handles:
   orchestrator node that invoked it (``note_branch`` / ``retrieve_notes`` /
   ``extract``), so :func:`infer_agent` recovers the owning agent from there.
 * Orchestrator container nodes that merely fan out or delegate map onto the
-  corresponding conceptual marker (e.g. ``scan_notes`` -> ``fan_out_notes``,
-  ``extract`` -> ``extractor_initialize``).
+  corresponding conceptual marker (e.g. ``scan_notes`` -> ``fan_out_notes``).
+  The ``extract`` wrapper owns the implicit relevant-notes decision before it
+  delegates to the extractor, so it maps to that gate rather than the nested
+  extractor's initialize node.
 
 A test (Phase 0) asserts every ``DEFAULT_NODE_KINDS`` name resolves to a real
 ``agent_system.json`` node ID, so the map cannot silently drift from the graph.
@@ -60,7 +62,7 @@ _FLAT: dict[str, str] = {
     "plan_extraction": "plan_extraction",
     "extract_branch": "fan_out_groups",
     "retrieve_notes": "hard_filter_notes",
-    "extract": "extractor_initialize",
+    "extract": "relevant_notes_gate",
     "merge_and_update": "merge_and_update",
     "finalize_case": "finalize_case",
     # Note-scanner subagent.
@@ -109,6 +111,7 @@ _OVERVIEW_BLOCK: dict[str, str] = {
     "hard_filter_notes": "retriever_agent_block",
     "retriever_initialize": "retriever_agent_block",
     "retriever_identify_relevant_notes": "retriever_agent_block",
+    "relevant_notes_gate": "relevant_notes_gate",
     "extractor_initialize": "extractor_agent_block",
     "extractor_load_notes": "extractor_agent_block",
     "extractor_extract_group_values": "extractor_agent_block",

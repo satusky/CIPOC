@@ -240,7 +240,7 @@ function mapStyle(agentColors) {
       selector: 'edge[kind="loop"]',
       style: {
         "line-color": LOOP, "target-arrow-color": LOOP, width: 3,
-        "taxi-direction": "vertical", "taxi-turn": "45%",
+        "taxi-direction": "vertical", "taxi-turn": "90%",
       },
     },
     // Edge captions (yes / no / loop / "one branch per …") on a small white chip.
@@ -373,6 +373,14 @@ function updateMap(snapshot, step) {
   for (const fine of snapshot.visited_map_nodes || []) {
     const c = coarse(fine);
     if (c) visitedCoarse.add(c);
+  }
+  // Older recorded traces mapped the extract wrapper directly onto the
+  // extractor. The wrapper is the implicit relevant-notes decision, so recover
+  // that conceptual visit without requiring persisted traces to be rewritten.
+  if (events.some((event) =>
+    event.seq <= snapshot.seq && event.type === "task_start" && event.node === "extract"
+  )) {
+    visitedCoarse.add("relevant_notes_gate");
   }
   visitedCoarse.add("case_start");
   if (snapshot.finished) visitedCoarse.add("case_end");
