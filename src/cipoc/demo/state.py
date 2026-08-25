@@ -35,7 +35,16 @@ from cipoc.utils.progress.events import ProgressEvent
 from cipoc.utils.progress.model import ProgressModel, Snapshot, TaskKind
 
 from .events import DemoEvent
-from .steps import FANOUT_COLLAPSE_NODES
+from .steps import FANOUT_INSTANCE_NODES
+
+# Nested nodes inside a ``variable_branch`` whose ``task_end`` marks one pass of
+# the extractor's extract → validate → repair loop. Each contributes a condensed
+# attempt record to its variable instance so the UI can show "2 attempts" with
+# the intermediate validation errors, without re-serializing the raw payloads
+# (which embed the whole variable definition *and* every note, per attempt).
+_ATTEMPT_NODES = frozenset(
+    {"extract_individual_value", "validate_extraction", "repair_invalid_extraction"}
+)
 
 
 @dataclass(frozen=True)
@@ -74,15 +83,19 @@ class NodeDetail:
 class InstanceDetail:
     """One fan-out instance's own material — e.g. a single note's characterization.
 
-    A fan-out node such as ``note_branch`` runs many times in parallel, all
-    sharing one conceptual map node. Folding them onto a single
+    A fan-out node such as ``note_branch`` or ``variable_branch`` runs many times
+    in parallel, all sharing one conceptual map node. Folding them onto a single
     :class:`NodeDetail` (keyed by map node) collapses every instance's input,
     result, and LLM calls together — the last write wins and the calls pile up.
-    So each instance is *also* tracked here, keyed by its root scope
-    ``"<node>:<task_id>"``, and every event nested beneath that scope (the
+    So each instance is *also* tracked here, keyed by its scope path (see
+    :func:`_instance_scope`), and every event nested beneath that scope (the
     sub-agent's ``values`` snapshots and captured LLM calls) is attributed back
     to it. ``index`` is the 1-based fan-out order; ``label`` is a human tag drawn
-    from the instance's input (e.g. ``"pathology #12"``).
+    from the instance's input (e.g. ``"pathology #12"``, ``"Primary Site"``).
+
+    ``attempts`` records one condensed entry per pass of an inner retry loop —
+    for a variable, each extract / validate / repair round — so the UI can show
+    the attempt count and surface intermediate validation errors on demand.
     """
 
     key: str
@@ -99,12 +112,42 @@ class InstanceDetail:
     result: Any = None
     error: Any = None
     llm_calls: tuple[dict[str, Any], ...] = ()
+    attempts: tuple[dict[str, Any], ...] = ()
 
     @property
     def status(self) -> str:
+        """``active`` / ``done`` / ``invalid`` / ``error``.
+
+        ``error`` means the task itself raised; ``invalid`` means it completed
+        normally but never validated — a real outcome the presenter needs to
+        see, not a crash.
+        """
         if self.errors:
             return "error"
-        return "active" if self.active > 0 else "done"
+        if self.active > 0:
+            return "active"
+        return "invalid" if self.final_is_valid is False else "done"
+
+    @property
+    def final_is_valid(self) -> bool | None:
+        """The instance's settled validity, or ``None`` if it has no verdict.
+
+        The completed result is authoritative. Falling back to the last
+        *validation* attempt (rather than the last attempt of any kind) matters
+        because an extract/repair pass clears the flag before re-validating, so
+        its record always reads ``False`` and would misreport a repaired
+        variable that simply has not been re-validated yet.
+        """
+        if isinstance(self.result, Mapping):
+            results = self.result.get("variable_results")
+            if isinstance(results, list) and results:
+                first = results[0]
+                if isinstance(first, Mapping):
+                    return first.get("is_valid")
+        for attempt in reversed(self.attempts):
+            if attempt.get("node") == "validate_extraction":
+                return attempt.get("is_valid")
+        return None
 
 
 @dataclass(frozen=True)
@@ -225,9 +268,9 @@ class DemoState:
 
         # Attribute the event to its fan-out instance (if any) before the
         # per-map-node folding below; the two views are independent.
-        scope = _instance_scope(event)
+        scope, is_root = _instance_scope(event)
         if scope is not None:
-            self._ingest_instance(event, scope)
+            self._ingest_instance(event, scope, is_root)
 
         if event.type == "llm_call":
             self._ingest_llm(event)
@@ -326,18 +369,19 @@ class DemoState:
         else:
             self._details[map_id] = _replace_calls(existing, (*existing.llm_calls, call))
 
-    def _ingest_instance(self, event: DemoEvent, scope: str) -> None:
-        """Fold one event into its fan-out instance (keyed by root scope).
+    def _ingest_instance(self, event: DemoEvent, scope: str, is_root: bool) -> None:
+        """Fold one event into its fan-out instance (keyed by scope path).
 
-        The instance is opened by the root fan-out ``task_start`` (which carries
-        the instance input, e.g. the note) and closed by that node's matching
-        ``task_end``. In between, the sub-agent's nested ``values`` snapshots
-        accumulate into the instance ``result`` (the running characterization)
-        and any captured LLM calls are appended.
+        The instance is opened by the fan-out ``task_start`` (which carries the
+        instance input, e.g. the note or the variable task) and closed by that
+        node's matching ``task_end``. In between, the sub-agent's nested
+        ``values`` snapshots accumulate into the instance ``result`` (the running
+        characterization / extraction), captured LLM calls are appended, and each
+        pass of an inner retry loop contributes an attempt record.
         """
         inst = self._instances.get(scope)
         if inst is None:
-            node = scope.split(":", 1)[0]
+            node = scope.rsplit("/", 1)[-1].split(":", 1)[0]
             inst = InstanceDetail(
                 key=scope,
                 node=node,
@@ -349,7 +393,6 @@ class DemoState:
             self._instances[scope] = inst
             self._instance_order.append(scope)
 
-        is_root = not event.namespace and event.node == inst.node
         if event.type == "task_start" and is_root:
             inst = replace(
                 inst,
@@ -366,6 +409,10 @@ class DemoState:
                 errors=inst.errors + (1 if event.error else 0),
                 error=event.error if event.error is not None else inst.error,
             )
+        elif event.type == "task_end" and event.node in _ATTEMPT_NODES:
+            attempt = _attempt_record(event)
+            if attempt is not None:
+                inst = replace(inst, attempts=(*inst.attempts, attempt))
         elif event.type == "values":
             inst = replace(inst, result=_merge_result(inst.result, event.payload))
         elif event.type == "llm_call":
@@ -449,28 +496,40 @@ def _to_progress_event(event: DemoEvent) -> ProgressEvent | None:
     return None
 
 
-def _instance_scope(event: DemoEvent) -> str | None:
-    """The fan-out instance scope this event belongs to, or ``None``.
+def _instance_scope(event: DemoEvent) -> tuple[str | None, bool]:
+    """The fan-out instance scope this event belongs to, and whether it owns it.
 
-    A root fan-out ``task_start``/``task_end`` (empty namespace, node in
-    :data:`~cipoc.demo.steps.FANOUT_COLLAPSE_NODES`) owns scope
-    ``"<node>:<task_id>"``; every nested event carries that scope as the first
-    element of its namespace.
+    Returns ``(key, is_root)``. A fan-out ``task_start``/``task_end`` (node in
+    :data:`~cipoc.demo.steps.FANOUT_INSTANCE_NODES`) *owns* the scope its own
+    namespace plus ``"<node>:<task_id>"`` names; every event produced beneath it
+    carries that same path as a namespace prefix and is attributed back to it.
+
+    The key is the namespace path joined by ``"/"``, because fan-outs nest: a
+    ``note_branch`` runs at the root (key ``"note_branch:<id>"``) while a
+    ``variable_branch`` runs two levels down inside an extractor sub-agent (key
+    ``"extract_branch:<id>/extract:<id>/variable_branch:<id>"``). Nested events
+    resolve to the *innermost* enclosing fan-out, so a repair-loop ``llm_call``
+    lands on its variable rather than on the whole group.
     """
     ns = event.namespace
-    if ns:
-        head = ns[0]
-        node = head.split(":", 1)[0]
-        return head if node in FANOUT_COLLAPSE_NODES else None
-    if event.type in ("task_start", "task_end") and event.node in FANOUT_COLLAPSE_NODES:
-        return f"{event.node}:{event.task_id}"
-    return None
+    if event.type in ("task_start", "task_end") and event.node in FANOUT_INSTANCE_NODES:
+        return "/".join([*ns, f"{event.node}:{event.task_id}"]), True
+    for depth in range(len(ns), 0, -1):
+        if ns[depth - 1].split(":", 1)[0] in FANOUT_INSTANCE_NODES:
+            return "/".join(ns[:depth]), False
+    return None, False
 
 
 def _instance_label(node: str, payload: Any) -> str:
     """Human tag for a fan-out instance drawn from its input payload."""
     if not isinstance(payload, Mapping):
         return ""
+    if node == "variable_branch":
+        variable = (payload.get("task") or {}).get("variable") or {}
+        if not isinstance(variable, Mapping):
+            return ""
+        name = variable.get("name")
+        return str(name) if name else f"Item {variable.get('item_id')}"
     note_id = payload.get("note_id")
     note_type = payload.get("note_type")
     if note_type and note_id is not None:
@@ -478,6 +537,28 @@ def _instance_label(node: str, payload: Any) -> str:
     if note_id is not None:
         return f"Note #{note_id}"
     return ""
+
+
+def _attempt_record(event: DemoEvent) -> dict[str, Any] | None:
+    """Condense one extract/validate/repair pass into a small attempt record.
+
+    The raw ``task_end`` payload carries the full variable definition and every
+    loaded note, per attempt; only the verdict is worth shipping to the browser.
+    """
+    payload = event.payload
+    if not isinstance(payload, Mapping):
+        return None
+    task = payload.get("task")
+    if not isinstance(task, Mapping):
+        return None
+    candidate = task.get("candidate")
+    return {
+        "node": event.node,
+        "attempt": task.get("extraction_attempts"),
+        "is_valid": task.get("is_valid"),
+        "validation_errors": list(task.get("validation_errors") or []),
+        "value": candidate.get("value") if isinstance(candidate, Mapping) else None,
+    }
 
 
 def _merge_result(prior: Any, payload: Any) -> Any:
@@ -559,6 +640,7 @@ def _instance_to_dict(instance: InstanceDetail) -> dict[str, Any]:
         "result": instance.result,
         "error": instance.error,
         "llm_calls": list(instance.llm_calls),
+        "attempts": list(instance.attempts),
     }
 
 

@@ -193,6 +193,135 @@ class InstanceDetailTests(unittest.TestCase):
         self.assertEqual(replay(events).snapshot().instances, {})
 
 
+class VariableInstanceTests(unittest.TestCase):
+    """Per-variable fan-out, two namespace levels down inside the extractor."""
+
+    GROUP = ("extract_branch:g", "extract:e")
+
+    def _variable_events(self, seq, task_id, name, item_id, passes):
+        """One variable_branch: start, each validate/repair pass, then finish.
+
+        ``passes`` is a list of ``(node, attempt, is_valid, errors)``.
+        """
+        scope = self.GROUP + (f"variable_branch:{task_id}",)
+        events = [
+            _task_start(seq, "variable_branch", task_id, self.GROUP, "fan_out_variables",
+                        "extractor",
+                        payload={"task": {"variable": {"item_id": item_id, "name": name}}}),
+        ]
+        for node, attempt, is_valid, errors in passes:
+            seq += 1
+            events.append(_task_end(
+                seq, node, f"{task_id}-{attempt}-{node}", scope,
+                f"extractor_{node}", "extractor",
+                payload={"task": {"candidate": {"value": "V"}, "is_valid": is_valid,
+                                  "validation_errors": errors, "extraction_attempts": attempt}},
+            ))
+        last = passes[-1]
+        events.append(DemoEvent(
+            seq=seq + 1, t=(seq + 1) * 0.1, type="values", namespace=scope, agent="extractor",
+            payload={"variable_results": [{"item_id": item_id, "value": "V",
+                                           "is_valid": last[2], "validation_errors": last[3],
+                                           "extraction_attempts": last[1]}]},
+        ))
+        events.append(_task_end(seq + 2, "variable_branch", task_id, self.GROUP,
+                                "fan_out_variables", "extractor"))
+        return events
+
+    def test_parallel_variables_keep_their_own_material(self):
+        events = [
+            *self._variable_events(1, "v1", "Primary Site", 400,
+                                   [("validate_extraction", 1, True, [])]),
+            *self._variable_events(10, "v2", "Laterality", 410,
+                                   [("validate_extraction", 1, True, [])]),
+        ]
+        insts = replay(events).snapshot().instances
+        self.assertEqual(
+            list(insts),
+            ["extract_branch:g/extract:e/variable_branch:v1",
+             "extract_branch:g/extract:e/variable_branch:v2"],
+        )
+        first = insts["extract_branch:g/extract:e/variable_branch:v1"]
+        self.assertEqual(first.node, "variable_branch")
+        self.assertEqual(first.label, "Primary Site")
+        self.assertEqual(first.status, "done")
+        self.assertEqual(first.result["variable_results"][0]["item_id"], 400)
+
+    def test_repair_loop_records_condensed_attempts(self):
+        events = self._variable_events(1, "v1", "Nodes Positive", 820, [
+            ("validate_extraction", 1, False, ["not an allowable code"]),
+            ("repair_invalid_extraction", 2, False, []),
+            ("validate_extraction", 2, True, []),
+        ])
+        inst = replay(events).snapshot().instances[
+            "extract_branch:g/extract:e/variable_branch:v1"
+        ]
+        self.assertEqual([a["node"] for a in inst.attempts],
+                         ["validate_extraction", "repair_invalid_extraction",
+                          "validate_extraction"])
+        self.assertEqual(inst.attempts[0]["validation_errors"], ["not an allowable code"])
+        self.assertEqual(inst.attempts[0]["value"], "V")
+        # Repaired successfully: the settled verdict is the *validation*, not the
+        # repair pass that cleared the flag on its way to being re-checked.
+        self.assertEqual(inst.status, "done")
+        self.assertIs(inst.final_is_valid, True)
+
+    def test_exhausted_repair_reports_invalid_not_error(self):
+        events = self._variable_events(1, "v1", "Nodes Positive", 820, [
+            ("validate_extraction", 1, False, ["bad"]),
+            ("repair_invalid_extraction", 2, False, []),
+            ("validate_extraction", 2, False, ["still bad"]),
+        ])
+        inst = replay(events).snapshot().instances[
+            "extract_branch:g/extract:e/variable_branch:v1"
+        ]
+        self.assertEqual(inst.status, "invalid")
+        self.assertEqual(inst.errors, 0)  # nothing *raised*
+
+    def test_nested_llm_call_lands_on_its_variable(self):
+        # A repair call's namespace nests one level deeper than the variable's;
+        # it must resolve to the innermost enclosing fan-out.
+        scope = self.GROUP + ("variable_branch:v1",)
+        call = LLMCall(node="repair_invalid_extraction",
+                       namespace=scope + ("repair_invalid_extraction:r",),
+                       run_id="r", response="{}")
+        events = [
+            _task_start(1, "variable_branch", "v1", self.GROUP, "fan_out_variables",
+                        "extractor", payload={"task": {"variable": {"name": "X", "item_id": 1}}}),
+            DemoEvent(seq=2, t=0.2, type="llm_call", node="repair_invalid_extraction",
+                      namespace=scope + ("repair_invalid_extraction:r",),
+                      map_node_id="extractor_repair_invalid_extraction", agent="extractor",
+                      payload=call.to_dict()),
+        ]
+        inst = replay(events).snapshot().instances[
+            "extract_branch:g/extract:e/variable_branch:v1"
+        ]
+        self.assertEqual(len(inst.llm_calls), 1)
+        self.assertEqual(inst.status, "active")
+
+    def test_fixture_groups_every_variable_under_its_own_group(self):
+        snap = replay(read_trace(FIXTURE)).snapshot()
+        variables = [i for i in snap.instances.values() if i.node == "variable_branch"]
+        self.assertTrue(variables)
+        self.assertTrue(all(v.label for v in variables), "every variable needs a name")
+        # Keys are scoped by extract_branch, so a group's cards can be selected.
+        groups = {v.key.split("/", 1)[0] for v in variables}
+        self.assertEqual(len(groups), 2)
+        # The fixture scripts item 674 to fail validation once, then repair.
+        repaired = [v for v in variables if len(v.attempts) > 1]
+        self.assertEqual(len(repaired), 1)
+        self.assertEqual(repaired[0].status, "done")
+
+    def test_variable_instances_serialize_their_attempts(self):
+        events = self._variable_events(1, "v1", "Grade", 440,
+                                       [("validate_extraction", 1, True, [])])
+        data = replay(events).snapshot().to_dict()
+        inst = data["instances"]["extract_branch:g/extract:e/variable_branch:v1"]
+        self.assertEqual(inst["label"], "Grade")
+        self.assertEqual(len(inst["attempts"]), 1)
+        json.dumps(data)  # the whole snapshot must stay JSON-serializable
+
+
 class LazyModelTests(unittest.TestCase):
     """The variable table's ProgressModel is built lazily from the streamed plan."""
 

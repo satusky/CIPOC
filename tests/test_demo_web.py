@@ -92,10 +92,66 @@ class WebAssetTests(unittest.TestCase):
         ):
             self.assertIn(symbol, app_js, f"app.js missing {symbol}")
 
+    def test_app_js_renders_one_container_per_variable(self):
+        """A group's extraction step is per-variable, not per inner-loop node."""
+        app_js = (WEB_DIR / "app.js").read_text()
+        for symbol in (
+            "renderExtractDetail",   # extract_branch step -> per-variable cards
+            "renderVariableDetail",  # one container per variable
+            "renderAttempts",        # repeated validation behind one dropdown
+            "variable_branch",       # the fan-out instances it selects
+            "step.task_id",          # scoped to *this* group's instances
+        ):
+            self.assertIn(symbol, app_js, f"app.js missing {symbol}")
+        # The merged group result just repeats the variable cards, so the node
+        # that produces it is demoted out of the extraction step's cards.
+        minor = app_js.split("const MINOR_NODES")[1].split("]")[0]
+        self.assertIn("merge_variable_results", minor)
+
+    def test_app_js_quiets_structural_nodes(self):
+        """Initialization / fan-outs / gates are quiet rows in the step timeline."""
+        app_js = (WEB_DIR / "app.js").read_text()
+        for symbol in ("MINOR_NODES", "renderMinorRow", "renderTimeline", "isMinor",
+                       "NODE_TITLES", "nodeHead"):
+            self.assertIn(symbol, app_js, f"app.js missing {symbol}")
+        # Raw payload dropdowns are opt-in (pinned components), not the default.
+        self.assertIn('raw ? collapsible("Task input"', app_js)
+
+    def test_app_js_renders_model_calls_readably(self):
+        """Inline icon, role-colored bubbles, and compact highlighted JSON."""
+        app_js = (WEB_DIR / "app.js").read_text()
+        for symbol in ("CALL_ICON", "msgBubble", "roleClass", "compactJSON",
+                       "highlightJSON", "codeBlock"):
+            self.assertIn(symbol, app_js, f"app.js missing {symbol}")
+        self.assertNotIn("🧠", app_js, "the brain emoji should be gone")
+        # Each note sub-step's call belongs inside that sub-step's slot.
+        self.assertIn("NOTE_SLOT_NODES", app_js)
+        self.assertIn("callsFor", app_js)
+
+    def test_app_js_summarizes_the_case(self):
+        """Case facts get their own container, and the run ends with a summary."""
+        app_js = (WEB_DIR / "app.js").read_text()
+        for symbol in ("viewCaseFacts", "viewFinalSummary"):
+            self.assertIn(symbol, app_js, f"app.js missing {symbol}")
+
+    def test_app_js_wires_the_panel_splitter(self):
+        app_js = (WEB_DIR / "app.js").read_text()
+        html = (WEB_DIR / "index.html").read_text()
+        self.assertIn("wireSplitter", app_js)
+        self.assertIn("--vars-h", app_js)
+        self.assertIn('id="row-split"', html)
+
     def test_styles_cover_phase4_views(self):
         css = (WEB_DIR / "styles.css").read_text()
         for cls in (".extraction", ".repair-badge", ".note-text mark", ".concept-chip",
                     ".headline-fact.pending"):
+            self.assertIn(cls, css, f"styles.css missing {cls}")
+
+    def test_styles_cover_the_cleanup_views(self):
+        css = (WEB_DIR / "styles.css").read_text()
+        for cls in (".node-head", ".node-head-title", ".minor-row",
+                    ".node-detail.variable", ".attempt", ".row-split", "--vars-h",
+                    ".msg.role-system", ".call-icon", ".j-key", "pre.code.json"):
             self.assertIn(cls, css, f"styles.css missing {cls}")
 
     def test_app_js_wires_reference_map_layout(self):

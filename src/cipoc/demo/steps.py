@@ -14,6 +14,10 @@ that step — so ``next``/``prev``/``goto`` are pure index moves over this list.
 root task (subagent task/values events and the LLM calls captured inside them)
 falls into that root task's step, because their namespaces are nested under it.
 This gives one linear, deterministic partition even though subagents fan out.
+Two exceptions keep the partition readable: consecutive instances of a collapsed
+fan-out node share one step (see :data:`FANOUT_COLLAPSE_NODES`), and a pair of
+root tasks describing a single decision shares one step (``check_state`` then
+``plan_extraction``).
 
 The leading ``run_start`` and any state that arrives before the first root task
 form an intro step so the whole stream is covered with no gaps.
@@ -45,15 +49,33 @@ _STEP_TITLES: dict[str, str] = {
 # Nodes that fan out (many instances per run) — their step titles get a counter.
 _COUNTED_NODES = frozenset({"extract_branch"})
 
-# Fan-out nodes whose parallel instances are collapsed into a *single* presenter
-# step. Their instances run interleaved, so giving each its own step leaves the
-# early ones as empty "active" shells while the last swallows every note's work.
-# Collapsed into one step, each instance is shown as its own card (fed by the
-# per-instance detail in :mod:`cipoc.demo.state`). Kept in sync with state.py.
+# Every node that fans out into parallel instances worth tracking *individually*
+# (:class:`~cipoc.demo.state.InstanceDetail`), at any namespace depth:
+# ``note_branch`` runs at the root, ``variable_branch`` two levels down inside
+# an extractor sub-agent. Each instance keeps its own input, result, model calls
+# and validation attempts so a card can be drawn per note / per variable instead
+# of the last instance overwriting the shared map node's detail.
+FANOUT_INSTANCE_NODES = frozenset({"note_branch", "variable_branch"})
+
+# The separate, step-level question: which fan-outs collapse into a *single*
+# presenter step. ``note_branch`` instances run interleaved, so giving each its
+# own step leaves the early ones as empty "active" shells while the last
+# swallows every note's work. ``variable_branch`` is deliberately absent — its
+# instances live inside their group's ``extract_branch`` step.
 FANOUT_COLLAPSE_NODES = frozenset({"note_branch"})
 
 # Title for a collapsed fan-out step (plural — it covers every instance).
 _FANOUT_STEP_TITLES: dict[str, str] = {"note_branch": "Characterize notes"}
+
+# Consecutive root tasks that describe one thing and so share a step. Keyed
+# ``(previous node, incoming node)``; the incoming task extends the open step
+# rather than starting a new one. ``check_state`` decides whether groups remain
+# and ``plan_extraction`` says which; ``scan_notes`` is the fan-out that hands
+# every note to the ``note_branch`` instances that characterize them.
+_MERGE_WITH_PREVIOUS: dict[tuple[str, str], str] = {
+    ("check_state", "plan_extraction"): "Check state & plan extraction",
+    ("scan_notes", "note_branch"): "Scan & characterize notes",
+}
 
 
 @dataclass(frozen=True)
@@ -73,6 +95,7 @@ class Step:
     start_seq: int
     end_seq: int
     fanout: bool = False
+    task_id: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -85,7 +108,22 @@ class Step:
             "start_seq": self.start_seq,
             "end_seq": self.end_seq,
             "fanout": self.fanout,
+            "task_id": self.task_id,
         }
+
+
+@dataclass
+class _Pending:
+    """The step currently being accumulated, before its end is known."""
+
+    title: str
+    subtitle: str
+    node: str
+    map_node_id: str | None
+    agent: str | None
+    start_seq: int
+    fanout: bool = False
+    task_id: str = ""
 
 
 def _is_root_task_start(event: DemoEvent) -> bool:
@@ -123,34 +161,32 @@ def build_steps(events: Iterable[DemoEvent]) -> list[Step]:
     steps: list[Step] = []
     counters: dict[str, int] = {}
 
-    # Pending step being accumulated: (title, subtitle, node, map_id, agent, start_seq).
     # Leading events before the first root task (run_start, the initial corpus
     # values) form an intro step — but only if any actually precede it, so a stream
     # that opens on a root task gets no empty intro.
     first_root = next(
         (i for i, event in enumerate(events) if _is_root_task_start(event)), len(events)
     )
-    # Pending step: (title, subtitle, node, map_id, agent, start_seq, fanout).
-    pending: tuple[str, str, str, str | None, str | None, int, bool] | None = (
-        ("Run start", "", "", None, None, events[0].seq, False) if first_root > 0 else None
+    pending: _Pending | None = (
+        _Pending("Run start", "", "", None, None, events[0].seq) if first_root > 0 else None
     )
     prev_seq = events[0].seq
 
     def close(end_seq: int) -> None:
         if pending is None:
             return
-        title, subtitle, node, map_id, agent, start_seq, fanout = pending
         steps.append(
             Step(
                 index=len(steps),
-                title=title,
-                subtitle=subtitle,
-                node=node,
-                map_node_id=map_id,
-                agent=agent,
-                start_seq=start_seq,
+                title=pending.title,
+                subtitle=pending.subtitle,
+                node=pending.node,
+                map_node_id=pending.map_node_id,
+                agent=pending.agent,
+                start_seq=pending.start_seq,
                 end_seq=end_seq,
-                fanout=fanout,
+                fanout=pending.fanout,
+                task_id=pending.task_id,
             )
         )
 
@@ -160,7 +196,24 @@ def build_steps(events: Iterable[DemoEvent]) -> list[Step]:
             # A collapsed fan-out node folds every consecutive same-node instance
             # into the step opened by its first instance (they run interleaved, so
             # one step holds them all, rendered as per-instance cards).
-            if pending is not None and node in FANOUT_COLLAPSE_NODES and pending[2] == node:
+            if pending is not None and node in FANOUT_COLLAPSE_NODES and pending.node == node:
+                prev_seq = event.seq
+                continue
+            # A follow-on task that continues the open step's decision extends it
+            # in place (retitled, and re-centered on the incoming node's map block)
+            # instead of opening a second step for the same thing.
+            merged_title = (
+                _MERGE_WITH_PREVIOUS.get((pending.node, node)) if pending is not None else None
+            )
+            if merged_title is not None:
+                pending.title = merged_title
+                pending.node = node
+                pending.map_node_id = event.map_node_id or map_node_id(node, event.namespace)
+                pending.task_id = event.task_id
+                # Merging *into* a collapsed fan-out makes the extended step a
+                # fan-out step, so its remaining instances collapse into it too
+                # (the branch above) and Panel 2 renders per-instance cards.
+                pending.fanout = node in FANOUT_COLLAPSE_NODES
                 prev_seq = event.seq
                 continue
             close(prev_seq)
@@ -175,14 +228,15 @@ def build_steps(events: Iterable[DemoEvent]) -> list[Step]:
                     title = f"{title} {counters[node]}"
                 subtitle = _subtitle(node, event.payload)
                 fanout = False
-            pending = (
-                title,
-                subtitle,
-                node,
-                event.map_node_id or map_node_id(node, event.namespace),
-                event.agent,
-                event.seq,
-                fanout,
+            pending = _Pending(
+                title=title,
+                subtitle=subtitle,
+                node=node,
+                map_node_id=event.map_node_id or map_node_id(node, event.namespace),
+                agent=event.agent,
+                start_seq=event.seq,
+                fanout=fanout,
+                task_id=event.task_id,
             )
         prev_seq = event.seq
 
@@ -190,4 +244,4 @@ def build_steps(events: Iterable[DemoEvent]) -> list[Step]:
     return steps
 
 
-__all__ = ["Step", "build_steps", "FANOUT_COLLAPSE_NODES"]
+__all__ = ["Step", "build_steps", "FANOUT_COLLAPSE_NODES", "FANOUT_INSTANCE_NODES"]

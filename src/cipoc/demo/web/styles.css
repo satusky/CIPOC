@@ -112,14 +112,31 @@ body {
   gap: .8rem;
   padding: .8rem;
   grid-template-columns: 1.55fr 1fr;
-  grid-template-rows: minmax(0, 1.35fr) minmax(0, 1fr);
+  /* The map gets whatever the variables panel does not; --vars-h is written by
+     wireSplitter (and restored from localStorage), so a presenter can pull the
+     variables panel upward when a case has more variables than fit. */
+  grid-template-rows: minmax(0, 1fr) minmax(0, var(--vars-h, 32%));
   grid-template-areas:
     "map    detail"
     "vars   detail";
 }
 .panel-map { grid-area: map; }
 .panel-detail { grid-area: detail; }
-.panel-vars { grid-area: vars; }
+.panel-vars { grid-area: vars; position: relative; }
+
+/* The drag handle lives in the grid gap above the variables panel, so it costs
+   no layout of its own. */
+.row-split {
+  position: absolute; left: 0; right: 0; top: -.85rem; height: .9rem;
+  cursor: row-resize; z-index: 4;
+  display: flex; align-items: center; justify-content: center;
+}
+.row-split::before {
+  content: ""; width: 3.5rem; height: 4px; border-radius: 999px;
+  background: var(--line-strong); opacity: 0; transition: opacity .12s, background .12s;
+}
+.row-split:hover::before, .row-split.dragging::before { opacity: 1; background: var(--accent); }
+body.row-resizing { cursor: row-resize; user-select: none; }
 
 .panel {
   background: var(--panel);
@@ -167,6 +184,76 @@ body {
 .chip.agent-retriever { background: color-mix(in srgb, var(--retriever) 12%, #fff); color: var(--retriever); border-color: color-mix(in srgb, var(--retriever) 30%, #fff); }
 .chip.agent-extractor { background: color-mix(in srgb, var(--extractor) 12%, #fff); color: var(--extractor); border-color: color-mix(in srgb, var(--extractor) 30%, #fff); }
 
+/* ---- panel 2: section headers ----
+   A component header must read as a *separator*, not as one more pill in a row
+   of pills: an agent-colored rule carries the name, the fine node id trails
+   behind it in mono, and the status pill is the only pill left in the row. */
+.node-head {
+  display: flex; align-items: center; gap: .5rem;
+  margin: 1.1rem 0 .5rem; padding: .1rem 0 .35rem .55rem;
+  border-left: 3px solid var(--line-strong);
+  border-bottom: 1px solid var(--line);
+}
+/* Inside a card (a note or a variable) the header is already framed, so it does
+   not need the separating top margin that spaces bare sections apart. */
+.node-detail:first-of-type > .node-head,
+.node-detail.instance > .node-head,
+.node-detail.variable > .node-head { margin-top: .2rem; }
+.node-head-title {
+  font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--ink);
+}
+.node-head-id {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: .66rem; color: var(--miss); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.node-head .status-pill { margin-left: auto; flex: none; }
+.node-head .summary-tag { margin-left: 0; }
+.node-head.agent-orchestrator { border-left-color: var(--orchestrator); }
+.node-head.agent-scanner { border-left-color: var(--scanner); }
+.node-head.agent-retriever { border-left-color: var(--retriever); }
+.node-head.agent-extractor { border-left-color: var(--extractor); }
+.node-detail > :not(.node-head) { margin-left: .55rem; }
+
+/* ---- panel 2: structural nodes, one quiet row in the step timeline ----
+   Same 3px left gutter as .node-head so the rows and the section headers stack
+   into one continuous rail down the step, read top-to-bottom in run order. */
+.minor-row {
+  display: flex; align-items: baseline; gap: .45rem;
+  margin: .1rem 0; padding: .18rem 0 .18rem .55rem;
+  border-left: 3px solid var(--line);
+  font-size: .74rem; color: var(--muted);
+}
+.minor-glyph { width: .8rem; flex: none; text-align: center; }
+.minor-name { font-weight: 600; }
+.minor-id {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: .64rem; color: var(--miss);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.minor-row.st-active { border-left-color: var(--warn); color: var(--warn); }
+.minor-row.st-error { border-left-color: var(--err); color: var(--err); font-weight: 700; }
+
+/* ---- panel 2: one container per extracted variable ---- */
+.node-detail.variable {
+  border: 1px solid var(--line); border-radius: 10px;
+  padding: .25rem .7rem .6rem; margin: 0 0 .7rem;
+  background: color-mix(in srgb, var(--extractor) 3%, transparent);
+}
+.node-detail.variable.status-active { border-style: dashed; }
+.node-detail.variable.status-invalid { border-color: color-mix(in srgb, var(--err) 45%, #fff); }
+.status-pill.status-invalid { background: var(--err-soft); color: var(--err); }
+
+.attempt { border-left: 3px solid var(--miss); padding: .2rem .5rem; margin: .35rem 0; }
+.attempt.ok { border-left-color: var(--ok); }
+.attempt.bad { border-left-color: var(--err); }
+.attempt-head { display: flex; align-items: center; gap: .4rem; font-size: .78rem; }
+.attempt-head .attempt-verdict { margin-left: auto; font-size: .72rem; font-weight: 700; }
+.attempt.ok .attempt-verdict { color: var(--ok); }
+.attempt.bad .attempt-verdict { color: var(--err); }
+ul.val-errors { margin: .2rem 0 0; padding-left: 1.1rem; }
+
 /* One card per parallel fan-out instance (e.g. each characterized note). */
 .node-detail.instance {
   border: 1px solid var(--line); border-radius: 10px;
@@ -187,11 +274,13 @@ body {
 }
 @keyframes pending-pulse { 0%, 100% { opacity: .4; } 50% { opacity: .9; } }
 
+/* Scoped to the pill: cards also carry a status-* class (for their border), and
+   an unscoped `color` here would be inherited by everything inside them. */
 .status-pill { font-size: .7rem; padding: .16rem .5rem; border-radius: 999px; font-weight: 700; }
-.status-active { background: var(--warn-soft); color: var(--warn); }
-.status-done { background: var(--ok-soft); color: var(--ok); }
-.status-error { background: var(--err-soft); color: var(--err); }
-.status-idle { background: var(--miss-soft); color: var(--muted); }
+.status-pill.status-active { background: var(--warn-soft); color: var(--warn); }
+.status-pill.status-done { background: var(--ok-soft); color: var(--ok); }
+.status-pill.status-error { background: var(--err-soft); color: var(--err); }
+.status-pill.status-idle { background: var(--miss-soft); color: var(--muted); }
 
 .headline-fact {
   background: var(--accent-soft);
@@ -216,14 +305,38 @@ details.block .block-body { padding: 0 .65rem .6rem; }
 .summary-tag { margin-left: auto; font-size: .68rem; color: var(--muted); font-weight: 500; }
 
 .llm-call { border: 1px solid var(--line); border-radius: 8px; margin: .45rem 0; overflow: hidden; }
+.llm-call > summary { padding: 0; }
 .llm-call .llm-head {
-  display: flex; align-items: center; gap: .5rem; padding: .4rem .6rem;
-  background: #fff9e8; border-bottom: 1px solid var(--line); font-size: .78rem;
+  display: flex; flex: 1; align-items: center; gap: .5rem; padding: .4rem .6rem;
+  background: color-mix(in srgb, var(--accent) 7%, #fff);
+  border-bottom: 1px solid var(--line); font-size: .78rem; color: var(--ink);
 }
+.llm-call[open] .llm-head { border-bottom-color: var(--line-strong); }
+.call-icon { width: 15px; height: 15px; flex: none; color: var(--accent); }
 .llm-call .tok { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--muted); }
-.msg { padding: .4rem .6rem; border-bottom: 1px solid var(--line); }
-.msg:last-child { border-bottom: none; }
-.msg .role { font-size: .66rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 700; }
+
+/* Message bubbles, colored by who is speaking: the prompt scaffolding (system)
+   reads as background, the request (human) as input, and what came back
+   (response / reasoning / error) as output. */
+.msg {
+  padding: .35rem .55rem; margin: .45rem .5rem;
+  border-left: 3px solid var(--line-strong); border-radius: 0 6px 6px 0;
+  background: #fbfcfe;
+}
+.msg .role { font-size: .66rem; text-transform: uppercase; letter-spacing: .05em; font-weight: 700; color: var(--muted); }
+.msg.role-system { border-left-color: var(--miss); background: var(--miss-soft); }
+.msg.role-human, .msg.role-user { border-left-color: var(--orchestrator); background: color-mix(in srgb, var(--orchestrator) 6%, #fff); }
+.msg.role-human .role, .msg.role-user .role { color: var(--orchestrator); }
+.msg.role-ai, .msg.role-assistant, .msg.role-response {
+  border-left-color: var(--ok); background: color-mix(in srgb, var(--ok) 6%, #fff);
+}
+.msg.role-ai .role, .msg.role-assistant .role, .msg.role-response .role { color: var(--ok); }
+.msg.role-tool { border-left-color: var(--retriever); background: color-mix(in srgb, var(--retriever) 6%, #fff); }
+.msg.role-tool .role { color: var(--retriever); }
+.msg.role-reasoning { border-left-color: var(--warn); background: var(--warn-soft); }
+.msg.role-reasoning .role { color: var(--warn); }
+.msg.role-error { border-left-color: var(--err); background: var(--err-soft); }
+.msg.role-error .role { color: var(--err); }
 
 pre.code {
   margin: .3rem 0 0; padding: .5rem .6rem;
@@ -233,7 +346,14 @@ pre.code {
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   white-space: pre-wrap; word-break: break-word;
 }
-pre.code.plain { background: #f5f7fb; color: var(--ink); border: 1px solid var(--line); }
+pre.code.plain { background: transparent; color: var(--ink); border: none; padding: .25rem 0 0; }
+/* The compact serializer already keeps lines short, so wrapping is rare; a
+   shorter max-height keeps a prettified prompt from taking over the panel. */
+pre.code.json { max-height: 15rem; line-height: 1.4; word-break: normal; overflow-wrap: anywhere; }
+.j-key { color: #7a3fb8; font-weight: 600; }
+.j-str { color: #1a6b4a; }
+.j-num { color: #b05a00; }
+.j-lit { color: #2b6cb0; font-weight: 600; }
 
 .empty { color: var(--muted); font-style: italic; padding: 1.5rem .5rem; text-align: center; }
 

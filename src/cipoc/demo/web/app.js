@@ -66,6 +66,75 @@ rebuildCoarseMembers();
 
 const AGENTS = ["orchestrator", "scanner", "retriever", "extractor"];
 
+// Human section titles for the fine map-node IDs Panel 2 renders. Falls back to
+// the raw ID, so a node added to the graph shows up rather than disappearing.
+const NODE_TITLES = {
+  initialize_case: "Initialize case",
+  fan_out_notes: "Fan out notes",
+  scanner_initialize: "Scanner init",
+  scanner_summarize_note: "Note summary",
+  scanner_detect_concepts: "Concept detection",
+  scanner_get_cancer_mentions: "Cancer mentions",
+  characterize_corpus: "Corpus characterization",
+  check_state: "Check state",
+  plan_extraction: "Extraction plan",
+  fan_out_groups: "Fan out groups",
+  hard_filter_notes: "Hard filter",
+  retriever_initialize: "Retriever init",
+  retriever_identify_relevant_notes: "Relevant notes",
+  extractor_initialize: "Extractor init",
+  extractor_load_notes: "Load notes",
+  extractor_extract_group_values: "Group extraction",
+  fan_out_variables: "Fan out variables",
+  extractor_extract_individual_value: "Individual extraction",
+  extractor_validate_extraction: "Validation",
+  extractor_repair_invalid_extraction: "Repair",
+  extractor_complete_variable: "Complete variable",
+  merge_variable_results: "Merge variable results",
+  merge_and_update: "Update case",
+  finalize_case: "Finalize case",
+  relevant_notes_gate: "Relevant notes?",
+  eligible_groups_gate: "Groups remain?",
+};
+
+// Structural plumbing — initialization, fan-outs, loaders, logic gates. They
+// carry no decision worth reading, and their raw payloads (a whole CaseState, a
+// whole note corpus) bury the components that do. Rendered as one compact strip
+// with no input/result dropdowns; an *erroring* one is promoted back to a full
+// card so a failure is never swallowed.
+const MINOR_NODES = new Set([
+  "initialize_case",
+  "fan_out_notes",
+  "scanner_initialize",
+  "retriever_initialize",
+  "extractor_initialize",
+  "extractor_load_notes",
+  "hard_filter_notes",
+  "fan_out_groups",
+  "fan_out_variables",
+  "relevant_notes_gate",
+  "merge_variable_results",
+]);
+
+// Nodes whose view is subsumed by another node's when both land in one step.
+// ``check_state`` and ``plan_extraction`` now share a step (steps.py merges
+// them) and both render the same eligibility gate off snapshot.progress, so the
+// gate is drawn once, by the node that names it.
+const SUBSUMED_BY = { check_state: "plan_extraction" };
+
+// Runtime node -> what that pass of the extractor's inner loop did.
+const ATTEMPT_LABELS = {
+  extract_individual_value: "individual extraction",
+  validate_extraction: "validation",
+  repair_invalid_extraction: "repair",
+};
+
+// Layout: default share of the left column given to the Variables panel, and
+// where a presenter's dragged size is remembered across reloads.
+const VARS_H_KEY = "cipoc.demo.varsHeight";
+const VARS_MIN = 120;
+const MAP_MIN = 200;
+
 // --- runtime state -------------------------------------------------------
 const els = {};
 let cy = null;
@@ -84,6 +153,7 @@ document.addEventListener("DOMContentLoaded", init);
 async function init() {
   cacheEls();
   wireControls();
+  wireSplitter();
 
   const [meta, graph] = await Promise.all([
     getJSON("/api/meta"),
@@ -440,19 +510,45 @@ function stepNodeIds(step) {
   return out;
 }
 
+function nodeTitle(id) {
+  return NODE_TITLES[id] || id;
+}
+
+function detailHeadline(title, subtitle, agent, extra) {
+  return `<div class="detail-headline">
+      <h3 class="detail-title">${esc(title)}</h3>
+      <div class="detail-meta">
+        ${subtitle ? `<span class="muted">${esc(subtitle)}</span>` : ""}
+        ${agent ? `<span class="chip agent-${agent}">${esc(agent)}</span>` : ""}
+        ${extra || ""}
+      </div>
+    </div>`;
+}
+
 function renderDetail(view) {
   const snap = view.snapshot;
   const step = view.step;
 
-  // A collapsed fan-out step (e.g. "Characterize notes") shows one card per
-  // instance instead of one merged card per map node.
-  if (!focusBlock && step && step.fanout) {
-    renderFanoutDetail(step, snap);
-    return;
+  if (!focusBlock && step) {
+    // A collapsed fan-out step (e.g. "Characterize notes") shows one card per
+    // instance instead of one merged card per map node.
+    if (step.fanout) {
+      renderFanoutDetail(step, snap);
+      return;
+    }
+    // A group's extraction step is likewise per-instance — one card per
+    // variable, not one per node of the extractor's inner loop.
+    if (step.node === "extract_branch") {
+      renderExtractDetail(step, snap);
+      return;
+    }
   }
 
   let title, subtitle, agent, nodeIds;
-  if (focusBlock) {
+  // A pinned block is an explicit "show me everything about this component"
+  // request, so it keeps the full cards (raw payloads included).
+  const pinned = Boolean(focusBlock);
+  if (pinned) {
     title = blockLabel(focusBlock);
     subtitle = "pinned component";
     agent = blockAgent(focusBlock);
@@ -465,7 +561,8 @@ function renderDetail(view) {
     const touched = stepNodeIds(step);
     const primary = step.map_node_id;
     nodeIds = primary && !touched.includes(primary) ? [primary, ...touched] : touched;
-    nodeIds = nodeIds.filter((id) => snap.details[id]);
+    const present = nodeIds.filter((id) => snap.details[id]);
+    nodeIds = present.filter((id) => !present.includes(SUBSUMED_BY[id]));
   } else {
     title = "Run start";
     subtitle = "";
@@ -475,47 +572,209 @@ function renderDetail(view) {
 
   els.detailNode.textContent = step && step.map_node_id ? step.map_node_id : "";
 
-  const parts = [];
-  parts.push(`<div class="detail-headline">
-      <h3 class="detail-title">${esc(title)}</h3>
-      <div class="detail-meta">
-        ${subtitle ? `<span class="muted">${esc(subtitle)}</span>` : ""}
-        ${agent ? `<span class="chip agent-${agent}">${esc(agent)}</span>` : ""}
-        ${focusBlock ? `<span class="chip">click background to unpin</span>` : ""}
-      </div>
-    </div>`);
+  const parts = [
+    detailHeadline(
+      title,
+      subtitle,
+      agent,
+      pinned ? `<span class="chip">click background to unpin</span>` : ""
+    ),
+  ];
 
   if (nodeIds.length === 0) {
     parts.push(`<p class="empty">No model activity captured for this step.</p>`);
+  } else if (pinned) {
+    for (const id of nodeIds) parts.push(renderNodeDetail(id, snap.details[id], snap, true));
   } else {
-    for (const id of nodeIds) parts.push(renderNodeDetail(id, snap.details[id], snap));
+    parts.push(
+      renderTimeline(nodeIds, snap, (id) => renderNodeDetail(id, snap.details[id], snap, false))
+    );
   }
   els.detail.innerHTML = parts.join("");
 }
 
-function renderNodeDetail(id, detail, snap) {
+function isMinor(id, detail) {
+  return MINOR_NODES.has(id) && !(detail && detail.error);
+}
+
+// A structural node as one quiet row *in place* — the step reads top-to-bottom
+// as the order things actually happened, with the plumbing shrunk rather than
+// swept into a header strip. No card, no raw payload dropdowns, and no ×N:
+// NodeDetail.count is cumulative over the whole run, so it would read as this
+// step's fan-out and be wrong on the second group. The map node's badge
+// (Panel 1) is where multiplicity belongs.
+const MINOR_GLYPH = { done: "✓", active: "◐", error: "✗", invalid: "⚠", idle: "·" };
+
+function renderMinorRow(id, snap) {
+  const status = (snap.details[id] || {}).status || "idle";
+  return `<div class="minor-row st-${esc(status)}">
+    <span class="minor-glyph">${MINOR_GLYPH[status] || "·"}</span>
+    <span class="minor-name">${esc(nodeTitle(id))}</span>
+    <span class="minor-id">${esc(id)}</span>
+  </div>`;
+}
+
+// Walk a step's map nodes in the order they were touched, rendering each as
+// either a quiet row (plumbing) or a full section (``renderMajor``). ``inject``
+// maps a node id to extra HTML emitted right after it, which is how the
+// per-variable cards land at the point the fan-out actually happened.
+function renderTimeline(ids, snap, renderMajor, inject) {
+  const parts = [];
+  for (const id of ids) {
+    parts.push(isMinor(id, snap.details[id]) ? renderMinorRow(id, snap) : renderMajor(id));
+    if (inject && inject[id]) parts.push(inject[id]);
+  }
+  return parts.join("");
+}
+
+// A section header that reads as a *separator* — an agent-colored rule with the
+// component's name — rather than one more pill in a row of pills. The fine node
+// ID stays visible but de-emphasized, and the status pill is the only pill left.
+function nodeHead(id, agent, status, extra) {
+  return `<header class="node-head agent-${agent || "orchestrator"}">
+    <span class="node-head-title">${esc(nodeTitle(id))}</span>
+    <span class="node-head-id">${esc(id)}</span>
+    ${extra || ""}
+    ${status ? `<span class="status-pill status-${esc(status)}">${esc(status)}</span>` : ""}
+  </header>`;
+}
+
+// ``raw`` adds the "Task input"/"Task result" payload dropdowns; step rendering
+// leaves them off (they drown out everything else) and pinning turns them on.
+function renderNodeDetail(id, detail, snap, raw) {
   const status = detail.status || "idle";
+  // Cumulative over the whole run, so it only makes sense on the pinned
+  // component view — inside a step it reads as this step's fan-out.
   const count =
-    detail.count > 1 ? `<span class="summary-tag">×${detail.count} instances</span>` : "";
+    raw && detail.count > 1 ? `<span class="summary-tag">×${detail.count} instances</span>` : "";
   const headline = componentHeadline(id, detail, snap);
   const calls = (detail.llm_calls || []).map(renderLLMCall).join("");
 
   return `<section class="node-detail">
-    <div class="detail-meta" style="margin:.2rem 0 .5rem">
-      <span class="chip agent-${detail.agent || "orchestrator"}">${esc(id)}</span>
-      <span class="status-pill status-${status}">${status}</span>
-      ${count}
-    </div>
+    ${nodeHead(id, detail.agent, status, count)}
     ${headline}
     ${calls || ""}
-    ${collapsible("Task input", detail.input, "input")}
-    ${collapsible("Task result", detail.result, "result")}
+    ${raw ? collapsible("Task input", detail.input, "input") : ""}
+    ${raw ? collapsible("Task result", detail.result, "result") : ""}
     ${
       detail.error
         ? `<pre class="code">${esc(fmt(detail.error))}</pre>`
         : ""
     }
   </section>`;
+}
+
+// --- Panel 2: a group's extraction step ---------------------------------
+// One card per variable (fed by the per-variable fan-out instances in
+// state.py), preceded by the retriever's verdict and the single group-level
+// model call. The merged group result is deliberately omitted: it is just the
+// variable cards concatenated.
+function renderExtractDetail(step, snap) {
+  const details = snap.details || {};
+  const prefix = `extract_branch:${step.task_id}/`;
+  const vars = Object.values(snap.instances || {})
+    .filter((i) => i.node === "variable_branch" && i.key.startsWith(prefix))
+    .sort((a, b) => a.index - b.index);
+  const settled = vars.filter((i) => i.status !== "active").length;
+
+  els.detailNode.textContent = step.map_node_id || "";
+
+  const counts = vars.length
+    ? `${vars.length} variable${vars.length === 1 ? "" : "s"} · ${settled} extracted`
+    : "";
+  const subtitle = [step.subtitle, counts].filter(Boolean).join(" · ");
+  const parts = [detailHeadline(step.title, subtitle, step.agent, "")];
+
+  // The inner loop's own nodes are replaced wholesale by the variable cards.
+  const perVariable = new Set([
+    "extractor_validate_extraction",
+    "extractor_repair_invalid_extraction",
+    "extractor_complete_variable",
+    "extractor_extract_individual_value",
+  ]);
+  const touched = stepNodeIds(step).filter((id) => details[id] && !perVariable.has(id));
+
+  // The variable cards belong where the fan-out happened; if that node never
+  // reported (an older trace), fall back to the end of the timeline.
+  const cards = vars.length
+    ? vars.map(renderVariableDetail).join("")
+    : `<p class="empty">No variables extracted for this group${
+        details.retriever_identify_relevant_notes
+          ? " — see the retriever verdict above."
+          : "."
+      }</p>`;
+  const anchor = touched.includes("fan_out_variables")
+    ? "fan_out_variables"
+    : touched[touched.length - 1];
+
+  parts.push(
+    renderTimeline(touched, snap, (id) => renderNodeDetail(id, details[id], snap, false), {
+      [anchor]: cards,
+    })
+  );
+  els.detail.innerHTML = parts.join("");
+}
+
+// One variable, start to finish: its coded value with evidence, its final
+// validation errors in plain sight, and the earlier attempts tucked away.
+function renderVariableDetail(inst) {
+  const status = inst.status || "active";
+  const result = inst.result && typeof inst.result === "object" ? inst.result : {};
+  const results = Array.isArray(result.variable_results) ? result.variable_results : [];
+  const final = results[0];
+  const task = (inst.input && inst.input.task) || {};
+  const itemId = final ? final.item_id : (task.variable || {}).item_id;
+  const calls = (inst.llm_calls || []).map(renderLLMCall).join("");
+
+  return `<section class="node-detail variable status-${esc(status)}">
+    <header class="node-head agent-${inst.agent || "extractor"}">
+      <span class="node-head-title">${esc(inst.label || inst.key)}</span>
+      <span class="node-head-id">${itemId == null ? "" : `#${esc(itemId)}`}</span>
+      <span class="status-pill status-${esc(status)}">${esc(status)}</span>
+    </header>
+    ${final ? extractionRow(final, null) : pendingSlot("Extraction")}
+    ${renderAttempts(inst.attempts || [])}
+    ${calls || ""}
+    ${inst.error ? `<pre class="code">${esc(fmt(inst.error))}</pre>` : ""}
+  </section>`;
+}
+
+// The extractor's inner loop, collapsed. A single clean pass says nothing worth
+// a dropdown, so only a genuine retry opens one — the final verdict and its
+// errors are already visible on the card above.
+function renderAttempts(attempts) {
+  if (attempts.length <= 1) return "";
+  // Only a validation pass carries a verdict. An extract/repair pass clears the
+  // flag before re-validating, so counting it as a failure would double-count.
+  const checks = attempts.filter((a) => a.node === "validate_extraction");
+  const failed = checks.filter((a) => a.is_valid === false).length;
+  const rows = attempts
+    .map((a) => {
+      const check = a.node === "validate_extraction";
+      const errs = (a.validation_errors || [])
+        .map((e) => `<li>${esc(e)}</li>`)
+        .join("");
+      const verdict = !check
+        ? "→ new candidate"
+        : a.is_valid
+        ? "✓ valid"
+        : "✗ invalid";
+      return `<div class="attempt ${!check ? "" : a.is_valid ? "ok" : "bad"}">
+        <div class="attempt-head">
+          <b>Attempt ${esc(a.attempt == null ? "?" : a.attempt)}</b>
+          <span class="muted">${esc(ATTEMPT_LABELS[a.node] || a.node || "")}</span>
+          <span class="attempt-verdict">${verdict}</span>
+        </div>
+        ${errs ? `<ul class="val-errors">${errs}</ul>` : ""}
+      </div>`;
+    })
+    .join("");
+  return `<details class="block">
+    <summary>Validation attempts<span class="summary-tag">${checks.length} check${
+    checks.length === 1 ? "" : "s"
+  } · ${failed} failed</span></summary>
+    <div class="block-body">${rows}</div>
+  </details>`;
 }
 
 // A fan-out step: render each parallel instance (e.g. each characterized note)
@@ -551,38 +810,66 @@ function renderFanoutDetail(step, snap) {
 function renderInstanceDetail(inst) {
   const status = inst.status || (inst.active ? "active" : "done");
   const r = inst.result && typeof inst.result === "object" ? inst.result : {};
-  const calls = (inst.llm_calls || []).map(renderLLMCall).join("");
+  const calls = inst.llm_calls || [];
+  // Anything not claimed by one of the note's three sub-steps still surfaces,
+  // so a new scanner node never silently loses its model call.
+  const other = calls
+    .filter((c) => !NOTE_SLOT_NODES.has(c.node))
+    .map(renderLLMCall)
+    .join("");
 
   return `<section class="node-detail instance status-${status}">
-    <div class="detail-meta" style="margin:.2rem 0 .5rem">
-      <span class="chip agent-${inst.agent || "scanner"}">${esc(inst.label || inst.key)}</span>
+    <header class="node-head agent-${inst.agent || "scanner"}">
+      <span class="node-head-title">${esc(inst.label || inst.key)}</span>
+      <span class="node-head-id"></span>
       <span class="status-pill status-${status}">${status}</span>
-    </div>
-    ${viewNote(r, inst.input)}
-    ${calls || ""}
+    </header>
+    ${viewNote(r, inst.input, calls)}
+    ${other}
     ${collapsible("Result", inst.result, "result")}
     ${inst.error ? `<pre class="code">${esc(fmt(inst.error))}</pre>` : ""}
   </section>`;
 }
 
+// The scanner sub-step behind each of a note card's three slots. Its captured
+// model call belongs *inside* that slot — the call is what produced the slot's
+// content, so reading them apart makes the reader correlate by hand.
+const NOTE_SLOT_NODES = new Set([
+  "summarize_note",
+  "detect_concepts",
+  "get_cancer_mentions",
+]);
+
+function callsFor(calls, node) {
+  return (calls || [])
+    .filter((c) => c.node === node)
+    .map(renderLLMCall)
+    .join("");
+}
+
 // One note's characterization as three fixed slots — summary, detected concepts,
-// and cancer mentions. Rendering all three always makes the card a stable
-// skeleton: in live mode each slot shows a "pending…" placeholder until its part
-// of the result streams in (keyed on the field's presence, since the scanner
-// sub-agent's values arrive summary → concepts → mentions), then fills in place.
-// (componentHeadline only dispatches one view; a note has all three, so compose
-// them here.)
-function viewNote(r, input) {
+// and cancer mentions — each holding the model call that produced it. Rendering
+// all three always makes the card a stable skeleton: in live mode each slot
+// shows a "pending…" placeholder until its part of the result streams in (keyed
+// on the field's presence, since the scanner sub-agent's values arrive summary →
+// concepts → mentions), then fills in place. (componentHeadline only dispatches
+// one view; a note has all three, so compose them here.)
+function viewNote(r, input, calls) {
   const summary =
-    "summary" in r ? viewSummary(r, { note: input }) : pendingSlot("Note summary");
+    "summary" in r
+      ? viewSummary(r, { note: input }, callsFor(calls, "summarize_note"))
+      : pendingSlot("Note summary");
   const concepts =
-    "concepts" in r ? viewConcepts(r.concepts || {}) : pendingSlot("Concepts detected");
+    "concepts" in r
+      ? viewConcepts(r.concepts || {}, callsFor(calls, "detect_concepts"))
+      : pendingSlot("Concepts detected");
   let mentions;
+  const mentionCalls = callsFor(calls, "get_cancer_mentions");
   if ("cancer_mentions" in r) {
     const m = r.cancer_mentions || [];
     mentions = m.length
-      ? viewCancerMentions(m, r.cancer_status)
-      : emptySlot("Cancer mentions", "none found");
+      ? viewCancerMentions(m, r.cancer_status, mentionCalls)
+      : emptySlot("Cancer mentions", "none found", mentionCalls);
   } else {
     mentions = pendingSlot("Cancer mentions");
   }
@@ -594,9 +881,9 @@ function pendingSlot(label) {
     <span class="pending-dot">pending…</span></div>`;
 }
 
-function emptySlot(label, note) {
+function emptySlot(label, note, extra) {
   return `<div class="headline-fact"><b>${esc(label)}</b>
-    <span class="muted" style="font-size:.78rem"> ${esc(note)}</span></div>`;
+    <span class="muted" style="font-size:.78rem"> ${esc(note)}</span>${extra || ""}</div>`;
 }
 
 /*
@@ -613,7 +900,13 @@ function componentHeadline(id, detail, snap) {
   const r = detail.result && typeof detail.result === "object" ? detail.result : {};
   const inp = detail.input && typeof detail.input === "object" ? detail.input : {};
 
+  // The run's closing summary is drawn from the variable table rather than the
+  // node's own thin result ({"report": {...}}), which says nothing on its own.
+  if (detail.node === "finalize_case") return viewFinalSummary(r, inp, snap);
   if (r.note_corpus_descriptors) return viewCorpus(r);
+  // Updating the case is exactly the step where the facts change, so show them.
+  if (r.case_facts && /merge|update/.test(detail.node || ""))
+    return viewCaseFacts(r.case_facts, "Case facts updated");
   if (Array.isArray(r.cancer_mentions) && r.cancer_mentions.length)
     return viewCancerMentions(r.cancer_mentions, r.cancer_status);
   if (r.concepts && !r.note_corpus_descriptors) return viewConcepts(r.concepts);
@@ -642,7 +935,9 @@ function componentHeadline(id, detail, snap) {
 }
 
 // --- scanner: single-note characterization ------------------------------
-function viewSummary(r, inp) {
+// Each view takes a trailing ``extra`` so the model call that produced it can be
+// nested inside the slot rather than pooled at the bottom of the card.
+function viewSummary(r, inp, extra) {
   const note = inp.note || {};
   const flags = Array.isArray(r.flags) && r.flags.length
     ? `<div class="chips">${r.flags.map((f) => `<span class="tag-chip">${esc(f)}</span>`).join("")}</div>`
@@ -654,10 +949,11 @@ function viewSummary(r, inp) {
     <b>Note summary</b>${head}
     <p class="summary-text">${esc(r.summary)}</p>
     ${flags}
+    ${extra || ""}
   </div>`;
 }
 
-function viewConcepts(concepts) {
+function viewConcepts(concepts, extra) {
   const chips = Object.entries(concepts)
     .map(([name, c]) => {
       const present = c && c.presence;
@@ -665,10 +961,12 @@ function viewConcepts(concepts) {
       return `<span class="concept-chip ${present ? "present" : "absent"}">${present ? "✓" : "○"} ${esc(name)}${present ? conf : ""}</span>`;
     })
     .join("");
-  return `<div class="headline-fact"><b>Concepts detected</b><div class="chips">${chips}</div></div>`;
+  return `<div class="headline-fact"><b>Concepts detected</b><div class="chips">${chips}</div>${
+    extra || ""
+  }</div>`;
 }
 
-function viewCancerMentions(mentions, statuses) {
+function viewCancerMentions(mentions, statuses, extra) {
   const cards = mentions
     .map((m) => {
       const meta = [
@@ -683,13 +981,14 @@ function viewCancerMentions(mentions, statuses) {
   const st = Array.isArray(statuses) && statuses.length
     ? `<span class="muted" style="font-size:.74rem"> (${statuses.map(esc).join(", ")})</span>`
     : "";
-  return `<div class="headline-fact"><b>Cancer mentions${st}</b>${cards}</div>`;
+  return `<div class="headline-fact"><b>Cancer mentions${st}</b>${cards}${extra || ""}</div>`;
 }
 
 // --- characterize: corpus-level descriptors -----------------------------
+// The corpus descriptors and the case facts derived from them are two different
+// answers, so they get two containers rather than one with a sub-heading.
 function viewCorpus(r) {
   const d = r.note_corpus_descriptors || {};
-  const facts = r.case_facts || {};
   const rows = [];
   if (d.note_count != null) rows.push(stat("Notes", d.note_count));
   if (Array.isArray(d.date_range) && d.date_range.length === 2)
@@ -701,14 +1000,96 @@ function viewCorpus(r) {
         .join("; ")
     : "";
   if (tissues) rows.push(stat("Affected tissue", tissues));
-  const factRows = Object.entries(facts)
-    .filter(([, v]) => v != null && v !== "")
-    .map(([k, v]) => stat(k.replace(/_/g, " "), fmt(v)));
   return `<div class="headline-fact">
     <b>Corpus characterization</b>
     <div class="stat-grid">${rows.join("")}</div>
-    ${factRows.length ? `<div class="stat-sub muted">Case facts</div><div class="stat-grid">${factRows.join("")}</div>` : ""}
+  </div>` + viewCaseFacts(r.case_facts, "Case facts");
+}
+
+// The case-level facts the orchestrator carries between steps. Facts that are
+// still unresolved are shown as "—" rather than dropped, so the same rows appear
+// every time the case is updated and a value filling in is visible as a change.
+function viewCaseFacts(facts, label) {
+  if (!facts || typeof facts !== "object") return "";
+  const entries = Object.entries(facts);
+  if (!entries.length) return "";
+  const rows = entries
+    .map(([k, v]) =>
+      stat(k.replace(/_/g, " "), v == null || v === "" ? "—" : fmt(v))
+    )
+    .join("");
+  const known = entries.filter(([, v]) => v != null && v !== "").length;
+  return `<div class="headline-fact">
+    <b>${esc(label)}<span class="conf"> ${known}/${entries.length} known</span></b>
+    <div class="stat-grid">${rows}</div>
   </div>`;
+}
+
+// --- finalize: what the run actually produced ---------------------------
+// finalize_case's own result is just the report envelope, so the summary is
+// built from the variable table (Panel 3's source): how much of the plan was
+// answered, how it broke down by status, and the coded values themselves.
+function viewFinalSummary(r, inp, snap) {
+  const prog = (snap && snap.progress) || null;
+  const report = r.report && typeof r.report === "object" ? r.report : {};
+  const flags = Array.isArray(report.flags) ? report.flags : [];
+  // finalize only adds the report envelope, so the case it was handed *is* the
+  // final case — which is where the settled facts live.
+  const facts = viewCaseFacts(inp.case_facts, "Final case facts");
+
+  if (!prog) {
+    return `<div class="headline-fact"><b>Case finalized</b>
+      <div class="muted" style="font-size:.78rem">No variable plan was produced.</div></div>${facts}`;
+  }
+
+  const t = prog.totals || {};
+  const rows = [
+    stat("Variables", `${t.terminal ?? 0} of ${t.variables ?? 0} resolved`),
+    stat("Groups", `${t.done_groups ?? 0} of ${t.groups ?? 0} complete`),
+    stat("Notes", `${prog.notes_done ?? 0} of ${prog.notes_total ?? 0} characterized`),
+  ].join("");
+
+  // One chip per outcome (extracted / not found / blocked / …), straight from
+  // the model's own tally so a new status never needs a code change here.
+  const counts = prog.counts || {};
+  const chips = Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .map(
+      ([status, n]) =>
+        `<span class="gate-chip ${
+          status === "extracted" ? "eligible" : "blocked"
+        }">${esc(status.replace(/_/g, " "))} <span class="conf">${n}</span></span>`
+    )
+    .join("");
+
+  const values = (prog.variables || [])
+    .map(
+      (v) => `<tr>
+        <td class="vt-name">${esc(v.name)}</td>
+        <td class="vt-value">${v.value == null || v.value === "" ? "—" : esc(fmt(v.value))}</td>
+        <td class="vt-status st-${esc(v.status)}">${esc(v.status || v.stage)}</td>
+      </tr>`
+    )
+    .join("");
+
+  const flagBlock = flags.length
+    ? `<div class="headline-fact"><b>Review flags<span class="conf"> ${flags.length}</span></b>
+        <ul>${flags.map((f) => `<li>${esc(fmt(f))}</li>`).join("")}</ul></div>`
+    : "";
+  const fatal = prog.fatal
+    ? `<div class="val-errors">⚠ ${esc(fmt(prog.fatal))}</div>`
+    : "";
+
+  return `<div class="headline-fact">
+    <b>Case finalized</b>
+    <div class="stat-grid">${rows}</div>
+    ${chips ? `<div class="chips">${chips}</div>` : ""}
+    ${prog.review_flags ? `<div class="val-errors">⚑ ${prog.review_flags} variable(s) flagged for review</div>` : ""}
+    ${fatal}
+  </div>
+  ${values ? `<div class="headline-fact"><b>Final values</b><table class="vartable">${values}</table></div>` : ""}
+  ${facts}
+  ${flagBlock}`;
 }
 
 // --- plan / gate: which variable groups are eligible --------------------
@@ -771,7 +1152,9 @@ function extractionLabel(node) {
 
 // One coded value: verdict, value, confidence, repair-loop badge, explanation,
 // validation errors, and its evidence spans highlighted inline in the note.
-function extractionRow(v) {
+// ``label`` names the variable; pass null inside a per-variable card, whose
+// header already says which variable this is.
+function extractionRow(v, label) {
   const invalid = v.is_valid === false;
   const ok = invalid ? "✗" : "✓";
   const conf = v.presence_confidence
@@ -790,7 +1173,7 @@ function extractionRow(v) {
   return `<div class="extraction ${invalid ? "invalid" : ""}">
     <div class="extraction-head">
       <span class="ext-ok">${ok}</span>
-      <b>${esc(String(v.item_id))}</b>
+      ${label === null ? "" : `<b>${esc(label === undefined ? String(v.item_id) : label)}</b>`}
       <span class="ext-val">= <span class="vt-value">${val}</span></span>
       ${conf}
       ${repair}
@@ -802,7 +1185,7 @@ function extractionRow(v) {
 }
 
 function viewExtractions(vars, label) {
-  const rows = vars.map(extractionRow).join("");
+  const rows = vars.map((v) => extractionRow(v)).join("");
   return `<div class="headline-fact"><b>${esc(label || "Extracted values")}</b>${rows}</div>`;
 }
 
@@ -887,6 +1270,34 @@ function stat(label, value) {
   return `<div class="stat"><span class="stat-k">${esc(label)}</span><span class="stat-v">${esc(value)}</span></div>`;
 }
 
+// --- model calls ---------------------------------------------------------
+
+// A chat-bubble-with-spark mark, inline so the page stays self-contained and the
+// icon inherits the surrounding text color instead of a fixed emoji palette.
+const CALL_ICON = `<svg class="call-icon" viewBox="0 0 16 16" aria-hidden="true">
+  <path d="M2.4 2.2h11.2v8.1H7.2L3.9 13v-2.7H2.4z" fill="none" stroke="currentColor"
+        stroke-width="1.3" stroke-linejoin="round"/>
+  <path d="M8 4.1l.85 1.9 1.9.85-1.9.85L8 9.6l-.85-1.9-1.9-.85 1.9-.85z" fill="currentColor"/>
+</svg>`;
+
+// Roles worth their own color. Anything unrecognized falls back to a neutral
+// bubble rather than being forced into one of these.
+const ROLE_CLASSES = new Set([
+  "system", "human", "user", "ai", "assistant", "tool", "reasoning", "response", "error",
+]);
+
+function roleClass(role) {
+  const key = String(role || "").toLowerCase();
+  return ROLE_CLASSES.has(key) ? key : "other";
+}
+
+function msgBubble(role, value) {
+  return `<div class="msg role-${roleClass(role)}">
+    <div class="role">${esc(role)}</div>
+    ${codeBlock(value)}
+  </div>`;
+}
+
 function renderLLMCall(call) {
   const usage = call.usage || {};
   const tok =
@@ -894,22 +1305,15 @@ function renderLLMCall(call) {
       ? `${usage.total_tokens} tok (${usage.input_tokens ?? "?"} in / ${usage.output_tokens ?? "?"} out)`
       : "";
   const messages = (call.prompt_messages || [])
-    .map(
-      (m) => `<div class="msg">
-        <div class="role">${esc(m.role || "message")}</div>
-        <pre class="code plain">${esc(fmt(m.content))}</pre>
-      </div>`
-    )
+    .map((m) => msgBubble(m.role || "message", m.content))
     .join("");
-  const reasoning = call.reasoning
-    ? `<div class="msg"><div class="role">reasoning</div><pre class="code plain">${esc(call.reasoning)}</pre></div>`
-    : "";
-  const response = `<div class="msg"><div class="role">response</div><pre class="code">${esc(fmt(call.response))}</pre></div>`;
-  const err = call.error ? `<div class="msg"><div class="role">error</div><pre class="code">${esc(call.error)}</pre></div>` : "";
+  const reasoning = call.reasoning ? msgBubble("reasoning", call.reasoning) : "";
+  const response = msgBubble("response", call.response);
+  const err = call.error ? msgBubble("error", call.error) : "";
 
   return `<details class="block llm-call">
-    <summary><span class="llm-head" style="all:unset;display:flex;flex:1;gap:.5rem;align-items:center">
-      🧠 Model call <span class="muted">${esc(call.model || "")}</span>
+    <summary><span class="llm-head">
+      ${CALL_ICON} Model call <span class="muted">${esc(call.model || "")}</span>
       <span class="tok">${tok}</span></span></summary>
     <div class="block-body">${messages}${reasoning}${response}${err}</div>
   </details>`;
@@ -920,8 +1324,153 @@ function collapsible(label, value, tag) {
   const empty = typeof value === "object" && Object.keys(value).length === 0;
   return `<details class="block">
     <summary>${esc(label)}${empty ? `<span class="summary-tag">empty</span>` : ""}</summary>
-    <div class="block-body"><pre class="code plain">${esc(fmt(value))}</pre></div>
+    <div class="block-body">${codeBlock(value)}</div>
   </details>`;
+}
+
+// --- JSON rendering ------------------------------------------------------
+// Prompts and structured responses are mostly JSON. Rendered with
+// JSON.stringify's fixed indent, one short object per line costs four lines and
+// the bubbles grow without bound; rendered flat, nothing is readable. So:
+// pretty-print only the containers that are actually too wide, then colorize.
+
+function codeBlock(value) {
+  if (value && typeof value === "object") {
+    return `<pre class="code plain json">${highlightJSON(compactJSON(value, 0, 0))}</pre>`;
+  }
+  if (typeof value === "string") {
+    return `<pre class="code plain json">${renderMixed(value)}</pre>`;
+  }
+  return `<pre class="code plain">${esc(fmt(value))}</pre>`;
+}
+
+// Prompts are rarely pure JSON: they are a line of prose ("Clinical notes:")
+// followed by one or more JSON documents. Walk the text, pretty-printing each
+// embedded document in place and leaving the prose around it alone.
+function renderMixed(text) {
+  let out = "";
+  let i = 0;
+  while (i < text.length) {
+    const start = jsonStart(text, i);
+    if (start < 0) return out + esc(text.slice(i));
+    const end = matchBalanced(text, start);
+    let parsed;
+    if (end > start) {
+      try {
+        parsed = JSON.parse(text.slice(start, end));
+      } catch {
+        /* a brace that only looked like a document */
+      }
+    }
+    if (parsed === undefined) {
+      out += esc(text.slice(i, start + 1));
+      i = start + 1;
+      continue;
+    }
+    out += esc(text.slice(i, start)) + highlightJSON(compactJSON(parsed, 0, 0));
+    i = end;
+  }
+  return out;
+}
+
+// First `{`/`[` at or after ``from`` that opens a line — a brace mid-sentence is
+// prose (or a format placeholder), not the start of a document.
+function jsonStart(text, from) {
+  for (let i = from; i < text.length; i++) {
+    const c = text[i];
+    if (c !== "{" && c !== "[") continue;
+    let j = i - 1;
+    while (j >= 0 && (text[j] === " " || text[j] === "\t")) j--;
+    if (j < 0 || text[j] === "\n") return i;
+  }
+  return -1;
+}
+
+// Index just past the bracket matching the one at ``start``, or -1. Skips over
+// string literals so a brace inside note text cannot unbalance the scan.
+function matchBalanced(text, start) {
+  const open = text[start];
+  const close = open === "{" ? "}" : "]";
+  let depth = 0;
+  let inString = false;
+  for (let i = start; i < text.length; i++) {
+    const c = text[i];
+    if (inString) {
+      if (c === "\\") i++;
+      else if (c === '"') inString = false;
+      continue;
+    }
+    if (c === '"') inString = true;
+    else if (c === open) depth++;
+    else if (c === close && --depth === 0) return i + 1;
+  }
+  return -1;
+}
+
+// Serialize with indentation only where a container does not fit on one line,
+// so leaves like {"note_id": 50, "text": "…"} stay single lines. The width is
+// tuned to the detail panel so lines rarely wrap.
+//
+// ``indent`` and ``column`` are deliberately separate. ``indent`` is the nesting
+// depth and only ever grows by 2 — it is what the padding is built from.
+// ``column`` is where this value actually starts on its line (further right,
+// because a key like `"presence_confidence": ` precedes it) and is used *only*
+// to decide whether the flat form still fits. Feeding the column back in as the
+// indent is what makes every key name push its children further right, so a few
+// levels of nesting march off the side of the panel.
+const JSON_WIDTH = 58;
+
+// The one-line form, spaced like the expanded form so a collapsed leaf sitting
+// next to an expanded sibling doesn't read as a different notation.
+function flatJSON(value) {
+  if (value === undefined) return "null";
+  if (value === null || typeof value !== "object") return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(flatJSON).join(", ")}]`;
+  const entries = Object.entries(value).map(
+    ([key, item]) => `${JSON.stringify(key)}: ${flatJSON(item)}`
+  );
+  return `{${entries.join(", ")}}`;
+}
+
+function compactJSON(value, indent, column) {
+  const flat = flatJSON(value);
+  if (value === null || typeof value !== "object" || flat.length + column <= JSON_WIDTH) {
+    return flat;
+  }
+  const pad = " ".repeat(indent + 2);
+  const close = " ".repeat(indent);
+  if (Array.isArray(value)) {
+    if (!value.length) return "[]";
+    const items = value.map((item) => pad + compactJSON(item, indent + 2, indent + 2));
+    return `[\n${items.join(",\n")}\n${close}]`;
+  }
+  const entries = Object.entries(value);
+  if (!entries.length) return "{}";
+  const rows = entries.map(([key, item]) => {
+    const label = JSON.stringify(key);
+    return `${pad}${label}: ${compactJSON(item, indent + 2, indent + 2 + label.length + 2)}`;
+  });
+  return `{\n${rows.join(",\n")}\n${close}}`;
+}
+
+// Colorize keys, strings, numbers and literals. Tokenizes the *raw* text and
+// escapes each piece as it is emitted, so nothing is double-escaped and no
+// markup can be smuggled in through a string value.
+function highlightJSON(text) {
+  const token = /("(?:\\.|[^"\\])*")(\s*:)?|\b(?:true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/g;
+  let out = "";
+  let last = 0;
+  let match;
+  while ((match = token.exec(text)) !== null) {
+    out += esc(text.slice(last, match.index));
+    const [whole, string, colon] = match;
+    if (string && colon) out += `<span class="j-key">${esc(string)}</span>${esc(colon)}`;
+    else if (string) out += `<span class="j-str">${esc(whole)}</span>`;
+    else if (/^(?:true|false|null)$/.test(whole)) out += `<span class="j-lit">${esc(whole)}</span>`;
+    else out += `<span class="j-num">${esc(whole)}</span>`;
+    last = token.lastIndex;
+  }
+  return out + esc(text.slice(last));
 }
 
 function blockLabel(block) {
@@ -993,6 +1542,54 @@ function wireControls() {
     if (e.key === "ArrowRight") { e.preventDefault(); post("/api/next"); }
     else if (e.key === "ArrowLeft") { e.preventDefault(); post("/api/prev"); }
     else if (e.key === " ") { e.preventDefault(); togglePlay(); }
+  });
+}
+
+// Drag the boundary between the workflow map and the variables panel. The size
+// is written as a pixel `--vars-h` on the grid; the map's ResizeObserver re-fits
+// Cytoscape as it changes, so the flowchart redraws live during the drag.
+function wireSplitter() {
+  const handle = document.getElementById("row-split");
+  const grid = document.querySelector(".grid");
+  if (!handle || !grid) return;
+
+  const setHeight = (px) => {
+    const max = grid.clientHeight - MAP_MIN;
+    const clamped = Math.max(VARS_MIN, Math.min(px, Math.max(VARS_MIN, max)));
+    grid.style.setProperty("--vars-h", `${Math.round(clamped)}px`);
+    return clamped;
+  };
+
+  const saved = Number(localStorage.getItem(VARS_H_KEY));
+  if (saved > 0) setHeight(saved);
+
+  handle.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    handle.setPointerCapture(e.pointerId);
+    handle.classList.add("dragging");
+    document.body.classList.add("row-resizing");
+
+    const onMove = (ev) => {
+      // The variables panel runs from the pointer to the bottom of the grid.
+      setHeight(grid.getBoundingClientRect().bottom - ev.clientY);
+    };
+    const onUp = () => {
+      handle.classList.remove("dragging");
+      document.body.classList.remove("row-resizing");
+      handle.removeEventListener("pointermove", onMove);
+      handle.removeEventListener("pointerup", onUp);
+      handle.removeEventListener("pointercancel", onUp);
+      const current = grid.style.getPropertyValue("--vars-h");
+      if (current) localStorage.setItem(VARS_H_KEY, String(parseFloat(current)));
+    };
+    handle.addEventListener("pointermove", onMove);
+    handle.addEventListener("pointerup", onUp);
+    handle.addEventListener("pointercancel", onUp);
+  });
+
+  handle.addEventListener("dblclick", () => {
+    grid.style.removeProperty("--vars-h");
+    localStorage.removeItem(VARS_H_KEY);
   });
 }
 
