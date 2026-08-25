@@ -69,6 +69,17 @@ class BaseAgent(ABC):
         self._graph = self._build_graph()
 
     @property
+    def compiled_graph(self) -> CompiledStateGraph:
+        """The compiled LangGraph for this agent.
+
+        A read-only accessor for tooling that needs to stream the graph itself
+        (e.g. the demo harness attaching callbacks via the stream config) without
+        reaching into the private ``_graph`` attribute. Returns the same object;
+        it does not recompile or alter behavior.
+        """
+        return self._graph
+
+    @property
     def retry_policy(self) -> RetryPolicy:
         """Retry policy for this agent's LLM-backed nodes.
 

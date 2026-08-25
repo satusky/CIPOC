@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CIPOC Extraction Demo</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="cytoscape.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="dot"></span>
+      <div>
+        <h1 id="run-title">CIPOC extraction</h1>
+        <p id="run-sub" class="muted">Loading…</p>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="btn-prev" class="ctl" title="Previous step (←)">‹ Prev</button>
+      <button id="btn-play" class="ctl ctl-primary" title="Play / Pause (space)">▶ Play</button>
+      <button id="btn-next" class="ctl" title="Next step (→)">Next ›</button>
+      <select id="step-select" class="step-select" title="Jump to step"></select>
+      <span id="step-counter" class="counter muted">–</span>
+      <span id="mode-badge" class="badge">replay</span>
+    </div>
+  </header>
+
+  <main class="grid">
+    <!-- Panel 1: workflow map -->
+    <section class="panel panel-map" aria-label="Workflow map">
+      <div class="panel-head">
+        <h2>Workflow map</h2>
+        <div id="agent-legend" class="legend"></div>
+      </div>
+      <div id="cy" class="cy"></div>
+    </section>
+
+    <!-- Panel 2: current-step detail -->
+    <section class="panel panel-detail" aria-label="Current step detail">
+      <div class="panel-head">
+        <h2>Current step</h2>
+        <span id="detail-node" class="chip muted"></span>
+      </div>
+      <div id="detail" class="detail scroll"></div>
+    </section>
+
+    <!-- Panel 3: variable overview -->
+    <section class="panel panel-vars" aria-label="Variable overview">
+      <div class="panel-head">
+        <h2>Variables</h2>
+        <div id="vars-summary" class="vars-summary muted"></div>
+      </div>
+      <div id="vars" class="vars scroll"></div>
+    </section>
+  </main>
+</body>
+</html>
