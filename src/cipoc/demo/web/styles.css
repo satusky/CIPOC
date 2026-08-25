@@ -167,6 +167,26 @@ body {
 .chip.agent-retriever { background: color-mix(in srgb, var(--retriever) 12%, #fff); color: var(--retriever); border-color: color-mix(in srgb, var(--retriever) 30%, #fff); }
 .chip.agent-extractor { background: color-mix(in srgb, var(--extractor) 12%, #fff); color: var(--extractor); border-color: color-mix(in srgb, var(--extractor) 30%, #fff); }
 
+/* One card per parallel fan-out instance (e.g. each characterized note). */
+.node-detail.instance {
+  border: 1px solid var(--line); border-radius: 10px;
+  padding: .6rem .7rem; margin: 0 0 .7rem;
+  background: color-mix(in srgb, var(--scanner) 4%, transparent);
+}
+/* A note still being characterized (live): its filled slots sit next to
+   still-pending ones, so the card fills in place as results stream back. */
+.node-detail.instance.status-active { border-style: dashed; }
+.headline-fact.pending {
+  background: var(--miss-soft); border-color: var(--line);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.headline-fact.pending b { color: var(--muted); font-weight: 600; }
+.pending-dot {
+  font-size: .74rem; color: var(--muted); font-style: italic;
+  animation: pending-pulse 1.4s ease-in-out infinite;
+}
+@keyframes pending-pulse { 0%, 100% { opacity: .4; } 50% { opacity: .9; } }
+
 .status-pill { font-size: .7rem; padding: .16rem .5rem; border-radius: 999px; font-weight: 700; }
 .status-active { background: var(--warn-soft); color: var(--warn); }
 .status-done { background: var(--ok-soft); color: var(--ok); }

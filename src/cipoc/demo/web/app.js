@@ -321,6 +321,13 @@ function renderDetail(view) {
   const snap = view.snapshot;
   const step = view.step;
 
+  // A collapsed fan-out step (e.g. "Characterize notes") shows one card per
+  // instance instead of one merged card per map node.
+  if (!focusBlock && step && step.fanout) {
+    renderFanoutDetail(step, snap);
+    return;
+  }
+
   let title, subtitle, agent, nodeIds;
   if (focusBlock) {
     title = blockLabel(focusBlock);
@@ -386,6 +393,87 @@ function renderNodeDetail(id, detail, snap) {
         : ""
     }
   </section>`;
+}
+
+// A fan-out step: render each parallel instance (e.g. each characterized note)
+// as its own card, in fan-out order, so every note's summary/concepts/mentions
+// and its own model calls stay grouped with that note.
+function renderFanoutDetail(step, snap) {
+  const insts = Object.values(snap.instances || {})
+    .filter((i) => i.node === step.node)
+    .sort((a, b) => a.index - b.index);
+  const done = insts.filter((i) => i.status === "done").length;
+
+  const parts = [];
+  parts.push(`<div class="detail-headline">
+      <h3 class="detail-title">${esc(step.title)}</h3>
+      <div class="detail-meta">
+        <span class="muted">${insts.length} note${insts.length === 1 ? "" : "s"}${
+    insts.length ? ` · ${done} characterized` : ""
+  }</span>
+        ${step.agent ? `<span class="chip agent-${step.agent}">${esc(step.agent)}</span>` : ""}
+      </div>
+    </div>`);
+
+  els.detailNode.textContent = step.map_node_id || "";
+
+  if (!insts.length) {
+    parts.push(`<p class="empty">No notes characterized yet for this step.</p>`);
+  } else {
+    for (const inst of insts) parts.push(renderInstanceDetail(inst));
+  }
+  els.detail.innerHTML = parts.join("");
+}
+
+function renderInstanceDetail(inst) {
+  const status = inst.status || (inst.active ? "active" : "done");
+  const r = inst.result && typeof inst.result === "object" ? inst.result : {};
+  const calls = (inst.llm_calls || []).map(renderLLMCall).join("");
+
+  return `<section class="node-detail instance status-${status}">
+    <div class="detail-meta" style="margin:.2rem 0 .5rem">
+      <span class="chip agent-${inst.agent || "scanner"}">${esc(inst.label || inst.key)}</span>
+      <span class="status-pill status-${status}">${status}</span>
+    </div>
+    ${viewNote(r, inst.input)}
+    ${calls || ""}
+    ${collapsible("Result", inst.result, "result")}
+    ${inst.error ? `<pre class="code">${esc(fmt(inst.error))}</pre>` : ""}
+  </section>`;
+}
+
+// One note's characterization as three fixed slots — summary, detected concepts,
+// and cancer mentions. Rendering all three always makes the card a stable
+// skeleton: in live mode each slot shows a "pending…" placeholder until its part
+// of the result streams in (keyed on the field's presence, since the scanner
+// sub-agent's values arrive summary → concepts → mentions), then fills in place.
+// (componentHeadline only dispatches one view; a note has all three, so compose
+// them here.)
+function viewNote(r, input) {
+  const summary =
+    "summary" in r ? viewSummary(r, { note: input }) : pendingSlot("Note summary");
+  const concepts =
+    "concepts" in r ? viewConcepts(r.concepts || {}) : pendingSlot("Concepts detected");
+  let mentions;
+  if ("cancer_mentions" in r) {
+    const m = r.cancer_mentions || [];
+    mentions = m.length
+      ? viewCancerMentions(m, r.cancer_status)
+      : emptySlot("Cancer mentions", "none found");
+  } else {
+    mentions = pendingSlot("Cancer mentions");
+  }
+  return summary + concepts + mentions;
+}
+
+function pendingSlot(label) {
+  return `<div class="headline-fact pending"><b>${esc(label)}</b>
+    <span class="pending-dot">pending…</span></div>`;
+}
+
+function emptySlot(label, note) {
+  return `<div class="headline-fact"><b>${esc(label)}</b>
+    <span class="muted" style="font-size:.78rem"> ${esc(note)}</span></div>`;
 }
 
 /*
@@ -840,9 +928,13 @@ function openStream() {
   es.onerror = () => { /* EventSource auto-reconnects */ };
 }
 
-// Live mode: the graph produced more steps. Refresh the step list and re-fetch
-// the authoritative cursor view so controls (Next / at_end) reflect the growth;
-// if auto-play was waiting at the end, it resumes once more steps exist.
+// Live mode: the graph produced an event. Refresh the step list on growth so
+// controls (Next / at_end) reflect it, then re-fetch the authoritative cursor
+// view. Only the in-progress *frontier* step's snapshot changes as events
+// stream in, so panels are re-rendered just for a presenter parked on that
+// frontier — letting per-note results fill in live — while an earlier step the
+// presenter has scrubbed back to stays frozen (its expanded payloads and scroll
+// position aren't disturbed). Growth also self-heals auto-play stuck at the end.
 async function applyLive(msg) {
   if (msg.num_steps && msg.num_steps !== numSteps) {
     numSteps = msg.num_steps;
@@ -854,9 +946,18 @@ async function applyLive(msg) {
   }
   els.sub.textContent =
     `${msg.num_steps} steps · ${msg.num_events} events${msg.done ? " · complete" : " · running"}`;
-  try {
-    applyView(await getJSON("/api/cursor"));
-  } catch { /* transient */ }
+
+  let view;
+  try { view = await getJSON("/api/cursor"); } catch { return; /* transient */ }
+
+  if (view.cursor >= numSteps - 1) {
+    // On the live frontier: its snapshot is still growing — redraw everything.
+    applyView(view);
+  } else {
+    // Behind the frontier on a frozen step: refresh controls only.
+    updateControls(view);
+    if (view.playing && !view.at_end && !autoTimer) startAutoplay();
+  }
 }
 
 function applyView(view) {

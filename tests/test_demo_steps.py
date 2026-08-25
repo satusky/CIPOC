@@ -55,22 +55,42 @@ class BoundaryTests(unittest.TestCase):
 
     def test_repeated_nodes_get_an_instance_counter(self):
         events = [
-            _root_start(0, "note_branch", payload={"note_id": 1, "note_type": "A"}),
-            _root_start(1, "note_branch", payload={"note_id": 2, "note_type": "B"}),
+            _root_start(0, "extract_branch",
+                        payload={"requested_variables": {"name": "A"}}),
+            _root_start(1, "extract_branch",
+                        payload={"requested_variables": {"name": "B"}}),
         ]
         steps = build_steps(events)
-        self.assertEqual(steps[0].title, "Characterize note 1")
-        self.assertEqual(steps[1].title, "Characterize note 2")
+        self.assertEqual(steps[0].title, "Extract group 1")
+        self.assertEqual(steps[1].title, "Extract group 2")
+
+    def test_parallel_note_fan_out_collapses_into_one_step(self):
+        # The interleaved note_branch instances (all one map node) collapse into
+        # a single "Characterize notes" step marked as a fan-out, rather than one
+        # empty "active" step per note plus a final step holding everyone's work.
+        events = [
+            _root_start(0, "note_branch", payload={"note_id": 1, "note_type": "A"},
+                        map_id="scanner_initialize"),
+            _root_start(1, "note_branch", payload={"note_id": 2, "note_type": "B"},
+                        map_id="scanner_initialize"),
+            _nested(2, "summarize_note", ("note_branch:t",)),
+            _root_start(3, "characterize_corpus", map_id="characterize_corpus"),
+        ]
+        steps = build_steps(events)
+        self.assertEqual(len(steps), 2)
+        self.assertEqual(steps[0].title, "Characterize notes")
+        self.assertTrue(steps[0].fanout)
+        self.assertEqual(steps[0].start_seq, 0)
+        self.assertEqual(steps[0].end_seq, 2)  # spans both notes + nested work
+        self.assertFalse(steps[1].fanout)
 
     def test_subtitle_from_payload(self):
         events = [
-            _root_start(0, "note_branch", payload={"note_id": 51, "note_type": "Pathology"}),
-            _root_start(1, "extract_branch",
+            _root_start(0, "extract_branch",
                         payload={"requested_variables": {"name": "Lymph Nodes", "group_id": "ln"}}),
         ]
         steps = build_steps(events)
-        self.assertEqual(steps[0].subtitle, "Pathology #51")
-        self.assertEqual(steps[1].subtitle, "Lymph Nodes")
+        self.assertEqual(steps[0].subtitle, "Lymph Nodes")
 
 
 class FixtureTilingTests(unittest.TestCase):

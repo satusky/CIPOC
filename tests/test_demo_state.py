@@ -124,6 +124,75 @@ class DetailTests(unittest.TestCase):
         )
 
 
+class InstanceDetailTests(unittest.TestCase):
+    """Fan-out instances (e.g. per-note characterization) stay grouped by scope."""
+
+    def _values(self, seq, ns, payload):
+        return DemoEvent(seq=seq, t=seq * 0.1, type="values", namespace=ns, payload=payload)
+
+    def _llm(self, seq, ns, response):
+        call = LLMCall(node="summarize_note", namespace=ns, run_id="r", response=response)
+        return DemoEvent(seq=seq, t=seq * 0.1, type="llm_call", node="summarize_note",
+                         namespace=ns, map_node_id="scanner_summarize_note", agent="scanner",
+                         payload=call.to_dict())
+
+    def test_two_parallel_notes_keep_their_own_material(self):
+        # Two note_branch instances run interleaved; each note's summary and its
+        # own LLM call must land on its own instance, not pile onto a shared node.
+        a, b = ("note_branch:a",), ("note_branch:b",)
+        events = [
+            _task_start(1, "note_branch", "a", (), "scanner_initialize", "scanner",
+                        payload={"note_id": 50, "note_type": "Path"}),
+            _task_start(2, "note_branch", "b", (), "scanner_initialize", "scanner",
+                        payload={"note_id": 51, "note_type": "Rad"}),
+            self._llm(3, a + ("summarize_note:x",), '{"summary": "A"}'),
+            self._llm(4, b + ("summarize_note:y",), '{"summary": "B"}'),
+            self._values(5, a, {"summary": "note A summary"}),
+            self._values(6, b, {"summary": "note B summary", "concepts": {"c": {"presence": True}}}),
+            _task_end(7, "note_branch", "a", (), "scanner_initialize", "scanner"),
+        ]
+        snap = replay(events).snapshot()
+        insts = snap.instances
+        self.assertEqual(list(insts), ["note_branch:a", "note_branch:b"])
+
+        inst_a = insts["note_branch:a"]
+        self.assertEqual(inst_a.index, 1)
+        self.assertEqual(inst_a.label, "Path #50")
+        self.assertEqual(inst_a.status, "done")  # its task_end arrived
+        self.assertEqual(inst_a.result["summary"], "note A summary")
+        self.assertEqual(len(inst_a.llm_calls), 1)
+        self.assertEqual(inst_a.llm_calls[0]["response"], '{"summary": "A"}')
+
+        inst_b = insts["note_branch:b"]
+        self.assertEqual(inst_b.index, 2)
+        self.assertEqual(inst_b.label, "Rad #51")
+        self.assertEqual(inst_b.status, "active")  # no task_end yet
+        self.assertEqual(len(inst_b.llm_calls), 1)
+        self.assertEqual(inst_b.llm_calls[0]["response"], '{"summary": "B"}')
+        self.assertIn("concepts", inst_b.result)
+
+    def test_nested_values_accumulate_into_one_result(self):
+        ns = ("note_branch:a",)
+        events = [
+            _task_start(1, "note_branch", "a", (), "scanner_initialize", "scanner",
+                        payload={"note_id": 1, "note_type": "T"}),
+            self._values(2, ns, {"summary": "s"}),
+            self._values(3, ns, {"summary": "s", "concepts": {"x": {}}}),
+            self._values(4, ns, {"summary": "s", "concepts": {"x": {}}, "cancer_mentions": [{"status": "m"}]}),
+        ]
+        inst = replay(events).snapshot().instances["note_branch:a"]
+        self.assertEqual(set(inst.result), {"summary", "concepts", "cancer_mentions"})
+
+    def test_extract_branch_is_not_treated_as_a_collapsed_instance(self):
+        # Only note_branch collapses; extract_branch keeps its per-group steps and
+        # is not tracked as a fan-out instance here.
+        events = [
+            _task_start(1, "extract_branch", "g", (), "fan_out_groups", "orchestrator",
+                        payload={"requested_variables": {"name": "G"}}),
+        ]
+        self.assertEqual(replay(events).snapshot().instances, {})
+
+
 class LazyModelTests(unittest.TestCase):
     """The variable table's ProgressModel is built lazily from the streamed plan."""
 

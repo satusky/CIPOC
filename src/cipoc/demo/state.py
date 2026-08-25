@@ -27,7 +27,7 @@ replaying a prefix of the trace.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field as dc_field
+from dataclasses import dataclass, field as dc_field, replace
 from typing import Any, Iterable, Mapping
 
 from cipoc.agents.orchestrator import CaseState
@@ -35,6 +35,7 @@ from cipoc.utils.progress.events import ProgressEvent
 from cipoc.utils.progress.model import ProgressModel, Snapshot, TaskKind
 
 from .events import DemoEvent
+from .steps import FANOUT_COLLAPSE_NODES
 
 
 @dataclass(frozen=True)
@@ -70,6 +71,43 @@ class NodeDetail:
 
 
 @dataclass(frozen=True)
+class InstanceDetail:
+    """One fan-out instance's own material — e.g. a single note's characterization.
+
+    A fan-out node such as ``note_branch`` runs many times in parallel, all
+    sharing one conceptual map node. Folding them onto a single
+    :class:`NodeDetail` (keyed by map node) collapses every instance's input,
+    result, and LLM calls together — the last write wins and the calls pile up.
+    So each instance is *also* tracked here, keyed by its root scope
+    ``"<node>:<task_id>"``, and every event nested beneath that scope (the
+    sub-agent's ``values`` snapshots and captured LLM calls) is attributed back
+    to it. ``index`` is the 1-based fan-out order; ``label`` is a human tag drawn
+    from the instance's input (e.g. ``"pathology #12"``).
+    """
+
+    key: str
+    node: str
+    map_node_id: str
+    agent: str | None
+    index: int
+    label: str = ""
+    active: int = 1
+    errors: int = 0
+    started_t: float | None = None
+    finished_t: float | None = None
+    input: Any = None
+    result: Any = None
+    error: Any = None
+    llm_calls: tuple[dict[str, Any], ...] = ()
+
+    @property
+    def status(self) -> str:
+        if self.errors:
+            return "error"
+        return "active" if self.active > 0 else "done"
+
+
+@dataclass(frozen=True)
 class DemoSnapshot:
     """An immutable read of the demo run at one point in the stream.
 
@@ -87,6 +125,7 @@ class DemoSnapshot:
     visited_map_nodes: tuple[str, ...]
     node_multiplicity: Mapping[str, int]
     details: Mapping[str, NodeDetail]
+    instances: Mapping[str, InstanceDetail]
     progress: Snapshot | None
 
     def to_dict(self) -> dict[str, Any]:
@@ -100,6 +139,7 @@ class DemoSnapshot:
             "visited_map_nodes": list(self.visited_map_nodes),
             "node_multiplicity": dict(self.node_multiplicity),
             "details": {key: _detail_to_dict(value) for key, value in self.details.items()},
+            "instances": {key: _instance_to_dict(value) for key, value in self.instances.items()},
             "progress": _progress_to_dict(self.progress),
         }
 
@@ -148,6 +188,11 @@ class DemoState:
         self._details: dict[str, NodeDetail] = {}
         self._case: Any = None
 
+        # Per-instance detail for fan-out nodes (Panel 2), keyed by root scope
+        # ``"<node>:<task_id>"``; ``_instance_order`` preserves fan-out order.
+        self._instances: dict[str, InstanceDetail] = {}
+        self._instance_order: list[str] = []
+
     # --- Model construction ----------------------------------------------
 
     def _build_model(self, target_groups: list[Any], graph_input: Any) -> None:
@@ -177,6 +222,13 @@ class DemoState:
         if event.type == "run_end":
             self.finish()
             return
+
+        # Attribute the event to its fan-out instance (if any) before the
+        # per-map-node folding below; the two views are independent.
+        scope = _instance_scope(event)
+        if scope is not None:
+            self._ingest_instance(event, scope)
+
         if event.type == "llm_call":
             self._ingest_llm(event)
             return
@@ -274,6 +326,53 @@ class DemoState:
         else:
             self._details[map_id] = _replace_calls(existing, (*existing.llm_calls, call))
 
+    def _ingest_instance(self, event: DemoEvent, scope: str) -> None:
+        """Fold one event into its fan-out instance (keyed by root scope).
+
+        The instance is opened by the root fan-out ``task_start`` (which carries
+        the instance input, e.g. the note) and closed by that node's matching
+        ``task_end``. In between, the sub-agent's nested ``values`` snapshots
+        accumulate into the instance ``result`` (the running characterization)
+        and any captured LLM calls are appended.
+        """
+        inst = self._instances.get(scope)
+        if inst is None:
+            node = scope.split(":", 1)[0]
+            inst = InstanceDetail(
+                key=scope,
+                node=node,
+                map_node_id=event.map_node_id or "",
+                agent=event.agent,
+                index=len(self._instance_order) + 1,
+                started_t=event.t,
+            )
+            self._instances[scope] = inst
+            self._instance_order.append(scope)
+
+        is_root = not event.namespace and event.node == inst.node
+        if event.type == "task_start" and is_root:
+            inst = replace(
+                inst,
+                input=event.payload,
+                label=_instance_label(inst.node, event.payload),
+                map_node_id=event.map_node_id or inst.map_node_id,
+                agent=event.agent or inst.agent,
+            )
+        elif event.type == "task_end" and is_root:
+            inst = replace(
+                inst,
+                active=0,
+                finished_t=event.t,
+                errors=inst.errors + (1 if event.error else 0),
+                error=event.error if event.error is not None else inst.error,
+            )
+        elif event.type == "values":
+            inst = replace(inst, result=_merge_result(inst.result, event.payload))
+        elif event.type == "llm_call":
+            call = event.payload if isinstance(event.payload, dict) else {"response": event.payload}
+            inst = replace(inst, llm_calls=(*inst.llm_calls, call))
+        self._instances[scope] = inst
+
     # --- Lifecycle --------------------------------------------------------
 
     def finish(self) -> None:
@@ -297,6 +396,7 @@ class DemoState:
             visited_map_nodes=tuple(self._visited),
             node_multiplicity=multiplicity,
             details=dict(self._details),
+            instances={key: self._instances[key] for key in self._instance_order},
             progress=self._model.snapshot() if self._model is not None else None,
         )
 
@@ -349,6 +449,49 @@ def _to_progress_event(event: DemoEvent) -> ProgressEvent | None:
     return None
 
 
+def _instance_scope(event: DemoEvent) -> str | None:
+    """The fan-out instance scope this event belongs to, or ``None``.
+
+    A root fan-out ``task_start``/``task_end`` (empty namespace, node in
+    :data:`~cipoc.demo.steps.FANOUT_COLLAPSE_NODES`) owns scope
+    ``"<node>:<task_id>"``; every nested event carries that scope as the first
+    element of its namespace.
+    """
+    ns = event.namespace
+    if ns:
+        head = ns[0]
+        node = head.split(":", 1)[0]
+        return head if node in FANOUT_COLLAPSE_NODES else None
+    if event.type in ("task_start", "task_end") and event.node in FANOUT_COLLAPSE_NODES:
+        return f"{event.node}:{event.task_id}"
+    return None
+
+
+def _instance_label(node: str, payload: Any) -> str:
+    """Human tag for a fan-out instance drawn from its input payload."""
+    if not isinstance(payload, Mapping):
+        return ""
+    note_id = payload.get("note_id")
+    note_type = payload.get("note_type")
+    if note_type and note_id is not None:
+        return f"{note_type} #{note_id}"
+    if note_id is not None:
+        return f"Note #{note_id}"
+    return ""
+
+
+def _merge_result(prior: Any, payload: Any) -> Any:
+    """Accumulate nested ``values`` snapshots into one running result dict.
+
+    Sub-agent ``values`` arrive as progressively fuller partial states; merging
+    keeps the union so an instance's result carries every field it has produced
+    so far (summary, then concepts, then cancer mentions, …).
+    """
+    if isinstance(prior, Mapping) and isinstance(payload, Mapping):
+        return {**prior, **payload}
+    return payload
+
+
 def _hydrate_case(payload: Any) -> CaseState | None:
     """Re-hydrate a root ``values`` JSON payload into a ``CaseState``.
 
@@ -396,6 +539,26 @@ def _detail_to_dict(detail: NodeDetail) -> dict[str, Any]:
         "result": detail.result,
         "error": detail.error,
         "llm_calls": list(detail.llm_calls),
+    }
+
+
+def _instance_to_dict(instance: InstanceDetail) -> dict[str, Any]:
+    return {
+        "key": instance.key,
+        "node": instance.node,
+        "map_node_id": instance.map_node_id,
+        "agent": instance.agent,
+        "index": instance.index,
+        "label": instance.label,
+        "status": instance.status,
+        "active": instance.active,
+        "errors": instance.errors,
+        "started_t": instance.started_t,
+        "finished_t": instance.finished_t,
+        "input": instance.input,
+        "result": instance.result,
+        "error": instance.error,
+        "llm_calls": list(instance.llm_calls),
     }
 
 
@@ -460,4 +623,4 @@ def _progress_to_dict(progress: Snapshot | None) -> dict[str, Any] | None:
     }
 
 
-__all__ = ["DemoState", "DemoSnapshot", "NodeDetail", "replay"]
+__all__ = ["DemoState", "DemoSnapshot", "NodeDetail", "InstanceDetail", "replay"]

@@ -297,8 +297,13 @@ class LiveDemoSession(DemoSession):
             self._step_snapshots.pop(last, None)
             self._step_snapshots.pop(self._max_cursor(), None)
             grew = len(self._steps) != prev_steps
-        # Notify outside the lock: a new step became available to reveal.
-        if grew:
+        # Notify outside the lock. A new step becomes available to reveal (grew),
+        # but also any content-bearing event advances the in-progress frontier
+        # step's snapshot — so a presenter watching that frontier (e.g. the
+        # collapsed "Characterize notes" step) sees per-note results fill in as
+        # they arrive. The frontend only re-renders panels when the cursor is
+        # actually on the frontier, so frozen earlier steps stay undisturbed.
+        if grew or event.type != "run_start":
             self._emit_live()
 
     def _emit_live(self) -> None:

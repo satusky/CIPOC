@@ -85,12 +85,17 @@ class WebAssetTests(unittest.TestCase):
             "viewExtractions",    # extractor coded values + repair loop
             "viewRetriever",      # kept/dropped candidate notes
             "applyLive",          # live-mode push-on-event handling
+            "renderFanoutDetail", # collapsed fan-out step -> per-instance cards
+            "renderInstanceDetail",
+            "viewNote",           # per-note summary + concepts + mentions together
+            "pendingSlot",        # live skeleton: unfilled characterization slot
         ):
             self.assertIn(symbol, app_js, f"app.js missing {symbol}")
 
     def test_styles_cover_phase4_views(self):
         css = (WEB_DIR / "styles.css").read_text()
-        for cls in (".extraction", ".repair-badge", ".note-text mark", ".concept-chip"):
+        for cls in (".extraction", ".repair-badge", ".note-text mark", ".concept-chip",
+                    ".headline-fact.pending"):
             self.assertIn(cls, css, f"styles.css missing {cls}")
 
 

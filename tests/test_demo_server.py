@@ -12,6 +12,7 @@ from pathlib import Path
 
 warnings.filterwarnings("ignore")
 
+from cipoc.demo.events import DemoEvent  # noqa: E402
 from cipoc.demo.server import (  # noqa: E402
     Broadcaster,
     DemoSession,
@@ -188,18 +189,37 @@ class LiveSessionTests(unittest.TestCase):
         live = LiveDemoSession(iter([]))
         self.assertEqual(live.meta()["mode"], "live")
 
-    def test_listener_is_notified_when_steps_grow(self):
+    def test_listener_is_notified_as_content_streams_in(self):
         events = read_trace(FIXTURE)
         live = LiveDemoSession(iter([]))
         seen: list[dict] = []
         live.set_listener(seen.append)
         for event in events:
             live.append(event)
-        self.assertTrue(seen, "expected live notifications as steps grew")
+        self.assertTrue(seen, "expected live notifications as events arrived")
         self.assertTrue(all(m["type"] == "live" for m in seen))
-        # One notification per step boundary opened (not per event).
         self.assertEqual(seen[-1]["num_steps"], len(live.steps))
-        self.assertLess(len(seen), len(events))
+        # Finer-grained than step boundaries: content-bearing events (values /
+        # task_end / llm_call) notify too, so a presenter on the in-progress
+        # frontier step sees per-note results fill in — hence far more
+        # notifications than there are steps.
+        self.assertGreater(len(seen), len(live.steps))
+
+    def test_content_event_notifies_without_opening_a_step(self):
+        # A nested values event advances the frontier step's snapshot but opens no
+        # new step; it must still notify so the frontier can re-render.
+        live = LiveDemoSession(iter([]))
+        seen: list[dict] = []
+        live.set_listener(seen.append)
+        live.append(DemoEvent(seq=0, t=0.0, type="task_start", node="note_branch",
+                              task_id="a", namespace=(), map_node_id="scanner_initialize",
+                              agent="scanner", payload={"note_id": 1}))
+        steps_before = len(live.steps)
+        seen.clear()
+        live.append(DemoEvent(seq=1, t=0.1, type="values", namespace=("note_branch:a",),
+                              payload={"summary": "s"}))
+        self.assertEqual(len(live.steps), steps_before)  # no new step opened
+        self.assertEqual(len(seen), 1)                    # but it still notified
 
     def test_listener_notified_on_completion(self):
         events = read_trace(FIXTURE)

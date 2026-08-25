@@ -43,7 +43,17 @@ _STEP_TITLES: dict[str, str] = {
 }
 
 # Nodes that fan out (many instances per run) — their step titles get a counter.
-_COUNTED_NODES = frozenset({"note_branch", "extract_branch"})
+_COUNTED_NODES = frozenset({"extract_branch"})
+
+# Fan-out nodes whose parallel instances are collapsed into a *single* presenter
+# step. Their instances run interleaved, so giving each its own step leaves the
+# early ones as empty "active" shells while the last swallows every note's work.
+# Collapsed into one step, each instance is shown as its own card (fed by the
+# per-instance detail in :mod:`cipoc.demo.state`). Kept in sync with state.py.
+FANOUT_COLLAPSE_NODES = frozenset({"note_branch"})
+
+# Title for a collapsed fan-out step (plural — it covers every instance).
+_FANOUT_STEP_TITLES: dict[str, str] = {"note_branch": "Characterize notes"}
 
 
 @dataclass(frozen=True)
@@ -62,6 +72,7 @@ class Step:
     agent: str | None
     start_seq: int
     end_seq: int
+    fanout: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -73,6 +84,7 @@ class Step:
             "agent": self.agent,
             "start_seq": self.start_seq,
             "end_seq": self.end_seq,
+            "fanout": self.fanout,
         }
 
 
@@ -118,15 +130,16 @@ def build_steps(events: Iterable[DemoEvent]) -> list[Step]:
     first_root = next(
         (i for i, event in enumerate(events) if _is_root_task_start(event)), len(events)
     )
-    pending: tuple[str, str, str, str | None, str | None, int] | None = (
-        ("Run start", "", "", None, None, events[0].seq) if first_root > 0 else None
+    # Pending step: (title, subtitle, node, map_id, agent, start_seq, fanout).
+    pending: tuple[str, str, str, str | None, str | None, int, bool] | None = (
+        ("Run start", "", "", None, None, events[0].seq, False) if first_root > 0 else None
     )
     prev_seq = events[0].seq
 
     def close(end_seq: int) -> None:
         if pending is None:
             return
-        title, subtitle, node, map_id, agent, start_seq = pending
+        title, subtitle, node, map_id, agent, start_seq, fanout = pending
         steps.append(
             Step(
                 index=len(steps),
@@ -137,24 +150,39 @@ def build_steps(events: Iterable[DemoEvent]) -> list[Step]:
                 agent=agent,
                 start_seq=start_seq,
                 end_seq=end_seq,
+                fanout=fanout,
             )
         )
 
     for event in events:
         if _is_root_task_start(event):
-            close(prev_seq)
             node = event.node
-            title = _STEP_TITLES.get(node, node or "Step")
-            if node in _COUNTED_NODES:
-                counters[node] = counters.get(node, 0) + 1
-                title = f"{title} {counters[node]}"
+            # A collapsed fan-out node folds every consecutive same-node instance
+            # into the step opened by its first instance (they run interleaved, so
+            # one step holds them all, rendered as per-instance cards).
+            if pending is not None and node in FANOUT_COLLAPSE_NODES and pending[2] == node:
+                prev_seq = event.seq
+                continue
+            close(prev_seq)
+            if node in FANOUT_COLLAPSE_NODES:
+                title = _FANOUT_STEP_TITLES.get(node, _STEP_TITLES.get(node, node or "Step"))
+                subtitle = ""
+                fanout = True
+            else:
+                title = _STEP_TITLES.get(node, node or "Step")
+                if node in _COUNTED_NODES:
+                    counters[node] = counters.get(node, 0) + 1
+                    title = f"{title} {counters[node]}"
+                subtitle = _subtitle(node, event.payload)
+                fanout = False
             pending = (
                 title,
-                _subtitle(node, event.payload),
+                subtitle,
                 node,
                 event.map_node_id or map_node_id(node, event.namespace),
                 event.agent,
                 event.seq,
+                fanout,
             )
         prev_seq = event.seq
 
@@ -162,4 +190,4 @@ def build_steps(events: Iterable[DemoEvent]) -> list[Step]:
     return steps
 
 
-__all__ = ["Step", "build_steps"]
+__all__ = ["Step", "build_steps", "FANOUT_COLLAPSE_NODES"]
