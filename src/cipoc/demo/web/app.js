@@ -150,6 +150,112 @@ function applyMeta(meta) {
 }
 
 // --- Panel 1: workflow map ----------------------------------------------
+
+// Hand-authored positions matching the reference flowchart: a horizontal top
+// row (Initialize → Scanner → Characterize) feeding a central decision column
+// (Groups? → Retriever → Relevant? → Extractor) that LOOPS back up the left
+// side through Update case to the gate — so the per-group extraction loop reads
+// as an actual cycle. The two "no" branches exit sideways (→ Finalize, →
+// Update). START/END endpoints are hidden in the demo (Initialize/Finalize read
+// as the entry/terminal, as in the reference). Keyed by node id.
+const MAP_POS = {
+  initialize_case:       { x: 130, y: 60 },
+  scanner_agent_block:   { x: 410, y: 60 },
+  characterize_corpus:   { x: 640, y: 60 },
+  eligible_groups_gate:  { x: 640, y: 205 },   // "Groups remain?" — top of the loop
+  finalize_case:         { x: 960, y: 205 },   // "no" exit → terminal
+  retriever_agent_block: { x: 640, y: 350 },
+  relevant_notes_gate:   { x: 640, y: 495 },
+  update_case:           { x: 210, y: 495 },   // left side of the loop
+  extractor_agent_block: { x: 640, y: 640 },
+};
+
+// Endpoints the demo map omits (the reference starts at Initialize, ends at
+// Finalize); their edges are dropped with them.
+const MAP_HIDE = new Set(["case_start", "case_end"]);
+
+// Lighten a hex color toward white (soft node fills that keep the agent hue).
+function tint(hex, amt) {
+  const c = String(hex).replace("#", "");
+  if (c.length < 6) return hex;
+  const r = parseInt(c.slice(0, 2), 16);
+  const g = parseInt(c.slice(2, 4), 16);
+  const b = parseInt(c.slice(4, 6), 16);
+  const mix = (x) => Math.round(x + (255 - x) * amt);
+  return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+}
+
+// Demo stylesheet for the map, built from the chart's agent colors. Uniform
+// rounded blocks with a soft agent tint + agent-colored border; diamonds for the
+// decision gates; Finalize colored as the terminal. Edges are orthogonal (taxi,
+// like the reference): forward flow into an agent is blue, the two "no" exits are
+// red, and the per-group loop-back is an emphasized cycle so it can't be missed.
+function mapStyle(agentColors) {
+  const BLUE = "#4a86d8", RED = "#e0564b", LOOP = "#6b5bd0", GRAY = "#9aa3b2";
+  const perAgent = Object.entries(agentColors).map(([agent, color]) => ({
+    selector: `node[agent="${agent}"]`,
+    style: { "border-color": color, "background-color": tint(color, 0.86) },
+  }));
+  return [
+    {
+      selector: "node",
+      style: {
+        shape: "round-rectangle",
+        width: 150, height: 50,
+        "background-color": "#ffffff",
+        "border-width": 2, "border-color": "#cbd0da",
+        label: "data(label)", "text-wrap": "wrap", "text-max-width": 126,
+        "text-valign": "center", "text-halign": "center",
+        "font-size": 11.5, "font-weight": 600, color: "#2b3040",
+      },
+    },
+    { selector: 'node[kind="subagent"]', style: { width: 168, height: 58, "border-width": 3, "font-size": 12.5, "font-weight": 700 } },
+    { selector: 'node[kind="decision"]', style: { shape: "round-diamond", width: 150, height: 108, "background-color": "#ffffff", "font-size": 11 } },
+    ...perAgent,
+    // Finalize reads as the terminal (as in the reference): soft red.
+    { selector: 'node[id="finalize_case"]', style: { "background-color": "#f6dede", "border-color": RED, color: "#8a2c2c" } },
+
+    // Orthogonal connectors, thin gray by default.
+    {
+      selector: "edge",
+      style: {
+        width: 2, "line-color": GRAY, "curve-style": "taxi",
+        "taxi-turn": "50%", "taxi-turn-min-distance": 8,
+        "target-arrow-shape": "triangle", "target-arrow-color": GRAY, "arrow-scale": 1.1,
+      },
+    },
+    // Forward flow that enters an agent block: blue (fan-out branches + the
+    // "yes" edge into the extractor).
+    { selector: 'edge[kind="fanout"]', style: { "line-color": BLUE, "target-arrow-color": BLUE } },
+    { selector: 'edge[label="yes"]', style: { "line-color": BLUE, "target-arrow-color": BLUE } },
+    // The two "no" branches exit the loop sideways: red.
+    { selector: 'edge[label="no"]', style: { "line-color": RED, "target-arrow-color": RED, width: 2.5 } },
+    { selector: 'edge[label="no: not found"]', style: { "line-color": RED, "target-arrow-color": RED, width: 2.5 } },
+    // Extractor → Update case: leave horizontally so it runs along the bottom
+    // then up the left side (the loop's lower-left corner).
+    { selector: 'edge[source="extractor_agent_block"]', style: { "taxi-direction": "horizontal" } },
+    // The per-group loop-back (Update case → gate): emphasized cycle — thick,
+    // colored, routed up the left and across the top.
+    {
+      selector: 'edge[kind="loop"]',
+      style: {
+        "line-color": LOOP, "target-arrow-color": LOOP, width: 3,
+        "taxi-direction": "vertical", "taxi-turn": "45%",
+      },
+    },
+    // Edge captions (yes / no / loop / "one branch per …") on a small white chip.
+    {
+      selector: "edge[label]",
+      style: {
+        label: "data(label)", "font-size": 9.5, "font-weight": 600, color: "#5b6270",
+        "text-background-color": "#ffffff", "text-background-opacity": 0.92,
+        "text-background-padding": 2.5, "text-background-shape": "round-rectangle",
+        "text-rotation": "none",
+      },
+    },
+  ];
+}
+
 function buildMap(graph) {
   if (graph.coarse_map && Object.keys(graph.coarse_map).length) {
     COARSE = graph.coarse_map;
@@ -159,18 +265,33 @@ function buildMap(graph) {
   applyAgentColors(agentColors);
   renderLegend(agentColors);
 
-  const nodes = graph.elements.nodes.map((n) => ({
+  // Hand-authored layout matching the reference flowchart (see MAP_POS). Endpoint
+  // blocks are hidden; each fan-out is drawn as ONE labeled edge (the ×N badge on
+  // the target node already conveys the multiplicity), so the map reads as a clean
+  // cyclic flowchart. Falls back to breadthfirst if the chart grows nodes we have
+  // no position for.
+  const rawNodes = graph.elements.nodes.filter((n) => !MAP_HIDE.has(n.data.id));
+  const havePreset = rawNodes.every((n) => MAP_POS[n.data.id]);
+  const nodes = rawNodes.map((n) => ({
     data: { ...n.data, baseLabel: n.data.label },
+    ...(MAP_POS[n.data.id] ? { position: { ...MAP_POS[n.data.id] } } : {}),
   }));
-  const edges = graph.elements.edges.map((e) => ({ data: { ...e.data } }));
+  const edges = graph.elements.edges
+    .filter((e) => !MAP_HIDE.has(e.data.source) && !MAP_HIDE.has(e.data.target))
+    // Collapse fan-out triples: keep only the center (labeled) lane.
+    .filter((e) => e.data.kind !== "fanout" || e.data.fanout_lane === "center")
+    .map((e) => ({ data: { ...e.data } }));
 
   cy = cytoscape({
     container: document.getElementById("cy"),
     elements: { nodes, edges },
-    // The chart's own style already colors nodes/edges by agent and kind; we only
-    // layer run-state (visited / current / active / traversed) on top of it.
-    style: [...(graph.style || []), ...stateStyles()],
-    layout: graph.layout || { name: "breadthfirst", directed: true },
+    // Demo-only stylesheet (built from the chart's agent colors) + the authored
+    // preset positions; the shared chart JSON is untouched. Run-state overlays
+    // (visited / current / active / traversed) layer on top.
+    style: [...mapStyle(agentColors), ...stateStyles()],
+    layout: havePreset
+      ? { name: "preset", fit: true, padding: 24 }
+      : graph.layout || { name: "breadthfirst", directed: true },
     wheelSensitivity: 0.2,
     minZoom: 0.3,
     maxZoom: 2.5,
@@ -227,17 +348,11 @@ function stateStyles() {
       selector: "node.active",
       style: { "overlay-color": "#ffb020", "overlay-opacity": 0.22, "overlay-padding": 7 },
     },
-    { selector: "edge.dim", style: { opacity: 0.18 } },
-    {
-      selector: "edge.traversed",
-      style: {
-        opacity: 1,
-        width: 4,
-        "line-color": "#5b4bc0",
-        "target-arrow-color": "#5b4bc0",
-        "z-index": 15,
-      },
-    },
+    { selector: "edge.dim", style: { opacity: 0.16 } },
+    // Traversed edges just light up (full opacity + raised) — the run-state must
+    // NOT recolor them, so the semantic edge colors (blue forward / red exit /
+    // purple loop) stay readable along the walked path.
+    { selector: "edge.traversed", style: { opacity: 1, "z-index": 15 } },
   ];
 }
 
