@@ -1,7 +1,7 @@
 == 100x24 ==
 ╭─ CIPOC · Orchestrator ─────────────────────────────────────────────────────────────────── 01:12 ─╮
-│ notes  ▰▰▰▰▰▰▰▰▰▰▰▰▰▰  14/14 scanned      groups  ▰▰▰▰▰▱▱  8/11                                  │
-│ vars   ▰▰▰▰▰▰▰▰▰▰▱▱▱▱  39/52   ✔9 ▣1 ∅8 ⊗19 ✖2   1 branch active                                 │
+│ notes  ▰▰▰▰▰▰▰▰▰▰▰▰▰▰  14/14 scanned      groups  ▰▰▰▰▰▱▱  8/10                                  │
+│ vars   ▰▰▰▰▰▰▰▰▰▰▰▰▱▱  39/44   ✔9 ▣1 ∅8 ⊗19 ✖2   1 branch active                                 │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
   ITEM  VARIABLE                          PIPELINE         NOTES  STATUS       VALUE
   ────  ────────────────────────────────  ───────────────  ─────  ───────────  ─────────────────────
@@ -16,7 +16,6 @@
   1117  Mets at DX-Other                  ▰▰▰                 3n  ✔ extracted  0                  ?░
 ▸ Lymph Node Removal                      gate:nodes ✓                    4/4  ✔3 ✖1
 ▸ Site Specific Codes                                                     3/6  ▰▰▰▱▱▱
-▸ TNM Staging                                                             0/8  ▱▱▱▱▱▱▱▱
 ▸ Other                                                                   6/6  ∅6
 ▸ Limited By Primary Site                                                 7/7  ⊗7
 ────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -24,8 +23,8 @@
 
 == 80x24 ==
 ╭─ CIPOC · Orchestrator ─────────────────────────────────────────────── 01:12 ─╮
-│ notes  ▰▰▰▰▰▰▰▰  14/14 scanned      groups  ▰▰▱▱  8/11                       │
-│ vars   ▰▰▰▰▰▰▱▱  39/52   ✔9 ▣1 ∅8 ⊗19 ✖2   1 branch active                   │
+│ notes  ▰▰▰▰▰▰▰▰  14/14 scanned      groups  ▰▰▰▱  8/10                       │
+│ vars   ▰▰▰▰▰▰▰▱  39/44   ✔9 ▣1 ∅8 ⊗19 ✖2   1 branch active                   │
 ╰──────────────────────────────────────────────────────────────────────────────╯
   ITEM  VARIABLE                        PIPELINE         STATUS       VALUE
   ────  ──────────────────────────────  ───────────────  ───────────  ──────────
@@ -40,7 +39,6 @@
   1117  Mets at DX-Other                ▰▰▰              ✔ extracted  0       ?░
 ▸ Lymph Node Removal                    gate:nodes ✓             4/4  ✔3 ✖1
 ▸ Site Specific Codes                                            3/6  ▰▰▰▱▱▱
-▸ TNM Staging                                                    0/8  ▱▱▱▱▱▱▱▱
 ▸ Other                                                          6/6  ∅6
 ▸ Limited By Primary Site                                        7/7  ⊗7
 ────────────────────────────────────────────────────────────────────────────────
@@ -49,7 +47,7 @@
 == 60x24 ==
 ╭─ CIPOC · Orchestrator ─────────────────────────── 01:12 ─╮
 │ notes  ▰▰▰▰▰▰▰▰  14/14 scanned                           │
-│ vars   ▰▰▰▰▰▰▱▱  39/52   ✔9 ▣1 ∅8 ⊗19 ✖2                 │
+│ vars   ▰▰▰▰▰▰▰▱  39/44   ✔9 ▣1 ∅8 ⊗19 ✖2                 │
 ╰──────────────────────────────────────────────────────────╯
   ITEM  VARIABLE                PI…  STATUS       VALUE
   ────  ──────────────────────  ───  ───────────  ──────────
@@ -64,7 +62,6 @@
   1117  Mets at DX-Other        ▰▰▰  ✔ extracted  0       ?░
 ▸ Lymph Node Removal            gate…        4/4  ✔3 ✖1
 ▸ Site Specific Codes                        3/6  ▰▰▰▱▱▱
-▸ TNM Staging                                0/8  ▱▱▱▱▱▱▱▱
 ▸ Other                                      6/6  ∅6
 ▸ Limited By Primary Site                    7/7  ⊗7
 ────────────────────────────────────────────────────────────
@@ -72,8 +69,8 @@
 
 == 100x50 ==
 ╭─ CIPOC · Orchestrator ─────────────────────────────────────────────────────────────────── 01:12 ─╮
-│ notes  ▰▰▰▰▰▰▰▰▰▰▰▰▰▰  14/14 scanned      groups  ▰▰▰▰▰▱▱  8/11                                  │
-│ vars   ▰▰▰▰▰▰▰▰▰▰▱▱▱▱  39/52   ✔9 ▣1 ∅8 ⊗19 ✖2   1 branch active                                 │
+│ notes  ▰▰▰▰▰▰▰▰▰▰▰▰▰▰  14/14 scanned      groups  ▰▰▰▰▰▱▱  8/10                                  │
+│ vars   ▰▰▰▰▰▰▰▰▰▰▰▰▱▱  39/44   ✔9 ▣1 ∅8 ⊗19 ✖2   1 branch active                                 │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
   ITEM  VARIABLE                          PIPELINE         NOTES  STATUS       VALUE
   ────  ────────────────────────────────  ───────────────  ─────  ───────────  ─────────────────────
@@ -99,24 +96,31 @@
 ▾   Histologic Type and Behavior Code                                     2/2  ✔2
    522    Histologic Type ICD-O-3         ▰▰▰                 7n  ✔ extracted  8500                █
    523    Behavior Code ICD-O-3           ▰▰▰                 7n  ✔ extracted  3                   █
-▾ TNM Staging                                                             0/8  ▱▱▱▱▱▱▱▱
-  1001  AJCC TNM Clin T                   ▱▱▱                     · pending    —
-  1002  AJCC TNM Clin N                   ▱▱▱                     · pending    —
-  1003  AJCC TNM Clin M                   ▱▱▱                     · pending    —
-  1004  AJCC TNM Clin Stage Group         ▱▱▱                     · pending    —
-  1011  AJCC TNM Path T                   ▱▱▱                     · pending    —
-  1012  AJCC TNM Path N                   ▱▱▱                     · pending    —
-  1013  AJCC TNM Path M                   ▱▱▱                     · pending    —
-  1014  AJCC TNM Path Stage Group         ▱▱▱                     · pending    —
-▸ Other                                                                   6/6  ∅6
-▸ Limited By Primary Site                                                 7/7  ⊗7
+▾ Other                                                                   6/6  ∅6
+   764  Summary Stage 2018                ▰▰▰                 4n  ∅ not found  —                   ░
+   820  Regional Nodes Positive           ▰▰▰                 4n  ∅ not found  —                   ░
+   830  Regional Nodes Examined           ▰▰▰                 4n  ∅ not found  —                   ░
+  1182  Lymphovascular Invasion           ▰▰▰                 4n  ∅ not found  —                   ░
+  3280  RX Hosp--Palliative Proc          ▰▰▰                 4n  ∅ not found  —                   ░
+   756  Tumor Size Summary                ▰▰▰                 4n  ∅ not found  —                   ░
+▾ Limited By Primary Site                                                 7/7  ⊗7
+▾   Breast/Melanoma Only                  site:breast/melanoma            1/1  ⊗1
+   832    Date of Sentinel Lymph Node B…  ▱▱▱                     ⊗ n/a        Primary site does…
+▾   Ovary Only                            site:ovary                      1/1  ⊗1
+  3836    FIGO Stage                      ▱▱▱                     ⊗ n/a        Primary site does…
+▾   Prostate Only                         site:prostate                   5/5  ⊗5
+  3838    Gleason Patterns Clinical       ▱▱▱                     ⊗ n/a        Primary site does…
+  3839    Gleason Patterns Pathological   ▱▱▱                     ⊗ n/a        Primary site does…
+  3840    Gleason Score Clinical          ▱▱▱                     ⊗ n/a        Primary site does…
+  3841    Gleason Score Pathological      ▱▱▱                     ⊗ n/a        Primary site does…
+  3842    Gleason Tertiary Pattern        ▱▱▱                     ⊗ n/a        Primary site does…
 ────────────────────────────────────────────────────────────────────────────────────────────────────
  ⟳ Metastases  · validate · 2 vars · 3 notes                                                   00:12
 
 == 80x50 ==
 ╭─ CIPOC · Orchestrator ─────────────────────────────────────────────── 01:12 ─╮
-│ notes  ▰▰▰▰▰▰▰▰  14/14 scanned      groups  ▰▰▱▱  8/11                       │
-│ vars   ▰▰▰▰▰▰▱▱  39/52   ✔9 ▣1 ∅8 ⊗19 ✖2   1 branch active                   │
+│ notes  ▰▰▰▰▰▰▰▰  14/14 scanned      groups  ▰▰▰▱  8/10                       │
+│ vars   ▰▰▰▰▰▰▰▱  39/44   ✔9 ▣1 ∅8 ⊗19 ✖2   1 branch active                   │
 ╰──────────────────────────────────────────────────────────────────────────────╯
   ITEM  VARIABLE                        PIPELINE         STATUS       VALUE
   ────  ──────────────────────────────  ───────────────  ───────────  ──────────
@@ -142,24 +146,31 @@
 ▾   Histologic Type and Behavior Code                            2/2  ✔2
    522    Histologic Type ICD-O-3       ▰▰▰              ✔ extracted  8500     █
    523    Behavior Code ICD-O-3         ▰▰▰              ✔ extracted  3        █
-▾ TNM Staging                                                    0/8  ▱▱▱▱▱▱▱▱
-  1001  AJCC TNM Clin T                 ▱▱▱              · pending    —
-  1002  AJCC TNM Clin N                 ▱▱▱              · pending    —
-  1003  AJCC TNM Clin M                 ▱▱▱              · pending    —
-  1004  AJCC TNM Clin Stage Group       ▱▱▱              · pending    —
-  1011  AJCC TNM Path T                 ▱▱▱              · pending    —
-  1012  AJCC TNM Path N                 ▱▱▱              · pending    —
-  1013  AJCC TNM Path M                 ▱▱▱              · pending    —
-  1014  AJCC TNM Path Stage Group       ▱▱▱              · pending    —
-▸ Other                                                          6/6  ∅6
-▸ Limited By Primary Site                                        7/7  ⊗7
+▾ Other                                                          6/6  ∅6
+   764  Summary Stage 2018              ▰▰▰              ∅ not found  —        ░
+   820  Regional Nodes Positive         ▰▰▰              ∅ not found  —        ░
+   830  Regional Nodes Examined         ▰▰▰              ∅ not found  —        ░
+  1182  Lymphovascular Invasion         ▰▰▰              ∅ not found  —        ░
+  3280  RX Hosp--Palliative Proc        ▰▰▰              ∅ not found  —        ░
+   756  Tumor Size Summary              ▰▰▰              ∅ not found  —        ░
+▾ Limited By Primary Site                                        7/7  ⊗7
+▾   Breast/Melanoma Only                site:breast/mela…        1/1  ⊗1
+   832    Date of Sentinel Lymph Node…  ▱▱▱              ⊗ n/a        Primar…
+▾   Ovary Only                          site:ovary               1/1  ⊗1
+  3836    FIGO Stage                    ▱▱▱              ⊗ n/a        Primar…
+▾   Prostate Only                       site:prostate            5/5  ⊗5
+  3838    Gleason Patterns Clinical     ▱▱▱              ⊗ n/a        Primar…
+  3839    Gleason Patterns Pathologic…  ▱▱▱              ⊗ n/a        Primar…
+  3840    Gleason Score Clinical        ▱▱▱              ⊗ n/a        Primar…
+  3841    Gleason Score Pathological    ▱▱▱              ⊗ n/a        Primar…
+  3842    Gleason Tertiary Pattern      ▱▱▱              ⊗ n/a        Primar…
 ────────────────────────────────────────────────────────────────────────────────
  ⟳ Metastases  · validate · 2 vars · 3 notes                               00:12
 
 == 60x50 ==
 ╭─ CIPOC · Orchestrator ─────────────────────────── 01:12 ─╮
 │ notes  ▰▰▰▰▰▰▰▰  14/14 scanned                           │
-│ vars   ▰▰▰▰▰▰▱▱  39/52   ✔9 ▣1 ∅8 ⊗19 ✖2                 │
+│ vars   ▰▰▰▰▰▰▰▱  39/44   ✔9 ▣1 ∅8 ⊗19 ✖2                 │
 ╰──────────────────────────────────────────────────────────╯
   ITEM  VARIABLE                PI…  STATUS       VALUE
   ────  ──────────────────────  ───  ───────────  ──────────
@@ -185,16 +196,23 @@
 ▾   Histologic Type and Behavio…             2/2  ✔2
    522    Histologic Type ICD…  ▰▰▰  ✔ extracted  8500     █
    523    Behavior Code ICD-O…  ▰▰▰  ✔ extracted  3        █
-▾ TNM Staging                                0/8  ▱▱▱▱▱▱▱▱
-  1001  AJCC TNM Clin T         ▱▱▱  · pending    —
-  1002  AJCC TNM Clin N         ▱▱▱  · pending    —
-  1003  AJCC TNM Clin M         ▱▱▱  · pending    —
-  1004  AJCC TNM Clin Stage G…  ▱▱▱  · pending    —
-  1011  AJCC TNM Path T         ▱▱▱  · pending    —
-  1012  AJCC TNM Path N         ▱▱▱  · pending    —
-  1013  AJCC TNM Path M         ▱▱▱  · pending    —
-  1014  AJCC TNM Path Stage G…  ▱▱▱  · pending    —
-▸ Other                                      6/6  ∅6
-▸ Limited By Primary Site                    7/7  ⊗7
+▾ Other                                      6/6  ∅6
+   764  Summary Stage 2018      ▰▰▰  ∅ not found  —        ░
+   820  Regional Nodes Positi…  ▰▰▰  ∅ not found  —        ░
+   830  Regional Nodes Examin…  ▰▰▰  ∅ not found  —        ░
+  1182  Lymphovascular Invasi…  ▰▰▰  ∅ not found  —        ░
+  3280  RX Hosp--Palliative P…  ▰▰▰  ∅ not found  —        ░
+   756  Tumor Size Summary      ▰▰▰  ∅ not found  —        ░
+▾ Limited By Primary Site                    7/7  ⊗7
+▾   Breast/Melanoma Only        site…        1/1  ⊗1
+   832    Date of Sentinel Ly…  ▱▱▱  ⊗ n/a        Primar…
+▾   Ovary Only                  site…        1/1  ⊗1
+  3836    FIGO Stage            ▱▱▱  ⊗ n/a        Primar…
+▾   Prostate Only               site…        5/5  ⊗5
+  3838    Gleason Patterns Cl…  ▱▱▱  ⊗ n/a        Primar…
+  3839    Gleason Patterns Pa…  ▱▱▱  ⊗ n/a        Primar…
+  3840    Gleason Score Clini…  ▱▱▱  ⊗ n/a        Primar…
+  3841    Gleason Score Patho…  ▱▱▱  ⊗ n/a        Primar…
+  3842    Gleason Tertiary Pa…  ▱▱▱  ⊗ n/a        Primar…
 ────────────────────────────────────────────────────────────
  ⟳ Metastases  · validate · 2 vars · 3 notes           00:12
