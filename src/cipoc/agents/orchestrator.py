@@ -53,7 +53,6 @@ class CaseState(BaseModel):
     case_facts: CaseFacts | None = Field(
         default=None,
         description="Data-dictionary scoping facts; derived during the run, absent until then.",
-        description="Data-dictionary scoping facts; derived during the run, absent until then.",
     )
     target_variables: list[TargetGroup] = Field(
         default_factory=list,
@@ -327,8 +326,6 @@ class OrchestratorAgent(BaseAgent):
     def _scope_group(self, group: TargetGroup, case_facts: CaseFacts | None) -> TargetGroup:
         """Fill each variable's data-dictionary metadata and site-scoped codes,
         preserving the group's gating/filter fields.
-        """Fill each variable's data-dictionary metadata and site-scoped codes,
-        preserving the group's gating/filter fields.
 
         ``build_variable_group`` returns a plain ``VariableGroupInfo`` (no gating),
         so its enriched variables are merged back onto the pending ``TargetGroup``
@@ -339,7 +336,6 @@ class OrchestratorAgent(BaseAgent):
             [variable.item_id for variable in group.variables],
             self._data_dictionary_path,
             case_facts=case_facts,
-            site_data_dictionary_path=self._site_data_dictionary_path,
             site_data_dictionary_path=self._site_data_dictionary_path,
         )
         enriched_by_id = {variable.item_id: variable for variable in enriched.variables}
