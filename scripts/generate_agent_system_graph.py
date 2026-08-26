@@ -32,20 +32,33 @@ CYTOSCAPE_URL = (
 CYTOSCAPE_START_MARKER = "/* CYTOSCAPE_BUNDLE_START */"
 CYTOSCAPE_END_MARKER = "/* CYTOSCAPE_BUNDLE_END */"
 
+# UNC Chapel Hill brand palette. These are the canonical agent hues: they are
+# baked into the generated JSON, served as ``metadata.agent_colors``, and written
+# onto the demo's ``:root`` at runtime, so they override the fallbacks in
+# ``demo/web/styles.css``. Change them here, then regenerate the JSON.
+#
+# Four hues held as far apart as the palette allows. The retriever cannot be pink
+# or amber — the gate disc runs retrieve -> extract -> open/shut on one shape, and
+# those are the error and in-progress colours — which leaves Basin Slate.
 AGENT_COLORS = {
-    "orchestrator": "#6d5bd0",
-    "scanner": "#008c7a",
-    "retriever": "#d16b22",
-    "extractor": "#1473e6",
+    "orchestrator": "#13294B",  # Navy, PMS 2767
+    "scanner": "#00A5AD",  # Tile Teal, PMS 7466
+    "retriever": "#4F758B",  # Basin Slate, PMS 5405
+    "extractor": "#4B9CD3",  # Carolina Blue, PMS 542
 }
 
+# Label ink on the pale node fills: Navy, 14.7:1 on white.
+INK = "#13294B"
+
+# Node-kind fills, all breakdowns of the primary palette plus one Sunburst wash
+# to mark the steps that call an LLM.
 KIND_COLORS = {
-    "endpoint": "#263248",
-    "deterministic": "#eef2f7",
-    "llm": "#fff1c7",
-    "decision": "#ffffff",
-    "fanout": "#e8e4ff",
-    "convergence": "#e8e4ff",
+    "endpoint": "#13294B",  # Navy
+    "deterministic": "#F1F3F6",  # Navy at 8%
+    "llm": "#FFF4CC",  # Sunburst Yellow at 15%
+    "decision": "#FFFFFF",
+    "fanout": "#E4F1F9",  # Carolina Blue at 15%
+    "convergence": "#E4F1F9",
 }
 
 
@@ -668,10 +681,10 @@ def cytoscape_style() -> list[dict[str, Any]]:
             "selector": "node",
             "style": {
                 "label": "data(label)",
-                "background-color": "#eef2f7",
+                "background-color": KIND_COLORS["deterministic"],
                 "border-width": 3,
-                "border-color": "#6d5bd0",
-                "color": "#172033",
+                "border-color": AGENT_COLORS["orchestrator"],
+                "color": INK,
                 "font-size": 13,
                 "text-wrap": "wrap",
                 "text-max-width": 150,
@@ -687,8 +700,8 @@ def cytoscape_style() -> list[dict[str, Any]]:
             "style": {
                 "label": "data(label)",
                 "width": 2.5,
-                "line-color": "#6d5bd0",
-                "target-arrow-color": "#6d5bd0",
+                "line-color": AGENT_COLORS["orchestrator"],
+                "target-arrow-color": AGENT_COLORS["orchestrator"],
                 "target-arrow-shape": "triangle",
                 "curve-style": "bezier",
                 "font-size": 10,

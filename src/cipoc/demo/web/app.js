@@ -260,6 +260,19 @@ function applyMeta(meta) {
 // are what the characterization is made of — so they live inside it.
 const CORPUS_ID = "stage:corpus";
 
+// The corpus box is shaped like an ungated group — a marker disc at the left and
+// its discs in a grid beside it — so that the front of the pipeline reads as a
+// peer of the boxes in the band rather than as its own kind of object. It has no
+// gate to show, so the marker carries a note glyph instead of a verdict and is
+// never given a `gate-*` class.
+const CORPUS_MARK_ID = "stage:corpus:mark";
+// U+1F5CF PAGE, the same glyph the evidence rows in panel 2 use, so a note is
+// marked the same way wherever it appears. It defaults to *text* presentation
+// rather than emoji, which is the whole reason it can be used here: 📄 renders
+// from the colour-emoji font, ignores the fill colour it is given, and so could
+// never take the scanner's hue or dim with the rest of the map.
+const NOTE_GLYPH = "\u{1F5CF}";
+
 // The middle of the drawing is the case, and it is *one box*. Splitting it into
 // Plan and Update containers spent the box's whole interior on two small labels
 // saying what the case's own label can say on its own — so the box is plain now,
@@ -349,25 +362,46 @@ function tint(hex, amt) {
  * is the first stop of a vertical gradient; and it dropped `shadow-*` in v3, so
  * the card elevation is a low-opacity `underlay-*` halo instead.
  */
-// `err` is a magenta-leaning pink rather than a brick red, so the ✓/✗ pair and
-// the pass/fail verdict lines stay apart under red-green colour blindness: green
-// and pink separate on the blue axis, which deuteranopia leaves intact. The
-// glyphs carry the same distinction in shape, so colour is never load-bearing.
-const MAP_COLORS = { ok: "#1a7f52", warn: "#c98a12", err: "#d02670", line: "#c9d2e3", muted: "#9aa3b2" };
+/* styles.css is the single source of truth for colour; the map reads the same
+ * custom properties the panels do rather than keeping its own copy. It used to
+ * keep one, and the two had already drifted — the map's amber was #c98a12 while
+ * --warn was #b8860b. Read after applyAgentColors() has written the
+ * server-supplied agent hues onto :root, so those win here too.
+ *
+ * On `err`: it is a magenta-leaning pink rather than a brick red, so
+ * the ✓/✗ pair and the pass/fail verdict lines stay apart under red-green colour
+ * blindness — green and pink separate on the blue axis, which deuteranopia
+ * leaves intact. The glyphs carry the same distinction in shape, so colour is
+ * never load-bearing.
+ */
+function readTheme() {
+  const cs = getComputedStyle(document.documentElement);
+  const v = (name) => cs.getPropertyValue(name).trim();
+  return {
+    ok: v("--ok"), warn: v("--warn"), err: v("--err"), errSoft: v("--err-soft"),
+    line: v("--line-strong"), lineSoft: v("--line"), muted: v("--miss"),
+    navy: v("--navy"), ink: v("--ink"), inkMuted: v("--muted"),
+    panel: v("--panel"), sunk: v("--panel-sunk"),
+    orchestrator: v("--orchestrator"), scanner: v("--scanner"),
+    scannerInk: v("--scanner-ink"),
+    retriever: v("--retriever"), extractor: v("--extractor"),
+    // Canvas labels do not inherit CSS, so the family is set per selector below.
+    font: v("--font-sans"),
+  };
+}
 
-function mapStyle(agentColors) {
-  const { ok, warn, err, line, muted } = MAP_COLORS;
-  const agent = (name, fallback) => agentColors[name] || fallback;
-  const ORCH = agent("orchestrator", "#6d5bd0");
-  const SCAN = agent("scanner", "#008c7a");
-  const EXTR = agent("extractor", "#1473e6");
-  const RETR = agent("retriever", "#d16b22");
+function mapStyle(theme) {
+  const { ok, warn, err, line, muted, font } = theme;
+  const ORCH = theme.orchestrator;
+  const SCAN = theme.scanner;
+  const EXTR = theme.extractor;
+  const RETR = theme.retriever;
 
   // A white card with `color` as a rule across its top edge.
   const ruled = (color) => ({
     "background-fill": "linear-gradient",
     "background-gradient-direction": "to-bottom",
-    "background-gradient-stop-colors": `${color} ${color} #ffffff #ffffff`,
+    "background-gradient-stop-colors": `${color} ${color} ${theme.panel} ${theme.panel}`,
     "background-gradient-stop-positions": "0% 8% 8% 100%",
   });
 
@@ -383,11 +417,12 @@ function mapStyle(agentColors) {
         shape: "round-rectangle",
         width: GEO.caseW, height: GEO.caseH,
         ...ruled(ORCH),
-        "border-width": 1, "border-color": "#b9c4d8",
-        "underlay-color": "#172033", "underlay-opacity": 0.14, "underlay-padding": 3,
+        "border-width": 1, "border-color": tint(theme.navy, 0.72),
+        "underlay-color": theme.navy, "underlay-opacity": 0.14, "underlay-padding": 3,
         label: "data(label)", "text-wrap": "wrap", "text-max-width": GEO.caseW - 26,
         "text-valign": "center", "text-halign": "center", "text-margin-y": 3,
-        "font-size": 21, "font-weight": 700, color: "#2b3040", "line-height": 1.25,
+        "font-family": font,
+        "font-size": 21, "font-weight": 700, color: theme.ink, "line-height": 1.25,
       },
     },
     // The phase is named in the colour of what is flowing while it runs: the
@@ -402,12 +437,13 @@ function mapStyle(agentColors) {
       selector: "node.cluster",
       style: {
         shape: "round-rectangle",
-        "background-color": "#f4f7fc", "background-opacity": 0.9,
-        "border-width": 1, "border-color": "#e3e9f4",
+        "background-color": theme.sunk, "background-opacity": 0.9,
+        "border-width": 1, "border-color": theme.lineSoft,
         padding: 10,
         label: "data(label)", "text-valign": "top", "text-halign": "center",
         "text-margin-y": -3, "text-wrap": "wrap", "text-max-width": 170,
-        "font-size": 12.5, "font-weight": 700, color: "#5b6270",
+        "font-family": font,
+        "font-size": 12.5, "font-weight": 700, color: theme.inkMuted,
       },
     },
     // A cluster's border carries its gate's verdict, so live work and ruled-out
@@ -416,16 +452,18 @@ function mapStyle(agentColors) {
     // drawn in a heavier line than one the planner has already discarded.
     { selector: "node.cluster.gate-open", style: { "border-width": 2.5, "border-color": tint(ok, 0.5) } },
     { selector: "node.cluster.gate-ungated", style: { "border-width": 2.5, "border-color": tint(ORCH, 0.55) } },
-    { selector: "node.cluster.gate-shut", style: { "background-color": "#fdf2f6", "border-color": tint(err, 0.72) } },
-    // The front of the pipeline is a cluster too — same container, same discs
-    // filling in as the work lands. It carries a little more weight than a group
-    // cluster because it is one of only two boxes above the band.
+    { selector: "node.cluster.gate-shut", style: { "background-color": theme.errSoft, "border-color": tint(err, 0.72) } },
+    // The front of the pipeline is a cluster too, and now says so: same fill,
+    // same label, same 2.5 border an ungated group wears — in the scanner's hue
+    // rather than the orchestrator's, because everything in this box is the
+    // scanner's work. It was a teal-tinted, elevated, larger-labelled box before,
+    // which made the one thing structurally identical to a group read as a
+    // different kind of object entirely.
     {
       selector: "node.cluster.corpus",
       style: {
-        "background-color": "#f1f8f7", "border-color": tint(SCAN, 0.42), "border-width": 2,
-        "underlay-color": "#172033", "underlay-opacity": 0.07, "underlay-padding": 2,
-        color: SCAN, "font-size": 15, "text-margin-y": -5, "text-max-width": 320,
+        "border-color": tint(SCAN, 0.55), "border-width": 2.5,
+        "text-max-width": 320,
       },
     },
 
@@ -434,10 +472,11 @@ function mapStyle(agentColors) {
       selector: "node.disc",
       style: {
         shape: "ellipse",
-        "background-color": "#ffffff",
+        "background-color": theme.panel,
         "border-width": 3, "border-color": muted, "border-opacity": 1,
         label: "data(label)", "text-valign": "center", "text-halign": "center",
-        "font-size": 11, "font-weight": 700, color: "#4a5468",
+        "font-family": font,
+        "font-size": 11, "font-weight": 700, color: theme.inkMuted,
       },
     },
     { selector: "node.disc.note", style: { width: GEO.noteD, height: GEO.noteD, "border-color": SCAN } },
@@ -454,6 +493,26 @@ function mapStyle(agentColors) {
         "border-color": warn, color: warn,
         "font-size": 24, "text-outline-width": 0.9,
         "text-outline-color": warn, "text-outline-opacity": 1,
+      },
+    },
+    // The corpus marker: a gate-sized disc in the same slot, carrying a note
+    // glyph rather than a verdict. Filled the way an ungated gate is, so the box
+    // opens on a marked disc like every box in the band does — in the scanner's
+    // hue, and a size larger than the note discs it introduces.
+    {
+      selector: "node.disc.mark",
+      style: {
+        width: GEO.gateD, height: GEO.gateD,
+        "background-color": tint(SCAN, 0.92),
+        // Ring in the scanner's hue so the marker belongs to the note discs
+        // beside it; glyph in the darker ink, because a page of fine rules at
+        // 23px needs the weight that #00A5AD at 2.7:1 does not give it.
+        "border-color": SCAN, color: theme.scannerInk,
+        // No outline, unlike the verdict glyphs: the rules inside a page icon are
+        // ~2px apart at this size and a 0.9 outline on each side of every stroke
+        // closes them into a solid block — the same way 1.8 turned a ✗ into a
+        // blob. The glyph is dense enough to carry itself without one.
+        "font-size": 23, "text-outline-width": 0,
       },
     },
 
@@ -743,6 +802,7 @@ function buildMapModel(snapshot) {
   // them. Structurally identical to a group and its variables — no edges in or
   // out of the individual notes, because the box already says what they are.
   add({ id: CORPUS_ID, label: "Scan & characterize notes", block: "characterize_corpus" }, "cluster corpus");
+  add({ id: CORPUS_MARK_ID, parent: CORPUS_ID, label: NOTE_GLYPH, title: "Clinical notes", block: "scanner_agent_block" }, "disc mark");
   for (const note of mapIndex.notes) {
     add({ id: note.id, parent: CORPUS_ID, label: `#${note.noteId}`, title: `${note.type} #${note.noteId}`.trim(), block: "scanner_agent_block" }, "disc note");
   }
@@ -862,21 +922,24 @@ function packLayout(parts, opts) {
   const bandW = Math.max(0, ...bandRows.map((r) => r.w));
   const bandH = bandRows.reduce((a, r, i) => a + r.h + (i ? BAND_ROW_GAP : 0), 0);
 
-  // --- the corpus box: note discs in a grid, measured the same way a cluster
-  // is, because it is one. Only the discs get positions — the container is a
-  // compound parent and sizes itself around them.
+  // --- the corpus box: a marker disc at the left and note discs in a grid to
+  // the right of it — measured exactly the way a cluster is, because it is one.
+  // Only the discs get positions; the container is a compound parent and sizes
+  // itself around them.
   const notes = parts.notes;
   const perRow = Math.max(1, Math.min(noteCols, notes.length || 1));
   const noteRows = Math.ceil(notes.length / perRow) || 1;
-  const stripW = perRow * GEO.noteGapX + CLUSTER_PAD * 2;
-  const stripH = noteRows * GEO.noteGapY + CLUSTER_PAD * 2;
+  const stripW = GEO.gateD + GEO.gateGap + perRow * GEO.noteGapX + CLUSTER_PAD * 2;
+  const stripH = Math.max(GEO.gateD, noteRows * GEO.noteGapY) + CLUSTER_PAD * 2;
 
   // Nothing hangs off either side any more, so the drawing is symmetric about
   // `cx` and one half-width describes it.
   const half = Math.max(stripW, bandW, GEO.caseW) / 2;
   const cx = half;
 
-  const noteX0 = cx - stripW / 2 + CLUSTER_PAD + GEO.noteGapX / 2;
+  const stripX0 = cx - stripW / 2;
+  pos[CORPUS_MARK_ID] = { x: stripX0 + CLUSTER_PAD + GEO.gateD / 2, y: stripH / 2 };
+  const noteX0 = stripX0 + CLUSTER_PAD + GEO.gateD + GEO.gateGap + GEO.noteGapX / 2;
   const noteY0 = stripH / 2 - ((noteRows - 1) * GEO.noteGapY) / 2;
   notes.forEach((note, i) => {
     pos[note.id] = {
@@ -962,14 +1025,16 @@ function buildMap(graph) {
     COARSE = graph.coarse_map;
     rebuildCoarseMembers();
   }
-  const agentColors = graph.agent_colors || {};
-  applyAgentColors(agentColors);
+  // Server-supplied agent hues land on :root first, so readTheme() picks them up
+  // along with every other token from styles.css.
+  applyAgentColors(graph.agent_colors || {});
+  const theme = readTheme();
 
   buildMapIndex();
   cy = cytoscape({
     container: document.getElementById("cy"),
     elements: { nodes: [], edges: [] },
-    style: [...mapStyle(agentColors), ...stateStyles(agentColors)],
+    style: [...mapStyle(theme), ...stateStyles(theme)],
     layout: { name: "preset" },
     wheelSensitivity: 0.2,
     minZoom: 0.2,
@@ -1076,12 +1141,9 @@ function applyAgentColors(colors) {
 // Run-state overlay: how a node/edge looks at a point in the run. A disc's ring
 // is faint before it runs, haloed while it runs, and filled once done — the
 // "○ empty → ◎ half → ● filled" progression.
-function stateStyles(agentColors) {
-  const { ok, warn, err, line } = MAP_COLORS;
-  const scanner = (agentColors || {}).scanner || "#008c7a";
-  const extractor = (agentColors || {}).extractor || "#1473e6";
-  const retriever = (agentColors || {}).retriever || "#d16b22";
-  const orch = (agentColors || {}).orchestrator || "#6d5bd0";
+function stateStyles(theme) {
+  const { ok, warn, err, line } = theme;
+  const { scanner, extractor, retriever, orchestrator: orch } = theme;
   return [
     {
       selector: "node, edge",
@@ -1114,6 +1176,11 @@ function stateStyles(agentColors) {
         "background-color": tint(warn, 0.55), "border-color": warn,
       },
     },
+    // The corpus marker is an icon naming the box, not a unit of work, so it
+    // does not pulse: the generic active halo put a 7-unit amber block at the
+    // head of the strip, competing with the notes that are actually being read.
+    // It simply comes up out of the dim when the box is live.
+    { selector: "node.disc.mark.st-active", style: { opacity: 1, "border-opacity": 1, "underlay-opacity": 0 } },
     // Done is *filled*, not merely un-dimmed: at the size these discs end up on
     // screen a pale tint is indistinguishable from idle, and telling finished
     // work from pending work at a glance is the whole job.
@@ -1121,7 +1188,7 @@ function stateStyles(agentColors) {
     { selector: "node.disc.note.st-done", style: { "background-color": tint(scanner, 0.42) } },
     { selector: "node.disc.var.st-done", style: { "background-color": tint(extractor, 0.42) } },
     // A variable the run settled without a value — visibly reached, but empty.
-    { selector: "node.disc.var.st-empty", style: { opacity: 1, "border-opacity": 0.55, "background-color": "#ffffff" } },
+    { selector: "node.disc.var.st-empty", style: { opacity: 1, "border-opacity": 0.55, "background-color": theme.panel } },
     { selector: "node.disc.var.st-flagged", style: { "border-color": err, "background-color": tint(err, 0.9) } },
 
     // Everything behind a shut gate stays dark for the whole run: it never ran,
@@ -1322,6 +1389,10 @@ function renderMapAt(t, snapshot, step) {
       setState(corpusNode, stateAt(CORPUS_ID, t));
       corpusNode.toggleClass("current", currentBlock === CORPUS_ID);
     }
+    // The marker stands for the box, so it lights with it rather than with any
+    // one note — the same way an ungated gate lights with its group.
+    const corpusMark = cy.getElementById(CORPUS_MARK_ID);
+    if (corpusMark.nonempty()) setState(corpusMark, stateAt(CORPUS_ID, t));
 
     cy.nodes(".var").forEach((node) => {
       const gid = node.data("group");
@@ -2378,7 +2449,7 @@ function renderEvidence(spans) {
         return "";
       }
       return `<details class="block evidence-note">
-        <summary>📄 In note #${esc(nid)} <span class="muted">${esc(note.note_type || "")}</span></summary>
+        <summary><span class="note-glyph">${NOTE_GLYPH}</span> In note #${esc(nid)} <span class="muted">${esc(note.note_type || "")}</span></summary>
         <div class="block-body"><div class="note-text">${highlightContent(note.content, texts)}</div></div>
       </details>`;
     })

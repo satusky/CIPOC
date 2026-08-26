@@ -254,6 +254,32 @@ class WebAssetTests(unittest.TestCase):
                      "var-in", "var-out", "node.slab"):
             self.assertNotIn(dead, app_js, f"{dead} should be gone")
 
+    def test_the_corpus_box_is_shaped_like_an_ungated_group(self):
+        """A marker disc at the left, its discs in a grid beside it.
+
+        The front of the pipeline is structurally identical to a group and its
+        variables, but it used to be drawn as its own kind of object — tinted
+        fill, elevation, a larger label — so it read as a different sort of thing
+        from every box in the band. It now wears the container an ungated group
+        wears, led by a note glyph instead of a verdict.
+        """
+        app_js = (WEB_DIR / "app.js").read_text()
+        self.assertIn("const CORPUS_MARK_ID", app_js)
+        self.assertIn("parent: CORPUS_ID", app_js)
+        self.assertIn('"disc mark"', app_js)
+        self.assertIn('selector: "node.disc.mark"', app_js)
+
+        # The marker must not be a gate. renderMapAt rewrites the label of every
+        # `.gate` node to a verdict glyph, so classing it as one would silently
+        # replace the note icon with a ✓ the moment the planner reached a verdict.
+        mark_add = next(ln for ln in app_js.splitlines() if "id: CORPUS_MARK_ID" in ln)
+        self.assertNotIn("gate", mark_add)
+
+        # The strip has to reserve the same left slot a cluster gives its gate,
+        # or the marker lands on top of the first note.
+        self.assertIn("const stripW = GEO.gateD + GEO.gateGap +", app_js)
+        self.assertIn("pos[CORPUS_MARK_ID]", app_js)
+
     def test_map_edges_belong_to_the_phase_that_owns_them(self):
         """Lines are scoped to their step, not accumulated across the run.
 
@@ -315,9 +341,16 @@ class WebAssetTests(unittest.TestCase):
             self.assertIn(f".plan-row.{verdict}", css)
         # The old flat treatment keyed off the retriever's stage is gone.
         self.assertNotIn(".gate-chip.eligible", css)
-        # Pink, not brick: the two files have to agree on the failure colour.
-        self.assertIn("--err: #d02670", css)
-        self.assertIn('err: "#d02670"', app_js)
+        # Pink, not brick, so ✓ and ✗ stay apart under deuteranopia: green
+        # desaturates to a neutral grey there and a magenta-leaning pink to a
+        # yellow-green, which a red would not.
+        self.assertIn("--pink: #ED40A9", css)
+        self.assertIn("--err: var(--pink)", css)
+        # The two files cannot drift any more: the map reads the failure colour
+        # out of the same custom property the panels use rather than keeping a
+        # second copy of it, which is how --warn and MAP_COLORS.warn diverged.
+        self.assertIn('err: v("--err")', app_js)
+        self.assertNotIn("const MAP_COLORS", app_js)
 
     def test_the_check_has_nothing_to_add_to_a_step_it_was_merged_into(self):
         """`check_state` is merged twice over, and is a repeat either way."""

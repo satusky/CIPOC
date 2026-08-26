@@ -1,33 +1,137 @@
+/* Vendored rather than linked, the same way cytoscape.min.js is: the deployment
+   target is airgapped, and a fonts.googleapis.com link would fall back there to
+   whatever the machine happens to have without ever saying so. Both families are
+   variable, so one file per style covers every weight this UI asks for. */
+@font-face {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url("fonts/open-sans-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Open Sans";
+  font-style: italic;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url("fonts/open-sans-latin-italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Libre Baskerville";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("fonts/libre-baskerville-latin.woff2") format("woff2");
+}
+
+/* ---- UNC Chapel Hill brand palette -------------------------------------
+ *
+ * Every value below is either a brand hex or a documented breakdown of one (a
+ * stated tint/shade), never an eyeballed colour. Primary palette carries the
+ * design; the secondary palette appears only as accents — agent identity, run
+ * status, and the two warm surfaces.
+ *
+ * Where a brand hex cannot meet WCAG 2.1 AA as text on white, it keeps its role
+ * in fills, rings and rules and a darkened `-ink` sibling carries the text.
+ * Carolina Blue is the clearest case: 3.0:1 on white as a fill, and #007FAE —
+ * the brand's own digital-link blue — at 4.6:1 for anything that has to be read.
+ */
 :root {
-  --bg: #f4f6fb;
+  /* --- primary palette --- */
+  --carolina: #4B9CD3;       /* PMS 542 */
+  --carolina-ink: #007FAE;   /* brand digital-link blue, 4.6:1 on white */
+  --navy: #13294B;           /* PMS 2767 */
+  --black: #151515;          /* PMS Black 3 */
+  --brand-gray: #F8F8F8;     /* PMS Black 3 at 6% */
+
+  /* --- secondary palette (accents only) ---
+     Only the hues this design actually spends. The green comes from the second
+     branding secondary sheet — the one whose primary circle samples as Carolina
+     Blue — rather than from the Longleaf Pine / Davie Green sheet. */
+  --green: #3DAE2B;          /* secondary-palette green */
+  --pink: #ED40A9;           /* secondary-palette pink */
+  --tile-teal: #00A5AD;      /* Tile Teal */
+  --sunburst: #FFD100;       /* Sunburst Yellow */
+  --slate: #4F758B;          /* Basin Slate */
+
+  /* --- surfaces and text --- */
+  --bg: var(--brand-gray);
   --panel: #ffffff;
-  --ink: #172033;
-  --muted: #66718a;
-  --line: #e2e7f0;
-  --line-strong: #cbd3e2;
-  --accent: #6d5bd0;
-  --accent-soft: #efecfb;
+  --panel-sunk: #FAFAFB;     /* Navy at 3% */
+  --panel-card: #EFF1F4;     /* Navy at 6% — the fact cards */
+  --ink: var(--navy);        /* 14.7:1 on white */
+  --ink-max: var(--black);   /* dense running text only */
+  --muted: #5A6981;          /* Navy at 70%, 5.6:1 */
+  --line: #D5D8DF;           /* Navy at 18% */
+  --line-strong: #959FAE;    /* Navy at 45% */
 
-  /* agent colors (mirrors agent_flowcharts.json, overridden at runtime) */
-  --orchestrator: #6d5bd0;
-  --scanner: #008c7a;
-  --retriever: #d16b22;
-  --extractor: #1473e6;
+  /* --- accent: the Carolina Blue budget --- */
+  --accent: var(--carolina);
+  --accent-ink: var(--carolina-ink);
+  --accent-soft: #E4F1F9;    /* Carolina at 15% on white */
+  --accent-hover: color-mix(in srgb, var(--carolina) 80%, var(--navy));
 
-  --ok: #1a7f52;
-  --ok-soft: #e4f4ec;
-  --warn: #b8860b;
-  --warn-soft: #fbf1d6;
-  --miss: #8a94a6;
-  --miss-soft: #eef1f6;
-  /* Magenta-leaning rather than brick, matching MAP_COLORS.err in app.js so the
-     panels agree: green and pink stay apart under red-green colour blindness. */
-  --err: #d02670;
-  --err-soft: #fce8f0;
+  /* --- agent identity (mirrors agent_flowcharts.json, overridden at runtime) ---
+     Four hues held as far apart as the brand allows. The gate disc runs
+     retrieve -> extract -> open/shut on one shape, so the retriever cannot be
+     pink (err) or amber (warn); Basin Slate is what is left, and it sits clear
+     of --miss because --miss is the light end of the Navy ramp. */
+  --orchestrator: var(--navy);
+  --orchestrator-ink: var(--navy);
+  --scanner: var(--tile-teal);
+  --scanner-ink: #00707A;    /* Tile Teal darkened to 5.8:1 */
+  --retriever: var(--slate);
+  --retriever-ink: var(--slate);   /* 5.0:1 as-is */
+  --extractor: var(--carolina);
+  --extractor-ink: var(--carolina-ink);
+
+  /* --- run status ---
+     Green and yellow come off different branding sheets on purpose: the green
+     and pink are the second sheet's, the yellow stays Sunburst from the first.
+     `--err` is a magenta-leaning pink rather than a brick red so that green and
+     pink stay apart under red-green colour blindness — that is the whole reason
+     the failure colour is not red, and both sheets' pinks hold it (3.4:1 from
+     the ✓ under deuteranopia either way). */
+
+  /* A true green, not Longleaf Pine and not Davie. On the gate row the ungated ↓
+     disc is the orchestrator's Navy and the open ✓ disc sits directly beside it,
+     and Longleaf Pine is dark and blue enough that the two read as one colour at
+     disc size. Davie fixed that but cost two other pairs: it is yellow-green, so
+     under deuteranopia it collapsed toward the pink ✗ (1.6:1), and its ink sat
+     right next to the Sunburst-derived --warn-ink. #3DAE2B clears all three —
+     far from Navy on hue, 3.4:1 from the pink ✗ under deuteranopia, and plainly
+     green against the warn brown.
+     At 2.9:1 on white the brand hex is a shade under the 3:1 a ring needs, so —
+     as with Sunburst below — it is shaded over Black: 90% for anything drawn
+     (rings, 3px rails, the ✓ glyph, which is large text), 65% for anything read
+     at body size. */
+  --ok: #399F29;             /* palette green 90% over Black — 3.4:1 */
+  --ok-ink: #2F7823;         /* palette green 65% over Black — 5.5:1 */
+  --ok-soft: #E8F5E6;        /* palette green at 12% on white */
+  /* Sunburst Yellow shaded 60/40 toward --warn-ink. The pure brand hex is 1.5:1
+     on white: as a 3px rail or a disc ring it disappears, and as the case's
+     in-progress halo it reads as a highlighter mark rather than as activity.
+     The pure hex still gets its two proper uses — the search highlight, and
+     numbers on the navy code surface, where it clears 10:1. */
+  --warn: #C9A200;
+  --warn-ink: #7A5B00;       /* Sunburst darkened to 6.1:1 */
+  --warn-soft: #FFF4CC;
+  --miss: #959FAE;           /* Navy at 45% */
+  --miss-ink: var(--muted);
+  --miss-soft: #EFF1F4;
+  --err: var(--pink);        /* 3.6:1 — rings, rails, the ✗ glyph */
+  --err-ink: #B73584;        /* palette pink 75% over Black — 5.5:1 */
+  --err-soft: #FDE8F5;       /* palette pink at 12% on white */
+
+  /* --- type --- */
+  --font-sans: "Open Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Libre Baskerville", Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   --radius: 10px;
-  --shadow: 0 1px 2px rgba(23, 32, 51, .06), 0 4px 16px rgba(23, 32, 51, .05);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --shadow: 0 1px 2px rgba(19, 41, 75, .07), 0 4px 16px rgba(19, 41, 75, .06);
+  color-scheme: light;
+  font-family: var(--font-sans);
 }
 
 * { box-sizing: border-box; }
@@ -48,27 +152,40 @@ body {
 
 .muted { color: var(--muted); }
 
-/* ---- top bar ---- */
+/* ---- top bar ----
+   Navy field under a Carolina Blue rule: the one place on the page that is
+   unambiguously the university rather than the product, and where most of the
+   design's Carolina Blue is spent. Everything inside it is on navy, so the
+   control colours here are the inverse of the ones the panels use. */
 .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   padding: .6rem 1rem;
-  background: var(--panel);
-  border-bottom: 1px solid var(--line);
+  background: var(--navy);
+  border-bottom: 3px solid var(--carolina);
   box-shadow: var(--shadow);
   z-index: 5;
   flex: none;
+  color: #fff;
 }
 
 .brand { display: flex; align-items: center; gap: .7rem; min-width: 0; }
-.brand h1 { font-size: 1rem; margin: 0; line-height: 1.2; }
-.brand p { margin: 0; font-size: .78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 42vw; }
+.brand h1 {
+  font-family: var(--font-display);
+  font-size: .95rem; margin: 0; line-height: 1.25; letter-spacing: .01em;
+}
+/* On navy the generic .muted (a light-background grey) would sink; this is the
+   Carolina hue lightened until it clears AA against the bar. */
+.brand p {
+  margin: 0; font-size: .78rem; color: #B9C6D6;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 42vw;
+}
 .brand .dot {
   width: 12px; height: 12px; border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 4px var(--accent-soft);
+  background: var(--carolina);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--carolina) 28%, transparent);
   flex: none;
 }
 
@@ -78,33 +195,42 @@ body {
   font: inherit;
   font-size: .85rem;
   padding: .42rem .7rem;
-  border: 1px solid var(--line-strong);
-  background: #fff;
-  color: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--carolina) 45%, transparent);
+  background: color-mix(in srgb, #fff 8%, transparent);
+  color: #fff;
   border-radius: 8px;
   cursor: pointer;
   transition: background .12s, border-color .12s, opacity .12s;
 }
-.ctl:hover:not(:disabled) { background: #f5f6fa; border-color: var(--accent); }
-.ctl:disabled { opacity: .45; cursor: default; }
-.ctl-primary { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
-.ctl-primary:hover:not(:disabled) { background: #5b4bc0; }
+.ctl:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--carolina) 22%, transparent);
+  border-color: var(--carolina);
+}
+.ctl:disabled { opacity: .4; cursor: default; }
+/* Carolina fill with navy text — 4.9:1, and the only filled control in the bar. */
+.ctl-primary { background: var(--carolina); color: var(--navy); border-color: var(--carolina); font-weight: 700; }
+.ctl-primary:hover:not(:disabled) { background: var(--accent-hover); color: #fff; border-color: var(--accent-hover); }
 
 .step-select {
   font: inherit; font-size: .82rem;
   padding: .38rem .5rem;
-  border: 1px solid var(--line-strong);
-  border-radius: 8px; background: #fff; color: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--carolina) 45%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, #fff 8%, transparent); color: #fff;
   max-width: 15rem;
 }
+.step-select option { background: var(--panel); color: var(--ink); }
 .counter { font-variant-numeric: tabular-nums; font-size: .82rem; min-width: 4.5rem; text-align: right; }
+.topbar .muted { color: #B9C6D6; }
 
 .badge {
   font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; font-weight: 700;
   padding: .2rem .5rem; border-radius: 999px;
-  background: var(--accent-soft); color: var(--accent);
+  background: var(--accent-soft); color: var(--navy);
 }
-.badge.live { background: var(--err-soft); color: var(--err); }
+/* The pink hex itself is 3.6:1 behind white — loud but not readable at badge
+   size, so the live badge takes the darkened ink as its fill instead. */
+.badge.live { background: var(--err-ink); color: #fff; }
 
 /* ---- grid ---- */
 .grid {
@@ -135,7 +261,7 @@ body {
 .grid.vars-collapsed .row-split { display: none; }
 
 .vars-head { cursor: pointer; user-select: none; }
-.vars-head:hover h2 { color: var(--accent); }
+.vars-head:hover h2 { color: var(--accent-ink); }
 .vars-head:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .vars-caret {
   margin-left: auto; flex: none;
@@ -178,8 +304,12 @@ body.row-resizing { cursor: row-resize; user-select: none; }
 }
 .panel-head h2 { margin: 0; font-size: .82rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
 /* The map's heading is a product name, so it keeps the case it is written in —
-   the other panels are generic labels and stay in the uppercase house style. */
-.panel-map .panel-head h2 { text-transform: none; letter-spacing: .02em; }
+   and, being a name, it is one of the three places the display serif appears.
+   The other panels are generic labels and stay in the uppercase house style. */
+.panel-map .panel-head h2 {
+  text-transform: none; letter-spacing: .01em;
+  font-family: var(--font-display); font-size: .8rem; color: var(--ink);
+}
 
 .scroll { overflow: auto; }
 
@@ -189,8 +319,8 @@ body.row-resizing { cursor: row-resize; user-select: none; }
   position: absolute; inset: 0;
   border-radius: 0 0 var(--radius) var(--radius);
   background:
-    radial-gradient(circle at 1px 1px, #e7ecf6 1px, transparent 0) 0 0 / 22px 22px,
-    #fcfdff;
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--navy) 12%, #fff) 1px, transparent 0) 0 0 / 22px 22px,
+    var(--panel);
 }
 
 /* Replay / scrub the current step's own span (see playStep in app.js). */
@@ -199,7 +329,7 @@ body.row-resizing { cursor: row-resize; user-select: none; }
   font: inherit; font-size: .8rem; line-height: 1;
   width: 1.6rem; height: 1.6rem; padding: 0;
   border: 1px solid var(--line-strong); border-radius: 999px;
-  background: #fff; color: var(--accent); cursor: pointer;
+  background: var(--panel); color: var(--accent-ink); cursor: pointer;
   transition: background .12s, border-color .12s;
 }
 .map-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
@@ -209,10 +339,10 @@ body.row-resizing { cursor: row-resize; user-select: none; }
 .map-tip {
   position: absolute; z-index: 6; pointer-events: none;
   max-width: 15rem; padding: .2rem .45rem;
-  background: #172033; color: #fff; border-radius: 5px;
+  background: var(--navy); color: #fff; border-radius: 5px;
   font-size: .7rem; font-weight: 600; white-space: nowrap;
   overflow: hidden; text-overflow: ellipsis;
-  box-shadow: 0 2px 8px rgba(23, 32, 51, .25);
+  box-shadow: 0 2px 8px rgba(19, 41, 75, .28);
 }
 .map-tip[hidden] { display: none; }
 
@@ -222,7 +352,7 @@ body.row-resizing { cursor: row-resize; user-select: none; }
   display: flex; flex-direction: column; gap: .35rem;
   padding-bottom: .7rem; margin-bottom: .7rem; border-bottom: 1px dashed var(--line);
 }
-.detail-title { font-size: 1.05rem; font-weight: 700; margin: 0; }
+.detail-title { font-family: var(--font-display); font-size: .98rem; font-weight: 700; margin: 0; line-height: 1.3; }
 .detail-meta { display: flex; gap: .4rem; flex-wrap: wrap; align-items: center; }
 
 .chip {
@@ -230,10 +360,12 @@ body.row-resizing { cursor: row-resize; user-select: none; }
   background: var(--miss-soft); color: var(--muted); font-weight: 600;
   border: 1px solid var(--line);
 }
-.chip.agent-orchestrator { background: color-mix(in srgb, var(--orchestrator) 12%, #fff); color: var(--orchestrator); border-color: color-mix(in srgb, var(--orchestrator) 30%, #fff); }
-.chip.agent-scanner { background: color-mix(in srgb, var(--scanner) 12%, #fff); color: var(--scanner); border-color: color-mix(in srgb, var(--scanner) 30%, #fff); }
-.chip.agent-retriever { background: color-mix(in srgb, var(--retriever) 12%, #fff); color: var(--retriever); border-color: color-mix(in srgb, var(--retriever) 30%, #fff); }
-.chip.agent-extractor { background: color-mix(in srgb, var(--extractor) 12%, #fff); color: var(--extractor); border-color: color-mix(in srgb, var(--extractor) 30%, #fff); }
+/* Fill takes the agent's brand hue, text takes its `-ink` sibling: Tile Teal and
+   Carolina Blue are both under 4.5:1 as text on a pale tint of themselves. */
+.chip.agent-orchestrator { background: color-mix(in srgb, var(--orchestrator) 12%, #fff); color: var(--orchestrator-ink); border-color: color-mix(in srgb, var(--orchestrator) 30%, #fff); }
+.chip.agent-scanner { background: color-mix(in srgb, var(--scanner) 12%, #fff); color: var(--scanner-ink); border-color: color-mix(in srgb, var(--scanner) 30%, #fff); }
+.chip.agent-retriever { background: color-mix(in srgb, var(--retriever) 12%, #fff); color: var(--retriever-ink); border-color: color-mix(in srgb, var(--retriever) 30%, #fff); }
+.chip.agent-extractor { background: color-mix(in srgb, var(--extractor) 12%, #fff); color: var(--extractor-ink); border-color: color-mix(in srgb, var(--extractor) 30%, #fff); }
 
 /* ---- panel 2: section headers ----
    A component header must read as a *separator*, not as one more pill in a row
@@ -255,8 +387,10 @@ body.row-resizing { cursor: row-resize; user-select: none; }
   color: var(--ink);
 }
 .node-head-id {
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  font-size: .66rem; color: var(--miss); white-space: nowrap;
+  font-family: var(--font-mono);
+  /* The ink, not the light --miss ring colour: this is 10px mono and has to
+     clear AA on the panel. */
+  font-size: .66rem; color: var(--miss-ink); white-space: nowrap;
   overflow: hidden; text-overflow: ellipsis;
 }
 .node-head .status-pill { margin-left: auto; flex: none; }
@@ -286,7 +420,7 @@ details.node-detail > summary.node-head::after {
 details.node-detail[open] > summary.node-head::after { transform: rotate(90deg); }
 /* Without a pill to push it, the caret still belongs at the far right. */
 details.node-detail > summary.node-head:not(:has(.status-pill))::after { margin-left: auto; }
-details.node-detail > summary.node-head:hover .node-head-title { color: var(--accent); }
+details.node-detail > summary.node-head:hover .node-head-title { color: var(--accent-ink); }
 
 /* ---- panel 2: structural nodes, one quiet row in the step timeline ----
    Same 3px left gutter as .node-head so the rows and the section headers stack
@@ -300,12 +434,12 @@ details.node-detail > summary.node-head:hover .node-head-title { color: var(--ac
 .minor-glyph { width: .8rem; flex: none; text-align: center; }
 .minor-name { font-weight: 600; }
 .minor-id {
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  font-size: .64rem; color: var(--miss);
+  font-family: var(--font-mono);
+  font-size: .64rem; color: var(--miss-ink);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.minor-row.st-active { border-left-color: var(--warn); color: var(--warn); }
-.minor-row.st-error { border-left-color: var(--err); color: var(--err); font-weight: 700; }
+.minor-row.st-active { border-left-color: var(--warn); color: var(--warn-ink); }
+.minor-row.st-error { border-left-color: var(--err); color: var(--err-ink); font-weight: 700; }
 
 /* ---- panel 2: one container per variable group in an extraction pass ---- */
 .node-detail.group {
@@ -323,15 +457,15 @@ details.node-detail > summary.node-head:hover .node-head-title { color: var(--ac
 }
 .node-detail.variable.status-active { border-style: dashed; }
 .node-detail.variable.status-invalid { border-color: color-mix(in srgb, var(--err) 45%, #fff); }
-.status-pill.status-invalid { background: var(--err-soft); color: var(--err); }
+.status-pill.status-invalid { background: var(--err-soft); color: var(--err-ink); }
 
 .attempt { border-left: 3px solid var(--miss); padding: .2rem .5rem; margin: .35rem 0; }
 .attempt.ok { border-left-color: var(--ok); }
 .attempt.bad { border-left-color: var(--err); }
 .attempt-head { display: flex; align-items: center; gap: .4rem; font-size: .78rem; }
 .attempt-head .attempt-verdict { margin-left: auto; font-size: .72rem; font-weight: 700; }
-.attempt.ok .attempt-verdict { color: var(--ok); }
-.attempt.bad .attempt-verdict { color: var(--err); }
+.attempt.ok .attempt-verdict { color: var(--ok-ink); }
+.attempt.bad .attempt-verdict { color: var(--err-ink); }
 ul.val-errors { margin: .2rem 0 0; padding-left: 1.1rem; }
 
 /* One card per parallel fan-out instance (e.g. each characterized note). */
@@ -343,8 +477,11 @@ ul.val-errors { margin: .2rem 0 0; padding-left: 1.1rem; }
 /* A note still being characterized (live): its filled slots sit next to
    still-pending ones, so the card fills in place as results stream back. */
 .node-detail.instance.status-active { border-style: dashed; }
+/* A slot not filled in yet sits a step *below* a filled card rather than beside
+   it: --miss-soft is the same grey the card now uses, so the pending state would
+   have lost the one signal it had. Flatter and paler reads as emptier. */
 .headline-fact.pending {
-  background: var(--miss-soft); border-color: var(--line);
+  background: var(--panel-sunk); border-color: var(--line);
   display: flex; align-items: center; justify-content: space-between;
 }
 .headline-fact.pending b { color: var(--muted); font-weight: 600; }
@@ -357,23 +494,27 @@ ul.val-errors { margin: .2rem 0 0; padding-left: 1.1rem; }
 /* Scoped to the pill: cards also carry a status-* class (for their border), and
    an unscoped `color` here would be inherited by everything inside them. */
 .status-pill { font-size: .7rem; padding: .16rem .5rem; border-radius: 999px; font-weight: 700; }
-.status-pill.status-active { background: var(--warn-soft); color: var(--warn); }
-.status-pill.status-done { background: var(--ok-soft); color: var(--ok); }
-.status-pill.status-error { background: var(--err-soft); color: var(--err); }
-.status-pill.status-idle { background: var(--miss-soft); color: var(--muted); }
+.status-pill.status-active { background: var(--warn-soft); color: var(--warn-ink); }
+.status-pill.status-done { background: var(--ok-soft); color: var(--ok-ink); }
+.status-pill.status-error { background: var(--err-soft); color: var(--err-ink); }
+.status-pill.status-idle { background: var(--miss-soft); color: var(--miss-ink); }
 
+/* What the step concluded, as a light grey card set into the white panel. Grey
+   rather than a pale Carolina: these are the largest blocks in panel 2 and they
+   hold coloured content of their own — status words, gate chips, kept/dropped
+   counts — which a tinted ground was competing with. */
 .headline-fact {
-  background: var(--accent-soft);
-  border: 1px solid color-mix(in srgb, var(--accent) 20%, #fff);
+  background: var(--panel-card);
+  border: 1px solid var(--line);
   border-radius: 8px; padding: .55rem .7rem; margin: .2rem 0 .6rem;
   font-size: .85rem;
 }
 .headline-fact ul { margin: .3rem 0 0; padding-left: 1.1rem; }
 .headline-fact li { margin: .15rem 0; }
-.kept { color: var(--ok); font-weight: 600; }
-.dropped { color: var(--miss); }
+.kept { color: var(--ok-ink); font-weight: 600; }
+.dropped { color: var(--miss-ink); }
 
-details.block { border: 1px solid var(--line); border-radius: 8px; margin: .5rem 0; background: #fbfcfe; }
+details.block { border: 1px solid var(--line); border-radius: 8px; margin: .5rem 0; background: var(--panel-sunk); }
 details.block > summary {
   cursor: pointer; padding: .5rem .65rem; font-weight: 600; font-size: .8rem;
   list-style: none; display: flex; align-items: center; gap: .5rem;
@@ -382,6 +523,10 @@ details.block > summary::-webkit-details-marker { display: none; }
 details.block > summary::before { content: "▸"; color: var(--muted); transition: transform .12s; }
 details.block[open] > summary::before { transform: rotate(90deg); }
 details.block .block-body { padding: 0 .65rem .6rem; }
+/* Same page glyph the corpus marker on the map carries, in the same agent's
+   hue — a note is marked the same way in both panels. The ink rather than the
+   raw Tile Teal: fine rules at text size need the weight. */
+.note-glyph { color: var(--scanner-ink); font-size: 1.05em; line-height: 1; }
 .summary-tag { margin-left: auto; font-size: .68rem; color: var(--muted); font-weight: 500; }
 
 .llm-call { border: 1px solid var(--line); border-radius: 8px; margin: .45rem 0; overflow: hidden; }
@@ -392,7 +537,7 @@ details.block .block-body { padding: 0 .65rem .6rem; }
   border-bottom: 1px solid var(--line); font-size: .78rem; color: var(--ink);
 }
 .llm-call[open] .llm-head { border-bottom-color: var(--line-strong); }
-.call-icon { width: 15px; height: 15px; flex: none; color: var(--accent); }
+.call-icon { width: 15px; height: 15px; flex: none; color: var(--accent-ink); }
 .llm-call .tok { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--muted); }
 
 /* Message bubbles, colored by who is speaking: the prompt scaffolding (system)
@@ -401,39 +546,50 @@ details.block .block-body { padding: 0 .65rem .6rem; }
 .msg {
   padding: .35rem .55rem; margin: .45rem .5rem;
   border-left: 3px solid var(--line-strong); border-radius: 0 6px 6px 0;
-  background: #fbfcfe;
+  background: var(--panel-sunk);
 }
 .msg .role { font-size: .66rem; text-transform: uppercase; letter-spacing: .05em; font-weight: 700; color: var(--muted); }
 .msg.role-system { border-left-color: var(--miss); background: var(--miss-soft); }
 .msg.role-human, .msg.role-user { border-left-color: var(--orchestrator); background: color-mix(in srgb, var(--orchestrator) 6%, #fff); }
-.msg.role-human .role, .msg.role-user .role { color: var(--orchestrator); }
+.msg.role-human .role, .msg.role-user .role { color: var(--orchestrator-ink); }
 .msg.role-ai, .msg.role-assistant, .msg.role-response {
   border-left-color: var(--ok); background: color-mix(in srgb, var(--ok) 6%, #fff);
 }
-.msg.role-ai .role, .msg.role-assistant .role, .msg.role-response .role { color: var(--ok); }
+.msg.role-ai .role, .msg.role-assistant .role, .msg.role-response .role { color: var(--ok-ink); }
 .msg.role-tool { border-left-color: var(--retriever); background: color-mix(in srgb, var(--retriever) 6%, #fff); }
-.msg.role-tool .role { color: var(--retriever); }
+.msg.role-tool .role { color: var(--retriever-ink); }
 .msg.role-reasoning { border-left-color: var(--warn); background: var(--warn-soft); }
-.msg.role-reasoning .role { color: var(--warn); }
+.msg.role-reasoning .role { color: var(--warn-ink); }
 .msg.role-error { border-left-color: var(--err); background: var(--err-soft); }
-.msg.role-error .role { color: var(--err); }
+.msg.role-error .role { color: var(--err-ink); }
 
+/* The one dark surface in the app. It carries raw error text only — every
+   syntax-highlighted block below is `.plain`, i.e. on the pale message bubble
+   rather than on this. */
 pre.code {
   margin: .3rem 0 0; padding: .5rem .6rem;
-  background: #0f1729; color: #e6ecf7;
+  background: var(--navy); color: #E8EEF5;
   border-radius: 6px; font-size: .74rem; line-height: 1.45;
   overflow: auto; max-height: 22rem;
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   white-space: pre-wrap; word-break: break-word;
 }
 pre.code.plain { background: transparent; color: var(--ink); border: none; padding: .25rem 0 0; }
 /* The compact serializer already keeps lines short, so wrapping is rare; a
    shorter max-height keeps a prettified prompt from taking over the panel. */
 pre.code.json { max-height: 15rem; line-height: 1.4; word-break: normal; overflow-wrap: anywhere; }
-.j-key { color: #7a3fb8; font-weight: 600; }
-.j-str { color: #1a6b4a; }
-.j-num { color: #b05a00; }
-.j-lit { color: #2b6cb0; font-weight: 600; }
+/* Four brand hues, held to AA against the *bubble* rather than against white —
+   the message background is #EFF1F4, which costs about half a point of ratio, so
+   the two that only just cleared on white are shaded 15% toward Navy to buy it
+   back. Contrasts below are measured on the bubble. */
+.j-key { color: #03729F; font-weight: 600; }  /* Carolina digital-link, 15% toward Navy — 4.7:1 */
+/* Now the same green as --ok. It was Longleaf Pine while --ok was the olive
+   Davie shade, because olive beside the brown --j-num was a poor pair for the
+   string/number split that shows up on every line of JSON; a true green beside
+   brown is not, so the design is down to one green. */
+.j-str { color: var(--ok-ink); }              /* 4.9:1 on the bubble */
+.j-num { color: var(--warn-ink); }            /* Sunburst shade — 5.6:1 */
+.j-lit { color: #466981; font-weight: 600; }  /* Basin Slate, 15% toward Navy — 5.2:1 */
 
 .empty { color: var(--muted); font-style: italic; padding: 1.5rem .5rem; text-align: center; }
 
@@ -451,8 +607,8 @@ pre.code.json { max-height: 15rem; line-height: 1.4; word-break: normal; overflo
 }
 .vargroup-head .gcount { margin-left: auto; font-weight: 500; color: var(--muted); font-size: .72rem; }
 .stage-badge { font-size: .62rem; text-transform: uppercase; letter-spacing: .04em; padding: .12rem .4rem; border-radius: 999px; font-weight: 700; }
-.stage-done { background: var(--ok-soft); color: var(--ok); }
-.stage-active, .stage-running { background: var(--warn-soft); color: var(--warn); }
+.stage-done { background: var(--ok-soft); color: var(--ok-ink); }
+.stage-active, .stage-running { background: var(--warn-soft); color: var(--warn-ink); }
 .stage-pending, .stage-idle, .stage-planned { background: var(--miss-soft); color: var(--muted); }
 .stage-blocked, .stage-skipped { background: var(--miss-soft); color: var(--muted); }
 
@@ -462,13 +618,13 @@ table.vartable tr:last-child td { border-bottom: none; }
 .vt-name { font-weight: 600; }
 .vt-value { font-variant-numeric: tabular-nums; }
 .vt-status { text-align: right; white-space: nowrap; }
-.st-extracted { color: var(--ok); font-weight: 600; }
-.st-not_found, .st-not-found { color: var(--miss); }
+.st-extracted { color: var(--ok-ink); font-weight: 600; }
+.st-not_found, .st-not-found { color: var(--miss-ink); }
 .st-blocked, .st-skipped { color: var(--muted); }
-.st-error, .st-invalid { color: var(--err); font-weight: 600; }
-.st-pending, .st-running, .st-active { color: var(--warn); }
+.st-error, .st-invalid { color: var(--err-ink); font-weight: 600; }
+.st-pending, .st-running, .st-active { color: var(--warn-ink); }
 .conf { font-size: .68rem; color: var(--muted); }
-.flag { color: var(--err); font-weight: 700; }
+.flag { color: var(--err-ink); font-weight: 700; }
 
 /* ---- panel 2: Phase-4 component views ---- */
 .headline-fact > b { display: block; margin-bottom: .35rem; }
@@ -477,19 +633,19 @@ table.vartable tr:last-child td { border-bottom: none; }
 .chips { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .3rem; }
 .tag-chip {
   font-size: .68rem; padding: .12rem .45rem; border-radius: 999px;
-  background: #fff; border: 1px solid var(--line-strong); color: var(--muted); font-weight: 600;
+  background: var(--panel); border: 1px solid var(--line-strong); color: var(--muted); font-weight: 600;
 }
-.tag-chip.warn { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+.tag-chip.warn { background: var(--warn-soft); color: var(--warn-ink); border-color: transparent; }
 
 .concept-chip {
   font-size: .7rem; padding: .14rem .5rem; border-radius: 999px; font-weight: 600;
   border: 1px solid var(--line);
 }
-.concept-chip.present { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
-.concept-chip.absent { background: var(--miss-soft); color: var(--miss); }
+.concept-chip.present { background: var(--ok-soft); color: var(--ok-ink); border-color: transparent; }
+.concept-chip.absent { background: var(--miss-soft); color: var(--miss-ink); }
 
 .mention-card {
-  background: #fff; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
   padding: .45rem .55rem; margin-top: .4rem;
 }
 
@@ -516,36 +672,36 @@ table.vartable tr:last-child td { border-bottom: none; }
   font-variant-numeric: tabular-nums; font-weight: 700; font-size: .66rem;
   padding: 0 .34rem; border-radius: 999px; background: var(--line); color: var(--muted);
 }
-.plan-row.ungated .plan-count { background: var(--accent-soft); color: var(--orchestrator); }
-.plan-row.open .plan-count { background: var(--ok-soft); color: var(--ok); }
-.plan-row.shut .plan-count { background: var(--err-soft); color: var(--err); }
+.plan-row.ungated .plan-count { background: var(--accent-soft); color: var(--orchestrator-ink); }
+.plan-row.open .plan-count { background: var(--ok-soft); color: var(--ok-ink); }
+.plan-row.shut .plan-count { background: var(--err-soft); color: var(--err-ink); }
 
 .gate-chip {
   font-size: .7rem; padding: .14rem .5rem; border-radius: 999px; font-weight: 600; border: 1px solid transparent;
 }
-.gate-chip.ungated { background: var(--accent-soft); color: var(--orchestrator); }
-.gate-chip.open { background: var(--ok-soft); color: var(--ok); }
-.gate-chip.shut { background: var(--err-soft); color: var(--err); }
+.gate-chip.ungated { background: var(--accent-soft); color: var(--orchestrator-ink); }
+.gate-chip.open { background: var(--ok-soft); color: var(--ok-ink); }
+.gate-chip.shut { background: var(--err-soft); color: var(--err-ink); }
 
 .note-chip { font-size: .72rem; padding: .14rem .5rem; border-radius: 999px; font-weight: 600; }
-.note-chip.kept { background: var(--ok-soft); color: var(--ok); }
-.note-chip.dropped { background: var(--miss-soft); color: var(--miss); }
+.note-chip.kept { background: var(--ok-soft); color: var(--ok-ink); }
+.note-chip.dropped { background: var(--miss-soft); color: var(--miss-ink); }
 
 .extraction {
-  background: #fff; border: 1px solid var(--line); border-left: 3px solid var(--ok);
+  background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--ok);
   border-radius: 8px; padding: .45rem .55rem; margin-top: .45rem;
 }
 .extraction.invalid { border-left-color: var(--err); }
 .extraction-head { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
-.ext-ok { font-weight: 700; color: var(--ok); }
-.extraction.invalid .ext-ok { color: var(--err); }
+.ext-ok { font-weight: 700; color: var(--ok-ink); }
+.extraction.invalid .ext-ok { color: var(--err-ink); }
 .ext-val { font-size: .82rem; }
 .expl { font-size: .8rem; color: var(--ink); margin: .3rem 0; line-height: 1.4; }
-.val-errors { font-size: .74rem; color: var(--err); margin: .25rem 0; }
+.val-errors { font-size: .74rem; color: var(--err-ink); margin: .25rem 0; }
 
 .repair-badge { font-size: .64rem; padding: .1rem .45rem; border-radius: 999px; font-weight: 700; margin-left: auto; }
-.repair-badge.repaired { background: var(--warn-soft); color: var(--warn); }
-.repair-badge.failed { background: var(--err-soft); color: var(--err); }
+.repair-badge.repaired { background: var(--warn-soft); color: var(--warn-ink); }
+.repair-badge.failed { background: var(--err-soft); color: var(--err-ink); }
 
 .evidence { margin-top: .4rem; }
 .evidence-label { font-size: .66rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 700; }
@@ -555,8 +711,10 @@ details.block.evidence-note { margin: .35rem 0 0; }
 .note-text {
   font-size: .76rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
   max-height: 18rem; overflow: auto; padding: .5rem .6rem;
-  background: #f5f7fb; border: 1px solid var(--line); border-radius: 6px;
+  color: var(--ink-max);
+  background: var(--panel-sunk); border: 1px solid var(--line); border-radius: 6px;
 }
 .note-text mark {
-  background: #ffe58a; color: #4a3800; padding: 0 .1rem; border-radius: 2px; font-weight: 600;
+  background: color-mix(in srgb, var(--sunburst) 45%, #fff);
+  color: var(--ink-max); padding: 0 .1rem; border-radius: 2px; font-weight: 600;
 }

@@ -8,18 +8,18 @@
     "entry_node": "case_start",
     "exit_node": "case_end",
     "agent_colors": {
-      "orchestrator": "#6d5bd0",
-      "scanner": "#008c7a",
-      "retriever": "#d16b22",
-      "extractor": "#1473e6"
+      "orchestrator": "#13294B",
+      "scanner": "#00A5AD",
+      "retriever": "#4F758B",
+      "extractor": "#4B9CD3"
     },
     "kind_colors": {
-      "endpoint": "#263248",
-      "deterministic": "#eef2f7",
-      "llm": "#fff1c7",
-      "decision": "#ffffff",
-      "fanout": "#e8e4ff",
-      "convergence": "#e8e4ff"
+      "endpoint": "#13294B",
+      "deterministic": "#F1F3F6",
+      "llm": "#FFF4CC",
+      "decision": "#FFFFFF",
+      "fanout": "#E4F1F9",
+      "convergence": "#E4F1F9"
     },
     "multiplicity": {
       "once": "Runs once at that point in the case flow",
@@ -931,10 +931,10 @@
       "selector": "node",
       "style": {
         "label": "data(label)",
-        "background-color": "#eef2f7",
+        "background-color": "#F1F3F6",
         "border-width": 3,
-        "border-color": "#6d5bd0",
-        "color": "#172033",
+        "border-color": "#13294B",
+        "color": "#13294B",
         "font-size": 13,
         "text-wrap": "wrap",
         "text-max-width": 150,
@@ -950,8 +950,8 @@
       "style": {
         "label": "data(label)",
         "width": 2.5,
-        "line-color": "#6d5bd0",
-        "target-arrow-color": "#6d5bd0",
+        "line-color": "#13294B",
+        "target-arrow-color": "#13294B",
         "target-arrow-shape": "triangle",
         "curve-style": "bezier",
         "font-size": 10,
@@ -964,7 +964,7 @@
     {
       "selector": "node[kind = \"endpoint\"]",
       "style": {
-        "background-color": "#263248",
+        "background-color": "#13294B",
         "color": "#ffffff",
         "shape": "ellipse"
       }
@@ -972,13 +972,13 @@
     {
       "selector": "node[kind = \"llm\"]",
       "style": {
-        "background-color": "#fff1c7"
+        "background-color": "#FFF4CC"
       }
     },
     {
       "selector": "node[kind = \"decision\"]",
       "style": {
-        "background-color": "#ffffff",
+        "background-color": "#FFFFFF",
         "shape": "diamond",
         "width": 145,
         "height": 80
@@ -987,7 +987,7 @@
     {
       "selector": "node[kind = \"fanout\"], node[kind = \"convergence\"]",
       "style": {
-        "background-color": "#e8e4ff",
+        "background-color": "#E4F1F9",
         "shape": "hexagon"
       }
     },
@@ -1007,53 +1007,53 @@
     {
       "selector": "node[agent = \"orchestrator\"]",
       "style": {
-        "border-color": "#6d5bd0"
+        "border-color": "#13294B"
       }
     },
     {
       "selector": "edge[agent = \"orchestrator\"]",
       "style": {
-        "line-color": "#6d5bd0",
-        "target-arrow-color": "#6d5bd0"
+        "line-color": "#13294B",
+        "target-arrow-color": "#13294B"
       }
     },
     {
       "selector": "node[agent = \"scanner\"]",
       "style": {
-        "border-color": "#008c7a"
+        "border-color": "#00A5AD"
       }
     },
     {
       "selector": "edge[agent = \"scanner\"]",
       "style": {
-        "line-color": "#008c7a",
-        "target-arrow-color": "#008c7a"
+        "line-color": "#00A5AD",
+        "target-arrow-color": "#00A5AD"
       }
     },
     {
       "selector": "node[agent = \"retriever\"]",
       "style": {
-        "border-color": "#d16b22"
+        "border-color": "#4F758B"
       }
     },
     {
       "selector": "edge[agent = \"retriever\"]",
       "style": {
-        "line-color": "#d16b22",
-        "target-arrow-color": "#d16b22"
+        "line-color": "#4F758B",
+        "target-arrow-color": "#4F758B"
       }
     },
     {
       "selector": "node[agent = \"extractor\"]",
       "style": {
-        "border-color": "#1473e6"
+        "border-color": "#4B9CD3"
       }
     },
     {
       "selector": "edge[agent = \"extractor\"]",
       "style": {
-        "line-color": "#1473e6",
-        "target-arrow-color": "#1473e6"
+        "line-color": "#4B9CD3",
+        "target-arrow-color": "#4B9CD3"
       }
     }
   ],
