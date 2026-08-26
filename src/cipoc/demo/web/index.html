@@ -30,9 +30,9 @@
 
   <main class="grid">
     <!-- Panel 1: workflow map -->
-    <section class="panel panel-map" aria-label="Workflow map">
+    <section class="panel panel-map" aria-label="RapCID-E Agentic Orchestration">
       <div class="panel-head">
-        <h2>Workflow map</h2>
+        <h2>RapCID-E Agentic Orchestration</h2>
         <div class="map-ctl">
           <button id="btn-replay-step" class="map-btn" title="Replay this step on the map">▸</button>
           <input id="map-scrub" class="map-scrub" type="range" min="0" max="1000" value="1000"
@@ -55,14 +55,19 @@
     </section>
 
     <!-- Panel 3: variable overview -->
+    <!-- Collapsed to its header by default and pulled up from the bottom edge
+         when wanted: the map is the thing being presented, and the variables
+         are a reference the presenter opens to answer a question. -->
     <section class="panel panel-vars" aria-label="Variable overview">
       <!-- Sits in the grid gap above this panel: drag the map/variables
            boundary, double-click to reset (see wireSplitter in app.js). -->
       <div id="row-split" class="row-split" role="separator" aria-orientation="horizontal"
            title="Drag to resize · double-click to reset"></div>
-      <div class="panel-head">
+      <div id="vars-toggle" class="panel-head vars-head" role="button" tabindex="0"
+           aria-expanded="false" aria-controls="vars" title="Show variables (V)">
         <h2>Variables</h2>
         <div id="vars-summary" class="vars-summary muted"></div>
+        <span class="vars-caret" aria-hidden="true">⌃</span>
       </div>
       <div id="vars" class="vars scroll"></div>
     </section>

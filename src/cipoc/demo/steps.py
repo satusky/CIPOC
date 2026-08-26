@@ -19,8 +19,10 @@ fan-out node share one step (see :data:`FANOUT_COLLAPSE_NODES`), and a pair of
 root tasks describing a single decision shares one step (``check_state`` then
 ``plan_extraction``).
 
-The leading ``run_start`` and any state that arrives before the first root task
-form an intro step so the whole stream is covered with no gaps.
+The leading ``run_start`` and any state arriving before the first root task have
+nothing to show on their own, so they open the *first* step rather than an intro
+step of their own — the presenter starts on "Initialize case" with the whole
+stream still covered and no gaps.
 """
 
 from __future__ import annotations
@@ -84,9 +86,16 @@ _NAME_INSTANCES_IN_SUBTITLE = frozenset({"extract_branch"})
 # rather than starting a new one. ``check_state`` decides whether groups remain
 # and ``plan_extraction`` says which; ``scan_notes`` is the fan-out that hands
 # every note to the ``note_branch`` instances that characterize them.
+#
+# The last ``check_state`` of a run has no plan after it — it is the one that
+# finds nothing left to do — so it would otherwise stand as a step identical to
+# the check before it. It belongs to the finalization it triggers. This pair can
+# only match a *lone* check: once a check has merged with its plan the open
+# step's node is ``plan_extraction``, so a normal round never falls in here.
 _MERGE_WITH_PREVIOUS: dict[tuple[str, str], str] = {
     ("check_state", "plan_extraction"): "Check state & plan extraction",
     ("scan_notes", "note_branch"): "Scan & characterize notes",
+    ("check_state", "finalize_case"): "Finalize case",
 }
 
 
@@ -174,14 +183,11 @@ def build_steps(events: Iterable[DemoEvent]) -> list[Step]:
     counters: dict[str, int] = {}
 
     # Leading events before the first root task (run_start, the initial corpus
-    # values) form an intro step — but only if any actually precede it, so a stream
-    # that opens on a root task gets no empty intro.
-    first_root = next(
-        (i for i, event in enumerate(events) if _is_root_task_start(event)), len(events)
-    )
-    pending: _Pending | None = (
-        _Pending("Run start", "", "", None, None, events[0].seq) if first_root > 0 else None
-    )
+    # values) show nothing on their own, so they are folded into the first real
+    # step instead of standing as a "Run start" the presenter has to click past.
+    # The stream still tiles: the first step simply begins at seq 0.
+    pending: _Pending | None = None
+    stream_start: int | None = events[0].seq
     prev_seq = events[0].seq
 
     def close(end_seq: int) -> None:
@@ -257,17 +263,26 @@ def build_steps(events: Iterable[DemoEvent]) -> list[Step]:
                     title = f"{title} {counters[node]}"
                 subtitle = _subtitle(node, event.payload)
                 fanout = False
+            # The first step swallows whatever preceded it, so the stream stays
+            # fully tiled without an intro step that shows nothing.
+            start_seq = event.seq if stream_start is None else stream_start
+            stream_start = None
             pending = _Pending(
                 title=title,
                 subtitle=subtitle,
                 node=node,
                 map_node_id=event.map_node_id or map_node_id(node, event.namespace),
                 agent=event.agent,
-                start_seq=event.seq,
+                start_seq=start_seq,
                 fanout=fanout,
                 task_id=event.task_id,
             )
         prev_seq = event.seq
+
+    # A stream with no root task at all (a crash before the first node) still
+    # needs one step, or the presenter has nothing to sit on.
+    if pending is None and not steps:
+        pending = _Pending("Run start", "", "", None, None, events[0].seq)
 
     close(prev_seq)
     return steps

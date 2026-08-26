@@ -200,32 +200,173 @@ class WebAssetTests(unittest.TestCase):
             self.assertNotIn("legend", (WEB_DIR / name).read_text(),
                              f"{name} still references the legend")
 
-    def test_the_case_is_the_centre_with_plan_and_update_poles(self):
-        """The extraction loop is two poles inside the case, not one slab.
+    def test_the_case_is_one_box_that_names_its_own_phase(self):
+        """The case is a plain box, not a container of Plan/Update slabs.
 
-        Dispatch leaves Plan and results return to Update, so the two directions
-        are separated by the drawing itself rather than by an endpoint nudge —
-        and no edge has to loop back around the band to close the cycle.
+        Everything that happens *to* the case — initializing, planning against
+        it, updating it, finalizing it — is the same box, told apart by a label
+        that is big enough to read because nothing else is in there. The label
+        also takes the colour of whatever is flowing, so it agrees with the lit
+        lines rather than merely sitting between them.
         """
         app_js = (WEB_DIR / "app.js").read_text()
-        for symbol in ("const CASE_ID", "const POLES", "CASE_REST",
-                       "CASE_PHASE_NODES", "function casePhase",
-                       "function passStartBefore", "function anyGroupActive"):
+        for symbol in ("const CASE_ID", "CASE_REST", "CASE_PHASE_NODES",
+                       "function casePhase", "function passStartBefore",
+                       "function anyGroupActive"):
             self.assertIn(symbol, app_js, f"app.js missing {symbol}")
-        # Each half of the loop is its own pole...
+        # Four blocks land on the one box...
         table = app_js.split("const BLOCK_TO_MAP = {")[1].split("};")[0]
-        self.assertIn('eligible_groups_gate: "pole:plan"', table)
-        self.assertIn('update_case: "pole:update"', table)
-        # ...so the merged hub, the separate update slab, and the edge that had
-        # to loop back to it are all gone.
-        for dead in ("stage:hub", "stage:update", '"loop"'):
+        for block in ("initialize_case", "eligible_groups_gate", "update_case",
+                      "finalize_case"):
+            self.assertIn(f"{block}: CASE_ID", table, f"{block} should map to the case")
+        # ...so the poles, the merged hub and the separate Initialize/Finalize
+        # slabs are all gone, along with the edge that had to loop back.
+        for dead in ("stage:hub", "stage:update", "stage:initialize",
+                     "stage:finalize", "pole:", '"loop"'):
             self.assertNotIn(dead, app_js, f"{dead} should be gone")
-        # Results leave the variable, are gathered by the group's gate, and the
-        # group reports to the Update pole — one arc per group, not one per
-        # variable, which would be the old bottom fan-in upside down.
-        self.assertIn('link(id, gate, "fan to-extractor var-out"', app_js)
-        self.assertIn('link(gate, "pole:update", "fan to-extractor grp-out"', app_js)
-        self.assertIn('link("pole:plan", gate, "fan to-retriever gate-in"', app_js)
+        # Each group has exactly two lines: dispatched from the case, reported
+        # back to it. The gate's own variables carry their state in place.
+        self.assertIn('link(CASE_ID, gate, "fan gate-in"', app_js)
+        self.assertIn('link(gate, CASE_ID, "fan to-extractor grp-out"', app_js)
+        self.assertIn("tone-retr", app_js)   # the label agrees with the lines
+        self.assertIn("tone-extr", app_js)
+
+    def test_the_front_of_the_pipeline_is_one_container(self):
+        """Notes and corpus characterization are a single box of discs.
+
+        The notes were a container and characterization a slab beside it, joined
+        by an arrow that only ever said "and then" — and the notes are what the
+        characterization is *made of*, so they live inside it. Nothing is wired
+        per note; the discs fill in place.
+        """
+        app_js = (WEB_DIR / "app.js").read_text()
+        self.assertIn("const CORPUS_ID", app_js)
+        self.assertIn('add({ id: CORPUS_ID, label: "Scan & characterize notes"', app_js)
+        self.assertIn("parent: CORPUS_ID", app_js)     # the discs live inside it
+        self.assertIn('link(CORPUS_ID, CASE_ID, "spine")', app_js)
+        # Both blocks resolve to the one box, so it lights across the pair.
+        table = app_js.split("const BLOCK_TO_MAP = {")[1].split("};")[0]
+        self.assertIn("characterize_corpus: CORPUS_ID", table)
+        self.assertIn("scanner_agent_block: CORPUS_ID", table)
+        # The separate notes box, the arrow between them, and every per-note and
+        # per-variable line are gone — as is the slab, which nothing is now.
+        for dead in ("NOTES_ID", "scan-out", "note-in", "note-out",
+                     "var-in", "var-out", "node.slab"):
+            self.assertNotIn(dead, app_js, f"{dead} should be gone")
+
+    def test_map_edges_belong_to_the_phase_that_owns_them(self):
+        """Lines are scoped to their step, not accumulated across the run.
+
+        Wiring that persisted past its moment turned the map into a static
+        diagram of the whole run drawn over the part of it that was moving. The
+        planner's verdicts show during the check, the retriever's dispatch during
+        the pass, the extractor's results during the merge, nothing after.
+        """
+        app_js = (WEB_DIR / "app.js").read_text()
+        state = app_js.split("function edgeState")[1].split("\n}")[0]
+        for phase in ("ctx.deciding", "ctx.dispatching", "ctx.returning"):
+            self.assertIn(phase, state, f"edgeState missing {phase}")
+        # The case-to-gate edge is the verdict during a check and the dispatch
+        # during a pass, so its colour is per-frame, not fixed when it is built.
+        # The wire classes are named for the verdict, so `wire-${verdict}` in
+        # edgeState resolves without a lookup table to drift out of sync.
+        styles = app_js.split("function stateStyles")[1].split("\n}")[0]
+        self.assertIn("wire-${verdict}", state)
+        for verdict in ("pending", "open", "shut", "skipped", "ungated", "dispatch"):
+            self.assertIn(f"edge.wire-{verdict}", styles, f"no style for wire-{verdict}")
+        # The old dim-but-present treatment for a ruled-out group's wire is gone
+        # — a failed check now says so with a pink line while the check is on.
+        self.assertNotIn("edge.blocked", app_js)
+
+    def test_a_group_with_no_gate_gets_no_verdict(self):
+        """An ungated group never passed a check, so it does not show a ✓.
+
+        Four of demo2's ten groups have no `gate:`/`site:` predicate at all;
+        giving them the same green tick as a group that cleared a corpus gate
+        claims a decision that was never made.
+        """
+        app_js = (WEB_DIR / "app.js").read_text()
+        verdict = app_js.split("function gateVerdict")[1].split("\n}")[0]
+        self.assertIn('return "ungated"', verdict)
+        self.assertIn("planChecked", verdict)   # gated ones wait for the planner
+        self.assertIn('ungated: "↓"', app_js)
+        self.assertIn("gate-ungated", app_js)
+        # The verdict lands when the planner reaches it, not when corpus
+        # characterization first made it computable.
+        index = app_js.split("function buildMapIndex")[1].split("\n}")[0]
+        self.assertIn('ev.map_node_id === "plan_extraction"', index)
+
+    def test_the_extraction_plan_is_grouped_by_verdict(self):
+        """A plan that rules three groups out must not read as ten passing.
+
+        Panel 2's chips took their ✓/✗ from the *retriever's* stage, so at the
+        planning step — before the retriever has run — every group wore a green
+        tick and the plan contradicted the map directly above it. Both now read
+        the same annotation, and each verdict keeps the colour it has on the map.
+        """
+        app_js = (WEB_DIR / "app.js").read_text()
+        css = (WEB_DIR / "styles.css").read_text()
+        self.assertIn("function annotationVerdict", app_js)
+        # Panel 1's gate disc and Panel 2's chip share it, so they cannot drift.
+        self.assertEqual(app_js.count("annotationVerdict("), 3)  # def + gate + plan
+        self.assertIn("const PLAN_ROWS", app_js)
+        for verdict in ("ungated", "open", "shut"):
+            self.assertIn(f".gate-chip.{verdict}", css)
+            self.assertIn(f".plan-row.{verdict}", css)
+        # The old flat treatment keyed off the retriever's stage is gone.
+        self.assertNotIn(".gate-chip.eligible", css)
+        # Pink, not brick: the two files have to agree on the failure colour.
+        self.assertIn("--err: #d02670", css)
+        self.assertIn('err: "#d02670"', app_js)
+
+    def test_the_check_has_nothing_to_add_to_a_step_it_was_merged_into(self):
+        """`check_state` is merged twice over, and is a repeat either way."""
+        app_js = (WEB_DIR / "app.js").read_text()
+        self.assertIn('check_state: ["plan_extraction", "finalize_case"]', app_js)
+
+    def test_the_variables_panel_is_put_away_by_default(self):
+        """The map is what is being presented; the variable table is a reference.
+
+        Left open it took a third of the map's height for the whole talk, so it
+        collapses to its own header at the bottom edge and is pulled up when
+        wanted — and reopens at whatever size the splitter was last dragged to.
+        """
+        app_js = (WEB_DIR / "app.js").read_text()
+        css = (WEB_DIR / "styles.css").read_text()
+        html = (WEB_DIR / "index.html").read_text()
+        self.assertIn("function wireVarsPane", app_js)
+        self.assertIn("wireVarsPane()", app_js)
+        self.assertIn("const VARS_OPEN_KEY", app_js)      # remembered per presenter
+        # Opened before it has ever been dragged it takes everything the map can
+        # spare — a third of a screen shows a handful of forty-four rows — and
+        # the clamp is shared with the drag so neither can starve the map.
+        self.assertIn("function maxVarsHeight", app_js)
+        self.assertIn("setVarsHeight(grid, maxVarsHeight(grid))", app_js)
+        # One clamp, shared with the drag, and it discounts the grid's own
+        # padding and row gap — those belong to neither row, so ignoring them
+        # left the map about 40px short of MAP_MIN.
+        self.assertIn("padding - gap - MAP_MIN", app_js)
+        self.assertEqual(app_js.count("grid.style.setProperty(\"--vars-h\""), 1)
+        self.assertIn('id="vars-toggle"', html)
+        self.assertIn('aria-expanded="false"', html)      # closed on first load
+        # Collapsed is a row of `auto`, not a height, so it cannot disagree with
+        # what the header measures and the dragged size survives underneath it.
+        self.assertIn(".grid.vars-collapsed { grid-template-rows: minmax(0, 1fr) auto; }", css)
+        self.assertIn(".grid.vars-collapsed #vars { display: none; }", css)
+
+    def test_panel_two_container_cards_collapse(self):
+        """A step's shape first; one card's contents when asked for."""
+        app_js = (WEB_DIR / "app.js").read_text()
+        css = (WEB_DIR / "styles.css").read_text()
+        self.assertIn("function cardSection", app_js)
+        self.assertIn("const openCards", app_js)   # survives a re-render
+        self.assertIn("function watchCards", app_js)
+        # Notes and variable groups both become containers that open on demand,
+        # and neither is a bare <section> any more.
+        self.assertEqual(app_js.count("cardSection("), 3)  # def + notes + groups
+        self.assertNotIn('<section class="node-detail instance', app_js)
+        self.assertNotIn('<section class="node-detail group"', app_js)
+        self.assertIn("details.node-detail > summary.node-head", css)
 
     def test_map_edges_are_drawn_only_when_they_have_something_to_say(self):
         """An edge with nothing to say is absent, not dim.
@@ -262,7 +403,7 @@ class WebAssetTests(unittest.TestCase):
         """Edge-in-on-start / edge-out-on-finish only reads if the step moves."""
         app_js = (WEB_DIR / "app.js").read_text()
         for symbol in ("function playStep", "function seekStep", "function stepSpan",
-                       "function settleStep", "dashLoop", "note-in", "var-out"):
+                       "function settleStep", "dashLoop", "gate-in", "grp-out"):
             self.assertIn(symbol, app_js, f"app.js missing {symbol}")
 
 

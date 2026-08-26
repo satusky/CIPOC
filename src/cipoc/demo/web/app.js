@@ -118,10 +118,13 @@ const MINOR_NODES = new Set([
 ]);
 
 // Nodes whose view is subsumed by another node's when both land in one step.
-// ``check_state`` and ``plan_extraction`` now share a step (steps.py merges
-// them) and both render the same eligibility gate off snapshot.progress, so the
-// gate is drawn once, by the node that names it.
-const SUBSUMED_BY = { check_state: "plan_extraction" };
+// ``check_state`` is merged into a step by steps.py twice over: with the plan
+// that follows it, where both render the same eligibility gate off
+// snapshot.progress, and — when it is the final check that finds nothing left —
+// with the finalization it triggers, where it is a verbatim repeat of the check
+// the presenter has just finished talking about. Either way the check has
+// nothing of its own to say, so it is drawn once, by the node that names it.
+const SUBSUMED_BY = { check_state: ["plan_extraction", "finalize_case"] };
 
 // Runtime node -> what that pass of the extractor's inner loop did.
 const ATTEMPT_LABELS = {
@@ -133,6 +136,7 @@ const ATTEMPT_LABELS = {
 // Layout: default share of the left column given to the Variables panel, and
 // where a presenter's dragged size is remembered across reloads.
 const VARS_H_KEY = "cipoc.demo.varsHeight";
+const VARS_OPEN_KEY = "cipoc.demo.varsOpen";
 const VARS_MIN = 120;
 const MAP_MIN = 200;
 
@@ -155,6 +159,7 @@ async function init() {
   cacheEls();
   wireControls();
   wireSplitter();
+  wireVarsPane();
 
   const [meta, graph] = await Promise.all([
     getJSON("/api/meta"),
@@ -202,6 +207,7 @@ function cacheEls() {
   els.mapTip = document.getElementById("map-tip");
   els.detail = document.getElementById("detail");
   els.detailNode = document.getElementById("detail-node");
+  watchCards(els.detail);
   els.vars = document.getElementById("vars");
   els.varsSummary = document.getElementById("vars-summary");
 }
@@ -248,40 +254,54 @@ function applyMeta(meta) {
  * selecting notes, extractor-blue while extracting, then settled).
  */
 
-// The orchestrator root nodes that are phases of the extraction loop. Each one
-// keeps its own busy window, so the case can name the phase that is running.
-const CASE_REST = "";
-const CASE_PHASE_NODES = { check_state: "Check state", plan_extraction: "Plan extraction", merge_and_update: "Update case" };
+// One box at the top of the drawing for the whole front of the pipeline: the
+// notes the scanner reads *and* the characterization drawn from them. They were
+// two boxes and an arrow, but the arrow only ever said "and then", and the notes
+// are what the characterization is made of — so they live inside it.
+const CORPUS_ID = "stage:corpus";
 
-// The orchestrator stages that stay plain slabs, with the coarse overview block
-// each one stands for (see mapping.py::overview_block_map).
-const STAGES = [
-  { id: "stage:initialize", label: "Initialize case", block: "initialize_case" },
-  { id: "stage:corpus", label: "Characterize corpus", block: "characterize_corpus" },
-  { id: "stage:finalize", label: "Finalize case", block: "finalize_case" },
-];
-
-// The middle of the drawing is the case itself, and the extraction loop is two
-// poles inside it: work is dispatched from Plan and comes back to Update. That
-// is a structural separation of the two directions, so the fan-out and the
-// fan-in never share a corridor and no edge has to loop back around the band.
+// The middle of the drawing is the case, and it is *one box*. Splitting it into
+// Plan and Update containers spent the box's whole interior on two small labels
+// saying what the case's own label can say on its own — so the box is plain now,
+// work is dispatched from it and returns to it, and the label gets the room.
 const CASE_ID = "stage:case";
-const POLES = [
-  { id: "pole:plan", label: "Plan", block: "eligible_groups_gate" },
-  { id: "pole:update", label: "Update", block: "update_case" },
-];
+
+// The orchestrator root nodes that are phases of the case's life. Each keeps its
+// own busy window, so the case can name the phase that is running — and name it
+// in the colour of whatever is flowing along the lines at that moment, so the
+// label and the lit edges always agree about whose work this is.
+const CASE_REST = "Case";
+// Each tone is the colour of whatever is on the lines during that phase: the
+// planner's own verdicts are the orchestrator's, dispatch is the retriever's,
+// results coming back are the extractor's. Finalizing is orchestrator, not err —
+// nothing flows by then, and pink means "ruled out" everywhere else on the map.
+const CASE_PHASE_NODES = {
+  initialize_case: { label: "Initializing", tone: "orch" },
+  check_state: { label: "Checking state", tone: "orch" },
+  plan_extraction: { label: "Planning extraction", tone: "orch" },
+  merge_and_update: { label: "Updating case", tone: "extr" },
+  finalize_case: { label: "Finalizing", tone: "orch" },
+};
+// Extraction belongs to no root node — it is the fan-out running — so it is not
+// in the table above, but it is the phase the case spends most of its time in.
+// Retriever, because the lines up during a pass are its dispatch to the gates.
+const CASE_EXTRACTING = { label: "Extracting…", tone: "retr" };
 
 // Coarse overview block -> what now represents it on the drawing. The Python
 // side (mapping.py) is untouched and still owns runtime-node -> block; this is
 // only the last hop, block -> drawn element, and it is what keeps click-to-pin
 // and the "current stage" highlight working against the new topology.
+//
+// Four blocks land on the case: initializing it, planning against it, updating
+// it and finalizing it are all things that happen *to the case*, and with the
+// poles gone the case's label is where they are told apart.
 const BLOCK_TO_MAP = {
-  initialize_case: "stage:initialize",
-  characterize_corpus: "stage:corpus",
-  eligible_groups_gate: "pole:plan",
-  update_case: "pole:update",
-  finalize_case: "stage:finalize",
-  scanner_agent_block: "band:notes",
+  initialize_case: CASE_ID,
+  characterize_corpus: CORPUS_ID,
+  eligible_groups_gate: CASE_ID,
+  update_case: CASE_ID,
+  finalize_case: CASE_ID,
+  scanner_agent_block: CORPUS_ID,
   retriever_agent_block: "band:groups",
   extractor_agent_block: "band:groups",
   relevant_notes_gate: "band:groups",
@@ -297,16 +317,15 @@ const BLOCK_TO_MAP = {
  * spends the winnings.
  */
 const GEO = {
-  slabW: 190, slabH: 48,
-  poleW: 112, poleH: 38, poleGap: 26, casePad: 50,
-  noteD: 38, noteGapX: 66, noteGapY: 48,
-  // The notes sit *below* the strip's slabs, never on their baseline: level with
-  // them every fan edge is collinear and seven parallel notes read as a chain.
-  noteDrop: 56,
+  caseW: 264, caseH: 100,
+  noteD: 34, noteGapX: 46, noteGapY: 46,
   gateD: 50, gateGap: 16, varD: 20, varGapX: 30, varGapY: 28,
   clusterGap: 40,
   rowGap: 78,
-  stripGap: 58,           // between the strip's slabs and the notes between them
+  // The corpus box sits closer to the case than the band does. One line runs
+  // between them and nothing else competes for the corridor, whereas the band
+  // below fans twenty arcs into the case's underside and needs the room.
+  headGap: 44,
 };
 
 // Lighten a hex color toward white (soft node fills that keep the agent hue).
@@ -322,15 +341,19 @@ function tint(hex, amt) {
 
 /* "Light clinical" stylesheet.
  *
- * Stage slabs are elevated white cards with a colored rule along the top edge;
- * instance nodes are white discs with a thick agent-colored ring that fills in
- * as they complete; active edges carry a travelling dash.
+ * Two kinds of box — the case, and the containers that hold work in progress —
+ * plus instance discs: white with a thick agent-colored ring that fills in as
+ * they complete. Active edges carry a travelling dash.
  *
- * Two Cytoscape-specific notes: it has no per-side borders, so the slab's top
- * rule is the first stop of a vertical gradient; and it dropped `shadow-*` in
- * v3, so the card elevation is a low-opacity `underlay-*` halo instead.
+ * Two Cytoscape-specific notes: it has no per-side borders, so a box's top rule
+ * is the first stop of a vertical gradient; and it dropped `shadow-*` in v3, so
+ * the card elevation is a low-opacity `underlay-*` halo instead.
  */
-const MAP_COLORS = { ok: "#1a7f52", warn: "#c98a12", err: "#c0392b", line: "#c9d2e3", muted: "#9aa3b2" };
+// `err` is a magenta-leaning pink rather than a brick red, so the ✓/✗ pair and
+// the pass/fail verdict lines stay apart under red-green colour blindness: green
+// and pink separate on the blue axis, which deuteranopia leaves intact. The
+// glyphs carry the same distinction in shape, so colour is never load-bearing.
+const MAP_COLORS = { ok: "#1a7f52", warn: "#c98a12", err: "#d02670", line: "#c9d2e3", muted: "#9aa3b2" };
 
 function mapStyle(agentColors) {
   const { ok, warn, err, line, muted } = MAP_COLORS;
@@ -349,56 +372,30 @@ function mapStyle(agentColors) {
   });
 
   return [
-    // --- stage slabs ---
-    {
-      selector: "node.slab",
-      style: {
-        shape: "round-rectangle",
-        width: GEO.slabW, height: GEO.slabH,
-        ...ruled(ORCH),
-        "border-width": 1, "border-color": line,
-        // Stands in for a drop shadow (see the note above).
-        "underlay-color": "#172033", "underlay-opacity": 0.1, "underlay-padding": 2,
-        label: "data(label)", "text-wrap": "wrap", "text-max-width": GEO.slabW - 22,
-        "text-valign": "center", "text-halign": "center",
-        "text-margin-y": 2,
-        "font-size": 15, "font-weight": 700, color: "#2b3040",
-      },
-    },
-    { selector: 'node.slab[id="stage:finalize"]', style: ruled(err) },
-
-    // --- the case, and the two poles of the loop inside it ---
+    // --- the case ---
     //
-    // A compound parent, like the group clusters, so it sizes itself around the
-    // poles. Its label is the one text on the drawing that moves: `Case`, plus
-    // the phase of the loop that is running.
+    // A plain box with nothing inside it but its own label, which is the one
+    // text on the drawing that moves: `Case`, plus the phase that is running.
+    // Emptying it out is what lets that label be read from the back of a room.
     {
       selector: "node.case",
       style: {
         shape: "round-rectangle",
+        width: GEO.caseW, height: GEO.caseH,
         ...ruled(ORCH),
         "border-width": 1, "border-color": "#b9c4d8",
         "underlay-color": "#172033", "underlay-opacity": 0.14, "underlay-padding": 3,
-        // The label lives *inside* the top padding band, unlike the group
-        // clusters' labels: the spine lands on this node's top edge, and a
-        // label sitting above the boundary would be written through it.
-        padding: GEO.casePad,
-        label: "data(label)", "text-wrap": "wrap", "text-max-width": 240,
-        // `text-valign: top` anchors the block's *bottom* to the top edge, so
-        // the margin has to clear the whole two-line block plus the top rule.
-        "text-valign": "top", "text-halign": "center", "text-margin-y": 44,
-        "font-size": 14.5, "font-weight": 700, color: "#2b3040",
+        label: "data(label)", "text-wrap": "wrap", "text-max-width": GEO.caseW - 26,
+        "text-valign": "center", "text-halign": "center", "text-margin-y": 3,
+        "font-size": 21, "font-weight": 700, color: "#2b3040", "line-height": 1.25,
       },
     },
-    // The poles are slabs, so they inherit every node.slab.st-* state rule.
-    {
-      selector: "node.slab.pole",
-      style: {
-        width: GEO.poleW, height: GEO.poleH,
-        "background-fill": "solid", "background-color": "#ffffff",
-        "font-size": 13.5, "text-margin-y": 0,
-      },
-    },
+    // The phase is named in the colour of what is flowing while it runs: the
+    // dispatch out to the gates is the retriever's, the results coming back are
+    // the extractor's. Label and top rule both take it, so the case agrees with
+    // whichever lines are lit rather than merely sitting between them.
+    { selector: "node.case.tone-retr", style: { color: RETR, ...ruled(RETR) } },
+    { selector: "node.case.tone-extr", style: { color: EXTR, ...ruled(EXTR) } },
 
     // --- group cluster (compound parent carries the group's name) ---
     {
@@ -413,7 +410,24 @@ function mapStyle(agentColors) {
         "font-size": 12.5, "font-weight": 700, color: "#5b6270",
       },
     },
-    { selector: "node.cluster.gate-shut", style: { "background-color": "#faf1f0", "border-color": "#f0d9d6" } },
+    // A cluster's border carries its gate's verdict, so live work and ruled-out
+    // work are told apart by weight and not only by the glyph on one small disc:
+    // a group that passed — or that passed and is still waiting its turn — is
+    // drawn in a heavier line than one the planner has already discarded.
+    { selector: "node.cluster.gate-open", style: { "border-width": 2.5, "border-color": tint(ok, 0.5) } },
+    { selector: "node.cluster.gate-ungated", style: { "border-width": 2.5, "border-color": tint(ORCH, 0.55) } },
+    { selector: "node.cluster.gate-shut", style: { "background-color": "#fdf2f6", "border-color": tint(err, 0.72) } },
+    // The front of the pipeline is a cluster too — same container, same discs
+    // filling in as the work lands. It carries a little more weight than a group
+    // cluster because it is one of only two boxes above the band.
+    {
+      selector: "node.cluster.corpus",
+      style: {
+        "background-color": "#f1f8f7", "border-color": tint(SCAN, 0.42), "border-width": 2,
+        "underlay-color": "#172033", "underlay-opacity": 0.07, "underlay-padding": 2,
+        color: SCAN, "font-size": 15, "text-margin-y": -5, "text-max-width": 320,
+      },
+    },
 
     // --- instance discs: white with an agent-colored ring ---
     {
@@ -428,11 +442,18 @@ function mapStyle(agentColors) {
     },
     { selector: "node.disc.note", style: { width: GEO.noteD, height: GEO.noteD, "border-color": SCAN } },
     { selector: "node.disc.var", style: { width: GEO.varD, height: GEO.varD, "border-color": EXTR, "font-size": 0 } },
+    // The verdict glyph is the smallest thing on the map carrying the biggest
+    // meaning, and ✓ / ✗ come from a fallback symbol font that ignores
+    // font-weight — so each is outlined in its own colour to give it weight.
+    // *Narrowly*, though: at 1.8 the two strokes of a ✗ ran together and the
+    // icon read as a blob rather than as a mark.
     {
       selector: "node.disc.gate",
       style: {
         width: GEO.gateD, height: GEO.gateD,
-        "border-color": warn, "font-size": 19, color: warn,
+        "border-color": warn, color: warn,
+        "font-size": 24, "text-outline-width": 0.9,
+        "text-outline-color": warn, "text-outline-opacity": 1,
       },
     },
 
@@ -453,46 +474,52 @@ function mapStyle(agentColors) {
         "target-arrow-shape": "triangle", "target-arrow-color": line, "arrow-scale": 0.9,
       },
     },
-    // Dispatch leaves the Plan pole and results arrive at the Update pole, so
-    // the two directions are separated by the drawing itself and neither edge
-    // needs an endpoint offset to stay out of the other's corridor.
-    //
-    // The group's return arc still sags outward — unbundled-bezier bows
-    // perpendicular to the source->target line, which for a fan converging
-    // upward means "away from the case" — so a second-row cluster sweeps around
-    // the first row rather than through it.
+    // Dispatch and return now share one pair of endpoints — case to gate and
+    // gate back to case — so they have to bow apart or they lie on top of each
+    // other. `unbundled-bezier` bows perpendicular to the source->target line,
+    // and that line is reversed between the two, so the *same* sign puts them on
+    // opposite sides. The sag also means a second-row cluster's arc sweeps
+    // around the first row rather than through it.
+    {
+      selector: "edge.gate-in",
+      style: {
+        "curve-style": "unbundled-bezier",
+        "control-point-distances": 44, "control-point-weights": 0.5,
+        "target-arrow-shape": "triangle", "arrow-scale": 0.8,
+        width: 1.8,
+      },
+    },
     {
       selector: "edge.grp-out",
       style: {
         "curve-style": "unbundled-bezier",
-        "control-point-distances": 48, "control-point-weights": 0.5,
+        "control-point-distances": 44, "control-point-weights": 0.5,
         "target-arrow-shape": "triangle", "target-arrow-color": EXTR, "arrow-scale": 0.8,
         width: 1.8,
       },
     },
-    // Out and back between a gate and its variable are two edges on one pair, so
-    // they bow apart into a lobe instead of lying on top of each other.
+    { selector: "edge.to-scanner", style: { "line-color": SCAN } },
+    { selector: "edge.to-extractor", style: { "line-color": EXTR } },
+    // Each verdict re-colours the glyph, so it has to re-colour the outline with
+    // it or the fattening reverts to the amber of the pending state.
+    { selector: "node.disc.gate.pipe-retrieve", style: { "border-color": RETR, color: RETR, "text-outline-color": RETR } },
+    { selector: "node.disc.gate.pipe-extract", style: { "border-color": EXTR, color: EXTR, "text-outline-color": EXTR } },
+    { selector: "node.disc.gate.gate-open", style: { "border-color": ok, color: ok, "text-outline-color": ok, "background-color": tint(ok, 0.9) } },
+    { selector: "node.disc.gate.gate-shut", style: { "border-color": err, color: err, "text-outline-color": err, "background-color": tint(err, 0.9) } },
+    { selector: "node.disc.gate.gate-skipped", style: { "border-color": muted, color: muted, "text-outline-color": muted } },
+    // A group with no gate predicate at all never passed anything, so it does
+    // not get the ✓ that a gated group earns — it gets an arrow, in the
+    // orchestrator's colour, for work that goes straight through. A plain ↓,
+    // set a couple of units larger than the marks above because its head is a
+    // fraction of its shaft and is the first thing to go at disc size.
     {
-      selector: "edge.var-in",
-      style: { "curve-style": "unbundled-bezier", "control-point-distances": -7, "control-point-weights": 0.5 },
-    },
-    {
-      selector: "edge.var-out",
+      selector: "node.disc.gate.gate-ungated",
       style: {
-        "curve-style": "unbundled-bezier",
-        "control-point-distances": -7, "control-point-weights": 0.5,
-        "target-arrow-shape": "triangle", "target-arrow-color": EXTR, "arrow-scale": 0.5,
+        "border-color": ORCH, color: ORCH, "text-outline-color": ORCH,
+        "background-color": tint(ORCH, 0.92),
+        "font-size": 26,
       },
     },
-    { selector: "edge.to-scanner", style: { "line-color": SCAN } },
-    { selector: "edge.to-retriever", style: { "line-color": RETR } },
-    { selector: "edge.to-extractor", style: { "line-color": EXTR } },
-    { selector: "edge.exit", style: { "line-color": err, "target-arrow-color": err } },
-    { selector: "node.disc.gate.pipe-retrieve", style: { "border-color": RETR, color: RETR } },
-    { selector: "node.disc.gate.pipe-extract", style: { "border-color": EXTR, color: EXTR } },
-    { selector: "node.disc.gate.gate-open", style: { "border-color": ok, color: ok, "background-color": tint(ok, 0.9) } },
-    { selector: "node.disc.gate.gate-shut", style: { "border-color": err, color: err, "background-color": tint(err, 0.9) } },
-    { selector: "node.disc.gate.gate-skipped", style: { "border-color": muted, color: muted } },
   ];
 }
 
@@ -538,29 +565,37 @@ function buildMapIndex() {
     tMax = Math.max(tMax, ev.t || 0);
     const payload = ev.payload && typeof ev.payload === "object" ? ev.payload : {};
 
-    // The corpus descriptors are what the planner's gate predicates read, so
-    // this is the moment every gate verdict becomes knowable.
-    if (ev.type === "task_end" && ev.node === "characterize_corpus") {
+    // A verdict lands when the planner *reaches* it, not when it first became
+    // computable. Corpus characterization produces the descriptors the gate
+    // predicates read, but flipping the glyphs there put the ✓/✗ on screen a
+    // whole step before the check that decides them — the lines reaching out to
+    // the gates arrived to find the answer already written.
+    if (ev.type === "task_end" && !ev.namespace.length && ev.map_node_id === "plan_extraction") {
       verdictT = Math.min(verdictT, ev.t);
     }
 
     if (ev.type !== "task_start" && ev.type !== "task_end") continue;
 
-    // Stage slabs and the two case poles, via the coarse block the runtime node
-    // belongs to. Both kinds are drawn boxes with their own busy state; only the
-    // `band:` entries are not.
-    const slab = BLOCK_TO_MAP[coarse(ev.map_node_id)];
-    if (slab && !slab.startsWith("band:")) {
-      if (ev.type === "task_start") open(`slab/${ev.task_id}`, slab, ev.t);
-      else close(`slab/${ev.task_id}`, ev.t);
+    // The two top-level boxes — the corpus and the case — via the coarse block
+    // the runtime node belongs to. Several blocks land on each, so each keeps a
+    // list of windows; only the `band:` entries are not drawn boxes at all.
+    const box = BLOCK_TO_MAP[coarse(ev.map_node_id)];
+    if (box && !box.startsWith("band:")) {
+      if (ev.type === "task_start") open(`box/${ev.task_id}`, box, ev.t);
+      else close(`box/${ev.task_id}`, ev.t);
     }
 
     // The case stands for several root nodes at once, so each keeps its own
     // window — that is what lets the case's label name the running phase.
-    if (!ev.namespace.length && CASE_PHASE_NODES[ev.node]) {
+    //
+    // Keyed on `map_node_id`, not `ev.node`: the orchestrator's initialize node
+    // is called plain `initialize` at runtime and only the map id disambiguates
+    // it from the subagents' (mapping.py::map_node_id).
+    const phase = ev.map_node_id;
+    if (!ev.namespace.length && CASE_PHASE_NODES[phase]) {
       if (ev.type === "task_start") {
-        open(`phase/${ev.task_id}`, `phase:${ev.node}`, ev.t);
-        if (ev.node === "plan_extraction") passStarts.push(ev.t);
+        open(`phase/${ev.task_id}`, `phase:${phase}`, ev.t);
+        if (phase === "plan_extraction") passStarts.push(ev.t);
       } else close(`phase/${ev.task_id}`, ev.t);
     }
 
@@ -653,23 +688,35 @@ function anyGroupActive(t) {
   return false;
 }
 
-// Which phase of the loop is running at `t` — the second line of the case's
-// label, and "" at rest. Dispatch is checked before planning because a pass runs
-// *inside* the loop turn the planner opened. Extraction is the reason this lives
-// on the case rather than on a pole: it belongs to neither.
+// Which phase the case is in at `t` — the second line of its label and the tone
+// of both — or null at rest. Dispatch is checked before planning because a pass
+// runs *inside* the loop turn the planner opened; the two ends of the run come
+// last because they never overlap anything.
 function casePhase(t) {
   if (stateAt("phase:merge_and_update", t) === "active") return CASE_PHASE_NODES.merge_and_update;
-  if (anyGroupActive(t)) return "Extracting…";
-  for (const node of ["plan_extraction", "check_state"]) {
+  if (anyGroupActive(t)) return CASE_EXTRACTING;
+  for (const node of ["plan_extraction", "check_state", "finalize_case", "initialize_case"]) {
     if (stateAt(`phase:${node}`, t) === "active") return CASE_PHASE_NODES[node];
   }
-  return CASE_REST;
+  return null;
 }
 
-// A planning check has run by `t`, so the planner's verdicts are now things it
-// has *decided* rather than things merely computable. Gate lines hang off this.
+// The phase a *step* is about, for the frame it settles on. These orchestrator
+// nodes are near-instantaneous, so at a step's own end its window has already
+// closed and the window rule above finds nothing — the label would drop back to
+// "Case" the moment the presenter stopped scrubbing, on the very step whose name
+// they are standing there saying out loud.
+function stepPhase(step) {
+  if (!step) return null;
+  if (step.node === "extract_branch") return CASE_EXTRACTING;
+  return CASE_PHASE_NODES[step.map_node_id] || null;
+}
+
+// The planner has *reached* its first set of verdicts by `t`, so a gate's ✓/✗ is
+// something it decided rather than something merely computable. Every gate glyph
+// and every verdict line hangs off this.
 function planChecked(t) {
-  return mapIndex.passStarts.length > 0 && mapIndex.passStarts[0] <= t;
+  return t >= mapIndex.verdictT;
 }
 
 /* --- the drawing -------------------------------------------------------- */
@@ -685,20 +732,19 @@ function buildMapModel(snapshot) {
   const link = (source, target, classes, data) =>
     edges.push({ data: { id: `${source}->${target}`, source, target, ...(data || {}) }, classes });
 
-  for (const stage of STAGES) add({ id: stage.id, label: stage.label, block: stage.block }, "slab");
+  // The case. Initializing, planning, updating and finalizing all land here, so
+  // it carries the planner's block for click-to-pin and says the rest in its
+  // label — there is no Finalize box any more either, just a label that reads
+  // "Finalizing" when the run gets there.
+  add({ id: CASE_ID, label: CASE_REST, block: "eligible_groups_gate" }, "case");
 
-  // The case, and the two poles of the extraction loop inside it. The container
-  // carries no `block`, so a tap on it falls through and leaves Panel 2's pin
-  // alone; the poles are the click targets.
-  add({ id: CASE_ID, label: "Case" }, "case");
-  for (const pole of POLES) {
-    add({ id: pole.id, parent: CASE_ID, label: pole.label, title: pole.label, block: pole.block }, "slab pole");
-  }
-
+  // The front of the pipeline: one container of note discs that fill as the
+  // scanner reads them, and which *is* the corpus characterization drawn from
+  // them. Structurally identical to a group and its variables — no edges in or
+  // out of the individual notes, because the box already says what they are.
+  add({ id: CORPUS_ID, label: "Scan & characterize notes", block: "characterize_corpus" }, "cluster corpus");
   for (const note of mapIndex.notes) {
-    add({ id: note.id, label: `#${note.noteId}`, title: `${note.type} #${note.noteId}`.trim(), block: "scanner_agent_block" }, "disc note");
-    link("stage:initialize", note.id, "fan to-scanner note-in");
-    link(note.id, "stage:corpus", "fan to-scanner note-out");
+    add({ id: note.id, parent: CORPUS_ID, label: `#${note.noteId}`, title: `${note.type} #${note.noteId}`.trim(), block: "scanner_agent_block" }, "disc note");
   }
 
   for (const group of planGroups(snapshot)) {
@@ -706,28 +752,22 @@ function buildMapModel(snapshot) {
     const gate = `gate:${group.id}`;
     add({ id: cluster, label: group.name, block: "retriever_agent_block" }, "cluster");
     add({ id: gate, parent: cluster, label: "", title: group.annotation || group.name, group: group.id, block: "retriever_agent_block" }, "disc gate");
-    link("pole:plan", gate, "fan to-retriever gate-in", { group: group.id });
+    // The group's two lines are its whole story: dispatched from the case, and
+    // reported back to it. Its variables fill in place — a line per variable to
+    // and from the gate they already sit beside adds nothing but ink.
+    //
+    // No colour class here: this one edge is the planner's verdict during the
+    // check and the retriever's dispatch during the pass, so renderMapAt gives
+    // it a `wire-*` class per frame rather than it being fixed at build.
+    link(CASE_ID, gate, "fan gate-in", { group: group.id });
     for (const variable of group.variables) {
       const id = `var:${variable.itemId}`;
       add({ id, parent: cluster, label: "", title: variable.name, group: group.id, block: "extractor_agent_block" }, "disc var");
-      link(gate, id, "fan to-extractor var-in", { group: group.id });
-      // Results come back out of the variable — but to the gate, which then
-      // reports the group to the Update pole. Thirty-two arcs converging on one
-      // box is the same wall of ink as the old bottom fan-in, just upside down;
-      // one arc per group is legible, and it is what actually happens (the
-      // group's variables are merged before the case is updated).
-      link(id, gate, "fan to-extractor var-out", { group: group.id });
     }
-    // The loop closes on the case: dispatched from Plan, returned to Update.
-    link(gate, "pole:update", "fan to-extractor grp-out", { group: group.id });
+    link(gate, CASE_ID, "fan to-extractor grp-out", { group: group.id });
   }
 
-  // Onto the container, not the Plan pole: it stops at the case's top edge and
-  // so stays clear of the label sitting in the padding band below it.
-  link("stage:corpus", CASE_ID, "spine");
-  // Sourced from the container, so it leaves the case's right boundary rather
-  // than piercing it from a pole on the far side.
-  link(CASE_ID, "stage:finalize", "spine exit");
+  link(CORPUS_ID, CASE_ID, "spine");
 
   return { nodes, edges };
 }
@@ -765,7 +805,6 @@ function planGroups(snapshot) {
 const FIT_PAD = 12;
 const CLUSTER_PAD = 10;   // node.cluster's `padding`, which Cytoscape adds around the children
 const BAND_ROW_GAP = 56;  // between band rows: a cluster's label hangs above its box
-const FINALIZE_GAP = 70;
 
 // The container, or a sane guess: on first paint the flex panel has no size yet.
 function viewportBox() {
@@ -823,48 +862,32 @@ function packLayout(parts, opts) {
   const bandW = Math.max(0, ...bandRows.map((r) => r.w));
   const bandH = bandRows.reduce((a, r, i) => a + r.h + (i ? BAND_ROW_GAP : 0), 0);
 
-  // --- the strip: Initialize and Corpus at the ends, notes in a grid between
+  // --- the corpus box: note discs in a grid, measured the same way a cluster
+  // is, because it is one. Only the discs get positions — the container is a
+  // compound parent and sizes itself around them.
   const notes = parts.notes;
   const perRow = Math.max(1, Math.min(noteCols, notes.length || 1));
   const noteRows = Math.ceil(notes.length / perRow) || 1;
-  const notesW = (perRow - 1) * GEO.noteGapX + GEO.noteD;
-  const notesH = (noteRows - 1) * GEO.noteGapY + GEO.noteD;
-  const stripW = GEO.slabW * 2 + GEO.stripGap * 2 + notesW;
-  const slabCy = GEO.slabH / 2;
-  const notesCy = slabCy + GEO.noteDrop;
-  const stripH = notesCy + notesH / 2;
+  const stripW = perRow * GEO.noteGapX + CLUSTER_PAD * 2;
+  const stripH = noteRows * GEO.noteGapY + CLUSTER_PAD * 2;
 
-  // --- the case row, with Finalize hanging off its right
-  const caseW = GEO.poleW * 2 + GEO.poleGap + GEO.casePad * 2;
-  const caseH = GEO.poleH + GEO.casePad * 2;
+  // Nothing hangs off either side any more, so the drawing is symmetric about
+  // `cx` and one half-width describes it.
+  const half = Math.max(stripW, bandW, GEO.caseW) / 2;
+  const cx = half;
 
-  // Finalize makes the case row asymmetric, so the two sides are measured apart.
-  const left = Math.max(stripW, bandW, caseW) / 2;
-  const right = Math.max(stripW / 2, bandW / 2, caseW / 2 + FINALIZE_GAP + GEO.slabW);
-  const cx = left;
-
-  let y = slabCy;
-  pos["stage:initialize"] = { x: cx - stripW / 2 + GEO.slabW / 2, y };
-  pos["stage:corpus"] = { x: cx + stripW / 2 - GEO.slabW / 2, y };
-  const noteY0 = notesCy - notesH / 2 + GEO.noteD / 2;
+  const noteX0 = cx - stripW / 2 + CLUSTER_PAD + GEO.noteGapX / 2;
+  const noteY0 = stripH / 2 - ((noteRows - 1) * GEO.noteGapY) / 2;
   notes.forEach((note, i) => {
-    const row = Math.floor(i / perRow);
-    const inRow = Math.min(perRow, notes.length - row * perRow);
     pos[note.id] = {
-      x: cx - ((inRow - 1) * GEO.noteGapX) / 2 + (i % perRow) * GEO.noteGapX,
-      y: noteY0 + row * GEO.noteGapY,
+      x: noteX0 + (i % perRow) * GEO.noteGapX,
+      y: noteY0 + Math.floor(i / perRow) * GEO.noteGapY,
     };
   });
 
-  // Only the poles get positions — the case container is a compound parent and
-  // sizes itself around them.
-  y = stripH + GEO.rowGap + caseH / 2;
-  const poleDX = (GEO.poleW + GEO.poleGap) / 2;
-  pos["pole:plan"] = { x: cx - poleDX, y };
-  pos["pole:update"] = { x: cx + poleDX, y };
-  pos["stage:finalize"] = { x: cx + caseW / 2 + FINALIZE_GAP + GEO.slabW / 2, y };
+  pos[CASE_ID] = { x: cx, y: stripH + GEO.headGap + GEO.caseH / 2 };
 
-  let by = stripH + GEO.rowGap + caseH + GEO.rowGap;
+  let by = stripH + GEO.headGap + GEO.caseH + GEO.rowGap;
   for (const band of bandRows) {
     let x = cx - band.w / 2;
     for (const s of band.items) {
@@ -885,8 +908,8 @@ function packLayout(parts, opts) {
 
   return {
     pos,
-    w: left + right,
-    h: stripH + GEO.rowGap + caseH + (bandH ? GEO.rowGap + bandH : 0),
+    w: half * 2,
+    h: stripH + GEO.headGap + GEO.caseH + (bandH ? GEO.rowGap + bandH : 0),
   };
 }
 
@@ -960,7 +983,7 @@ function buildMap(graph) {
   const container = document.getElementById("cy");
   if (window.ResizeObserver) new ResizeObserver(refitMap).observe(container);
 
-  // Click a slab or a disc to pin Panel 2 to the component behind it; click
+  // Click a box or a disc to pin Panel 2 to the component behind it; click
   // empty space to unpin. Discs resolve through their own `block`, so clicking
   // a note pins the scanner and clicking a variable pins the extractor.
   cy.on("tap", "node", (evt) => {
@@ -995,6 +1018,10 @@ function refitMap() {
   refitTimer = setTimeout(() => {
     refitTimer = null;
     if (!cy) return;
+    // First, before anything reads the viewport: cy.width()/height() are cached
+    // and keep reporting the old size until this runs, so the packing search
+    // below would score every candidate against the panel we no longer have.
+    cy.resize();
     if (lastMapModel) {
       const before = layoutKey;
       const pos = computeLayout(lastMapModel);
@@ -1050,9 +1077,11 @@ function applyAgentColors(colors) {
 // is faint before it runs, haloed while it runs, and filled once done — the
 // "○ empty → ◎ half → ● filled" progression.
 function stateStyles(agentColors) {
-  const { warn, err } = MAP_COLORS;
+  const { ok, warn, err, line } = MAP_COLORS;
   const scanner = (agentColors || {}).scanner || "#008c7a";
   const extractor = (agentColors || {}).extractor || "#1473e6";
+  const retriever = (agentColors || {}).retriever || "#d16b22";
+  const orch = (agentColors || {}).orchestrator || "#6d5bd0";
   return [
     {
       selector: "node, edge",
@@ -1071,6 +1100,20 @@ function stateStyles(agentColors) {
         "z-index": 20,
       },
     },
+    // A note being read and a note already read were both scanner teal, a shade
+    // apart — at disc size that is no distinction at all. In flight is amber
+    // now, the colour the map already uses for work in progress, so the strip
+    // reads as amber turning teal rather than as teal turning slightly darker.
+    //
+    // The halo also shrinks: six or seven notes run at once and pack tightly, so
+    // the generic 7-unit active halo above merged them into one tan bar.
+    {
+      selector: "node.disc.note.st-active",
+      style: {
+        "underlay-padding": 2, "underlay-opacity": 0.16,
+        "background-color": tint(warn, 0.55), "border-color": warn,
+      },
+    },
     // Done is *filled*, not merely un-dimmed: at the size these discs end up on
     // screen a pale tint is indistinguishable from idle, and telling finished
     // work from pending work at a glance is the whole job.
@@ -1085,15 +1128,23 @@ function stateStyles(agentColors) {
     // and showing it as merely "not yet" would be a lie.
     { selector: ".blocked", style: { opacity: 0.16 } },
     { selector: "node.cluster.blocked", style: { opacity: 0.5 } },
-    // A ruled-out group still gets its wire from Plan — that is what the ✗
-    // hangs on — so it has to be faint but actually visible.
-    { selector: "edge.blocked", style: { opacity: 0.34 } },
 
-    { selector: "node.slab.st-idle", style: { opacity: 0.45 } },
-    { selector: "node.slab.st-done", style: { opacity: 1 } },
+    // The case never dims all the way: it is the subject of the whole drawing
+    // and its label has to stay readable even before the run touches it.
+    { selector: "node.case.st-idle", style: { opacity: 0.7 } },
+    { selector: "node.case.st-done", style: { opacity: 1 } },
     {
-      selector: "node.slab.st-active",
-      style: { opacity: 1, "underlay-color": warn, "underlay-opacity": 0.3, "underlay-padding": 5 },
+      selector: "node.case.st-active",
+      style: { opacity: 1, "underlay-color": warn, "underlay-opacity": 0.3, "underlay-padding": 6 },
+    },
+    // The corpus box lights across both jobs it stands for: the scanner reading
+    // the notes, and the characterization drawn from them.
+    { selector: "node.cluster.corpus.st-idle", style: { opacity: 0.6 } },
+    // Border only, no halo: the discs inside carry their own, and two tan bands
+    // stacked read as one filled block rather than as work in progress.
+    {
+      selector: "node.cluster.corpus.st-active",
+      style: { "border-width": 2.5, "border-color": scanner },
     },
     {
       selector: "node.current",
@@ -1102,14 +1153,20 @@ function stateStyles(agentColors) {
 
     { selector: "edge.st-idle", style: { opacity: 0.28 } },
     { selector: "edge.st-done", style: { opacity: 0.95, width: 2 } },
-    // Nineteen variables converging on Update case is a lot of ink; the filled
-    // discs already carry the state, so a walked fan edge only has to show the
-    // path exists. The spine keeps its weight.
-    { selector: "edge.fan.st-done", style: { opacity: 0.5, width: 1.3 } },
-    // A 12-variable group is 24 lobes off one gate. Once walked they only have
-    // to show the path existed — the filled discs carry the state — so they get
-    // out of the way until something flows along them again.
-    { selector: "edge.var-in.st-done, edge.var-out.st-done", style: { opacity: 0.3, width: 1 } },
+
+    // What the case-to-gate line means at this moment. It is the planner's
+    // verdict during a check and the retriever's dispatch during a pass, so its
+    // colour is assigned per frame rather than fixed when the edge is built.
+    // Each matches the thing it is about: the gate glyph it lands on, or the
+    // agent doing the work.
+    // Named for the verdict, so `wire-${verdict}` in edgeState needs no table.
+    { selector: "edge.wire-pending", style: { "line-color": line, "target-arrow-color": line } },
+    { selector: "edge.wire-open", style: { "line-color": ok, "target-arrow-color": ok } },
+    { selector: "edge.wire-skipped", style: { "line-color": ok, "target-arrow-color": ok } },
+    { selector: "edge.wire-shut", style: { "line-color": err, "target-arrow-color": err } },
+    { selector: "edge.wire-ungated", style: { "line-color": orch, "target-arrow-color": orch } },
+    { selector: "edge.wire-dispatch", style: { "line-color": retriever, "target-arrow-color": retriever } },
+
     // The travelling dash: `line-dash-offset` is stepped by dashLoop().
     {
       selector: "edge.flowing",
@@ -1156,18 +1213,26 @@ function coarse(fineId) {
   return fineId ? COARSE[fineId] || null : null;
 }
 
-// A gate's verdict at trace-time t. Undecided until corpus characterization
-// produces the descriptors the planner's predicates read; after that the
-// annotation the model already computed *is* the verdict, so the map never
-// second-guesses the planner.
-function gateVerdict(annotation, t) {
-  const gated = /^(gate:|site:)/.test(annotation || "");
-  if (gated && t < mapIndex.verdictT) return "pending";
-  if (/✗/.test(annotation || "")) return "shut";
-  return "open";
+// A gate's verdict at trace-time t. A group with no `gate:`/`site:` predicate has
+// no gate to pass and so gets no verdict at all — showing it the same ✓ as a
+// group that actually cleared a corpus gate claims a check that never ran. The
+// rest stay undecided until the planner reaches them, and then the annotation
+// the model already computed *is* the verdict: the map never second-guesses it.
+// The verdict an annotation encodes, with no regard for when it becomes visible.
+// Shared with Panel 2's extraction plan, so the two panels cannot disagree about
+// which groups the planner ruled in.
+function annotationVerdict(annotation) {
+  if (!/^(gate:|site:)/.test(annotation || "")) return "ungated";
+  return /✗/.test(annotation) ? "shut" : "open";
 }
 
-const GATE_GLYPH = { open: "✓", shut: "✗", pending: "?", skipped: "–" };
+function gateVerdict(annotation, t) {
+  const verdict = annotationVerdict(annotation);
+  if (verdict === "ungated") return "ungated";
+  return planChecked(t) ? verdict : "pending";
+}
+
+const GATE_GLYPH = { open: "✓", shut: "✗", pending: "?", skipped: "–", ungated: "↓" };
 
 // The trace-time of the frame currently painted, for refitMap to replay.
 let lastRenderT = 0;
@@ -1196,6 +1261,20 @@ function renderMapAt(t, snapshot, step) {
   }
   const blocked = new Set();
 
+  // Which phase of the run is on screen. Lines are scoped to the step that owns
+  // them rather than accumulating: the planner's verdicts show during the check,
+  // the retriever's dispatch during the pass, the extractor's results during the
+  // merge, and nothing lingers afterwards. Wiring that stays up past its moment
+  // is a static diagram of the run drawn over the part of it that is moving.
+  const stepNode = (step && step.node) || "";
+  const ctx = {
+    verdicts: new Map(),
+    currentGroups,
+    deciding: stepNode === "check_state" || stepNode === "plan_extraction",
+    dispatching: stepNode === "extract_branch",
+    returning: stepNode === "merge_and_update",
+  };
+
   cy.batch(() => {
     // Gates first: their verdict decides whether anything behind them may light.
     cy.nodes(".gate").forEach((node) => {
@@ -1206,13 +1285,14 @@ function renderMapAt(t, snapshot, step) {
       const extracting = stateAt(`grpext:${gid}`, t);
       const ran = stateAt(`grp:${gid}`, t);
 
-      // An open group the retriever found no notes for is skipped, not failed.
-      if (verdict === "open" && ran === "done" && !hasAnyVariableRun(gid, t)) {
+      // A group the retriever found no notes for is skipped, not failed.
+      if (verdict !== "shut" && verdict !== "pending" && ran === "done" && !hasAnyVariableRun(gid, t)) {
         verdict = "skipped";
       }
       if (verdict === "shut") blocked.add(gid);
+      ctx.verdicts.set(gid, verdict);
 
-      node.removeClass("gate-open gate-shut gate-pending gate-skipped pipe-retrieve pipe-extract st-idle st-active st-done");
+      node.removeClass("gate-open gate-shut gate-pending gate-skipped gate-ungated pipe-retrieve pipe-extract st-idle st-active st-done");
       node.addClass(`gate-${verdict}`);
       node.addClass(ran === "idle" ? "st-idle" : ran === "active" ? "st-active" : "st-done");
       if (retrieving === "active") node.addClass("pipe-retrieve");
@@ -1221,14 +1301,27 @@ function renderMapAt(t, snapshot, step) {
       node.data("title", annotation || node.data("title"));
     });
 
-    cy.nodes(".cluster").forEach((node) => {
+    // The cluster wears its gate's verdict too, so the band reads at a glance:
+    // heavier borders are groups still in play, faint pink ones are discarded.
+    cy.nodes(".cluster").not(".corpus").forEach((node) => {
       const gid = node.id().replace("grp:", "");
+      const verdict = ctx.verdicts.get(gid) || "pending";
+      node.removeClass("gate-open gate-shut gate-pending gate-skipped gate-ungated");
+      node.addClass(`gate-${verdict}`);
       node.toggleClass("blocked", blocked.has(gid));
-      node.toggleClass("gate-shut", blocked.has(gid));
       node.toggleClass("current", currentGroups.has(gid));
     });
 
     cy.nodes(".note").forEach((node) => setState(node, stateAt(node.id(), t)));
+
+    // The corpus box carries both jobs it now stands for — the scanner reading
+    // the notes and the characterization drawn from them — so it stays lit
+    // across the pair while the discs inside it fill one by one.
+    const corpusNode = cy.getElementById(CORPUS_ID);
+    if (corpusNode.nonempty()) {
+      setState(corpusNode, stateAt(CORPUS_ID, t));
+      corpusNode.toggleClass("current", currentBlock === CORPUS_ID);
+    }
 
     cy.nodes(".var").forEach((node) => {
       const gid = node.data("group");
@@ -1248,32 +1341,27 @@ function renderMapAt(t, snapshot, step) {
       if (empty) node.removeClass("st-done");
     });
 
-    cy.nodes(".slab").forEach((node) => {
-      setState(node, stateAt(node.id(), t));
-      node.toggleClass("current", node.id() === currentBlock);
-    });
-
-    // The case is the one label on the drawing that moves.
-    const phase = casePhase(t);
+    // The case is the one label on the drawing that moves — and the one that
+    // changes colour, to agree with whichever lines are carrying data right now.
+    const phase = casePhase(t) || stepPhase(step);
     const caseNode = cy.getElementById(CASE_ID);
     if (caseNode.nonempty()) {
-      caseNode.data("label", phase ? `Case\n${phase}` : "Case");
-      const poles = ["pole:plan", "pole:update"].map((id) => stateAt(id, t));
-      setState(caseNode, phase ? "active" : poles.some((s) => s !== "idle") ? "done" : "idle");
+      caseNode.data("label", phase ? `Case\n${phase.label}` : CASE_REST);
+      caseNode.removeClass("tone-orch tone-retr tone-extr tone-err");
+      caseNode.addClass(`tone-${phase ? phase.tone : "orch"}`);
+      // Naming a phase *is* the case being busy, so the halo and the label agree
+      // — including during extraction, which is work the case is waiting on
+      // rather than work it is doing and so has no window of its own.
+      setState(caseNode, phase ? "active" : stateAt(CASE_ID, t));
+      caseNode.toggleClass("current", currentBlock === CASE_ID);
     }
 
-    const checked = planChecked(t);
     cy.edges().forEach((edge) => {
-      edge.removeClass("st-idle st-done flowing blocked undrawn");
-      const gid = edge.data("group");
-      if (gid && blocked.has(gid)) {
-        // The planner decided this group, so its gate line is drawn — dim, but
-        // there, because the ✗ needs a wire to hang on. Everything behind the
-        // gate never ran, so it is never drawn at all.
-        edge.addClass(edge.hasClass("gate-in") && checked ? "blocked" : "undrawn");
-        return;
-      }
-      edge.addClass(edgeState(edge, t));
+      edge.removeClass(
+        "st-idle st-done flowing undrawn " +
+        "wire-pending wire-open wire-shut wire-skipped wire-ungated wire-dispatch"
+      );
+      edge.addClass(edgeState(edge, t, ctx));
     });
   });
   startDashLoop();
@@ -1290,59 +1378,51 @@ function hasAnyVariableRun(groupId, t) {
     .some((node) => stateAt(node.id(), t) !== "idle");
 }
 
-// An edge *into* something lights the moment that thing starts and stays lit;
-// an edge *out of* it lights when it finishes. That is the whole point of the
-// per-instance nodes: you can see work being handed out and handed back.
+// An edge belongs to one phase of the run and is drawn only while that phase is
+// the step on screen. Lines that persisted past their moment turned the map into
+// a static diagram of the whole run drawn over the part of it that was moving —
+// by the second pass the band was a web of settled wiring the live edges had to
+// fight through. `ctx` carries what phase we are in and what the planner decided.
 //
-// An edge that has nothing to say yet is `undrawn` rather than merely dim: a
-// hundred hairlines showing the run's final wiring before any of it has
-// happened is a grey web the lit edges have to fight through. Every rule below
-// is monotone in `t`, so "once drawn, stays drawn" needs no extra bookkeeping —
-// the wiring accumulates as the run explains itself.
-function edgeState(edge, t) {
-  if (edge.hasClass("note-in") || edge.hasClass("var-in")) {
-    const state = stateAt(edge.target().id(), t);
-    if (state === "active") return "flowing";
-    return state === "done" ? "st-done" : "undrawn";
-  }
-  if (edge.hasClass("note-out")) {
-    return stateAt(edge.source().id(), t) === "done" ? "st-done" : "undrawn";
-  }
-  // A variable hands its result back to its gate the moment it settles, and
-  // keeps flowing while the rest of the group is still working.
-  if (edge.hasClass("var-out")) {
-    if (stateAt(edge.source().id(), t) !== "done") return "undrawn";
-    return stateAt(`grp:${edge.data("group")}`, t) === "active" ? "flowing" : "st-done";
-  }
-  // The group's arc into the Update pole is the picture of the case being
-  // updated, so it runs while it is — but only for the pass that is reporting
-  // back, or every group the run has ever finished would light on every turn.
+// The case-to-gate edge does two jobs at different times, so it is coloured per
+// frame: the planner's verdict during the check, the retriever's dispatch during
+// the pass. An edge with nothing to say right now is `undrawn`, not dim.
+function edgeState(edge, t, ctx) {
+  // The group's arc back into the case: the picture of the case being updated,
+  // so it is up for the merge step and only for the pass reporting back.
   if (edge.hasClass("grp-out")) {
+    if (!ctx.returning) return "undrawn";
+    const gid = edge.data("group");
+    if (stateAt(`grp:${gid}`, t) !== "done") return "undrawn";
+    if (!endedSince(`grp:${gid}`, t, passStartBefore(t))) return "undrawn";
+    return stateAt("phase:merge_and_update", t) === "active" ? "flowing" : "st-done";
+  }
+  if (edge.hasClass("gate-in")) {
     const gid = edge.data("group");
     const ran = stateAt(`grp:${gid}`, t);
-    if (ran !== "done") return "undrawn";
-    const updating = stateAt("phase:merge_and_update", t) === "active";
-    return updating && endedSince(`grp:${gid}`, t, passStartBefore(t)) ? "flowing" : "st-done";
+    // During a pass: the retriever handing this group its work.
+    if (ctx.dispatching && ctx.currentGroups.has(gid)) {
+      if (ran === "active") return "flowing wire-dispatch";
+      return ran === "done" ? "st-done wire-dispatch" : "undrawn";
+    }
+    // During a check: the planner reaching out to every group still in play and
+    // saying what it decided. The line goes out *first*, dashed and colourless
+    // while the answer is still pending, and lands as green or pink when the
+    // check settles — so the verdict arrives along the wire rather than being
+    // written on the gate before anything reached it.
+    if (ctx.deciding && ran !== "done") {
+      const verdict = ctx.verdicts.get(gid) || "pending";
+      return verdict === "pending" ? "flowing wire-pending" : `st-done wire-${verdict}`;
+    }
+    return "undrawn";
   }
-  // A gate is wired up by the planning check that *decides* it — dispatched
-  // here, or (in the blocked branch of renderMapAt) definitively ruled out. A
-  // group that only becomes eligible on a later pass stays unwired until then.
-  if (edge.hasClass("gate-in")) {
-    const ran = stateAt(`grp:${edge.data("group")}`, t);
-    if (ran === "active") return "flowing";
-    return ran === "done" ? "st-done" : "undrawn";
-  }
-  // The exit has to read its *target*: its source is the case container, which
-  // is a compound with no busy window of its own and so is forever "idle".
-  if (edge.hasClass("exit")) {
-    const state = stateAt("stage:finalize", t);
-    if (state === "active") return "flowing";
-    return state === "done" ? "st-done" : "undrawn";
-  }
-  // The backbone — the one edge that is always drawn. It lands on the case
-  // container, so like the exit it has to read a pole rather than its endpoint.
+  // The backbone — the one edge that is always drawn. It carries the corpus
+  // description into the case, which is the thing the first planning check
+  // reads, so that check is when it flows.
   if (edge.hasClass("spine")) {
-    if (stateAt("pole:plan", t) === "active") return "flowing";
+    const planning = ["check_state", "plan_extraction"]
+      .some((node) => stateAt(`phase:${node}`, t) === "active");
+    if (planning) return "flowing";
     return stateAt(edge.source().id(), t) === "done" ? "st-done" : "st-idle";
   }
   // Every edge buildMapModel creates is classed, so this is unreachable — and
@@ -1533,7 +1613,9 @@ function renderDetail(view) {
     const primary = step.map_node_id;
     nodeIds = primary && !touched.includes(primary) ? [primary, ...touched] : touched;
     const present = nodeIds.filter((id) => snap.details[id]);
-    nodeIds = present.filter((id) => !present.includes(SUBSUMED_BY[id]));
+    nodeIds = present.filter(
+      (id) => !(SUBSUMED_BY[id] || []).some((by) => present.includes(by))
+    );
   } else {
     title = "Run start";
     subtitle = "";
@@ -1686,6 +1768,40 @@ function stepTaskIds(step) {
   return ids;
 }
 
+/* --- Panel 2: cards that open on demand ----------------------------------
+ *
+ * A scan step is seven characterized notes and an extraction pass is a dozen
+ * variables across several groups, all expanded — the panel opened on the middle
+ * of somebody's summary and the shape of the step was three scrolls away. The
+ * containers collapse instead: the step's shape first, one card's contents when
+ * asked for.
+ *
+ * Which cards are open is kept out here rather than in the DOM, because Panel 2
+ * re-renders from scratch on every cursor move and a card opened to be talked
+ * about should survive the presenter scrubbing the map underneath it.
+ */
+const openCards = new Set();
+
+function cardSection(key, classes, head, body) {
+  return `<details class="node-detail ${classes}" data-card="${esc(key)}"${
+    openCards.has(key) ? " open" : ""
+  }>${head}<div class="card-body">${body}</div></details>`;
+}
+
+// `toggle` does not bubble, so this listens in the capture phase.
+function watchCards(root) {
+  root.addEventListener(
+    "toggle",
+    (evt) => {
+      const el = evt.target;
+      if (!el || el.tagName !== "DETAILS" || !el.dataset.card) return;
+      if (el.open) openCards.add(el.dataset.card);
+      else openCards.delete(el.dataset.card);
+    },
+    true
+  );
+}
+
 // One group within the pass: what the retriever kept, the one model call that
 // produced every candidate, then the variables themselves.
 function renderGroupDetail(group, vars, snap) {
@@ -1701,17 +1817,20 @@ function renderGroupDetail(group, vars, snap) {
         retrieval ? " — the retriever kept no notes for this group." : "."
       }</p>`;
 
-  return `<section class="node-detail group">
-    <header class="node-head agent-${group.agent || "orchestrator"}">
+  const head = `<summary class="node-head agent-${group.agent || "orchestrator"}">
       <span class="node-head-title">${esc(group.label || group.key)}</span>
       <span class="node-head-id">${vars.length ? `${settled}/${vars.length}` : ""}</span>
       <span class="status-pill status-${esc(group.status)}">${esc(group.status)}</span>
-    </header>
-    ${retrieval}
-    ${calls}
-    ${cards}
-    ${group.error ? `<pre class="code">${esc(fmt(group.error))}</pre>` : ""}
-  </section>`;
+    </summary>`;
+
+  return cardSection(
+    group.key,
+    "group",
+    head,
+    `${retrieval}${calls}${cards}${
+      group.error ? `<pre class="code">${esc(fmt(group.error))}</pre>` : ""
+    }`
+  );
 }
 
 // One variable, start to finish: its coded value with evidence, its final
@@ -1817,17 +1936,20 @@ function renderInstanceDetail(inst) {
     .map(renderLLMCall)
     .join("");
 
-  return `<section class="node-detail instance status-${status}">
-    <header class="node-head agent-${inst.agent || "scanner"}">
+  const head = `<summary class="node-head agent-${inst.agent || "scanner"}">
       <span class="node-head-title">${esc(inst.label || inst.key)}</span>
       <span class="node-head-id"></span>
       <span class="status-pill status-${status}">${status}</span>
-    </header>
-    ${viewNote(r, inst.input, calls)}
-    ${other}
-    ${collapsible("Result", inst.result, "result")}
-    ${inst.error ? `<pre class="code">${esc(fmt(inst.error))}</pre>` : ""}
-  </section>`;
+    </summary>`;
+
+  return cardSection(
+    inst.key,
+    `instance status-${status}`,
+    head,
+    `${viewNote(r, inst.input, calls)}${other}${collapsible("Result", inst.result, "result")}${
+      inst.error ? `<pre class="code">${esc(fmt(inst.error))}</pre>` : ""
+    }`
+  );
 }
 
 // The scanner sub-step behind each of a note card's three slots. Its captured
@@ -2092,17 +2214,54 @@ function viewFinalSummary(r, inp, snap) {
 }
 
 // --- plan / gate: which variable groups are eligible --------------------
+//
+// One row per verdict rather than one flat run of chips. Flat, every group wore
+// a green ✓ unless the *retriever* had already discarded it, so a plan that
+// ruled three groups out read as ten groups all passing — and disagreed with the
+// map sitting directly above it. The verdict comes from the same annotation the
+// gate discs read, and each row is the colour that verdict has on the map.
+const PLAN_ROWS = [
+  { verdict: "ungated", glyph: "↓", label: "Ungated", hint: "no gate — always extracted" },
+  { verdict: "open", glyph: "✓", label: "Passed", hint: "cleared the corpus gate" },
+  { verdict: "shut", glyph: "✗", label: "Blocked", hint: "ruled out for this corpus" },
+];
+
 function viewGate(prog) {
   const groups = prog.groups || [];
   if (!groups.length) return "";
-  const chip = (g) => {
-    const blocked = g.stage === "blocked" || g.stage === "skipped";
-    return `<span class="gate-chip ${blocked ? "blocked" : "eligible"}">${blocked ? "✗" : "✓"} ${esc(g.name || g.group_id)}<span class="conf"> ${esc(g.stage)}</span></span>`;
-  };
+
+  const byVerdict = new Map();
+  for (const g of groups) {
+    const verdict = annotationVerdict(g.annotation || "");
+    if (!byVerdict.has(verdict)) byVerdict.set(verdict, []);
+    byVerdict.get(verdict).push(g);
+  }
+
+  const rows = PLAN_ROWS.filter((row) => byVerdict.has(row.verdict))
+    .map((row) => {
+      const members = byVerdict.get(row.verdict);
+      const chips = members
+        .map(
+          (g) =>
+            `<span class="gate-chip ${row.verdict}">${row.glyph} ${esc(
+              g.name || g.group_id
+            )}</span>`
+        )
+        .join("");
+      return `<div class="plan-row ${row.verdict}">
+        <div class="plan-row-head">
+          <b>${row.label}</b><span class="plan-count">${members.length}</span>
+          <span class="muted">${esc(row.hint)}</span>
+        </div>
+        <div class="chips">${chips}</div>
+      </div>`;
+    })
+    .join("");
+
   return `<div class="headline-fact">
     <b>Extraction plan</b>
-    <div class="muted" style="font-size:.74rem">${groups.length} group(s) — eligible groups run; gated/blocked groups are skipped.</div>
-    <div class="chips">${groups.map(chip).join("")}</div>
+    <div class="muted" style="font-size:.74rem">${groups.length} group(s) considered.</div>
+    ${rows}
   </div>`;
 }
 
@@ -2548,6 +2707,81 @@ function wireControls() {
   });
 }
 
+// How tall the variables panel may grow before the map hits its floor, and the
+// clamp both the splitter drag and the first open share so neither can push the
+// map below MAP_MIN.
+//
+// The grid's own padding and row gap are not available to either row, so they
+// have to come off first — `clientHeight` includes the padding, and subtracting
+// MAP_MIN from it alone left the map about 40px short of its floor.
+function maxVarsHeight(grid) {
+  const cs = getComputedStyle(grid);
+  const gap = parseFloat(cs.rowGap) || 0;
+  const padding = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+  return Math.max(VARS_MIN, grid.clientHeight - padding - gap - MAP_MIN);
+}
+
+function setVarsHeight(grid, px) {
+  const clamped = Math.max(VARS_MIN, Math.min(px, maxVarsHeight(grid)));
+  grid.style.setProperty("--vars-h", `${Math.round(clamped)}px`);
+  return clamped;
+}
+
+/* The variables panel is put away by default and pulled up from the bottom edge
+ * when it is wanted. The map is the thing being presented; the variable table is
+ * a reference the presenter opens to answer a question and closes again, and
+ * left open it was taking a third of the map's height for the whole talk.
+ *
+ * Collapsed is a class on the grid rather than a height, so the row falls back
+ * to `auto` and the inline `--vars-h` the splitter wrote is simply not consulted
+ * until the panel opens again — reopening lands on the size it was dragged to.
+ */
+function wireVarsPane() {
+  const toggle = document.getElementById("vars-toggle");
+  const grid = document.querySelector(".grid");
+  if (!toggle || !grid) return;
+
+  const apply = (collapsed) => {
+    // Opened before it has ever been dragged, it takes everything the map can
+    // spare. Someone reaching for the variable table wants to read the table,
+    // and a third of a screen shows a handful of rows out of forty-four; the
+    // map is one keystroke away again. Once dragged, that size wins instead —
+    // and double-clicking the splitter to forget it comes back here.
+    if (!collapsed && !localStorage.getItem(VARS_H_KEY)) {
+      setVarsHeight(grid, maxVarsHeight(grid));
+    }
+    grid.classList.toggle("vars-collapsed", collapsed);
+    toggle.setAttribute("aria-expanded", String(!collapsed));
+    toggle.title = collapsed ? "Show variables (V)" : "Hide variables (V)";
+    localStorage.setItem(VARS_OPEN_KEY, collapsed ? "0" : "1");
+    // Explicitly, rather than leaving it to the map's ResizeObserver: this is
+    // the largest shape change the map ever sees, and we know for certain it
+    // just happened. The observer stays as the catch-all for the splitter drag
+    // and the window, but it is not reliably delivered for a container that
+    // resizes because a grid track changed.
+    refitMap();
+  };
+  const toggleOpen = () => apply(!grid.classList.contains("vars-collapsed"));
+
+  // Closed unless this presenter has opened it before.
+  apply(localStorage.getItem(VARS_OPEN_KEY) !== "1");
+
+  toggle.addEventListener("click", toggleOpen);
+  toggle.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      toggleOpen();
+    }
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "v" && e.key !== "V") return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const tag = (e.target && e.target.tagName) || "";
+    if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
+    toggleOpen();
+  });
+}
+
 // Drag the boundary between the workflow map and the variables panel. The size
 // is written as a pixel `--vars-h` on the grid; the map's ResizeObserver re-fits
 // Cytoscape as it changes, so the flowchart redraws live during the drag.
@@ -2556,12 +2790,7 @@ function wireSplitter() {
   const grid = document.querySelector(".grid");
   if (!handle || !grid) return;
 
-  const setHeight = (px) => {
-    const max = grid.clientHeight - MAP_MIN;
-    const clamped = Math.max(VARS_MIN, Math.min(px, Math.max(VARS_MIN, max)));
-    grid.style.setProperty("--vars-h", `${Math.round(clamped)}px`);
-    return clamped;
-  };
+  const setHeight = (px) => setVarsHeight(grid, px);
 
   const saved = Number(localStorage.getItem(VARS_H_KEY));
   if (saved > 0) setHeight(saved);

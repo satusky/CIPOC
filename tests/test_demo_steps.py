@@ -25,7 +25,13 @@ class BoundaryTests(unittest.TestCase):
     def test_empty_stream_has_no_steps(self):
         self.assertEqual(build_steps([]), [])
 
-    def test_intro_step_precedes_first_root_task(self):
+    def test_the_first_step_swallows_the_leading_events(self):
+        """`run_start` and the initial values have nothing to show on their own.
+
+        They used to stand as a "Run start" step the presenter had to click past
+        before anything appeared. They now open the first real step, so the run
+        begins on "Initialize case" with the stream still tiled from seq 0.
+        """
         events = [
             DemoEvent(seq=0, t=0.0, type="run_start"),
             DemoEvent(seq=1, t=0.1, type="values", namespace=(), payload={"note_corpus": {}}),
@@ -34,10 +40,14 @@ class BoundaryTests(unittest.TestCase):
                       namespace=(), map_node_id="initialize_case", agent="orchestrator"),
         ]
         steps = build_steps(events)
-        self.assertEqual(steps[0].title, "Run start")
+        self.assertEqual(steps[0].title, "Initialize case")
         self.assertEqual(steps[0].start_seq, 0)
-        self.assertEqual(steps[0].end_seq, 1)
-        self.assertEqual(steps[1].title, "Initialize case")
+        self.assertEqual(steps[0].end_seq, 3)
+
+    def test_a_stream_with_no_root_task_still_gets_one_step(self):
+        # A crash before the first node — the presenter still needs a step.
+        events = [DemoEvent(seq=0, t=0.0, type="run_start")]
+        self.assertEqual([s.title for s in build_steps(events)], ["Run start"])
 
     def test_nested_events_belong_to_their_root_task_step(self):
         events = [
@@ -147,14 +157,20 @@ class BoundaryTests(unittest.TestCase):
         self.assertEqual(steps[0].node, "plan_extraction")
         self.assertEqual(steps[0].map_node_id, "plan_extraction")
 
-    def test_check_state_alone_still_gets_its_own_step(self):
-        # The final gate ("no groups remain") has no plan after it.
+    def test_the_final_lone_check_belongs_to_the_finalization(self):
+        """The last check ("no groups remain") has no plan after it.
+
+        Standing alone it read as a second copy of the check before it, with
+        nothing new to show. It belongs to the finalization it triggers.
+        """
         events = [
             _root_start(0, "check_state", map_id="check_state"),
             _root_start(1, "finalize_case", map_id="finalize_case"),
         ]
-        self.assertEqual([s.title for s in build_steps(events)],
-                         ["Check state", "Finalize case"])
+        steps = build_steps(events)
+        self.assertEqual([s.title for s in steps], ["Finalize case"])
+        self.assertEqual(steps[0].start_seq, 0)
+        self.assertEqual(steps[0].map_node_id, "finalize_case")
 
     def test_step_carries_the_opening_task_id(self):
         # Panel 2 selects a group's variable instances by this task_id prefix.
