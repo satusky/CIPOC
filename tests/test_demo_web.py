@@ -93,14 +93,15 @@ class WebAssetTests(unittest.TestCase):
             self.assertIn(symbol, app_js, f"app.js missing {symbol}")
 
     def test_app_js_renders_one_container_per_variable(self):
-        """A group's extraction step is per-variable, not per inner-loop node."""
+        """An extraction pass is per-group and then per-variable."""
         app_js = (WEB_DIR / "app.js").read_text()
         for symbol in (
-            "renderExtractDetail",   # extract_branch step -> per-variable cards
+            "renderExtractDetail",   # extract_branch step -> per-group sections
+            "renderGroupDetail",     # one container per group in the pass
             "renderVariableDetail",  # one container per variable
             "renderAttempts",        # repeated validation behind one dropdown
             "variable_branch",       # the fan-out instances it selects
-            "step.task_id",          # scoped to *this* group's instances
+            "stepTaskIds",           # scoped to the groups *this* pass fanned out
         ):
             self.assertIn(symbol, app_js, f"app.js missing {symbol}")
         # The merged group result just repeats the variable cards, so the node
@@ -150,21 +151,119 @@ class WebAssetTests(unittest.TestCase):
     def test_styles_cover_the_cleanup_views(self):
         css = (WEB_DIR / "styles.css").read_text()
         for cls in (".node-head", ".node-head-title", ".minor-row",
-                    ".node-detail.variable", ".attempt", ".row-split", "--vars-h",
-                    ".msg.role-system", ".call-icon", ".j-key", "pre.code.json"):
+                    ".node-detail.variable", ".node-detail.group", ".attempt",
+                    ".row-split", "--vars-h", ".msg.role-system", ".call-icon",
+                    ".j-key", "pre.code.json", ".map-tip", ".map-scrub", ".cy-wrap"):
             self.assertIn(cls, css, f"styles.css missing {cls}")
 
-    def test_app_js_wires_reference_map_layout(self):
+    def test_app_js_derives_the_map_from_the_run(self):
+        """The map is built from this run's notes/groups/variables, not a chart."""
         app_js = (WEB_DIR / "app.js").read_text()
         for wiring in (
-            "const MAP_POS",
-            "const MAP_HIDE",
-            "function mapStyle",
-            'edge[kind="loop"]',
-            '"taxi-turn": "90%"',
-            'visitedCoarse.add("relevant_notes_gate")',
+            "function buildMapModel",   # nodes/edges from the snapshot
+            "function computeLayout",   # positions, since counts are run-dependent
+            "function buildMapIndex",   # per-instance timing from the event list
+            "function renderMapAt",     # classes at a point in the run
+            "const BLOCK_TO_MAP",       # coarse block -> drawn element
+            "function stateAt",
         ):
             self.assertIn(wiring, app_js, f"app.js missing map wiring: {wiring}")
+        # The hand-authored positions are gone with the static topology.
+        self.assertNotIn("const MAP_POS", app_js)
+
+    def test_the_layout_is_chosen_against_the_panel(self):
+        """The arrangement is searched for, not fixed.
+
+        A drawing whose aspect does not match the panel's is scaled to whichever
+        side binds and the rest of the panel is thrown away, which is what made
+        the labels unreadable. So candidate packings are scored on the zoom they
+        would actually achieve in this container.
+        """
+        app_js = (WEB_DIR / "app.js").read_text()
+        for symbol in ("function packLayout", "function modelParts",
+                       "function viewportBox", "function refitMap", "layoutKey"):
+            self.assertIn(symbol, app_js, f"app.js missing {symbol}")
+        # Scored against the real container, not a guessed target shape.
+        chooser = app_js.split("function computeLayout")[1].split("\n}")[0]
+        self.assertIn("viewportBox", chooser)
+        self.assertIn("packLayout", chooser)
+        # The two constants that used to guess for it are gone.
+        for dead in ("bandTargetW", "varCols: 4"):
+            self.assertNotIn(dead, app_js, f"{dead} should be gone")
+        # A resize can change the winner, so it re-packs rather than only re-fitting.
+        self.assertIn("new ResizeObserver(refitMap)", app_js)
+        self.assertIn("lastRenderT", app_js)  # and repaints the frame it was on
+
+    def test_the_agent_color_legend_is_gone(self):
+        """Obsolete once the map carries agent color on the elements themselves."""
+        for name in ("app.js", "index.html", "styles.css"):
+            self.assertNotIn("legend", (WEB_DIR / name).read_text(),
+                             f"{name} still references the legend")
+
+    def test_the_case_is_the_centre_with_plan_and_update_poles(self):
+        """The extraction loop is two poles inside the case, not one slab.
+
+        Dispatch leaves Plan and results return to Update, so the two directions
+        are separated by the drawing itself rather than by an endpoint nudge —
+        and no edge has to loop back around the band to close the cycle.
+        """
+        app_js = (WEB_DIR / "app.js").read_text()
+        for symbol in ("const CASE_ID", "const POLES", "CASE_REST",
+                       "CASE_PHASE_NODES", "function casePhase",
+                       "function passStartBefore", "function anyGroupActive"):
+            self.assertIn(symbol, app_js, f"app.js missing {symbol}")
+        # Each half of the loop is its own pole...
+        table = app_js.split("const BLOCK_TO_MAP = {")[1].split("};")[0]
+        self.assertIn('eligible_groups_gate: "pole:plan"', table)
+        self.assertIn('update_case: "pole:update"', table)
+        # ...so the merged hub, the separate update slab, and the edge that had
+        # to loop back to it are all gone.
+        for dead in ("stage:hub", "stage:update", '"loop"'):
+            self.assertNotIn(dead, app_js, f"{dead} should be gone")
+        # Results leave the variable, are gathered by the group's gate, and the
+        # group reports to the Update pole — one arc per group, not one per
+        # variable, which would be the old bottom fan-in upside down.
+        self.assertIn('link(id, gate, "fan to-extractor var-out"', app_js)
+        self.assertIn('link(gate, "pole:update", "fan to-extractor grp-out"', app_js)
+        self.assertIn('link("pole:plan", gate, "fan to-retriever gate-in"', app_js)
+
+    def test_map_edges_are_drawn_only_when_they_have_something_to_say(self):
+        """An edge with nothing to say is absent, not dim.
+
+        A hundred hairlines showing the run's final wiring before any of it has
+        happened is a grey web the lit edges have to fight through.
+        """
+        app_js = (WEB_DIR / "app.js").read_text()
+        state = app_js.split("function edgeState")[1].split("\n}")[0]
+        self.assertIn("undrawn", state)
+        # The backbone is the one edge that is always drawn, so it is also the
+        # only place edgeState may still fall through to st-idle.
+        self.assertLessEqual(state.count('"st-idle"'), 1)
+        self.assertIn("function planChecked", app_js)  # gate lines wait for the check
+        # display:none would drop the edge out of cy.fit()'s bounds, so the
+        # viewport would lurch every time one appeared mid-animation.
+        styles = app_js.split("function stateStyles")[1].split("\n}")[0]
+        self.assertIn('selector: ".undrawn"', styles)
+        self.assertIn("opacity: 0", styles)
+        self.assertNotIn('display: "none"', styles)
+
+    def test_block_to_map_covers_every_overview_block(self):
+        """Every coarse block must resolve to something the new map draws.
+
+        `mapping.py` still owns runtime-node -> block; this is the last hop, and
+        a block missing here would silently stop lighting up.
+        """
+        app_js = (WEB_DIR / "app.js").read_text()
+        table = app_js.split("const BLOCK_TO_MAP = {")[1].split("};")[0]
+        for block in set(overview_block_map().values()):
+            self.assertIn(f"{block}:", table, f"BLOCK_TO_MAP missing {block}")
+
+    def test_app_js_animates_within_a_step(self):
+        """Edge-in-on-start / edge-out-on-finish only reads if the step moves."""
+        app_js = (WEB_DIR / "app.js").read_text()
+        for symbol in ("function playStep", "function seekStep", "function stepSpan",
+                       "function settleStep", "dashLoop", "note-in", "var-out"):
+            self.assertIn(symbol, app_js, f"app.js missing {symbol}")
 
 
 class OverviewChartTests(unittest.TestCase):

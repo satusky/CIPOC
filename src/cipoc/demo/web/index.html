@@ -33,9 +33,16 @@
     <section class="panel panel-map" aria-label="Workflow map">
       <div class="panel-head">
         <h2>Workflow map</h2>
-        <div id="agent-legend" class="legend"></div>
+        <div class="map-ctl">
+          <button id="btn-replay-step" class="map-btn" title="Replay this step on the map">▸</button>
+          <input id="map-scrub" class="map-scrub" type="range" min="0" max="1000" value="1000"
+                 title="Scrub through this step" aria-label="Scrub through this step" />
+        </div>
       </div>
-      <div id="cy" class="cy"></div>
+      <div class="cy-wrap">
+        <div id="cy" class="cy"></div>
+        <div id="map-tip" class="map-tip" hidden></div>
+      </div>
     </section>
 
     <!-- Panel 2: current-step detail -->

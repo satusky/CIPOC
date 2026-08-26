@@ -2,10 +2,11 @@
  * CIPOC extraction demo — frontend (Phase 3).
  *
  * Renders three panels from the demo server's SSE cursor stream:
- *   1. Workflow map   — the overview flowchart, with the current node haloed,
- *                       visited nodes lit, and traversed edges highlighted.
- *   2. Current step   — the model I/O and task input/result for every map node
- *                       touched during the presenter's current step.
+ *   1. Workflow map   — this run's fan-out/fan-in graph: one node per note, per
+ *                       variable group's gate, and per variable, animated
+ *                       through each step's own span of the trace.
+ *   2. Current step   — what the components decided during the presenter's
+ *                       current step, per note / per group / per variable.
  *   3. Variables      — the reused ProgressModel variable table, grouped.
  *
  * The server is the single source of truth: every control (Prev/Next/goto/play)
@@ -196,7 +197,9 @@ function cacheEls() {
   els.play = document.getElementById("btn-play");
   els.stepSelect = document.getElementById("step-select");
   els.counter = document.getElementById("step-counter");
-  els.legend = document.getElementById("agent-legend");
+  els.mapReplay = document.getElementById("btn-replay-step");
+  els.mapScrub = document.getElementById("map-scrub");
+  els.mapTip = document.getElementById("map-tip");
   els.detail = document.getElementById("detail");
   els.detailNode = document.getElementById("detail-node");
   els.vars = document.getElementById("vars");
@@ -219,30 +222,92 @@ function applyMeta(meta) {
   els.modeBadge.classList.toggle("live", meta.mode === "live");
 }
 
-// --- Panel 1: workflow map ----------------------------------------------
+/* --- Panel 1: workflow map ----------------------------------------------
+ *
+ * The map is derived from *this run*, not from the static overview chart: the
+ * things that fan out get one node each, so the drawing is a picture of what
+ * actually happened (see `shitty_cipoc_drawing.png`).
+ *
+ *                     [ Initialize case ]
+ *                      ╱      │      ╲            one edge per note
+ *                   (n50)   (n51)   (n52) …
+ *                      ╲      │      ╱
+ *                   [ Characterize corpus ]
+ *                             │
+ *      ┌───────────► [ Plan extraction ] ──────► [ Finalize case ]
+ *      │              ╱      │      ╲            one edge per group
+ *      │           (gate)  (gate)  (gate) …      ✓ open / ✗ shut / … pending
+ *      │           ╱ │ ╲   ╱ │ ╲   ╱ │ ╲         one edge per variable
+ *      │         (v)(v)(v)(v)(v)(v)(v)(v) …
+ *      │           ╲ │ ╱   ╲ │ ╱   ╲ │ ╱
+ *      └─────────── [ Update case ]
+ *
+ * The per-group retriever and extractor are deliberately *not* nodes — eight
+ * groups would add sixteen boxes carrying no information the gate disc cannot.
+ * The group's pipeline stage rides on its gate instead (retriever-orange while
+ * selecting notes, extractor-blue while extracting, then settled).
+ */
 
-// Hand-authored positions matching the reference flowchart: a horizontal top
-// row (Initialize → Scanner → Characterize) feeding a central decision column
-// (Groups? → Retriever → Relevant? → Extractor) that LOOPS back up the left
-// side through Update case to the gate — so the per-group extraction loop reads
-// as an actual cycle. The two "no" branches exit sideways (→ Finalize, →
-// Update). START/END endpoints are hidden in the demo (Initialize/Finalize read
-// as the entry/terminal, as in the reference). Keyed by node id.
-const MAP_POS = {
-  initialize_case:       { x: 130, y: 60 },
-  scanner_agent_block:   { x: 410, y: 60 },
-  characterize_corpus:   { x: 640, y: 60 },
-  eligible_groups_gate:  { x: 640, y: 205 },   // "Groups remain?" — top of the loop
-  finalize_case:         { x: 960, y: 205 },   // "no" exit → terminal
-  retriever_agent_block: { x: 640, y: 350 },
-  relevant_notes_gate:   { x: 640, y: 495 },
-  update_case:           { x: 210, y: 495 },   // left side of the loop
-  extractor_agent_block: { x: 640, y: 640 },
+// The orchestrator root nodes that are phases of the extraction loop. Each one
+// keeps its own busy window, so the case can name the phase that is running.
+const CASE_REST = "";
+const CASE_PHASE_NODES = { check_state: "Check state", plan_extraction: "Plan extraction", merge_and_update: "Update case" };
+
+// The orchestrator stages that stay plain slabs, with the coarse overview block
+// each one stands for (see mapping.py::overview_block_map).
+const STAGES = [
+  { id: "stage:initialize", label: "Initialize case", block: "initialize_case" },
+  { id: "stage:corpus", label: "Characterize corpus", block: "characterize_corpus" },
+  { id: "stage:finalize", label: "Finalize case", block: "finalize_case" },
+];
+
+// The middle of the drawing is the case itself, and the extraction loop is two
+// poles inside it: work is dispatched from Plan and comes back to Update. That
+// is a structural separation of the two directions, so the fan-out and the
+// fan-in never share a corridor and no edge has to loop back around the band.
+const CASE_ID = "stage:case";
+const POLES = [
+  { id: "pole:plan", label: "Plan", block: "eligible_groups_gate" },
+  { id: "pole:update", label: "Update", block: "update_case" },
+];
+
+// Coarse overview block -> what now represents it on the drawing. The Python
+// side (mapping.py) is untouched and still owns runtime-node -> block; this is
+// only the last hop, block -> drawn element, and it is what keeps click-to-pin
+// and the "current stage" highlight working against the new topology.
+const BLOCK_TO_MAP = {
+  initialize_case: "stage:initialize",
+  characterize_corpus: "stage:corpus",
+  eligible_groups_gate: "pole:plan",
+  update_case: "pole:update",
+  finalize_case: "stage:finalize",
+  scanner_agent_block: "band:notes",
+  retriever_agent_block: "band:groups",
+  extractor_agent_block: "band:groups",
+  relevant_notes_gate: "band:groups",
 };
 
-// Endpoints the demo map omits (the reference starts at Initialize, ends at
-// Finalize); their edges are dropped with them.
-const MAP_HIDE = new Set(["case_start", "case_end"]);
+/* Layout geometry, in Cytoscape model units.
+ *
+ * Model units, not pixels: everything here — including font sizes — is
+ * multiplied by cy.zoom(), and zoom is whatever cy.fit() settles on. So the size
+ * text ends up on screen is `font-size × zoom`, and growing a node trades
+ * directly against zoom. That is why the type here is large and the padding
+ * mean: computeLayout picks the packing that maximises zoom, and the type scale
+ * spends the winnings.
+ */
+const GEO = {
+  slabW: 190, slabH: 48,
+  poleW: 112, poleH: 38, poleGap: 26, casePad: 50,
+  noteD: 38, noteGapX: 66, noteGapY: 48,
+  // The notes sit *below* the strip's slabs, never on their baseline: level with
+  // them every fan edge is collinear and seven parallel notes read as a chain.
+  noteDrop: 56,
+  gateD: 50, gateGap: 16, varD: 20, varGapX: 30, varGapY: 28,
+  clusterGap: 40,
+  rowGap: 78,
+  stripGap: 58,           // between the strip's slabs and the notes between them
+};
 
 // Lighten a hex color toward white (soft node fills that keep the agent hue).
 function tint(hex, amt) {
@@ -255,75 +320,618 @@ function tint(hex, amt) {
   return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
 }
 
-// Demo stylesheet for the map, built from the chart's agent colors. Uniform
-// rounded blocks with a soft agent tint + agent-colored border; diamonds for the
-// decision gates; Finalize colored as the terminal. Edges are orthogonal (taxi,
-// like the reference): forward flow into an agent is blue, the two "no" exits are
-// red, and the per-group loop-back is an emphasized cycle so it can't be missed.
+/* "Light clinical" stylesheet.
+ *
+ * Stage slabs are elevated white cards with a colored rule along the top edge;
+ * instance nodes are white discs with a thick agent-colored ring that fills in
+ * as they complete; active edges carry a travelling dash.
+ *
+ * Two Cytoscape-specific notes: it has no per-side borders, so the slab's top
+ * rule is the first stop of a vertical gradient; and it dropped `shadow-*` in
+ * v3, so the card elevation is a low-opacity `underlay-*` halo instead.
+ */
+const MAP_COLORS = { ok: "#1a7f52", warn: "#c98a12", err: "#c0392b", line: "#c9d2e3", muted: "#9aa3b2" };
+
 function mapStyle(agentColors) {
-  const BLUE = "#4a86d8", RED = "#e0564b", LOOP = "#6b5bd0", GRAY = "#9aa3b2";
-  const perAgent = Object.entries(agentColors).map(([agent, color]) => ({
-    selector: `node[agent="${agent}"]`,
-    style: { "border-color": color, "background-color": tint(color, 0.86) },
-  }));
+  const { ok, warn, err, line, muted } = MAP_COLORS;
+  const agent = (name, fallback) => agentColors[name] || fallback;
+  const ORCH = agent("orchestrator", "#6d5bd0");
+  const SCAN = agent("scanner", "#008c7a");
+  const EXTR = agent("extractor", "#1473e6");
+  const RETR = agent("retriever", "#d16b22");
+
+  // A white card with `color` as a rule across its top edge.
+  const ruled = (color) => ({
+    "background-fill": "linear-gradient",
+    "background-gradient-direction": "to-bottom",
+    "background-gradient-stop-colors": `${color} ${color} #ffffff #ffffff`,
+    "background-gradient-stop-positions": "0% 8% 8% 100%",
+  });
+
   return [
+    // --- stage slabs ---
     {
-      selector: "node",
+      selector: "node.slab",
       style: {
         shape: "round-rectangle",
-        width: 150, height: 50,
-        "background-color": "#ffffff",
-        "border-width": 2, "border-color": "#cbd0da",
-        label: "data(label)", "text-wrap": "wrap", "text-max-width": 126,
+        width: GEO.slabW, height: GEO.slabH,
+        ...ruled(ORCH),
+        "border-width": 1, "border-color": line,
+        // Stands in for a drop shadow (see the note above).
+        "underlay-color": "#172033", "underlay-opacity": 0.1, "underlay-padding": 2,
+        label: "data(label)", "text-wrap": "wrap", "text-max-width": GEO.slabW - 22,
         "text-valign": "center", "text-halign": "center",
-        "font-size": 11.5, "font-weight": 600, color: "#2b3040",
+        "text-margin-y": 2,
+        "font-size": 15, "font-weight": 700, color: "#2b3040",
       },
     },
-    { selector: 'node[kind="subagent"]', style: { width: 168, height: 58, "border-width": 3, "font-size": 12.5, "font-weight": 700 } },
-    { selector: 'node[kind="decision"]', style: { shape: "round-diamond", width: 150, height: 108, "background-color": "#ffffff", "font-size": 11 } },
-    ...perAgent,
-    // Finalize reads as the terminal (as in the reference): soft red.
-    { selector: 'node[id="finalize_case"]', style: { "background-color": "#f6dede", "border-color": RED, color: "#8a2c2c" } },
+    { selector: 'node.slab[id="stage:finalize"]', style: ruled(err) },
 
-    // Orthogonal connectors, thin gray by default.
+    // --- the case, and the two poles of the loop inside it ---
+    //
+    // A compound parent, like the group clusters, so it sizes itself around the
+    // poles. Its label is the one text on the drawing that moves: `Case`, plus
+    // the phase of the loop that is running.
+    {
+      selector: "node.case",
+      style: {
+        shape: "round-rectangle",
+        ...ruled(ORCH),
+        "border-width": 1, "border-color": "#b9c4d8",
+        "underlay-color": "#172033", "underlay-opacity": 0.14, "underlay-padding": 3,
+        // The label lives *inside* the top padding band, unlike the group
+        // clusters' labels: the spine lands on this node's top edge, and a
+        // label sitting above the boundary would be written through it.
+        padding: GEO.casePad,
+        label: "data(label)", "text-wrap": "wrap", "text-max-width": 240,
+        // `text-valign: top` anchors the block's *bottom* to the top edge, so
+        // the margin has to clear the whole two-line block plus the top rule.
+        "text-valign": "top", "text-halign": "center", "text-margin-y": 44,
+        "font-size": 14.5, "font-weight": 700, color: "#2b3040",
+      },
+    },
+    // The poles are slabs, so they inherit every node.slab.st-* state rule.
+    {
+      selector: "node.slab.pole",
+      style: {
+        width: GEO.poleW, height: GEO.poleH,
+        "background-fill": "solid", "background-color": "#ffffff",
+        "font-size": 13.5, "text-margin-y": 0,
+      },
+    },
+
+    // --- group cluster (compound parent carries the group's name) ---
+    {
+      selector: "node.cluster",
+      style: {
+        shape: "round-rectangle",
+        "background-color": "#f4f7fc", "background-opacity": 0.9,
+        "border-width": 1, "border-color": "#e3e9f4",
+        padding: 10,
+        label: "data(label)", "text-valign": "top", "text-halign": "center",
+        "text-margin-y": -3, "text-wrap": "wrap", "text-max-width": 170,
+        "font-size": 12.5, "font-weight": 700, color: "#5b6270",
+      },
+    },
+    { selector: "node.cluster.gate-shut", style: { "background-color": "#faf1f0", "border-color": "#f0d9d6" } },
+
+    // --- instance discs: white with an agent-colored ring ---
+    {
+      selector: "node.disc",
+      style: {
+        shape: "ellipse",
+        "background-color": "#ffffff",
+        "border-width": 3, "border-color": muted, "border-opacity": 1,
+        label: "data(label)", "text-valign": "center", "text-halign": "center",
+        "font-size": 11, "font-weight": 700, color: "#4a5468",
+      },
+    },
+    { selector: "node.disc.note", style: { width: GEO.noteD, height: GEO.noteD, "border-color": SCAN } },
+    { selector: "node.disc.var", style: { width: GEO.varD, height: GEO.varD, "border-color": EXTR, "font-size": 0 } },
+    {
+      selector: "node.disc.gate",
+      style: {
+        width: GEO.gateD, height: GEO.gateD,
+        "border-color": warn, "font-size": 19, color: warn,
+      },
+    },
+
+    // --- edges: hairline by default, no arrowheads on the fan-out lines ---
     {
       selector: "edge",
       style: {
-        width: 2, "line-color": GRAY, "curve-style": "taxi",
-        "taxi-turn": "50%", "taxi-turn-min-distance": 8,
-        "target-arrow-shape": "triangle", "target-arrow-color": GRAY, "arrow-scale": 1.1,
+        width: 1.4, "line-color": line, "curve-style": "straight",
+        "target-arrow-shape": "none", opacity: 0.45,
       },
     },
-    // Forward flow that enters an agent block: blue (fan-out branches + the
-    // "yes" edge into the extractor).
-    { selector: 'edge[kind="fanout"]', style: { "line-color": BLUE, "target-arrow-color": BLUE } },
-    { selector: 'edge[label="yes"]', style: { "line-color": BLUE, "target-arrow-color": BLUE } },
-    // The two "no" branches exit the loop sideways: red.
-    { selector: 'edge[label="no"]', style: { "line-color": RED, "target-arrow-color": RED, width: 2.5 } },
-    { selector: 'edge[label="no: not found"]', style: { "line-color": RED, "target-arrow-color": RED, width: 2.5 } },
-    // Extractor → Update case: leave horizontally so it runs along the bottom
-    // then up the left side (the loop's lower-left corner).
-    { selector: 'edge[source="extractor_agent_block"]', style: { "taxi-direction": "horizontal" } },
-    // The per-group loop-back (Update case → gate): emphasized cycle — thick,
-    // colored, routed up the left and across the top.
+    // Straight, not taxi: the strip puts Corpus at the far right and the case
+    // below centre, so a taxi dogleg wandered down past Finalize on its way in.
     {
-      selector: 'edge[kind="loop"]',
+      selector: "edge.spine",
       style: {
-        "line-color": LOOP, "target-arrow-color": LOOP, width: 3,
-        "taxi-direction": "vertical", "taxi-turn": "90%",
+        width: 2, "curve-style": "straight",
+        "target-arrow-shape": "triangle", "target-arrow-color": line, "arrow-scale": 0.9,
       },
     },
-    // Edge captions (yes / no / loop / "one branch per …") on a small white chip.
+    // Dispatch leaves the Plan pole and results arrive at the Update pole, so
+    // the two directions are separated by the drawing itself and neither edge
+    // needs an endpoint offset to stay out of the other's corridor.
+    //
+    // The group's return arc still sags outward — unbundled-bezier bows
+    // perpendicular to the source->target line, which for a fan converging
+    // upward means "away from the case" — so a second-row cluster sweeps around
+    // the first row rather than through it.
     {
-      selector: "edge[label]",
+      selector: "edge.grp-out",
       style: {
-        label: "data(label)", "font-size": 9.5, "font-weight": 600, color: "#5b6270",
-        "text-background-color": "#ffffff", "text-background-opacity": 0.92,
-        "text-background-padding": 2.5, "text-background-shape": "round-rectangle",
-        "text-rotation": "none",
+        "curve-style": "unbundled-bezier",
+        "control-point-distances": 48, "control-point-weights": 0.5,
+        "target-arrow-shape": "triangle", "target-arrow-color": EXTR, "arrow-scale": 0.8,
+        width: 1.8,
       },
     },
+    // Out and back between a gate and its variable are two edges on one pair, so
+    // they bow apart into a lobe instead of lying on top of each other.
+    {
+      selector: "edge.var-in",
+      style: { "curve-style": "unbundled-bezier", "control-point-distances": -7, "control-point-weights": 0.5 },
+    },
+    {
+      selector: "edge.var-out",
+      style: {
+        "curve-style": "unbundled-bezier",
+        "control-point-distances": -7, "control-point-weights": 0.5,
+        "target-arrow-shape": "triangle", "target-arrow-color": EXTR, "arrow-scale": 0.5,
+      },
+    },
+    { selector: "edge.to-scanner", style: { "line-color": SCAN } },
+    { selector: "edge.to-retriever", style: { "line-color": RETR } },
+    { selector: "edge.to-extractor", style: { "line-color": EXTR } },
+    { selector: "edge.exit", style: { "line-color": err, "target-arrow-color": err } },
+    { selector: "node.disc.gate.pipe-retrieve", style: { "border-color": RETR, color: RETR } },
+    { selector: "node.disc.gate.pipe-extract", style: { "border-color": EXTR, color: EXTR } },
+    { selector: "node.disc.gate.gate-open", style: { "border-color": ok, color: ok, "background-color": tint(ok, 0.9) } },
+    { selector: "node.disc.gate.gate-shut", style: { "border-color": err, color: err, "background-color": tint(err, 0.9) } },
+    { selector: "node.disc.gate.gate-skipped", style: { "border-color": muted, color: muted } },
   ];
+}
+
+/* --- the run's shape, and when each part of it ran ------------------------
+ *
+ * `mapIndex` is built once per event-list load and answers "what was this node
+ * doing at trace-time t". It is what lets the map animate *inside* a step
+ * without any server round-trip: `/api/events` is already fetched in full, so
+ * every fan-out instance's start/end is known client-side.
+ *
+ * `windows` maps a node key to the intervals it was busy. Slabs can run more
+ * than once (the planner runs once per pass), hence a list rather than a pair.
+ */
+let mapIndex = {
+  windows: new Map(), notes: [], groups: new Map(), groupByTask: new Map(),
+  passStarts: [], verdictT: Infinity, tMax: 0,
+};
+
+function addWindow(windows, key, t0, t1) {
+  if (!windows.has(key)) windows.set(key, []);
+  windows.get(key).push({ t0, t1 });
+}
+
+function buildMapIndex() {
+  const windows = new Map();
+  const notes = [];
+  const groups = new Map();          // group_id -> {id, name, variables:[…]}
+  const openByTask = new Map();      // task_id -> {key, t0}
+  const groupByTask = new Map();     // extract_branch task_id -> group_id
+  const passStarts = [];             // each plan_extraction start: a loop turn
+  let verdictT = Infinity;
+  let tMax = 0;
+
+  const open = (taskId, key, t) => openByTask.set(taskId, { key, t0: t });
+  const close = (taskId, t) => {
+    const entry = openByTask.get(taskId);
+    if (!entry) return;
+    openByTask.delete(taskId);
+    addWindow(windows, entry.key, entry.t0, t);
+  };
+
+  for (const ev of events) {
+    tMax = Math.max(tMax, ev.t || 0);
+    const payload = ev.payload && typeof ev.payload === "object" ? ev.payload : {};
+
+    // The corpus descriptors are what the planner's gate predicates read, so
+    // this is the moment every gate verdict becomes knowable.
+    if (ev.type === "task_end" && ev.node === "characterize_corpus") {
+      verdictT = Math.min(verdictT, ev.t);
+    }
+
+    if (ev.type !== "task_start" && ev.type !== "task_end") continue;
+
+    // Stage slabs and the two case poles, via the coarse block the runtime node
+    // belongs to. Both kinds are drawn boxes with their own busy state; only the
+    // `band:` entries are not.
+    const slab = BLOCK_TO_MAP[coarse(ev.map_node_id)];
+    if (slab && !slab.startsWith("band:")) {
+      if (ev.type === "task_start") open(`slab/${ev.task_id}`, slab, ev.t);
+      else close(`slab/${ev.task_id}`, ev.t);
+    }
+
+    // The case stands for several root nodes at once, so each keeps its own
+    // window — that is what lets the case's label name the running phase.
+    if (!ev.namespace.length && CASE_PHASE_NODES[ev.node]) {
+      if (ev.type === "task_start") {
+        open(`phase/${ev.task_id}`, `phase:${ev.node}`, ev.t);
+        if (ev.node === "plan_extraction") passStarts.push(ev.t);
+      } else close(`phase/${ev.task_id}`, ev.t);
+    }
+
+    if (ev.node === "note_branch" && !ev.namespace.length) {
+      const key = `note:${payload.note_id}`;
+      if (ev.type === "task_start") {
+        notes.push({ id: key, noteId: payload.note_id, type: payload.note_type || "" });
+        open(`note/${ev.task_id}`, key, ev.t);
+      } else close(`note/${ev.task_id}`, ev.t);
+      continue;
+    }
+
+    if (ev.node === "extract_branch" && !ev.namespace.length) {
+      const requested = payload.requested_variables || {};
+      const gid = requested.group_id;
+      if (ev.type === "task_start") {
+        groupByTask.set(ev.task_id, gid);
+        if (gid && !groups.has(gid)) {
+          groups.set(gid, {
+            id: gid,
+            name: requested.name || gid,
+            variables: (requested.variables || []).map((v) => ({
+              itemId: v.item_id,
+              name: v.name || `Item ${v.item_id}`,
+            })),
+          });
+        }
+        open(`grp/${ev.task_id}`, `grp:${gid}`, ev.t);
+      } else close(`grp/${ev.task_id}`, ev.t);
+      continue;
+    }
+
+    // Which pipeline stage a group's gate disc should show while it runs.
+    if (ev.node === "retrieve_notes" || ev.node === "extract") {
+      const gid = groupByTask.get((ev.namespace[0] || "").split(":")[1]);
+      if (!gid) continue;
+      const key = ev.node === "retrieve_notes" ? `grpret:${gid}` : `grpext:${gid}`;
+      if (ev.type === "task_start") open(`pipe/${ev.task_id}`, key, ev.t);
+      else close(`pipe/${ev.task_id}`, ev.t);
+      continue;
+    }
+
+    if (ev.node === "variable_branch") {
+      // Only the *start* payload names the variable — the end payload carries
+      // the result. Closing has to key off the task id alone, or the window
+      // never closes and the variable reads as running for the rest of the run.
+      if (ev.type === "task_start") {
+        const itemId = ((payload.task || {}).variable || {}).item_id;
+        if (itemId != null) open(`var/${ev.task_id}`, `var:${itemId}`, ev.t);
+      } else close(`var/${ev.task_id}`, ev.t);
+      continue;
+    }
+  }
+
+  // Anything still open at the end of the stream (a live run, or a crash) stays
+  // busy to the end rather than vanishing.
+  for (const [, entry] of openByTask) addWindow(windows, entry.key, entry.t0, Infinity);
+
+  mapIndex = { windows, notes, groups, groupByTask, passStarts, verdictT, tMax };
+  return mapIndex;
+}
+
+// "idle" | "active" | "done" for a node key at trace-time t.
+function stateAt(key, t) {
+  const windows = mapIndex.windows.get(key);
+  if (!windows) return "idle";
+  let seen = false;
+  for (const w of windows) {
+    if (t >= w.t0 && t < w.t1) return "active";
+    if (t >= w.t1) seen = true;
+  }
+  return seen ? "done" : "idle";
+}
+
+// The start of the loop turn `t` falls in. Used to scope the return arcs to the
+// pass that is actually reporting back, rather than lighting every variable the
+// run has ever finished each time the case is updated.
+function passStartBefore(t) {
+  let start = 0;
+  for (const s of mapIndex.passStarts) if (s <= t) start = s;
+  return start;
+}
+
+function endedSince(key, t, since) {
+  return (mapIndex.windows.get(key) || []).some((w) => w.t1 <= t && w.t1 >= since);
+}
+
+function anyGroupActive(t) {
+  for (const gid of mapIndex.groups.keys()) if (stateAt(`grp:${gid}`, t) === "active") return true;
+  return false;
+}
+
+// Which phase of the loop is running at `t` — the second line of the case's
+// label, and "" at rest. Dispatch is checked before planning because a pass runs
+// *inside* the loop turn the planner opened. Extraction is the reason this lives
+// on the case rather than on a pole: it belongs to neither.
+function casePhase(t) {
+  if (stateAt("phase:merge_and_update", t) === "active") return CASE_PHASE_NODES.merge_and_update;
+  if (anyGroupActive(t)) return "Extracting…";
+  for (const node of ["plan_extraction", "check_state"]) {
+    if (stateAt(`phase:${node}`, t) === "active") return CASE_PHASE_NODES[node];
+  }
+  return CASE_REST;
+}
+
+// A planning check has run by `t`, so the planner's verdicts are now things it
+// has *decided* rather than things merely computable. Gate lines hang off this.
+function planChecked(t) {
+  return mapIndex.passStarts.length > 0 && mapIndex.passStarts[0] <= t;
+}
+
+/* --- the drawing -------------------------------------------------------- */
+
+// Node/edge elements for this run. Groups and their variables come from the
+// snapshot's plan when there is one (it is authoritative and present from
+// Initialize onward); the index fills in for a cursor that has not reached the
+// plan yet, so the map's shape never changes shape mid-run.
+function buildMapModel(snapshot) {
+  const nodes = [];
+  const edges = [];
+  const add = (data, classes) => nodes.push({ data, classes });
+  const link = (source, target, classes, data) =>
+    edges.push({ data: { id: `${source}->${target}`, source, target, ...(data || {}) }, classes });
+
+  for (const stage of STAGES) add({ id: stage.id, label: stage.label, block: stage.block }, "slab");
+
+  // The case, and the two poles of the extraction loop inside it. The container
+  // carries no `block`, so a tap on it falls through and leaves Panel 2's pin
+  // alone; the poles are the click targets.
+  add({ id: CASE_ID, label: "Case" }, "case");
+  for (const pole of POLES) {
+    add({ id: pole.id, parent: CASE_ID, label: pole.label, title: pole.label, block: pole.block }, "slab pole");
+  }
+
+  for (const note of mapIndex.notes) {
+    add({ id: note.id, label: `#${note.noteId}`, title: `${note.type} #${note.noteId}`.trim(), block: "scanner_agent_block" }, "disc note");
+    link("stage:initialize", note.id, "fan to-scanner note-in");
+    link(note.id, "stage:corpus", "fan to-scanner note-out");
+  }
+
+  for (const group of planGroups(snapshot)) {
+    const cluster = `grp:${group.id}`;
+    const gate = `gate:${group.id}`;
+    add({ id: cluster, label: group.name, block: "retriever_agent_block" }, "cluster");
+    add({ id: gate, parent: cluster, label: "", title: group.annotation || group.name, group: group.id, block: "retriever_agent_block" }, "disc gate");
+    link("pole:plan", gate, "fan to-retriever gate-in", { group: group.id });
+    for (const variable of group.variables) {
+      const id = `var:${variable.itemId}`;
+      add({ id, parent: cluster, label: "", title: variable.name, group: group.id, block: "extractor_agent_block" }, "disc var");
+      link(gate, id, "fan to-extractor var-in", { group: group.id });
+      // Results come back out of the variable — but to the gate, which then
+      // reports the group to the Update pole. Thirty-two arcs converging on one
+      // box is the same wall of ink as the old bottom fan-in, just upside down;
+      // one arc per group is legible, and it is what actually happens (the
+      // group's variables are merged before the case is updated).
+      link(id, gate, "fan to-extractor var-out", { group: group.id });
+    }
+    // The loop closes on the case: dispatched from Plan, returned to Update.
+    link(gate, "pole:update", "fan to-extractor grp-out", { group: group.id });
+  }
+
+  // Onto the container, not the Plan pole: it stops at the case's top edge and
+  // so stays clear of the label sitting in the padding band below it.
+  link("stage:corpus", CASE_ID, "spine");
+  // Sourced from the container, so it leaves the case's right boundary rather
+  // than piercing it from a pole on the far side.
+  link(CASE_ID, "stage:finalize", "spine exit");
+
+  return { nodes, edges };
+}
+
+// The planned groups, each with its variables — snapshot first, index as backup.
+function planGroups(snapshot) {
+  const progress = snapshot && snapshot.progress;
+  if (progress && progress.groups && progress.groups.length) {
+    const byGroup = {};
+    for (const v of progress.variables || []) {
+      (byGroup[v.group_id] = byGroup[v.group_id] || []).push({ itemId: v.item_id, name: v.name });
+    }
+    return progress.groups.map((g) => ({
+      id: g.group_id,
+      name: g.name || g.group_id,
+      annotation: g.annotation || "",
+      variables: byGroup[g.group_id] || [],
+    }));
+  }
+  return [...mapIndex.groups.values()].map((g) => ({ ...g, annotation: "" }));
+}
+
+/* --- layout ---------------------------------------------------------------
+ *
+ * The drawing's shape has to track the panel's, or cy.fit() throws half the
+ * panel away: a 1.4:1 drawing in a 2.3:1 panel scales to the height and leaves
+ * the sides empty, which is what made every label too small to read.
+ *
+ * So there is no fixed arrangement. `packLayout` lays the run out for a given
+ * (bandCols, varCols, noteCols), and `computeLayout` tries them all and keeps
+ * whichever renders *largest* in the container we actually have. Scoring on the
+ * achievable zoom rather than on some target aspect means the thing being
+ * optimised is exactly the thing that was wrong.
+ */
+const FIT_PAD = 12;
+const CLUSTER_PAD = 10;   // node.cluster's `padding`, which Cytoscape adds around the children
+const BAND_ROW_GAP = 56;  // between band rows: a cluster's label hangs above its box
+const FINALIZE_GAP = 70;
+
+// The container, or a sane guess: on first paint the flex panel has no size yet.
+function viewportBox() {
+  const w = cy ? cy.width() : 0;
+  const h = cy ? cy.height() : 0;
+  return { w: w > 40 ? w : 1100, h: h > 40 ? h : 500 };
+}
+
+// Group the model's variables under their cluster once, so the search below can
+// re-pack a few hundred times without re-filtering the node list every pass.
+function modelParts(model) {
+  const varsBy = new Map();
+  for (const n of model.nodes) {
+    if (!n.classes.includes("var") || !n.data.parent) continue;
+    if (!varsBy.has(n.data.parent)) varsBy.set(n.data.parent, []);
+    varsBy.get(n.data.parent).push(n.data.id);
+  }
+  const clusters = model.nodes
+    .filter((n) => n.classes === "cluster")
+    .map((n) => ({ id: n.data.id, gate: n.data.id.replace("grp:", "gate:"), vars: varsBy.get(n.data.id) || [] }));
+  return { clusters, notes: mapIndex.notes };
+}
+
+// One candidate arrangement: a scanner strip, the case row, then the group band.
+// Pure — same parts + opts always give the same positions and extent.
+function packLayout(parts, opts) {
+  const { bandCols, varCols, noteCols } = opts;
+  const pos = {};
+
+  // --- measure each cluster: the gate at the left, its variables in a grid to
+  // the right of it. Stacking the gate above cost `gateD + 26` of height on
+  // every cluster, and height is what binds in a panel this wide — sideways the
+  // gate costs nothing at all until a group has fewer than two rows of
+  // variables. It also reads like the case's poles: dispatch flows rightward.
+  const sized = parts.clusters.map((c) => {
+    const cols = Math.min(varCols, Math.max(c.vars.length, 1));
+    const rows = Math.ceil(c.vars.length / cols) || 1;
+    return {
+      ...c, cols, rows,
+      w: GEO.gateD + GEO.gateGap + cols * GEO.varGapX + CLUSTER_PAD * 2,
+      h: Math.max(GEO.gateD, rows * GEO.varGapY) + CLUSTER_PAD * 2,
+    };
+  });
+
+  // --- pack the clusters into rows of `bandCols`
+  const bandRows = [];
+  for (let i = 0; i < sized.length; i += bandCols) {
+    const items = sized.slice(i, i + bandCols);
+    bandRows.push({
+      items,
+      w: items.reduce((a, s) => a + s.w, 0) + GEO.clusterGap * (items.length - 1),
+      h: Math.max(0, ...items.map((s) => s.h)),
+    });
+  }
+  const bandW = Math.max(0, ...bandRows.map((r) => r.w));
+  const bandH = bandRows.reduce((a, r, i) => a + r.h + (i ? BAND_ROW_GAP : 0), 0);
+
+  // --- the strip: Initialize and Corpus at the ends, notes in a grid between
+  const notes = parts.notes;
+  const perRow = Math.max(1, Math.min(noteCols, notes.length || 1));
+  const noteRows = Math.ceil(notes.length / perRow) || 1;
+  const notesW = (perRow - 1) * GEO.noteGapX + GEO.noteD;
+  const notesH = (noteRows - 1) * GEO.noteGapY + GEO.noteD;
+  const stripW = GEO.slabW * 2 + GEO.stripGap * 2 + notesW;
+  const slabCy = GEO.slabH / 2;
+  const notesCy = slabCy + GEO.noteDrop;
+  const stripH = notesCy + notesH / 2;
+
+  // --- the case row, with Finalize hanging off its right
+  const caseW = GEO.poleW * 2 + GEO.poleGap + GEO.casePad * 2;
+  const caseH = GEO.poleH + GEO.casePad * 2;
+
+  // Finalize makes the case row asymmetric, so the two sides are measured apart.
+  const left = Math.max(stripW, bandW, caseW) / 2;
+  const right = Math.max(stripW / 2, bandW / 2, caseW / 2 + FINALIZE_GAP + GEO.slabW);
+  const cx = left;
+
+  let y = slabCy;
+  pos["stage:initialize"] = { x: cx - stripW / 2 + GEO.slabW / 2, y };
+  pos["stage:corpus"] = { x: cx + stripW / 2 - GEO.slabW / 2, y };
+  const noteY0 = notesCy - notesH / 2 + GEO.noteD / 2;
+  notes.forEach((note, i) => {
+    const row = Math.floor(i / perRow);
+    const inRow = Math.min(perRow, notes.length - row * perRow);
+    pos[note.id] = {
+      x: cx - ((inRow - 1) * GEO.noteGapX) / 2 + (i % perRow) * GEO.noteGapX,
+      y: noteY0 + row * GEO.noteGapY,
+    };
+  });
+
+  // Only the poles get positions — the case container is a compound parent and
+  // sizes itself around them.
+  y = stripH + GEO.rowGap + caseH / 2;
+  const poleDX = (GEO.poleW + GEO.poleGap) / 2;
+  pos["pole:plan"] = { x: cx - poleDX, y };
+  pos["pole:update"] = { x: cx + poleDX, y };
+  pos["stage:finalize"] = { x: cx + caseW / 2 + FINALIZE_GAP + GEO.slabW / 2, y };
+
+  let by = stripH + GEO.rowGap + caseH + GEO.rowGap;
+  for (const band of bandRows) {
+    let x = cx - band.w / 2;
+    for (const s of band.items) {
+      const midY = by + s.h / 2;
+      pos[s.gate] = { x: x + CLUSTER_PAD + GEO.gateD / 2, y: midY };
+      const varsX = x + CLUSTER_PAD + GEO.gateD + GEO.gateGap + GEO.varGapX / 2;
+      const varsY = midY - ((s.rows - 1) * GEO.varGapY) / 2;
+      s.vars.forEach((id, i) => {
+        pos[id] = {
+          x: varsX + (i % s.cols) * GEO.varGapX,
+          y: varsY + Math.floor(i / s.cols) * GEO.varGapY,
+        };
+      });
+      x += s.w + GEO.clusterGap;
+    }
+    by += band.h + BAND_ROW_GAP;
+  }
+
+  return {
+    pos,
+    w: left + right,
+    h: stripH + GEO.rowGap + caseH + (bandH ? GEO.rowGap + bandH : 0),
+  };
+}
+
+// Column counts worth trying for `n` items: every value while that is cheap,
+// thinning out beyond. `n` itself is always included — capping below it would
+// hide the single-row packing, which is the flattest one there is and the only
+// answer when the panel is very wide.
+function colCandidates(n) {
+  const out = new Set([1, n]);
+  for (let i = 2; i <= Math.min(n, 16); i++) out.add(i);
+  for (let i = 20; i < n; i += 4) out.add(i);
+  return [...out].filter((v) => v >= 1).sort((a, b) => a - b);
+}
+
+// Which packing renders largest here. `layoutKey` is what refitMap watches: if
+// the panel changes shape enough to change the winner, the band re-packs.
+let layoutKey = "";
+
+function computeLayout(model) {
+  const parts = modelParts(model);
+  const view = viewportBox();
+  const maxVars = Math.max(1, ...parts.clusters.map((c) => c.vars.length));
+  const bandChoices = colCandidates(Math.max(1, parts.clusters.length));
+  const noteChoices = colCandidates(Math.max(1, parts.notes.length));
+  let best = null;
+
+  for (const bandCols of bandChoices) {
+    for (let varCols = 1; varCols <= Math.min(maxVars, 16); varCols++) {
+      for (const noteCols of noteChoices) {
+        const packed = packLayout(parts, { bandCols, varCols, noteCols });
+        const scale = Math.min(
+          (view.w - FIT_PAD * 2) / packed.w,
+          (view.h - FIT_PAD * 2) / packed.h,
+        );
+        const area = packed.w * packed.h;
+        const better = !best
+          || scale > best.scale + 1e-6
+          || (scale > best.scale - 1e-6 && area < best.area);
+        if (better) best = { packed, scale, area, key: `${bandCols}/${varCols}/${noteCols}` };
+      }
+    }
+  }
+
+  layoutKey = best.key;
+  return best.packed.pos;
 }
 
 function buildMap(graph) {
@@ -333,51 +941,32 @@ function buildMap(graph) {
   }
   const agentColors = graph.agent_colors || {};
   applyAgentColors(agentColors);
-  renderLegend(agentColors);
 
-  // Hand-authored layout matching the reference flowchart (see MAP_POS). Endpoint
-  // blocks are hidden; each fan-out is drawn as ONE labeled edge (the ×N badge on
-  // the target node already conveys the multiplicity), so the map reads as a clean
-  // cyclic flowchart. Falls back to breadthfirst if the chart grows nodes we have
-  // no position for.
-  const rawNodes = graph.elements.nodes.filter((n) => !MAP_HIDE.has(n.data.id));
-  const havePreset = rawNodes.every((n) => MAP_POS[n.data.id]);
-  const nodes = rawNodes.map((n) => ({
-    data: { ...n.data, baseLabel: n.data.label },
-    ...(MAP_POS[n.data.id] ? { position: { ...MAP_POS[n.data.id] } } : {}),
-  }));
-  const edges = graph.elements.edges
-    .filter((e) => !MAP_HIDE.has(e.data.source) && !MAP_HIDE.has(e.data.target))
-    // Collapse fan-out triples: keep only the center (labeled) lane.
-    .filter((e) => e.data.kind !== "fanout" || e.data.fanout_lane === "center")
-    .map((e) => ({ data: { ...e.data } }));
-
+  buildMapIndex();
   cy = cytoscape({
     container: document.getElementById("cy"),
-    elements: { nodes, edges },
-    // Demo-only stylesheet (built from the chart's agent colors) + the authored
-    // preset positions; the shared chart JSON is untouched. Run-state overlays
-    // (visited / current / active / traversed) layer on top.
-    style: [...mapStyle(agentColors), ...stateStyles()],
-    layout: havePreset
-      ? { name: "preset", fit: true, padding: 24 }
-      : graph.layout || { name: "breadthfirst", directed: true },
+    elements: { nodes: [], edges: [] },
+    style: [...mapStyle(agentColors), ...stateStyles(agentColors)],
+    layout: { name: "preset" },
     wheelSensitivity: 0.2,
-    minZoom: 0.3,
+    minZoom: 0.2,
     maxZoom: 2.5,
   });
 
   // The map lives in a flex panel that may not have its final size when
-  // Cytoscape initializes, so re-fit once laid out and whenever it resizes.
-  const fit = () => { cy.resize(); cy.fit(undefined, 24); };
-  cy.one("layoutstop", fit);
-  requestAnimationFrame(fit);
+  // Cytoscape initializes, and the presenter can drag the splitter at any time.
+  // Since the packing is *chosen against* the container, a resize may want a
+  // different one — so re-pack, not just re-fit.
   const container = document.getElementById("cy");
-  if (window.ResizeObserver) new ResizeObserver(fit).observe(container);
+  if (window.ResizeObserver) new ResizeObserver(refitMap).observe(container);
 
-  // Click a block to pin Panel 2 to it; click empty space to unpin.
+  // Click a slab or a disc to pin Panel 2 to the component behind it; click
+  // empty space to unpin. Discs resolve through their own `block`, so clicking
+  // a note pins the scanner and clicking a variable pins the extractor.
   cy.on("tap", "node", (evt) => {
-    focusBlock = evt.target.id();
+    const block = evt.target.data("block");
+    if (!block) return;
+    focusBlock = block;
     if (lastView) renderDetail(lastView);
   });
   cy.on("tap", (evt) => {
@@ -386,6 +975,70 @@ function buildMap(graph) {
       if (lastView) renderDetail(lastView);
     }
   });
+  wireMapTooltip();
+}
+
+function fitMap() {
+  if (!cy) return;
+  cy.resize();
+  cy.fit(undefined, FIT_PAD);
+}
+
+// The panel changed shape. Re-run the search; if it picks a different packing,
+// move the nodes and repaint the frame we were on — replaying `lastRenderT`
+// rather than the step end, or a resize mid-animation would jump the map to
+// some other point in the run.
+let refitTimer = null;
+
+function refitMap() {
+  if (refitTimer !== null) clearTimeout(refitTimer);
+  refitTimer = setTimeout(() => {
+    refitTimer = null;
+    if (!cy) return;
+    if (lastMapModel) {
+      const before = layoutKey;
+      const pos = computeLayout(lastMapModel);
+      if (layoutKey !== before) {
+        cy.batch(() => {
+          for (const id of Object.keys(pos)) {
+            const node = cy.getElementById(id);
+            if (node.nonempty()) node.position({ ...pos[id] });
+          }
+        });
+        if (lastView) renderMapAt(lastRenderT, lastView.snapshot, lastView.step);
+      }
+    }
+    fitMap();
+  }, 120);
+}
+
+// Rebuild the drawing when the run's shape changes (first snapshot, or a live
+// run growing). `shapeKey` keeps a redraw from firing on every cursor move,
+// which would reset pan/zoom and kill the animation.
+let mapShapeKey = "";
+// Kept so a resize can re-pack without rebuilding the elements.
+let lastMapModel = null;
+
+function syncMap(snapshot) {
+  if (!cy) return;
+  const model = buildMapModel(snapshot);
+  const key = model.nodes.map((n) => n.data.id).join("|");
+  if (key === mapShapeKey) return;
+  mapShapeKey = key;
+  lastMapModel = model;
+
+  const pos = computeLayout(model);
+  cy.elements().remove();
+  cy.add(model.nodes.map((n) => ({
+    group: "nodes",
+    data: n.data,
+    classes: n.classes,
+    ...(pos[n.data.id] ? { position: { ...pos[n.data.id] } } : {}),
+  })));
+  cy.add(model.edges.map((e) => ({ group: "edges", data: e.data, classes: e.classes })));
+  // Fit now (the panel may still be sizing) and again next frame, once it has.
+  fitMap();
+  requestAnimationFrame(fitMap);
 }
 
 function applyAgentColors(colors) {
@@ -393,105 +1046,423 @@ function applyAgentColors(colors) {
   for (const a of AGENTS) if (colors[a]) root.setProperty(`--${a}`, colors[a]);
 }
 
-function stateStyles() {
+// Run-state overlay: how a node/edge looks at a point in the run. A disc's ring
+// is faint before it runs, haloed while it runs, and filled once done — the
+// "○ empty → ◎ half → ● filled" progression.
+function stateStyles(agentColors) {
+  const { warn, err } = MAP_COLORS;
+  const scanner = (agentColors || {}).scanner || "#008c7a";
+  const extractor = (agentColors || {}).extractor || "#1473e6";
   return [
     {
-      selector: "node",
+      selector: "node, edge",
       style: {
-        "transition-property": "opacity, border-width, background-color",
-        "transition-duration": "150ms",
+        "transition-property": "opacity, border-opacity, background-color, width",
+        "transition-duration": "160ms",
       },
     },
-    { selector: ".dim", style: { opacity: 0.32 } },
-    { selector: "node.visited", style: { opacity: 1 } },
+
+    { selector: "node.disc.st-idle", style: { "border-opacity": 0.3, opacity: 0.55 } },
     {
-      selector: "node.current",
+      selector: "node.disc.st-active",
       style: {
-        "border-width": 5,
-        "overlay-color": "#ffb020",
-        "overlay-opacity": 0.28,
-        "overlay-padding": 9,
+        opacity: 1, "border-opacity": 1,
+        "underlay-color": warn, "underlay-opacity": 0.35, "underlay-padding": 7,
         "z-index": 20,
       },
     },
+    // Done is *filled*, not merely un-dimmed: at the size these discs end up on
+    // screen a pale tint is indistinguishable from idle, and telling finished
+    // work from pending work at a glance is the whole job.
+    { selector: "node.disc.st-done", style: { opacity: 1, "border-opacity": 1 } },
+    { selector: "node.disc.note.st-done", style: { "background-color": tint(scanner, 0.42) } },
+    { selector: "node.disc.var.st-done", style: { "background-color": tint(extractor, 0.42) } },
+    // A variable the run settled without a value — visibly reached, but empty.
+    { selector: "node.disc.var.st-empty", style: { opacity: 1, "border-opacity": 0.55, "background-color": "#ffffff" } },
+    { selector: "node.disc.var.st-flagged", style: { "border-color": err, "background-color": tint(err, 0.9) } },
+
+    // Everything behind a shut gate stays dark for the whole run: it never ran,
+    // and showing it as merely "not yet" would be a lie.
+    { selector: ".blocked", style: { opacity: 0.16 } },
+    { selector: "node.cluster.blocked", style: { opacity: 0.5 } },
+    // A ruled-out group still gets its wire from Plan — that is what the ✗
+    // hangs on — so it has to be faint but actually visible.
+    { selector: "edge.blocked", style: { opacity: 0.34 } },
+
+    { selector: "node.slab.st-idle", style: { opacity: 0.45 } },
+    { selector: "node.slab.st-done", style: { opacity: 1 } },
     {
-      selector: "node.active",
-      style: { "overlay-color": "#ffb020", "overlay-opacity": 0.22, "overlay-padding": 7 },
+      selector: "node.slab.st-active",
+      style: { opacity: 1, "underlay-color": warn, "underlay-opacity": 0.3, "underlay-padding": 5 },
     },
-    { selector: "edge.dim", style: { opacity: 0.16 } },
-    // Traversed edges just light up (full opacity + raised) — the run-state must
-    // NOT recolor them, so the semantic edge colors (blue forward / red exit /
-    // purple loop) stay readable along the walked path.
-    { selector: "edge.traversed", style: { opacity: 1, "z-index": 15 } },
+    {
+      selector: "node.current",
+      style: { "border-width": 2, "border-color": warn, "z-index": 25 },
+    },
+
+    { selector: "edge.st-idle", style: { opacity: 0.28 } },
+    { selector: "edge.st-done", style: { opacity: 0.95, width: 2 } },
+    // Nineteen variables converging on Update case is a lot of ink; the filled
+    // discs already carry the state, so a walked fan edge only has to show the
+    // path exists. The spine keeps its weight.
+    { selector: "edge.fan.st-done", style: { opacity: 0.5, width: 1.3 } },
+    // A 12-variable group is 24 lobes off one gate. Once walked they only have
+    // to show the path existed — the filled discs carry the state — so they get
+    // out of the way until something flows along them again.
+    { selector: "edge.var-in.st-done, edge.var-out.st-done", style: { opacity: 0.3, width: 1 } },
+    // The travelling dash: `line-dash-offset` is stepped by dashLoop().
+    {
+      selector: "edge.flowing",
+      style: {
+        opacity: 1, width: 2.6,
+        "line-style": "dashed", "line-dash-pattern": [7, 5],
+        "z-index": 18,
+      },
+    },
+
+    // An edge with nothing to say yet. Last in the sheet so it beats
+    // `edge.flowing`'s opacity on a specificity tie.
+    //
+    // Opacity, *not* `display: none`: display would drop the edge out of
+    // cy.fit()'s bounds, so the viewport would lurch every time one appeared
+    // mid-animation. Opacity keeps the bounds fixed and picks up the 160ms
+    // transition above, so edges fade in as the run reaches them. `events: no`
+    // keeps an invisible edge from catching the hover tooltip.
+    { selector: ".undrawn", style: { opacity: 0, events: "no" } },
   ];
 }
 
-function renderLegend(colors) {
-  els.legend.innerHTML = AGENTS.map(
-    (a) =>
-      `<span class="lg"><span class="sw" style="background:${colors[a] || "#6d5bd0"}"></span>${a}</span>`
-  ).join("");
+// One shared rAF loop drives every travelling dash, and stops itself when no
+// edge is flowing so an idle map costs nothing.
+let dashOffset = 0;
+let dashRaf = null;
+
+function dashLoop() {
+  const flowing = cy && cy.edges(".flowing");
+  if (!flowing || flowing.length === 0) {
+    dashRaf = null;
+    return;
+  }
+  dashOffset = (dashOffset - 0.9) % 24;
+  flowing.style("line-dash-offset", dashOffset);
+  dashRaf = requestAnimationFrame(dashLoop);
+}
+
+function startDashLoop() {
+  if (dashRaf === null) dashRaf = requestAnimationFrame(dashLoop);
 }
 
 function coarse(fineId) {
   return fineId ? COARSE[fineId] || null : null;
 }
 
-function updateMap(snapshot, step) {
+// A gate's verdict at trace-time t. Undecided until corpus characterization
+// produces the descriptors the planner's predicates read; after that the
+// annotation the model already computed *is* the verdict, so the map never
+// second-guesses the planner.
+function gateVerdict(annotation, t) {
+  const gated = /^(gate:|site:)/.test(annotation || "");
+  if (gated && t < mapIndex.verdictT) return "pending";
+  if (/✗/.test(annotation || "")) return "shut";
+  return "open";
+}
+
+const GATE_GLYPH = { open: "✓", shut: "✗", pending: "?", skipped: "–" };
+
+// The trace-time of the frame currently painted, for refitMap to replay.
+let lastRenderT = 0;
+
+// Assign every node/edge its class for trace-time `t`. Pure: the same t always
+// produces the same drawing, so scrubbing and animating share one code path.
+function renderMapAt(t, snapshot, step) {
   if (!cy) return;
-  const visitedCoarse = new Set();
-  for (const fine of snapshot.visited_map_nodes || []) {
-    const c = coarse(fine);
-    if (c) visitedCoarse.add(c);
-  }
-  // Older recorded traces mapped the extract wrapper directly onto the
-  // extractor. The wrapper is the implicit relevant-notes decision, so recover
-  // that conceptual visit without requiring persisted traces to be rewritten.
-  if (events.some((event) =>
-    event.seq <= snapshot.seq && event.type === "task_start" && event.node === "extract"
-  )) {
-    visitedCoarse.add("relevant_notes_gate");
-  }
-  visitedCoarse.add("case_start");
-  if (snapshot.finished) visitedCoarse.add("case_end");
+  lastRenderT = t;   // so a resize can repaint this frame, not the step's end
+  const progress = (snapshot && snapshot.progress) || {};
+  const byItem = {};
+  for (const v of progress.variables || []) byItem[v.item_id] = v;
+  const annotations = {};
+  for (const g of progress.groups || []) annotations[g.group_id] = g.annotation || "";
 
-  const activeCoarse = new Set();
-  for (const fine of snapshot.active_map_nodes || []) {
-    const c = coarse(fine);
-    if (c) activeCoarse.add(c);
-  }
-  const currentCoarse = coarse(step && step.map_node_id);
-
-  // Fan-out multiplicity badges: max instance count among member fine nodes.
-  const badge = {};
-  for (const [block, members] of Object.entries(COARSE_MEMBERS)) {
-    let n = 0;
-    for (const m of members) {
-      const d = snapshot.details[m];
-      if (d && d.count > n) n = d.count;
+  const currentBlock = BLOCK_TO_MAP[coarse(step && step.map_node_id)] || null;
+  // An extraction pass is *about* the groups it fanned out over, so highlight
+  // those clusters rather than the whole band — the step's coarse block can
+  // only name "the extractor".
+  const currentGroups = new Set();
+  if (step && step.node === "extract_branch") {
+    for (const taskId of stepTaskIds(step)) {
+      const gid = mapIndex.groupByTask.get(taskId);
+      if (gid) currentGroups.add(gid);
     }
-    if (n > 1) badge[block] = n;
   }
+  const blocked = new Set();
 
   cy.batch(() => {
-    cy.nodes().forEach((node) => {
-      const id = node.id();
-      node.removeClass("visited current active dim");
-      if (visitedCoarse.has(id)) node.addClass("visited");
-      else node.addClass("dim");
-      if (activeCoarse.has(id)) node.addClass("active");
-      if (id === currentCoarse) node.addClass("current");
-      const base = node.data("baseLabel");
-      node.data("label", badge[id] ? `${base}  ×${badge[id]}` : base);
+    // Gates first: their verdict decides whether anything behind them may light.
+    cy.nodes(".gate").forEach((node) => {
+      const gid = node.data("group");
+      const annotation = annotations[gid] || "";
+      let verdict = gateVerdict(annotation, t);
+      const retrieving = stateAt(`grpret:${gid}`, t);
+      const extracting = stateAt(`grpext:${gid}`, t);
+      const ran = stateAt(`grp:${gid}`, t);
+
+      // An open group the retriever found no notes for is skipped, not failed.
+      if (verdict === "open" && ran === "done" && !hasAnyVariableRun(gid, t)) {
+        verdict = "skipped";
+      }
+      if (verdict === "shut") blocked.add(gid);
+
+      node.removeClass("gate-open gate-shut gate-pending gate-skipped pipe-retrieve pipe-extract st-idle st-active st-done");
+      node.addClass(`gate-${verdict}`);
+      node.addClass(ran === "idle" ? "st-idle" : ran === "active" ? "st-active" : "st-done");
+      if (retrieving === "active") node.addClass("pipe-retrieve");
+      else if (extracting === "active") node.addClass("pipe-extract");
+      node.data("label", GATE_GLYPH[verdict] || "");
+      node.data("title", annotation || node.data("title"));
     });
+
+    cy.nodes(".cluster").forEach((node) => {
+      const gid = node.id().replace("grp:", "");
+      node.toggleClass("blocked", blocked.has(gid));
+      node.toggleClass("gate-shut", blocked.has(gid));
+      node.toggleClass("current", currentGroups.has(gid));
+    });
+
+    cy.nodes(".note").forEach((node) => setState(node, stateAt(node.id(), t)));
+
+    cy.nodes(".var").forEach((node) => {
+      const gid = node.data("group");
+      if (blocked.has(gid)) {
+        node.removeClass("st-idle st-active st-done st-empty st-flagged").addClass("blocked");
+        return;
+      }
+      node.removeClass("blocked");
+      const state = stateAt(node.id(), t);
+      setState(node, state);
+      // A settled variable with no value reads as reached-but-empty rather than
+      // as another filled dot.
+      const result = byItem[Number(node.id().slice(4))];
+      const empty = state === "done" && result && (result.value == null || result.value === "");
+      node.toggleClass("st-empty", Boolean(empty));
+      node.toggleClass("st-flagged", Boolean(result && result.flag));
+      if (empty) node.removeClass("st-done");
+    });
+
+    cy.nodes(".slab").forEach((node) => {
+      setState(node, stateAt(node.id(), t));
+      node.toggleClass("current", node.id() === currentBlock);
+    });
+
+    // The case is the one label on the drawing that moves.
+    const phase = casePhase(t);
+    const caseNode = cy.getElementById(CASE_ID);
+    if (caseNode.nonempty()) {
+      caseNode.data("label", phase ? `Case\n${phase}` : "Case");
+      const poles = ["pole:plan", "pole:update"].map((id) => stateAt(id, t));
+      setState(caseNode, phase ? "active" : poles.some((s) => s !== "idle") ? "done" : "idle");
+    }
+
+    const checked = planChecked(t);
     cy.edges().forEach((edge) => {
-      edge.removeClass("traversed dim");
-      const s = edge.source().id();
-      const t = edge.target().id();
-      if (visitedCoarse.has(s) && visitedCoarse.has(t)) edge.addClass("traversed");
-      else edge.addClass("dim");
+      edge.removeClass("st-idle st-done flowing blocked undrawn");
+      const gid = edge.data("group");
+      if (gid && blocked.has(gid)) {
+        // The planner decided this group, so its gate line is drawn — dim, but
+        // there, because the ✗ needs a wire to hang on. Everything behind the
+        // gate never ran, so it is never drawn at all.
+        edge.addClass(edge.hasClass("gate-in") && checked ? "blocked" : "undrawn");
+        return;
+      }
+      edge.addClass(edgeState(edge, t));
     });
   });
+  startDashLoop();
+}
+
+function setState(node, state) {
+  node.removeClass("st-idle st-active st-done");
+  node.addClass(`st-${state}`);
+}
+
+function hasAnyVariableRun(groupId, t) {
+  return cy
+    .nodes(`.var[group = "${groupId}"]`)
+    .some((node) => stateAt(node.id(), t) !== "idle");
+}
+
+// An edge *into* something lights the moment that thing starts and stays lit;
+// an edge *out of* it lights when it finishes. That is the whole point of the
+// per-instance nodes: you can see work being handed out and handed back.
+//
+// An edge that has nothing to say yet is `undrawn` rather than merely dim: a
+// hundred hairlines showing the run's final wiring before any of it has
+// happened is a grey web the lit edges have to fight through. Every rule below
+// is monotone in `t`, so "once drawn, stays drawn" needs no extra bookkeeping —
+// the wiring accumulates as the run explains itself.
+function edgeState(edge, t) {
+  if (edge.hasClass("note-in") || edge.hasClass("var-in")) {
+    const state = stateAt(edge.target().id(), t);
+    if (state === "active") return "flowing";
+    return state === "done" ? "st-done" : "undrawn";
+  }
+  if (edge.hasClass("note-out")) {
+    return stateAt(edge.source().id(), t) === "done" ? "st-done" : "undrawn";
+  }
+  // A variable hands its result back to its gate the moment it settles, and
+  // keeps flowing while the rest of the group is still working.
+  if (edge.hasClass("var-out")) {
+    if (stateAt(edge.source().id(), t) !== "done") return "undrawn";
+    return stateAt(`grp:${edge.data("group")}`, t) === "active" ? "flowing" : "st-done";
+  }
+  // The group's arc into the Update pole is the picture of the case being
+  // updated, so it runs while it is — but only for the pass that is reporting
+  // back, or every group the run has ever finished would light on every turn.
+  if (edge.hasClass("grp-out")) {
+    const gid = edge.data("group");
+    const ran = stateAt(`grp:${gid}`, t);
+    if (ran !== "done") return "undrawn";
+    const updating = stateAt("phase:merge_and_update", t) === "active";
+    return updating && endedSince(`grp:${gid}`, t, passStartBefore(t)) ? "flowing" : "st-done";
+  }
+  // A gate is wired up by the planning check that *decides* it — dispatched
+  // here, or (in the blocked branch of renderMapAt) definitively ruled out. A
+  // group that only becomes eligible on a later pass stays unwired until then.
+  if (edge.hasClass("gate-in")) {
+    const ran = stateAt(`grp:${edge.data("group")}`, t);
+    if (ran === "active") return "flowing";
+    return ran === "done" ? "st-done" : "undrawn";
+  }
+  // The exit has to read its *target*: its source is the case container, which
+  // is a compound with no busy window of its own and so is forever "idle".
+  if (edge.hasClass("exit")) {
+    const state = stateAt("stage:finalize", t);
+    if (state === "active") return "flowing";
+    return state === "done" ? "st-done" : "undrawn";
+  }
+  // The backbone — the one edge that is always drawn. It lands on the case
+  // container, so like the exit it has to read a pole rather than its endpoint.
+  if (edge.hasClass("spine")) {
+    if (stateAt("pole:plan", t) === "active") return "flowing";
+    return stateAt(edge.source().id(), t) === "done" ? "st-done" : "st-idle";
+  }
+  // Every edge buildMapModel creates is classed, so this is unreachable — and
+  // an edge nobody claimed has, by definition, nothing to say.
+  return "undrawn";
+}
+
+/* --- animating a step ----------------------------------------------------
+ *
+ * At a step *boundary* the work in that step is already finished — replaying
+ * the scan step would just show seven green notes. So revealing a step replays
+ * its own span of the trace over a fixed wall-clock budget, mapping the
+ * recorded [t0, t1] onto it so relative durations still read.
+ */
+const STEP_ANIM_MS = 2500;
+let stepAnim = null;
+let stepFallback = null;
+
+function stepSpan(step) {
+  let t0 = Infinity;
+  let t1 = -Infinity;
+  for (const ev of events) {
+    if (ev.seq < step.start_seq || ev.seq > step.end_seq) continue;
+    t0 = Math.min(t0, ev.t);
+    t1 = Math.max(t1, ev.t);
+  }
+  return t0 <= t1 ? [t0, t1] : null;
+}
+
+// The trace time a step is finished at — everything up to and including it has
+// happened, and nothing after it has. Not the same as the whole run's end.
+function stepEndT(step) {
+  let t = 0;
+  for (const ev of events) {
+    if (ev.seq > step.end_seq) break;
+    t = Math.max(t, ev.t);
+  }
+  return t;
+}
+
+// Show a step's settled end state with no animation.
+function settleStep(step, snapshot) {
+  stopStepAnim();
+  renderMapAt(step ? stepEndT(step) : 0, snapshot, step);
+  setStepProgress(1);
+}
+
+function stopStepAnim() {
+  if (stepAnim !== null) cancelAnimationFrame(stepAnim);
+  if (stepFallback !== null) clearTimeout(stepFallback);
+  stepAnim = null;
+  stepFallback = null;
+}
+
+function playStep(step, snapshot) {
+  stopStepAnim();
+  const span = step && stepSpan(step);
+  if (!span) {
+    settleStep(step, snapshot);
+    return;
+  }
+  const [t0, t1] = span;
+  // Paint the opening frame synchronously. requestAnimationFrame does not fire
+  // while the tab is hidden, and leaving the map unpainted until the first
+  // frame arrives means a backgrounded tab shows an empty graph forever.
+  renderMapAt(t0, snapshot, step);
+  setStepProgress(0);
+
+  const started = performance.now();
+  const frame = (now) => {
+    const p = Math.min(1, (now - started) / STEP_ANIM_MS);
+    renderMapAt(t0 + (t1 - t0) * p, snapshot, step);
+    setStepProgress(p);
+    stepAnim = p < 1 ? requestAnimationFrame(frame) : null;
+    if (stepAnim === null) stopStepAnim();
+  };
+  stepAnim = requestAnimationFrame(frame);
+  // …and for the same reason, guarantee the map reaches the step's settled
+  // state even if the frames never come.
+  stepFallback = setTimeout(() => {
+    stopStepAnim();
+    settleStep(step, snapshot);
+  }, STEP_ANIM_MS + 400);
+}
+
+// Scrub to a fraction of the current step without animating.
+function seekStep(fraction) {
+  stopStepAnim();
+  if (!lastView || !lastView.step) return;
+  const span = stepSpan(lastView.step);
+  if (!span) return;
+  renderMapAt(span[0] + (span[1] - span[0]) * fraction, lastView.snapshot, lastView.step);
+  setStepProgress(fraction);
+}
+
+function setStepProgress(fraction) {
+  if (els.mapScrub && document.activeElement !== els.mapScrub) {
+    els.mapScrub.value = String(Math.round(fraction * 1000));
+  }
+}
+
+// Hover a disc for the name behind it — the discs themselves are deliberately
+// unlabeled (43 labels would be unreadable), so this is how a presenter answers
+// "which variable is that one?".
+function wireMapTooltip() {
+  const tip = els.mapTip;
+  if (!tip) return;
+  cy.on("mouseover", "node.disc", (evt) => {
+    const title = evt.target.data("title");
+    if (!title) return;
+    tip.textContent = title;
+    tip.hidden = false;
+  });
+  cy.on("mousemove", "node.disc", (evt) => {
+    const box = cy.container().getBoundingClientRect();
+    const point = evt.renderedPosition || { x: 0, y: 0 };
+    tip.style.left = `${Math.min(point.x + 12, box.width - tip.offsetWidth - 8)}px`;
+    tip.style.top = `${Math.max(point.y - 30, 4)}px`;
+  });
+  cy.on("mouseout", "node.disc", () => { tip.hidden = true; });
 }
 
 // --- Panel 2: current-step detail ---------------------------------------
@@ -530,16 +1501,16 @@ function renderDetail(view) {
   const step = view.step;
 
   if (!focusBlock && step) {
+    // An extraction pass is per-group and then per-variable, so it is checked
+    // before the generic fan-out path (it is also a collapsed fan-out step).
+    if (step.node === "extract_branch") {
+      renderExtractDetail(step, snap);
+      return;
+    }
     // A collapsed fan-out step (e.g. "Characterize notes") shows one card per
     // instance instead of one merged card per map node.
     if (step.fanout) {
       renderFanoutDetail(step, snap);
-      return;
-    }
-    // A group's extraction step is likewise per-instance — one card per
-    // variable, not one per node of the extractor's inner loop.
-    if (step.node === "extract_branch") {
-      renderExtractDetail(step, snap);
       return;
     }
   }
@@ -664,55 +1635,83 @@ function renderNodeDetail(id, detail, snap, raw) {
   </section>`;
 }
 
-// --- Panel 2: a group's extraction step ---------------------------------
-// One card per variable (fed by the per-variable fan-out instances in
-// state.py), preceded by the retriever's verdict and the single group-level
-// model call. The merged group result is deliberately omitted: it is just the
-// variable cards concatenated.
+// --- Panel 2: an extraction pass ----------------------------------------
+// A pass fans out over every eligible group at once, so this renders one
+// section per group — its retriever verdict, its single group-level model call,
+// then one card per variable (fed by the per-group and per-variable fan-out
+// instances in state.py). The merged group result is deliberately omitted: it
+// is just the variable cards concatenated.
 function renderExtractDetail(step, snap) {
-  const details = snap.details || {};
-  const prefix = `extract_branch:${step.task_id}/`;
-  const vars = Object.values(snap.instances || {})
-    .filter((i) => i.node === "variable_branch" && i.key.startsWith(prefix))
+  const instances = Object.values(snap.instances || {});
+  const groups = instances
+    .filter((i) => i.node === "extract_branch" && withinStep(i, step))
     .sort((a, b) => a.index - b.index);
-  const settled = vars.filter((i) => i.status !== "active").length;
+
+  const varsFor = (group) =>
+    instances
+      .filter((i) => i.node === "variable_branch" && i.key.startsWith(`${group.key}/`))
+      .sort((a, b) => a.index - b.index);
 
   els.detailNode.textContent = step.map_node_id || "";
 
-  const counts = vars.length
-    ? `${vars.length} variable${vars.length === 1 ? "" : "s"} · ${settled} extracted`
+  const total = groups.reduce((n, g) => n + varsFor(g).length, 0);
+  const counts = [
+    groups.length ? `${groups.length} group${groups.length === 1 ? "" : "s"}` : "",
+    total ? `${total} variable${total === 1 ? "" : "s"}` : "",
+  ].filter(Boolean).join(" · ");
+  const parts = [detailHeadline(step.title, [step.subtitle, counts].filter(Boolean).join(" · "), step.agent, "")];
+
+  if (!groups.length) {
+    parts.push(`<p class="empty">No group extraction captured for this step.</p>`);
+  } else {
+    for (const group of groups) parts.push(renderGroupDetail(group, varsFor(group), snap));
+  }
+  els.detail.innerHTML = parts.join("");
+}
+
+// A fan-out instance belongs to the step whose seq range opened it. The keys
+// carry no seq, so match on the task id the step's own events name.
+function withinStep(instance, step) {
+  const taskId = instance.key.split(":")[1];
+  return stepTaskIds(step).has(taskId);
+}
+
+function stepTaskIds(step) {
+  const ids = new Set();
+  if (!step) return ids;
+  for (const ev of events) {
+    if (ev.seq < step.start_seq || ev.seq > step.end_seq) continue;
+    if (ev.type === "task_start" && !ev.namespace.length) ids.add(ev.task_id);
+  }
+  return ids;
+}
+
+// One group within the pass: what the retriever kept, the one model call that
+// produced every candidate, then the variables themselves.
+function renderGroupDetail(group, vars, snap) {
+  const result = group.result && typeof group.result === "object" ? group.result : {};
+  const settled = vars.filter((i) => i.status !== "active").length;
+  const calls = (group.llm_calls || []).map(renderLLMCall).join("");
+  const retrieval = Array.isArray(result.relevant_note_ids)
+    ? viewRetriever(result, snap)
     : "";
-  const subtitle = [step.subtitle, counts].filter(Boolean).join(" · ");
-  const parts = [detailHeadline(step.title, subtitle, step.agent, "")];
-
-  // The inner loop's own nodes are replaced wholesale by the variable cards.
-  const perVariable = new Set([
-    "extractor_validate_extraction",
-    "extractor_repair_invalid_extraction",
-    "extractor_complete_variable",
-    "extractor_extract_individual_value",
-  ]);
-  const touched = stepNodeIds(step).filter((id) => details[id] && !perVariable.has(id));
-
-  // The variable cards belong where the fan-out happened; if that node never
-  // reported (an older trace), fall back to the end of the timeline.
   const cards = vars.length
     ? vars.map(renderVariableDetail).join("")
-    : `<p class="empty">No variables extracted for this group${
-        details.retriever_identify_relevant_notes
-          ? " — see the retriever verdict above."
-          : "."
+    : `<p class="empty">No variables extracted${
+        retrieval ? " — the retriever kept no notes for this group." : "."
       }</p>`;
-  const anchor = touched.includes("fan_out_variables")
-    ? "fan_out_variables"
-    : touched[touched.length - 1];
 
-  parts.push(
-    renderTimeline(touched, snap, (id) => renderNodeDetail(id, details[id], snap, false), {
-      [anchor]: cards,
-    })
-  );
-  els.detail.innerHTML = parts.join("");
+  return `<section class="node-detail group">
+    <header class="node-head agent-${group.agent || "orchestrator"}">
+      <span class="node-head-title">${esc(group.label || group.key)}</span>
+      <span class="node-head-id">${vars.length ? `${settled}/${vars.length}` : ""}</span>
+      <span class="status-pill status-${esc(group.status)}">${esc(group.status)}</span>
+    </header>
+    ${retrieval}
+    ${calls}
+    ${cards}
+    ${group.error ? `<pre class="code">${esc(fmt(group.error))}</pre>` : ""}
+  </section>`;
 }
 
 // One variable, start to finish: its coded value with evidence, its final
@@ -1536,6 +2535,10 @@ function wireControls() {
   els.next.addEventListener("click", () => post("/api/next"));
   els.play.addEventListener("click", togglePlay);
   els.stepSelect.addEventListener("change", (e) => post(`/api/goto/${e.target.value}`));
+  els.mapReplay.addEventListener("click", () => {
+    if (lastView) playStep(lastView.step, lastView.snapshot);
+  });
+  els.mapScrub.addEventListener("input", (e) => seekStep(Number(e.target.value) / 1000));
 
   document.addEventListener("keydown", (e) => {
     if (e.target.tagName === "SELECT") return;
@@ -1685,7 +2688,12 @@ function applyView(view) {
   lastView = view;
   if (stepChanged) focusBlock = null; // new step clears any pinned component
   updateControls(view);
-  updateMap(view.snapshot, view.step);
+  syncMap(view.snapshot);
+  // A step the presenter has just arrived at replays its own span; scrubbing
+  // back to one already seen jumps to its settled end state instead of
+  // re-animating work they have already watched.
+  if (stepChanged) playStep(view.step, view.snapshot);
+  else settleStep(view.step, view.snapshot);
   renderDetail(view);
   renderVars(view.snapshot);
   // Self-heal auto-play: if still playing and more steps are now available

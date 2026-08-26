@@ -53,16 +53,34 @@ class BoundaryTests(unittest.TestCase):
         self.assertEqual(steps[0].end_seq, 2)  # absorbs the nested events
         self.assertEqual(steps[1].node, "characterize_corpus")
 
-    def test_repeated_nodes_get_an_instance_counter(self):
+    def test_parallel_group_fan_out_collapses_into_one_pass(self):
+        # The planner Sends every eligible group at once, so consecutive
+        # extract_branch starts are one pass — split into a step each, the first
+        # two would span a single event and the last would swallow all the work.
         events = [
             _root_start(0, "extract_branch",
                         payload={"requested_variables": {"name": "A"}}),
             _root_start(1, "extract_branch",
                         payload={"requested_variables": {"name": "B"}}),
+            _nested(2, "extract_group_values", ("extract_branch:t",)),
         ]
         steps = build_steps(events)
-        self.assertEqual(steps[0].title, "Extract group 1")
-        self.assertEqual(steps[1].title, "Extract group 2")
+        self.assertEqual(len(steps), 1)
+        self.assertEqual(steps[0].title, "Extraction pass 1")
+        self.assertTrue(steps[0].fanout)
+        # Every group in the pass is named, not just the one that opened it.
+        self.assertEqual(steps[0].subtitle, "A · B")
+        self.assertEqual((steps[0].start_seq, steps[0].end_seq), (0, 2))
+
+    def test_separate_passes_get_their_own_counted_step(self):
+        # A later round of eligible groups is a second pass, not the same one.
+        events = [
+            _root_start(0, "extract_branch", payload={"requested_variables": {"name": "A"}}),
+            _root_start(1, "merge_and_update", map_id="merge_and_update"),
+            _root_start(2, "extract_branch", payload={"requested_variables": {"name": "B"}}),
+        ]
+        titles = [s.title for s in build_steps(events)]
+        self.assertEqual(titles, ["Extraction pass 1", "Merge results", "Extraction pass 2"])
 
     def test_parallel_note_fan_out_collapses_into_one_step(self):
         # The interleaved note_branch instances (all one map node) collapse into
@@ -183,8 +201,8 @@ class FixtureTilingTests(unittest.TestCase):
         self.assertIn("Finalize case", titles)
         # The gate and the plan it produces are never two separate steps.
         self.assertNotIn("Plan extraction", titles)
-        # Two variable groups -> two extract steps.
-        self.assertEqual(sum(t.startswith("Extract group") for t in titles), 2)
+        # Two variable groups, planned in two separate passes -> two steps.
+        self.assertEqual(sum(t.startswith("Extraction pass") for t in titles), 2)
 
     def test_to_dict_round_trips_fields(self):
         step = self.steps[1]

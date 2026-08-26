@@ -12,13 +12,20 @@ Run ``python -m tests._demo_fixture`` (from the repo root, ``PYTHONPATH=src``) t
 regenerate ``tests/fixtures/demo_trace.jsonl`` after an intentional schema change.
 The output is deterministic (fixed clock, single note, fixed synthetic content),
 so regeneration is a no-op unless the shape really changed.
+
+``--gated <path>`` writes a *second*, larger trace that is deliberately not
+committed: every note, several variable groups, and a corpus that opens some
+gates and closes others. The workflow map draws one node per note, per gate and
+per variable, so developing and demoing it needs a run whose shape is actually
+interesting — and the committed fixture (one note, two passing groups) is not.
 """
 
 from __future__ import annotations
 
+import argparse
 from itertools import count
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any, Iterable, Iterator
 
 from cipoc.demo.capture import LLMCaptureHandler
 from cipoc.demo.events import LLMCall
@@ -42,6 +49,25 @@ FIXTURE_PATH = Path(__file__).resolve().parent / "fixtures" / "demo_trace.jsonl"
 _FIXTURE_NOTE_ID = 51
 _FIXTURE_GROUP_IDS = ("initial_llm_extraction", "lymph_node_removal")
 _REPAIR_ITEM_ID = 674
+
+# The gated variant. Two gates open and one stays shut, so the map has a group
+# whose whole subtree must never light up; one open group retrieves no notes, so
+# it reaches the relevant-notes decision and is skipped for a different reason.
+_GATED_GROUP_IDS = (
+    "initial_llm_extraction",   # ungated
+    "first_course_treatment",   # gate:treatment -> open
+    "metastases",               # gate:mets      -> shut
+    "lymph_node_removal",       # gate:nodes     -> open
+    "site_specific_codes",      # ungated, but retrieves nothing
+)
+_GATED_CONCEPTS = {
+    "cancer": True,
+    "metastasis": False,        # shuts gate:mets
+    "surgery": True,
+    "chemotherapy": True,
+    "radiation": True,
+    "lymph_nodes_removed": True,
+}
 
 
 def _step_clock(step: float = 0.25):
@@ -91,17 +117,21 @@ def _inject_captures(
             handler.calls.append(_synthetic_call(event, next(run_seq)))
 
 
-def generate_fixture(path: Path = FIXTURE_PATH) -> int:
-    """Record the fixture trace to ``path``; return the number of events."""
-    note = next(n for n in load_notes() if n.note_id == _FIXTURE_NOTE_ID)
-    script = Script(outcomes={_REPAIR_ITEM_ID: Outcome(repairs=1)})
+def record_trace(
+    *,
+    notes: Iterable[Any],
+    group_ids: Iterable[str],
+    script: Script,
+    path: Path | None = None,
+) -> list[Any]:
+    """Drive the fake orchestrator and return (optionally record) its events."""
     agent = build_fake_orchestrator(script)
-    # Trim to two groups so the extractor fans out over a handful of variables
-    # rather than the full data-dictionary set — the graph plans from this list.
+    # Trim the plan to the requested groups so the extractor fans out over a
+    # handful of variables rather than the full data-dictionary set — the graph
+    # plans from this list.
+    wanted = set(group_ids)
     agent._target_variables = [
-        group
-        for group in agent._target_variables
-        if group.group_id in _FIXTURE_GROUP_IDS
+        group for group in agent._target_variables if group.group_id in wanted
     ]
     handler = LLMCaptureHandler()
 
@@ -115,10 +145,10 @@ def generate_fixture(path: Path = FIXTURE_PATH) -> int:
 
     agent.compiled_graph.stream = wrapped_stream  # type: ignore[method-assign]
     try:
-        events = list(
+        return list(
             run_demo_stream(
                 agent.compiled_graph,
-                graph_input([note]),
+                graph_input(list(notes)),
                 record_path=path,
                 handler=handler,
                 clock=_step_clock(),
@@ -126,10 +156,54 @@ def generate_fixture(path: Path = FIXTURE_PATH) -> int:
         )
     finally:
         agent.compiled_graph.stream = original_stream  # type: ignore[method-assign]
-    return len(events)
+
+
+def generate_fixture(path: Path = FIXTURE_PATH) -> int:
+    """Record the committed fixture trace to ``path``; return the event count."""
+    note = next(n for n in load_notes() if n.note_id == _FIXTURE_NOTE_ID)
+    return len(
+        record_trace(
+            notes=[note],
+            group_ids=_FIXTURE_GROUP_IDS,
+            script=Script(outcomes={_REPAIR_ITEM_ID: Outcome(repairs=1)}),
+            path=path,
+        )
+    )
+
+
+def build_gated_trace(path: Path | None = None) -> list[Any]:
+    """A run whose gates disagree: two open, one shut, one group retrieving none.
+
+    Not committed — it is large, and it exists so the workflow map can be built
+    and demoed against a run with more than one of everything.
+    """
+    return record_trace(
+        notes=load_notes(),
+        group_ids=_GATED_GROUP_IDS,
+        script=Script(
+            concepts=dict(_GATED_CONCEPTS),
+            outcomes={_REPAIR_ITEM_ID: Outcome(repairs=1)},
+            retrieved={"site_specific_codes": 0},
+        ),
+        path=path,
+    )
 
 
 if __name__ == "__main__":
-    count_written = generate_fixture()
-    size_kb = FIXTURE_PATH.stat().st_size / 1024
-    print(f"Wrote {count_written} events to {FIXTURE_PATH} ({size_kb:.1f} KiB).")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--gated",
+        type=Path,
+        default=None,
+        metavar="PATH",
+        help="Write the gated demo trace here instead of the committed fixture.",
+    )
+    args = parser.parse_args()
+
+    if args.gated is not None:
+        written = len(build_gated_trace(args.gated))
+        target = args.gated
+    else:
+        written = generate_fixture()
+        target = FIXTURE_PATH
+    print(f"Wrote {written} events to {target} ({target.stat().st_size / 1024:.1f} KiB).")

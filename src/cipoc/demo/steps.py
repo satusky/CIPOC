@@ -51,21 +51,33 @@ _COUNTED_NODES = frozenset({"extract_branch"})
 
 # Every node that fans out into parallel instances worth tracking *individually*
 # (:class:`~cipoc.demo.state.InstanceDetail`), at any namespace depth:
-# ``note_branch`` runs at the root, ``variable_branch`` two levels down inside
-# an extractor sub-agent. Each instance keeps its own input, result, model calls
-# and validation attempts so a card can be drawn per note / per variable instead
-# of the last instance overwriting the shared map node's detail.
-FANOUT_INSTANCE_NODES = frozenset({"note_branch", "variable_branch"})
+# ``note_branch`` and ``extract_branch`` run at the root, ``variable_branch``
+# two levels down inside an extractor sub-agent. Each instance keeps its own
+# input, result, model calls and validation attempts so a card can be drawn per
+# note / per group / per variable instead of the last instance overwriting the
+# shared map node's detail — which matters most when a pass extracts several
+# groups in parallel and they all fold onto one ``NodeDetail``.
+FANOUT_INSTANCE_NODES = frozenset({"note_branch", "extract_branch", "variable_branch"})
 
 # The separate, step-level question: which fan-outs collapse into a *single*
-# presenter step. ``note_branch`` instances run interleaved, so giving each its
-# own step leaves the early ones as empty "active" shells while the last
-# swallows every note's work. ``variable_branch`` is deliberately absent — its
-# instances live inside their group's ``extract_branch`` step.
-FANOUT_COLLAPSE_NODES = frozenset({"note_branch"})
+# presenter step. Their instances run interleaved, so giving each its own step
+# leaves the early ones as empty shells while the last swallows everyone's work
+# — a pass that extracts three groups in parallel otherwise yields two steps
+# spanning a single event each and a third holding all three groups. Collapsed,
+# one step covers the whole parallel pass. ``variable_branch`` is deliberately
+# absent: its instances live inside their group's ``extract_branch`` step.
+FANOUT_COLLAPSE_NODES = frozenset({"note_branch", "extract_branch"})
 
 # Title for a collapsed fan-out step (plural — it covers every instance).
-_FANOUT_STEP_TITLES: dict[str, str] = {"note_branch": "Characterize notes"}
+_FANOUT_STEP_TITLES: dict[str, str] = {
+    "note_branch": "Characterize notes",
+    "extract_branch": "Extraction pass",
+}
+
+# Collapsed fan-outs whose instances are worth naming in the subtitle. A pass
+# over three variable groups should say which three; seven notes would just be
+# a wall of text, and Panel 2 lists them anyway.
+_NAME_INSTANCES_IN_SUBTITLE = frozenset({"extract_branch"})
 
 # Consecutive root tasks that describe one thing and so share a step. Keyed
 # ``(previous node, incoming node)``; the incoming task extends the open step
@@ -197,6 +209,14 @@ def build_steps(events: Iterable[DemoEvent]) -> list[Step]:
             # into the step opened by its first instance (they run interleaved, so
             # one step holds them all, rendered as per-instance cards).
             if pending is not None and node in FANOUT_COLLAPSE_NODES and pending.node == node:
+                # Name every instance the collapsed step covers, so a parallel
+                # pass reads as "these three groups" rather than just the first.
+                if node in _NAME_INSTANCES_IN_SUBTITLE:
+                    extra = _subtitle(node, event.payload)
+                    if extra and extra not in pending.subtitle:
+                        pending.subtitle = (
+                            f"{pending.subtitle} · {extra}" if pending.subtitle else extra
+                        )
                 prev_seq = event.seq
                 continue
             # A follow-on task that continues the open step's decision extends it
@@ -219,7 +239,16 @@ def build_steps(events: Iterable[DemoEvent]) -> list[Step]:
             close(prev_seq)
             if node in FANOUT_COLLAPSE_NODES:
                 title = _FANOUT_STEP_TITLES.get(node, _STEP_TITLES.get(node, node or "Step"))
-                subtitle = ""
+                # A fan-out that recurs across passes still gets a counter — the
+                # planner runs one extraction pass per round of eligible groups.
+                if node in _COUNTED_NODES:
+                    counters[node] = counters.get(node, 0) + 1
+                    title = f"{title} {counters[node]}"
+                subtitle = (
+                    _subtitle(node, event.payload)
+                    if node in _NAME_INSTANCES_IN_SUBTITLE
+                    else ""
+                )
                 fanout = True
             else:
                 title = _STEP_TITLES.get(node, node or "Step")

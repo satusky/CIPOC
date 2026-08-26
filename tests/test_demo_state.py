@@ -183,14 +183,26 @@ class InstanceDetailTests(unittest.TestCase):
         inst = replay(events).snapshot().instances["note_branch:a"]
         self.assertEqual(set(inst.result), {"summary", "concepts", "cancer_mentions"})
 
-    def test_extract_branch_is_not_treated_as_a_collapsed_instance(self):
-        # Only note_branch collapses; extract_branch keeps its per-group steps and
-        # is not tracked as a fan-out instance here.
+    def test_extract_branch_is_tracked_as_a_fan_out_instance(self):
+        # A pass fans out over every eligible group at once, so each group needs
+        # its own instance — folded onto one NodeDetail the last group's
+        # retriever verdict would overwrite the others'.
         events = [
             _task_start(1, "extract_branch", "g", (), "fan_out_groups", "orchestrator",
-                        payload={"requested_variables": {"name": "G"}}),
+                        payload={"requested_variables": {"name": "Metastases", "group_id": "mets"}}),
+            _task_start(2, "extract_branch", "h", (), "fan_out_groups", "orchestrator",
+                        payload={"requested_variables": {"name": "Staging", "group_id": "tnm"}}),
+            DemoEvent(seq=3, t=0.3, type="values", namespace=("extract_branch:g",),
+                      agent="orchestrator", payload={"relevant_note_ids": [50, 51]}),
+            DemoEvent(seq=4, t=0.4, type="values", namespace=("extract_branch:h",),
+                      agent="orchestrator", payload={"relevant_note_ids": []}),
         ]
-        self.assertEqual(replay(events).snapshot().instances, {})
+        insts = replay(events).snapshot().instances
+        self.assertEqual(
+            [i.label for i in insts.values()], ["Metastases", "Staging"]
+        )
+        self.assertEqual(insts["extract_branch:g"].result["relevant_note_ids"], [50, 51])
+        self.assertEqual(insts["extract_branch:h"].result["relevant_note_ids"], [])
 
 
 class VariableInstanceTests(unittest.TestCase):

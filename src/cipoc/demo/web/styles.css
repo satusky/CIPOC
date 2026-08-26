@@ -160,10 +160,37 @@ body.row-resizing { cursor: row-resize; user-select: none; }
 .scroll { overflow: auto; }
 
 /* ---- panel 1: map ---- */
-.cy { flex: 1; min-height: 0; border-radius: 0 0 var(--radius) var(--radius); }
-.legend { display: flex; gap: .7rem; flex-wrap: wrap; }
-.legend .lg { display: inline-flex; align-items: center; gap: .3rem; font-size: .72rem; color: var(--muted); }
-.legend .sw { width: 11px; height: 11px; border-radius: 3px; }
+.cy-wrap { position: relative; flex: 1; min-height: 0; }
+.cy {
+  position: absolute; inset: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+  background:
+    radial-gradient(circle at 1px 1px, #e7ecf6 1px, transparent 0) 0 0 / 22px 22px,
+    #fcfdff;
+}
+
+/* Replay / scrub the current step's own span (see playStep in app.js). */
+.map-ctl { display: flex; align-items: center; gap: .4rem; flex: none; }
+.map-btn {
+  font: inherit; font-size: .8rem; line-height: 1;
+  width: 1.6rem; height: 1.6rem; padding: 0;
+  border: 1px solid var(--line-strong); border-radius: 999px;
+  background: #fff; color: var(--accent); cursor: pointer;
+  transition: background .12s, border-color .12s;
+}
+.map-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
+.map-scrub { width: 6rem; accent-color: var(--accent); cursor: pointer; }
+
+/* Discs are deliberately unlabeled — this is how you find out which one. */
+.map-tip {
+  position: absolute; z-index: 6; pointer-events: none;
+  max-width: 15rem; padding: .2rem .45rem;
+  background: #172033; color: #fff; border-radius: 5px;
+  font-size: .7rem; font-weight: 600; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+  box-shadow: 0 2px 8px rgba(23, 32, 51, .25);
+}
+.map-tip[hidden] { display: none; }
 
 /* ---- panel 2: detail ---- */
 .detail { flex: 1; padding: .85rem; font-size: .85rem; }
@@ -234,6 +261,14 @@ body.row-resizing { cursor: row-resize; user-select: none; }
 }
 .minor-row.st-active { border-left-color: var(--warn); color: var(--warn); }
 .minor-row.st-error { border-left-color: var(--err); color: var(--err); font-weight: 700; }
+
+/* ---- panel 2: one container per variable group in an extraction pass ---- */
+.node-detail.group {
+  border: 1px solid var(--line); border-radius: 10px;
+  padding: .25rem .7rem .5rem; margin: 0 0 .9rem;
+  background: color-mix(in srgb, var(--orchestrator) 3%, transparent);
+}
+.node-detail.group > .node-head { margin-top: .2rem; }
 
 /* ---- panel 2: one container per extracted variable ---- */
 .node-detail.variable {

@@ -530,6 +530,11 @@ def _instance_label(node: str, payload: Any) -> str:
             return ""
         name = variable.get("name")
         return str(name) if name else f"Item {variable.get('item_id')}"
+    if node == "extract_branch":
+        requested = payload.get("requested_variables") or {}
+        if not isinstance(requested, Mapping):
+            return ""
+        return str(requested.get("name") or requested.get("group_id") or "")
     note_id = payload.get("note_id")
     note_type = payload.get("note_type")
     if note_type and note_id is not None:
