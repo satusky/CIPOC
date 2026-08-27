@@ -523,10 +523,15 @@ details.block > summary::-webkit-details-marker { display: none; }
 details.block > summary::before { content: "▸"; color: var(--muted); transition: transform .12s; }
 details.block[open] > summary::before { transform: rotate(90deg); }
 details.block .block-body { padding: 0 .65rem .6rem; }
-/* Same page glyph the corpus marker on the map carries, in the same agent's
-   hue — a note is marked the same way in both panels. The ink rather than the
-   raw Tile Teal: fine rules at text size need the weight. */
-.note-glyph { color: var(--scanner-ink); font-size: 1.05em; line-height: 1; }
+/* Same page the corpus marker on the map carries, drawn from the same paths, in
+   the same agent's hue — a note is marked the same way in both panels. The ink
+   rather than the raw Tile Teal: rules this fine need the weight. `color` is
+   what the paths' `currentColor` resolves to, so this one line still sets the
+   hue the way it did when this was a character. Sized like `.call-icon`, the
+   other inline icon here: an SVG with only a viewBox falls back to the 300×150
+   default of a replaced element, so the box has to be stated, and `flex: none`
+   keeps the flex summary from shrinking it. */
+.note-glyph { color: var(--scanner-ink); width: 14px; height: 14px; flex: none; }
 .summary-tag { margin-left: auto; font-size: .68rem; color: var(--muted); font-weight: 500; }
 
 .llm-call { border: 1px solid var(--line); border-radius: 8px; margin: .45rem 0; overflow: hidden; }

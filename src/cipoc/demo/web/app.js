@@ -266,12 +266,51 @@ const CORPUS_ID = "stage:corpus";
 // gate to show, so the marker carries a note glyph instead of a verdict and is
 // never given a `gate-*` class.
 const CORPUS_MARK_ID = "stage:corpus:mark";
-// U+1F5CF PAGE, the same glyph the evidence rows in panel 2 use, so a note is
-// marked the same way wherever it appears. It defaults to *text* presentation
-// rather than emoji, which is the whole reason it can be used here: 📄 renders
-// from the colour-emoji font, ignores the fill colour it is given, and so could
-// never take the scanner's hue or dim with the rest of the map.
-const NOTE_GLYPH = "\u{1F5CF}";
+// The note mark is *drawn*, not typed, because no character could satisfy both
+// halves of what it has to be:
+//
+//   - Monochrome, so it takes the scanner's hue and dims with the rest of the
+//     map. That rules out PAGE FACING UP and every other emoji: they render
+//     from the colour font and ignore the fill colour they are given.
+//   - Present in a font the machine actually has. That rules out the literal
+//     page glyphs which *are* monochrome — U+1F5CF PAGE, U+1F5CB EMPTY DOCUMENT
+//     and their neighbours in the Wingdings-derived stretch of Miscellaneous
+//     Symbols and Pictographs — because macOS carries them in *LastResort* and
+//     nowhere else, i.e. they draw the tofu box. U+1F5CF was the mark here and
+//     that is exactly what it drew. The vendored faces cannot rescue a
+//     codepoint either: both are latin subsets, so anything symbolic falls
+//     through to whatever the system happens to have.
+//
+// A path has neither problem, and on an airgapped target that is worth more
+// than the few lines it costs: a drawing renders identically on a machine whose
+// font set we never get to inspect. The geometry lives in one place and is
+// wrapped two ways below, so the map and panel 2 cannot drift apart.
+const NOTE_PAGE_PATHS =
+  `<path d="M3.2 1.6h6.3l3.3 3.3v9.5H3.2z" fill="none" stroke="currentColor"
+         stroke-width="1.3" stroke-linejoin="round"/>` +
+  `<path d="M9.5 1.6v3.3h3.3" fill="none" stroke="currentColor"
+         stroke-width="1.3" stroke-linejoin="round"/>` +
+  `<path d="M5.6 7.8h4.8M5.6 10.2h4.8M5.6 12.6h3.2" fill="none" stroke="currentColor"
+         stroke-width="1.2" stroke-linecap="round"/>`;
+
+// Panel 2's copy: inline, so `currentColor` resolves against `.note-glyph` and
+// the icon follows --scanner-ink the way the text beside it follows its own.
+const NOTE_ICON = `<svg class="note-glyph" viewBox="0 0 16 16" aria-hidden="true">${NOTE_PAGE_PATHS}</svg>`;
+
+// The map's copy. A node background-image is fetched as an image and so has no
+// CSS context to resolve `currentColor` against — the hue has to be baked in.
+// Safe to bake because the marker's colour is fixed (`theme.scannerInk`, never
+// restyled by a state class); the dimming it *does* get is node `opacity`,
+// which applies to the image like any other node content. `xmlns` is required
+// for a standalone SVG document, and encodeURIComponent is not optional: the
+// `#` of the hex colour would otherwise open a fragment and truncate the URI.
+const noteIconUri = (color) =>
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">` +
+      NOTE_PAGE_PATHS.replace(/currentColor/g, color) +
+      `</svg>`,
+  );
 
 // The middle of the drawing is the case, and it is *one box*. Splitting it into
 // Plan and Update containers spent the box's whole interior on two small labels
@@ -505,14 +544,18 @@ function mapStyle(theme) {
         width: GEO.gateD, height: GEO.gateD,
         "background-color": tint(SCAN, 0.92),
         // Ring in the scanner's hue so the marker belongs to the note discs
-        // beside it; glyph in the darker ink, because a page of fine rules at
-        // 23px needs the weight that #00A5AD at 2.7:1 does not give it.
-        "border-color": SCAN, color: theme.scannerInk,
-        // No outline, unlike the verdict glyphs: the rules inside a page icon are
-        // ~2px apart at this size and a 0.9 outline on each side of every stroke
-        // closes them into a solid block — the same way 1.8 turned a ✗ into a
-        // blob. The glyph is dense enough to carry itself without one.
-        "font-size": 23, "text-outline-width": 0,
+        // beside it; the page in the darker ink, because rules this fine need
+        // the weight that #00A5AD at 2.7:1 does not give them.
+        "border-color": SCAN,
+        // Drawn, not lettered, so the disc carries no label at all — `label: ""`
+        // rather than the `font-size: 0` a var disc uses, because this node has
+        // no label data to suppress. 48% of a 50px disc puts the page at 24px,
+        // a size larger than the note discs it introduces, and well inside the
+        // ~35px square the circle inscribes, so the ellipse never clips it.
+        label: "",
+        "background-image": noteIconUri(theme.scannerInk),
+        "background-fit": "none",
+        "background-width": "48%", "background-height": "48%",
       },
     },
 
@@ -802,7 +845,7 @@ function buildMapModel(snapshot) {
   // them. Structurally identical to a group and its variables — no edges in or
   // out of the individual notes, because the box already says what they are.
   add({ id: CORPUS_ID, label: "Scan & characterize notes", block: "characterize_corpus" }, "cluster corpus");
-  add({ id: CORPUS_MARK_ID, parent: CORPUS_ID, label: NOTE_GLYPH, title: "Clinical notes", block: "scanner_agent_block" }, "disc mark");
+  add({ id: CORPUS_MARK_ID, parent: CORPUS_ID, title: "Clinical notes", block: "scanner_agent_block" }, "disc mark");
   for (const note of mapIndex.notes) {
     add({ id: note.id, parent: CORPUS_ID, label: `#${note.noteId}`, title: `${note.type} #${note.noteId}`.trim(), block: "scanner_agent_block" }, "disc note");
   }
@@ -2449,7 +2492,7 @@ function renderEvidence(spans) {
         return "";
       }
       return `<details class="block evidence-note">
-        <summary><span class="note-glyph">${NOTE_GLYPH}</span> In note #${esc(nid)} <span class="muted">${esc(note.note_type || "")}</span></summary>
+        <summary>${NOTE_ICON} In note #${esc(nid)} <span class="muted">${esc(note.note_type || "")}</span></summary>
         <div class="block-body"><div class="note-text">${highlightContent(note.content, texts)}</div></div>
       </details>`;
     })

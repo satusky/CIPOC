@@ -280,6 +280,47 @@ class WebAssetTests(unittest.TestCase):
         self.assertIn("const stripW = GEO.gateD + GEO.gateGap +", app_js)
         self.assertIn("pos[CORPUS_MARK_ID]", app_js)
 
+    def test_the_note_mark_is_drawn_rather_than_typed(self):
+        """The note mark must not depend on a font having the codepoint.
+
+        It used to be U+1F5CF PAGE, which macOS carries in *LastResort* and
+        nowhere else — so it drew the tofu box, on a target whose font set we
+        never get to inspect. Every monochrome page character has the same
+        problem (they all live in the same Wingdings-derived stretch of
+        Miscellaneous Symbols and Pictographs), and the emoji that *are* present
+        ignore the fill colour they are given, so neither kind can come back.
+        A path has no such dependency, which is why the mark is one now.
+        """
+        app_js = (WEB_DIR / "app.js").read_text()
+
+        # No astral-plane symbol may reappear as a note mark. The vendored faces
+        # are latin subsets, so anything up here falls through to the system.
+        self.assertNotIn("\\u{1F5CF}", app_js)
+        for char in ("\U0001F5CF", "\U0001F5CB", "\U0001F4C4", "\U0001F4C3"):
+            self.assertNotIn(char, app_js)
+
+        # One set of paths, wrapped twice — the map and panel 2 cannot drift.
+        self.assertIn("const NOTE_PAGE_PATHS", app_js)
+        self.assertIn("NOTE_PAGE_PATHS}</svg>", app_js)
+        self.assertIn("NOTE_PAGE_PATHS.replace(/currentColor/g, color)", app_js)
+
+        # The disc draws the page as an image and carries no text of its own.
+        self.assertIn('"background-image": noteIconUri(theme.scannerInk)', app_js)
+        self.assertIn('label: ""', app_js)
+
+        # encodeURIComponent is load-bearing, not decoration: the `#` of the hex
+        # colour would otherwise open a fragment and truncate the data URI.
+        self.assertIn("encodeURIComponent(", app_js)
+
+        # Panel 2 gets the inline copy, whose `currentColor` needs a `color` to
+        # resolve against — and an SVG with only a viewBox needs an explicit box
+        # or it lays out at the 300x150 default of a replaced element.
+        self.assertIn("${NOTE_ICON} In note #", app_js)
+        css = (WEB_DIR / "styles.css").read_text()
+        note_rule = next(ln for ln in css.splitlines() if ln.startswith(".note-glyph"))
+        for prop in ("color:", "width:", "height:"):
+            self.assertIn(prop, note_rule)
+
     def test_map_edges_belong_to_the_phase_that_owns_them(self):
         """Lines are scoped to their step, not accumulated across the run.
 
