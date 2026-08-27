@@ -40,9 +40,17 @@ from cipoc.demo.serialize import to_jsonable
 from cipoc.demo.state import DemoState, replay
 from cipoc.demo.steps import Step, build_steps
 from cipoc.demo.trace import read_trace
+from cipoc.export import NOTE_FIELDS, NOTE_NLP_FIELDS, OmopExporter
 
 
 WEB_DIR = Path(__file__).resolve().parent / "web"
+
+# OMOP NOTE.person_id is required and ``Case`` carries no patient identity — it is
+# a per-case extraction result, not a record about a person. The demo therefore
+# supplies one. It has to be a real value rather than ``None``: a blank person_id
+# fails ``OmopNoteRow`` validation, which would send every NOTE row to the error
+# list and make a working export look broken on stage.
+DEMO_PERSON_ID = 1
 
 # The simplified Panel-1 topology: the "overview" chart authored in the repo's
 # machine-readable flowcharts. Served to the frontend so the map is always drawn
@@ -147,6 +155,61 @@ class DemoSession:
     def case_at_seq(self, seq: int) -> Any:
         case = self._replay_to_seq(seq).latest_case
         return to_jsonable(case) if case is not None else None
+
+    def has_item(self, item_id: int) -> bool:
+        """Whether this run ever requested ``item_id``.
+
+        Read from the newest state, not the cursor's: the variable table is
+        planned once and does not shrink, so an item that is real later is real
+        now, and a 404 that depended on where the presenter is standing would be
+        a worse answer than an empty table.
+        """
+        seq = self._events[-1].seq if self._events else 0
+        case_state = self._replay_to_seq(seq).latest_case
+        if case_state is None:
+            return False
+        return item_id in case_state.variable_results
+
+    def omop_at_seq(self, item_id: int, seq: int) -> dict[str, Any]:
+        """The OMOP rows one variable would export, as of ``seq``.
+
+        The demo's closing point is that a coded value is not the deliverable —
+        the NOTE_NLP row is. This runs the real :class:`OmopExporter` rather than
+        describing it, so what the browser shows and what ``scripts/export_omop.py``
+        writes cannot drift apart.
+
+        NOTE rows are narrowed to the notes this variable's spans actually cite,
+        which is a *presentation* choice and so belongs here rather than in the
+        exporter: a real export writes the whole corpus, and ``build`` is handed
+        the whole corpus too so its dangling-reference check stays honest. Both
+        counts are reported so the modal can say which it is showing.
+        """
+        case_state = self._replay_to_seq(seq).latest_case
+        # Null until the first note has been scanned. The variables pane — and so
+        # the button — exists from the planning step onward, which is earlier.
+        if case_state is None:
+            return _empty_omop(item_id, seq)
+
+        notes = list((getattr(case_state, "note_corpus", None) or {}).values())
+        case = case_state.to_case()
+        tables = OmopExporter(person_id=DEMO_PERSON_ID).build(
+            notes=notes,
+            case=case,
+            item_ids=[item_id],
+        )
+
+        cited = {str(row.note_id) for row in tables.note_nlp_rows}
+        shown = [row for row in tables.note_rows if str(row.note_id) in cited]
+        return {
+            "item_id": item_id,
+            "seq": seq,
+            "person_id": DEMO_PERSON_ID,
+            "status": _variable_status(case, item_id),
+            "note_nlp": _table(NOTE_NLP_FIELDS, tables.note_nlp_rows),
+            "note": _table(NOTE_FIELDS, shown)
+            | {"shown": len(shown), "total": len(tables.note_rows)},
+            "errors": [error.model_dump() for error in tables.errors],
+        }
 
     def notes(self) -> dict[str, Any]:
         """Compact ``note_id -> {note_type, date, content}`` from the latest case.
@@ -425,6 +488,22 @@ def build_app(session: DemoSession) -> FastAPI:
     def notes() -> JSONResponse:
         return JSONResponse(session.notes())
 
+    @app.get("/api/omop/{item_id}")
+    def omop(item_id: int, seq: int | None = None) -> JSONResponse:
+        """OMOP NOTE / NOTE_NLP rows for one variable at one cursor position.
+
+        A variable with no valid extraction — structured-data, not-found,
+        blocked, or simply not reached yet — is a 200 with empty tables, not a
+        404. "This coding produces no NOTE_NLP row, and here is why" is a thing
+        the demo wants to be able to say. Only an item the case never requested
+        is a 404.
+        """
+        if seq is None:
+            seq = session.events[-1].seq if session.events else 0
+        if not session.has_item(item_id):
+            raise HTTPException(status_code=404, detail=f"No variable {item_id} in this run.")
+        return JSONResponse(session.omop_at_seq(item_id, seq))
+
     # --- Cursor + controls ---
     @app.get("/api/cursor")
     def cursor() -> JSONResponse:
@@ -490,6 +569,45 @@ def build_app(session: DemoSession) -> FastAPI:
             return HTMLResponse(_PLACEHOLDER_HTML)
 
     return app
+
+
+def _table(fields: tuple[str, ...], rows: Iterable[Any]) -> dict[str, Any]:
+    """Column-oriented shape: field order comes from the row model, once, here.
+
+    The browser renders a table straight from ``columns`` + positional ``rows``
+    and never has to know an OMOP column name, so the CSV header and the on-screen
+    header cannot disagree.
+    """
+    return {
+        "columns": list(fields),
+        "rows": [[_cell(row_data.get(field)) for field in fields] for row_data in (row.model_dump() for row in rows)],
+    }
+
+
+def _cell(value: Any) -> str:
+    """Every cell reaches the browser as a string; ``None`` renders as blank."""
+    return "" if value is None else str(value)
+
+
+def _empty_omop(item_id: int, seq: int) -> dict[str, Any]:
+    return {
+        "item_id": item_id,
+        "seq": seq,
+        "person_id": DEMO_PERSON_ID,
+        "status": None,
+        "note_nlp": {"columns": list(NOTE_NLP_FIELDS), "rows": []},
+        "note": {"columns": list(NOTE_FIELDS), "rows": [], "shown": 0, "total": 0},
+        "errors": [],
+    }
+
+
+def _variable_status(case: Any, item_id: int) -> str | None:
+    """The variable's own status, so an empty table can explain itself."""
+    result = case.variable_results.get(item_id)
+    if result is None:
+        return None
+    status = result.status
+    return getattr(status, "value", status)
 
 
 def _sse(message: dict[str, Any]) -> str:

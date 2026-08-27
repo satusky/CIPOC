@@ -723,3 +723,69 @@ details.block.evidence-note { margin: .35rem 0 0; }
   background: color-mix(in srgb, var(--sunburst) 45%, #fff);
   color: var(--ink-max); padding: 0 .1rem; border-radius: 2px; font-weight: 600;
 }
+
+/* --- OMOP row preview ----------------------------------------------------
+   Raised from a variable's button in panel 3. The overlay sits at body level,
+   outside `main`, because every `.panel` clips its own content — an absolutely
+   positioned card inside `.panel-vars` would be cut off at the panel edge. */
+.vt-omop { width: 1%; text-align: right; white-space: nowrap; }
+.omop-btn {
+  font: inherit; font-size: .66rem; font-weight: 700; letter-spacing: .04em;
+  padding: .12rem .42rem; border-radius: 999px; cursor: pointer;
+  background: var(--accent-soft); color: var(--accent-ink);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, #fff);
+}
+.omop-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.omop-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* Above every existing layer: the topbar is 5 and the map tooltip 6. */
+.modal { position: fixed; inset: 0; z-index: 7; display: flex; align-items: center; justify-content: center; }
+.modal[hidden] { display: none; }
+.modal-back { position: absolute; inset: 0; background: color-mix(in srgb, var(--navy) 45%, transparent); }
+.modal-card {
+  position: relative; display: flex; flex-direction: column;
+  width: min(1100px, 92vw); max-height: 85vh;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: 0 18px 48px color-mix(in srgb, var(--navy) 30%, transparent);
+}
+.modal-head {
+  display: flex; align-items: center; gap: .6rem;
+  padding: .6rem .85rem; border-bottom: 1px solid var(--line); flex: none;
+}
+.modal-head h2 { margin: 0; font-size: .82rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.modal-close {
+  font: inherit; font-size: .9rem; line-height: 1; margin-left: auto; cursor: pointer;
+  padding: .2rem .45rem; border-radius: 6px;
+  background: transparent; color: var(--muted); border: 1px solid var(--line);
+}
+.modal-close:hover { background: var(--err-soft); color: var(--err-ink); border-color: var(--err-ink); }
+.modal-body { padding: .7rem .85rem 1rem; overflow: auto; }
+
+.omop-block { margin-bottom: 1rem; }
+.omop-block h3 {
+  margin: 0 0 .3rem; font-size: .7rem; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--muted);
+}
+.omop-none { font-size: .78rem; margin: 0; }
+/* The tables are 14 columns wide and must scroll in their own box — the modal
+   body scrolls vertically only, so a wide table cannot push the card sideways. */
+.omop-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
+table.omop-table { border-collapse: collapse; font-size: .72rem; width: max-content; min-width: 100%; }
+.omop-table th {
+  text-align: left; white-space: nowrap; font-weight: 700; color: var(--muted);
+  padding: .35rem .5rem; background: var(--panel-sunk); border-bottom: 1px solid var(--line);
+  position: sticky; top: 0;
+}
+.omop-table td {
+  padding: .3rem .5rem; border-bottom: 1px solid var(--line);
+  vertical-align: top; white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.omop-table tr:last-child td { border-bottom: none; }
+.omop-wide { color: var(--ink-max); cursor: help; }
+
+.omop-error {
+  font-size: .76rem; padding: .4rem .55rem; margin-bottom: .35rem;
+  background: var(--err-soft); color: var(--err-ink);
+  border: 1px solid color-mix(in srgb, var(--err) 30%, #fff); border-radius: 6px;
+}
+.omop-error ul { margin: .25rem 0 0; padding-left: 1.1rem; }

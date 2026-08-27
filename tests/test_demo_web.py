@@ -27,6 +27,7 @@ from cipoc.demo.server import (  # noqa: E402
     load_replay_session,
     overview_chart,
 )
+from cipoc.export import NOTE_FIELDS, NOTE_NLP_FIELDS  # noqa: E402
 from cipoc.utils.progress.model import DEFAULT_NODE_KINDS  # noqa: E402
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "demo_trace.jsonl"
@@ -428,6 +429,53 @@ class WebAssetTests(unittest.TestCase):
         self.assertIn(".grid.vars-collapsed { grid-template-rows: minmax(0, 1fr) auto; }", css)
         self.assertIn(".grid.vars-collapsed #vars { display: none; }", css)
 
+    def test_a_variable_row_opens_the_rows_it_would_export(self):
+        """Panel 3 stops at the coded value; the export is the deliverable.
+
+        Each variable carries a button that shows the OMOP rows the real
+        exporter would write for it. The rows are fetched, never computed in
+        JS — re-deriving the column set here would be a second, quieter
+        definition of the export.
+        """
+        app_js = (WEB_DIR / "app.js").read_text()
+        css = (WEB_DIR / "styles.css").read_text()
+        html = (WEB_DIR / "index.html").read_text()
+
+        for symbol in (
+            "function wireOmopModal",
+            "function openOmopModal",
+            "function closeOmopModal",
+            "function omopTable",
+            "function omopErrors",
+            "function omopIsOpen",
+            "/api/omop/",
+            "omop-btn",
+            "v.item_id",          # already in the payload, previously unrendered
+        ):
+            self.assertIn(symbol, app_js, f"app.js is missing {symbol}")
+
+        # One delegated listener for the whole pane, not one per rendered row:
+        # renderVars replaces the pane wholesale on every cursor message, so
+        # per-button wiring would re-attach on every step and leak the old ones.
+        self.assertEqual(app_js.count('els.vars.addEventListener("click"'), 1)
+        self.assertIn('closest(".omop-btn")', app_js)
+
+        # The modal owns the keyboard while it is up. Without both guards the
+        # arrows would move the presentation for every viewer, and space would
+        # toggle play, while the presenter is reading a table.
+        self.assertEqual(app_js.count("if (omopIsOpen()) return;"), 2)
+
+        # The rows are pinned to a seq, so a step change closes them — the rule
+        # focusBlock already follows in the same place.
+        self.assertIn("closeOmopModal();", app_js.split("function applyView")[1])
+
+        # Outside #vars, which is replaced on every render, and outside .panel,
+        # which clips its own content.
+        self.assertIn('id="omop-modal"', html)
+        self.assertIn('id="omop-body"', html)
+        for selector in (".omop-btn", ".vt-omop", ".modal-card", "table.omop-table", ".omop-scroll"):
+            self.assertIn(selector, css, f"styles.css is missing {selector}")
+
     def test_panel_two_container_cards_collapse(self):
         """A step's shape first; one card's contents when asked for."""
         app_js = (WEB_DIR / "app.js").read_text()
@@ -502,6 +550,52 @@ class OverviewChartTests(unittest.TestCase):
         self.assertEqual(client.get("/").status_code, 200)
         for name in ("app.js", "styles.css", "cytoscape.min.js"):
             self.assertEqual(client.get(f"/{name}").status_code, 200, name)
+
+
+class OmopEndpointTests(unittest.TestCase):
+    """``/api/omop/{item_id}`` runs the real exporter over the replayed case.
+
+    The fixture's seven variables are all ``extracted`` against a single note, so
+    the interesting shapes here are the narrowing, the point-in-time behaviour,
+    and what an item with nothing to show returns.
+    """
+
+    ITEM = 400
+
+    def test_rows_are_scoped_to_one_variable(self):
+        data = _client().get(f"/api/omop/{self.ITEM}").json()
+        self.assertEqual(data["item_id"], self.ITEM)
+        self.assertEqual(data["status"], "extracted")
+        self.assertTrue(data["note_nlp"]["rows"])
+        source = data["note_nlp"]["columns"].index("note_nlp_source_concept_id")
+        self.assertEqual(
+            {row[source] for row in data["note_nlp"]["rows"]}, {str(self.ITEM)}
+        )
+
+    def test_columns_are_the_export_column_order(self):
+        data = _client().get(f"/api/omop/{self.ITEM}").json()
+        self.assertEqual(data["note"]["columns"], list(NOTE_FIELDS))
+        self.assertEqual(data["note_nlp"]["columns"], list(NOTE_NLP_FIELDS))
+
+    def test_note_rows_are_narrowed_to_the_notes_the_variable_cites(self):
+        data = _client().get(f"/api/omop/{self.ITEM}").json()
+        cited = {row[data["note_nlp"]["columns"].index("note_id")] for row in data["note_nlp"]["rows"]}
+        shown = {row[data["note"]["columns"].index("note_id")] for row in data["note"]["rows"]}
+        self.assertEqual(shown, cited)
+        self.assertLessEqual(data["note"]["shown"], data["note"]["total"])
+
+    def test_the_view_is_point_in_time(self):
+        """Rows are built from the case as it stood at ``seq``.
+
+        The modal is opened from a panel showing one step; rows from the end of
+        the run would not be the rows for what is on screen.
+        """
+        client = _client()
+        self.assertEqual(client.get(f"/api/omop/{self.ITEM}?seq=0").json()["note_nlp"]["rows"], [])
+        self.assertTrue(client.get(f"/api/omop/{self.ITEM}").json()["note_nlp"]["rows"])
+
+    def test_an_item_the_run_never_requested_is_absent(self):
+        self.assertEqual(_client().get("/api/omop/999999").status_code, 404)
 
 
 class CoarseMapCoverageTests(unittest.TestCase):

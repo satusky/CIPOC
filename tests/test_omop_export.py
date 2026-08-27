@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from cipoc.export import OmopExporter
+from cipoc.export import NOTE_NLP_FIELDS, OmopExporter
 from cipoc.models import (
     Case,
     CaseVariableResult,
@@ -245,3 +245,107 @@ class OmopExporterTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class OmopBuildTests(unittest.TestCase):
+    """``build`` is what ``export`` writes, minus the writing.
+
+    The demo renders these rows in the browser, so the two have to be the same
+    computation rather than two descriptions of one — a second reconstruction of
+    the row shapes is exactly what would drift from the CSVs.
+    """
+
+    def setUp(self):
+        self.notes = [
+            ClinicalNote(
+                note_id="note-A",
+                date="2025-02-24",
+                note_type="Pathology Report",
+                content="Final Diagnosis: Invasive ductal carcinoma of the left breast.",
+            ),
+            ClinicalNote(
+                note_id="note-B",
+                date="2025-03-02",
+                note_type="Progress Note",
+                content="Left breast primary confirmed on review.",
+            ),
+        ]
+        span_a = TextSpan(note_id="note-A", text="Invasive ductal carcinoma")
+        span_b = TextSpan(note_id="note-B", text="Left breast primary")
+        self.case = Case(
+            variable_results={
+                400: CaseVariableResult(
+                    item_id=400,
+                    status=VariableStatus.EXTRACTED,
+                    value="C504",
+                    extraction=extraction(400, "C504", [span_a]),
+                ),
+                522: CaseVariableResult(
+                    item_id=522,
+                    status=VariableStatus.EXTRACTED,
+                    value="8500",
+                    extraction=extraction(522, "8500", [span_b]),
+                ),
+            }
+        )
+
+    def build(self, **kwargs):
+        return OmopExporter(person_id=7).build(
+            notes=self.notes, case=self.case, **kwargs
+        )
+
+    def test_build_matches_what_export_writes(self):
+        exporter = OmopExporter(person_id=7)
+        tables = exporter.build(notes=self.notes, case=self.case)
+        with tempfile.TemporaryDirectory() as directory:
+            result = exporter.export(
+                notes=self.notes, case=self.case, output_directory=directory
+            )
+            note_csv = read_csv(result.note_path)
+            note_nlp_csv = read_csv(result.note_nlp_path)
+
+        self.assertEqual(len(tables.note_rows), result.note_count)
+        self.assertEqual(len(tables.note_nlp_rows), result.note_nlp_count)
+        self.assertEqual(len(tables.errors), result.error_count)
+
+        # ``DictWriter`` writes ``None`` as an empty field, so the in-memory rows
+        # have to be coerced the same way before they can be compared.
+        def as_csv(row):
+            return {
+                key: "" if value is None else str(value)
+                for key, value in row.model_dump().items()
+            }
+
+        self.assertEqual([as_csv(row) for row in tables.note_rows], note_csv)
+        self.assertEqual([as_csv(row) for row in tables.note_nlp_rows], note_nlp_csv)
+        # The column order the demo publishes to the browser is the CSV header.
+        self.assertEqual(list(note_nlp_csv[0]), list(NOTE_NLP_FIELDS))
+
+    def test_item_ids_selects_one_variable(self):
+        tables = self.build(item_ids=[400])
+        self.assertEqual(
+            [row.note_nlp_source_concept_id for row in tables.note_nlp_rows], [400]
+        )
+
+    def test_item_ids_does_not_narrow_the_note_table(self):
+        """NOTE stays whole-corpus even when one item is asked for.
+
+        ``valid_note_ids`` and the duplicate-id check are corpus-wide properties;
+        a caller that wants only the notes an item cites narrows the result
+        itself, because that is a view rather than a validation.
+        """
+        self.assertEqual(len(self.build(item_ids=[400]).note_rows), 2)
+
+    def test_item_ids_none_means_every_variable(self):
+        self.assertEqual(
+            [row.note_nlp_id for row in self.build().note_nlp_rows],
+            [
+                row.note_nlp_id
+                for row in self.build(item_ids=list(self.case.variable_results)).note_nlp_rows
+            ],
+        )
+
+    def test_an_empty_filter_selects_nothing(self):
+        tables = self.build(item_ids=[])
+        self.assertEqual(tables.note_nlp_rows, [])
+        self.assertEqual(len(tables.note_rows), 2)

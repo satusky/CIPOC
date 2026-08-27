@@ -6,7 +6,7 @@ import csv
 import json
 from datetime import date, datetime
 from pathlib import Path
-from typing import Iterable
+from typing import Collection, Iterable
 
 from pydantic import BaseModel, ValidationError
 
@@ -20,6 +20,7 @@ from .models import (
     OmopNoteNlpRow,
     OmopNoteRow,
     OmopRowError,
+    OmopTables,
     OmopValidationIssue,
 )
 
@@ -52,6 +53,45 @@ class OmopExporter:
         self.encoding = encoding
         self.language = language
 
+    def build(
+        self,
+        *,
+        notes: Iterable[ClinicalNote],
+        case: Case,
+        item_ids: Collection[int] | None = None,
+    ) -> OmopTables:
+        """Build the rows an export would write, without writing anything.
+
+        ``item_ids`` restricts which of ``case.variable_results`` contribute
+        NOTE_NLP rows; ``None`` means all of them, which is what :meth:`export`
+        passes and therefore the only behaviour the CSVs have ever had. The
+        filter lives here rather than in the caller because a rejected row is
+        identified only by ``OmopRowError.source_id`` (``"{item_id}:{span}"``),
+        so filtering a returned flat list would mean parsing that key apart
+        again.
+
+        ``notes`` is always the *whole* corpus even when one item is asked for.
+        ``_build_note_rows`` derives ``valid_note_ids`` from it for the
+        duplicate-id and dangling-reference checks, and a narrowed corpus would
+        turn "this span cites a note outside the export" into a false pass.
+        Callers that want only the notes an item cites should narrow the
+        returned ``note_rows`` themselves.
+        """
+        source_notes = list(notes)
+        note_rows, note_errors = self._build_note_rows(source_notes)
+        valid_note_ids = {str(row.note_id) for row in note_rows}
+        note_nlp_rows, note_nlp_errors = self._build_note_nlp_rows(
+            source_notes,
+            valid_note_ids,
+            case,
+            item_ids,
+        )
+        return OmopTables(
+            note_rows=note_rows,
+            note_nlp_rows=note_nlp_rows,
+            errors=note_errors + note_nlp_errors,
+        )
+
     def export(
         self,
         *,
@@ -67,25 +107,17 @@ class OmopExporter:
         output_directory = Path(output_directory)
         output_directory.mkdir(parents=True, exist_ok=True)
 
-        source_notes = list(notes)
-        note_rows, note_errors = self._build_note_rows(source_notes)
-        valid_note_ids = {str(row.note_id) for row in note_rows}
-        note_nlp_rows, note_nlp_errors = self._build_note_nlp_rows(
-            source_notes,
-            valid_note_ids,
-            case,
-        )
+        tables = self.build(notes=notes, case=case)
 
         note_path = output_directory / "note.csv"
         note_nlp_path = output_directory / "note_nlp.csv"
         error_path = output_directory / "omop_errors.json"
 
         # NOTE is intentionally materialized first because NOTE_NLP references it.
-        _write_csv(note_path, NOTE_FIELDS, note_rows)
-        _write_csv(note_nlp_path, NOTE_NLP_FIELDS, note_nlp_rows)
-        errors = note_errors + note_nlp_errors
+        _write_csv(note_path, NOTE_FIELDS, tables.note_rows)
+        _write_csv(note_nlp_path, NOTE_NLP_FIELDS, tables.note_nlp_rows)
         error_path.write_text(
-            OmopErrorReport(errors=errors).model_dump_json(indent=2),
+            OmopErrorReport(errors=tables.errors).model_dump_json(indent=2),
             encoding="utf-8",
         )
 
@@ -93,9 +125,9 @@ class OmopExporter:
             note_path=note_path,
             note_nlp_path=note_nlp_path,
             error_path=error_path,
-            note_count=len(note_rows),
-            note_nlp_count=len(note_nlp_rows),
-            error_count=len(errors),
+            note_count=len(tables.note_rows),
+            note_nlp_count=len(tables.note_nlp_rows),
+            error_count=len(tables.errors),
         )
 
     def _build_note_rows(
@@ -163,6 +195,7 @@ class OmopExporter:
         notes: list[ClinicalNote],
         valid_note_ids: set[str],
         case: Case,
+        item_ids: Collection[int] | None = None,
     ) -> tuple[list[OmopNoteNlpRow], list[OmopRowError]]:
         rows: list[OmopNoteNlpRow] = []
         errors: list[OmopRowError] = []
@@ -170,7 +203,10 @@ class OmopExporter:
         for note in notes:
             notes_by_id.setdefault(str(note.note_id), []).append(note)
 
+        wanted = None if item_ids is None else set(item_ids)
         for item_id, result in case.variable_results.items():
+            if wanted is not None and item_id not in wanted:
+                continue
             extraction = result.extraction
             if (
                 result.value is None

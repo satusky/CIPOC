@@ -72,5 +72,21 @@
       <div id="vars" class="vars scroll"></div>
     </section>
   </main>
+
+  <!-- OMOP row preview, raised from a variable's button in panel 3.
+       Declared here rather than built in JS because it must live outside #vars,
+       which renderVars replaces wholesale on every cursor message; the body is
+       the only part that is filled in. -->
+  <div id="omop-modal" class="modal" hidden>
+    <div id="omop-back" class="modal-back"></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="omop-title">
+      <div class="modal-head">
+        <h2 id="omop-title">OMOP export</h2>
+        <span id="omop-sub" class="chip muted"></span>
+        <button id="omop-close" class="modal-close" title="Close (Esc)" aria-label="Close">✕</button>
+      </div>
+      <div id="omop-body" class="modal-body scroll"></div>
+    </div>
+  </div>
 </body>
 </html>

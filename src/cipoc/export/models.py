@@ -99,6 +99,22 @@ class OmopErrorReport(BaseModel):
     errors: list[OmopRowError] = Field(default_factory=list)
 
 
+class OmopTables(BaseModel):
+    """The rows one export would write, before anything is written.
+
+    Split out from :meth:`OmopExporter.export` so a caller can *see* the rows
+    without producing files — the demo renders them per variable, and a test can
+    compare them against the CSVs without parsing them back. ``export`` is now
+    this plus three writes, so the two cannot describe different exports.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    note_rows: list[OmopNoteRow] = Field(default_factory=list)
+    note_nlp_rows: list[OmopNoteNlpRow] = Field(default_factory=list)
+    errors: list[OmopRowError] = Field(default_factory=list)
+
+
 class OmopExportResult(BaseModel):
     """Paths and row counts produced by one export."""
 
@@ -133,5 +149,6 @@ __all__ = [
     "OmopNoteNlpRow",
     "OmopNoteRow",
     "OmopRowError",
+    "OmopTables",
     "OmopValidationIssue",
 ]

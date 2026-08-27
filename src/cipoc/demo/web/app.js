@@ -160,6 +160,7 @@ async function init() {
   wireControls();
   wireSplitter();
   wireVarsPane();
+  wireOmopModal();
 
   const [meta, graph] = await Promise.all([
     getJSON("/api/meta"),
@@ -210,6 +211,12 @@ function cacheEls() {
   watchCards(els.detail);
   els.vars = document.getElementById("vars");
   els.varsSummary = document.getElementById("vars-summary");
+  els.omopModal = document.getElementById("omop-modal");
+  els.omopTitle = document.getElementById("omop-title");
+  els.omopSub = document.getElementById("omop-sub");
+  els.omopBody = document.getElementById("omop-body");
+  els.omopClose = document.getElementById("omop-close");
+  els.omopBack = document.getElementById("omop-back");
 }
 
 async function loadStatic() {
@@ -2786,6 +2793,8 @@ function renderVars(snapshot) {
             <td class="vt-value">${v.value == null || v.value === "" ? "—" : esc(fmt(v.value))}
               ${v.confidence ? `<span class="conf"> · ${esc(v.confidence)}</span>` : ""}</td>
             <td class="vt-status st-${esc(v.status)}">${esc(v.status || v.stage)}</td>
+            <td class="vt-omop"><button class="omop-btn" data-item-id="${esc(v.item_id)}"
+              data-name="${esc(v.name)}" title="OMOP rows for this variable">OMOP</button></td>
           </tr>`
         )
         .join("");
@@ -2802,6 +2811,122 @@ function renderVars(snapshot) {
   els.vars.innerHTML = html || `<p class="empty">No variable groups planned.</p>`;
 }
 
+/* --- OMOP row preview ----------------------------------------------------
+ *
+ * A coded value is not the deliverable; the NOTE_NLP row is. Panel 3 stops at
+ * the value, so each variable carries a button that shows the rows the export
+ * would actually write for it — its NOTE_NLP rows, one per evidence span, and
+ * the NOTE rows for only the notes those spans cite.
+ *
+ * The rows are fetched, never computed here. `/api/omop/{item_id}` runs the real
+ * `cipoc.export.OmopExporter`, so what is on screen and what
+ * `scripts/export_omop.py` writes cannot drift; re-deriving the column set in JS
+ * would have been a second, quieter definition of the export.
+ */
+function omopIsOpen() {
+  return els.omopModal && !els.omopModal.hasAttribute("hidden");
+}
+
+async function openOmopModal(itemId, name) {
+  if (!els.omopModal) return;
+  // Pinned to the cursor the presenter is standing on, not to the newest state:
+  // the panel behind it shows this step, and rows from a later one would not be
+  // the rows for what is on screen.
+  const seq = lastView && lastView.snapshot ? lastView.snapshot.seq : null;
+  els.omopTitle.textContent = name ? `OMOP export · ${name}` : "OMOP export";
+  els.omopSub.textContent = `item ${itemId}`;
+  els.omopBody.innerHTML = `<p class="muted">Building rows…</p>`;
+  els.omopModal.removeAttribute("hidden");
+  els.omopClose.focus();
+
+  try {
+    const url = `/api/omop/${encodeURIComponent(itemId)}` + (seq == null ? "" : `?seq=${seq}`);
+    const data = await getJSON(url);
+    els.omopBody.innerHTML = omopBody(data);
+  } catch (err) {
+    els.omopBody.innerHTML = `<p class="empty">Could not build the OMOP rows (${esc(String(err))}).</p>`;
+  }
+}
+
+function closeOmopModal() {
+  if (els.omopModal) els.omopModal.setAttribute("hidden", "");
+}
+
+function omopBody(data) {
+  // An empty table is a result, not a failure: a structured-data value never had
+  // an evidence span to cite, and a variable the run has not reached yet has no
+  // extraction at all. Saying which is the point of showing it.
+  const why = data.note_nlp.rows.length
+    ? ""
+    : `<p class="empty">No NOTE_NLP rows${data.status ? ` — this variable is <b>${esc(data.status)}</b>` : " yet"}.
+         Only a validated extraction with evidence spans produces one.</p>`;
+  const noteCount = data.note.total
+    ? `<span class="muted"> · ${data.note.shown} of ${data.note.total} cited</span>`
+    : "";
+  return (
+    why +
+    omopTable("NOTE_NLP", data.note_nlp, "") +
+    omopTable("NOTE", data.note, noteCount) +
+    omopErrors(data.errors)
+  );
+}
+
+// Column order comes from the server, which reads it off the row model, so the
+// header here and the CSV header are the same list by construction.
+function omopTable(label, table, extra) {
+  const head = table.columns.map((c) => `<th>${esc(c)}</th>`).join("");
+  const body = table.rows
+    .map((row) => `<tr>${row.map(omopCell).join("")}</tr>`)
+    .join("");
+  const inner = body
+    ? `<div class="omop-scroll"><table class="omop-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`
+    : `<p class="muted omop-none">no rows</p>`;
+  return `<div class="omop-block"><h3>${esc(label)}${extra}</h3>${inner}</div>`;
+}
+
+// `note_text` is a whole clinical note and `snippet` a 250-char window of one.
+// Shown whole they make one row taller than the modal, so every cell is capped
+// and carries the full value in `title`. Capped uniformly rather than per column:
+// a fat `term_modifiers` blob would otherwise reintroduce the same problem.
+const OMOP_CELL_MAX = 48;
+function omopCell(cell) {
+  const wide = cell.length > OMOP_CELL_MAX;
+  // `esc` covers the title too: term_modifiers is JSON and carries double quotes.
+  return `<td${wide ? ` class="omop-wide" title="${esc(cell)}"` : ""}>${esc(wide ? trunc(cell, OMOP_CELL_MAX) : cell)}</td>`;
+}
+
+function omopErrors(errors) {
+  if (!errors || !errors.length) return "";
+  const items = errors
+    .map((error) => {
+      const issues = error.issues
+        .map((issue) => `<li><b>${esc(issue.field)}</b> · ${esc(issue.message)}</li>`)
+        .join("");
+      return `<div class="omop-error"><b>${esc(error.table_name)}</b> ${esc(error.source_id)}<ul>${issues}</ul></div>`;
+    })
+    .join("");
+  // Rejected rows are held back from the loadable files rather than dropped, so
+  // the demo shows them the same way the export's error file records them.
+  return `<div class="omop-block"><h3>Rejected rows <span class="muted">· held back from the export</span></h3>${items}</div>`;
+}
+
+function wireOmopModal() {
+  if (!els.vars || !els.omopModal) return;
+  // Delegated: renderVars replaces the pane's innerHTML on every cursor message,
+  // so a listener per button would be re-attached on every step and leak the old
+  // ones. One listener on the container outlives every re-render.
+  els.vars.addEventListener("click", (e) => {
+    const btn = e.target.closest(".omop-btn");
+    if (!btn) return;
+    openOmopModal(btn.dataset.itemId, btn.dataset.name);
+  });
+  els.omopClose.addEventListener("click", closeOmopModal);
+  els.omopBack.addEventListener("click", closeOmopModal);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && omopIsOpen()) closeOmopModal();
+  });
+}
+
 // --- controls ------------------------------------------------------------
 function wireControls() {
   els.prev.addEventListener("click", () => post("/api/prev"));
@@ -2815,6 +2940,9 @@ function wireControls() {
 
   document.addEventListener("keydown", (e) => {
     if (e.target.tagName === "SELECT") return;
+    // The modal owns the keyboard while it is up: stepping the run underneath an
+    // open preview would leave it showing rows for a step no longer on screen.
+    if (omopIsOpen()) return;
     if (e.key === "ArrowRight") { e.preventDefault(); post("/api/next"); }
     else if (e.key === "ArrowLeft") { e.preventDefault(); post("/api/prev"); }
     else if (e.key === " ") { e.preventDefault(); togglePlay(); }
@@ -2890,6 +3018,7 @@ function wireVarsPane() {
   document.addEventListener("keydown", (e) => {
     if (e.key !== "v" && e.key !== "V") return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (omopIsOpen()) return;  // the pane behind the preview stays as it was
     const tag = (e.target && e.target.tagName) || "";
     if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
     toggleOpen();
@@ -3030,6 +3159,9 @@ function applyView(view) {
   const stepChanged = !lastView || lastView.cursor !== view.cursor;
   lastView = view;
   if (stepChanged) focusBlock = null; // new step clears any pinned component
+  // The rows are a point-in-time view, pinned to the seq they were fetched at.
+  // Left open across a step change they would quietly describe the wrong step.
+  if (stepChanged) closeOmopModal();
   updateControls(view);
   syncMap(view.snapshot);
   // A step the presenter has just arrived at replays its own span; scrubbing
