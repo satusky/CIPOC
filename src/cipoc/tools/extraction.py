@@ -12,27 +12,16 @@ if TYPE_CHECKING:
 
 
 _ENTRY_FIELD_MAP = {
-    "item_name": "name",
-    "description": "description",
-    "item_data_type": "data_type",
-    "item_length": "length",
-    "allowable_values": "allowable_values",
-    "format": "format",
-    "instructions_for_coding": "coding_instructions",
+    "name": ("item_name", "Data Item Name"),
+    "description": ("description", "Description"),
+    "data_type": ("item_data_type", "Data Type"),
+    "length": ("item_length", "Length"),
+    "allowable_values": ("allowable_values", "Allowable Values"),
+    "format": ("format", "Format"),
+    "coding_instructions": ("instructions_for_coding", "Instructions for Coding"),
 }
 
-_CODE_COLUMN_NAMES = ("code",)
-_DESCRIPTION_COLUMN_NAMES = ("description",)
-_MISSING = object()
-    "item_name": "name",
-    "description": "description",
-    "item_data_type": "data_type",
-    "item_length": "length",
-    "allowable_values": "allowable_values",
-    "format": "format",
-    "instructions_for_coding": "coding_instructions",
-}
-
+_CODE_FIELD_NAMES = ("allowed_codes", "Code Descriptions")
 _CODE_COLUMN_NAMES = ("code",)
 _DESCRIPTION_COLUMN_NAMES = ("description",)
 _MISSING = object()
@@ -162,7 +151,11 @@ def _normalize_text(value):
 
 
 def _entry_codes(entry: dict | None):
-    return entry["allowed_codes"] if entry and "allowed_codes" in entry else _MISSING
+    if entry:
+        for field in _CODE_FIELD_NAMES:
+            if field in entry:
+                return entry[field]
+    return _MISSING
 
 
 def _overlay_site_codes(item_entry: dict | None, site_entry: dict | None) -> dict | None:
@@ -208,7 +201,11 @@ def _variable_info(item_id: int, item_entry: dict | None) -> VariableInfo | None
         return None
 
     fields = {
-        field: item_entry.get(column) for column, field in _ENTRY_FIELD_MAP.items()
+        field: next(
+            (item_entry[column] for column in columns if column in item_entry),
+            None,
+        )
+        for field, columns in _ENTRY_FIELD_MAP.items()
     }
     codes = _entry_codes(item_entry)
     fields["valid_codes"] = None if codes is _MISSING else codes

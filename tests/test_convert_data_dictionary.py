@@ -86,7 +86,7 @@ class ConvertDataDictionaryTests(unittest.TestCase):
         self.assertIsInstance(laterality["allowed_codes"], list)
         self.assertEqual(laterality["allowed_codes"][0]["code"], "0")
 
-    def test_complete_flat_dictionary_is_idempotent(self):
+    def test_complete_flat_dictionary_is_converted(self):
         with open(
             "documents/manuals/naaccr_data_dictionary_v25.json", "r"
         ) as source_file:
@@ -94,9 +94,10 @@ class ConvertDataDictionaryTests(unittest.TestCase):
 
         converted = convert_dictionary(source, naaccr_version="25")
 
-        self.assertEqual(converted, source)
         self.assertEqual(len(converted), 783)
         self.assertEqual(converted["10"]["naaccr_version"], "25")
+        self.assertEqual(converted["10"]["item_name"], "Record Type")
+        self.assertNotIn("Data Item Name", converted["10"])
 
 
 if __name__ == "__main__":
