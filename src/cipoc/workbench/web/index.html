@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CIPOC Workbench</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+  <script src="notes.js" defer></script>
+  <script src="control.js" defer></script>
+  <script src="table.js" defer></script>
+  <script src="detail.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <h1>CIPOC</h1>
+      <span class="phi" title="This interface renders raw note text, prompts and model output.">
+        Internal &middot; PHI and raw model data
+      </span>
+    </div>
+
+    <nav class="views" role="tablist" aria-label="View">
+      <button class="view-tab" role="tab" data-view="notes">Notes</button>
+      <button class="view-tab" role="tab" data-view="variables">Variables</button>
+    </nav>
+
+    <div id="case-summary" class="case-summary"></div>
+  </header>
+
+  <div id="facts" class="facts" aria-label="Case facts"></div>
+
+  <main class="workspace">
+    <section id="stage" class="stage">
+      <!-- Notes -->
+      <div id="view-notes" class="view" hidden>
+        <div class="list-pane">
+          <div class="pane-head">
+            <h2>Notes</h2>
+            <input id="note-filter" class="filter" type="search"
+                   placeholder="Filter notes&hellip;" aria-label="Filter notes" />
+          </div>
+          <ol id="notes-list" class="notes-list"></ol>
+        </div>
+      </div>
+
+      <!-- Variables -->
+      <div id="view-variables" class="view" hidden>
+        <div class="pane-head">
+          <h2>Variables</h2>
+          <div class="modes" role="tablist" aria-label="Variables layout">
+            <button class="mode-tab" role="tab" data-mode="control">Control room</button>
+            <button class="mode-tab" role="tab" data-mode="table">Tabular</button>
+          </div>
+          <input id="var-filter" class="filter" type="search"
+                 placeholder="Filter variables&hellip;" aria-label="Filter variables" />
+          <label class="check"><input id="group-toggle" type="checkbox" checked /> Grouped</label>
+        </div>
+        <div id="control" class="control" hidden></div>
+        <div id="table-wrap" class="table-wrap" hidden></div>
+      </div>
+    </section>
+
+    <aside id="detail" class="detail" aria-label="Detail" hidden>
+      <div class="detail-head">
+        <span id="detail-kind" class="chip"></span>
+        <h2 id="detail-title"></h2>
+        <button id="detail-close" class="icon-btn" title="Close (Esc)" aria-label="Close">&#10005;</button>
+      </div>
+      <div id="detail-body" class="detail-body"></div>
+    </aside>
+  </main>
+
+  <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+  <div id="boot" class="boot"><p>Loading case state&hellip;</p></div>
+</body>
+</html>
