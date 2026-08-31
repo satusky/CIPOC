@@ -1,38 +1,148 @@
 /* CIPOC workbench — one stylesheet, no external assets.
-   Status colour is the primary encoding everywhere; confidence rides as a
-   secondary ring so a low-confidence accepted value never looks identical to a
-   confident one. */
+
+   Colour encoding: a result that holds a value is coloured by its recorded
+   confidence, one that does not by its status, drawn hollow. Every colour is a
+   token here, and the whole palette is redefined once under
+   [data-theme="light"] — no component rule names a literal colour, so a theme
+   swap needs no change below this block. The theme itself is resolved before
+   first paint by the head script in index.html.
+
+   ---- Palette -------------------------------------------------------------
+
+   Light is the UNC Chapel Hill brand palette carried over from the demo UI
+   (src/cipoc/demo/web/styles.css on the `demo` branch), value for value. Every
+   surface, line and text colour there is Navy #13294B mixed with white at a
+   stated percentage, so the entire light theme is two brand colours plus the
+   Carolina Blue accent — no eyeballed greys.
+
+   Dark reverses the mixing direction on the same axis: surfaces are Navy shaded
+   toward black, text is Navy tinted toward white. The swap moves along the Navy
+   ramp rather than to a different hue, so both themes are the same two colours.
+
+   Carolina Blue is the one value that differs by role rather than by ramp. At
+   3.0:1 on white it cannot carry text, so light mode uses the brand's own
+   digital-link blue (#007FAE, 4.6:1) and dark mode uses the brand hex itself
+   (#4B9CD3, 5.9:1 on the dark ground).
+
+   Two deliberate departures from the demo:
+
+   - Its ground is brand-gray #F8F8F8, a Black 3 tint. Here the ground is Navy
+     at 5% instead, which keeps every light surface on the one Navy axis and
+     leaves room below white for the two tints this UI needs above the ground:
+     `--bg-panel` is a hover and selected state on white cards, so it has to be
+     darker than the ground, and `--text-dim` still has to clear 4.5:1 on it.
+     Navy at 5% / 10% is the pair that satisfies both.
+   - Status and confidence hues are not brand colours and stay as they were:
+     they encode data, and re-tinting them toward Navy would trade legibility
+     for tidiness. The one exception is `--structured`, a royal blue 20° of hue
+     from Carolina that became indistinguishable from the accent it now sits
+     beside; it moves to the brand's Tile Teal, which is far enough from both
+     Carolina and `--extracted` green to read at dot size. */
 
 :root {
-  --bg: #11141a;
-  --bg-raised: #171b23;
-  --bg-panel: #1d222c;
-  --bg-input: #0d1015;
-  --line: #2b3240;
-  --line-soft: #222835;
+  /* Surfaces — Navy #13294B shaded toward black. */
+  --bg: #0a1426;            /* Navy at 50% */
+  --bg-raised: #0d1c33;     /* Navy at 68% */
+  --bg-panel: #112442;      /* Navy at 88% */
+  --bg-input: #070e1a;      /* Navy at 35% */
+  --line: #263a59;          /* Navy tinted 8% toward white */
+  --line-soft: #1c3252;     /* Navy tinted 4% toward white */
 
-  --text: #e5e9f0;
-  --text-dim: #97a1b4;
-  --text-faint: #6b7688;
+  /* Text — Navy tinted toward white. */
+  --text: #e7eaed;          /* 90% — 14.5:1 */
+  --text-dim: #a5aebb;      /* 62% — 8.0:1 */
+  --text-faint: #768397;    /* 42% — 4.6:1 */
 
-  --accent: #6aa8ff;
-  --accent-dim: #2c4a7a;
+  --accent: #4b9cd3;        /* Carolina Blue, PMS 542 — 5.9:1 here */
 
   --extracted: #3fb950;
-  --structured: #58a6ff;
+  --structured: #00a5ad;    /* Tile Teal — 6.0:1 */
   --not-found: #8b949e;
   --not-applicable: #4a5261;
   --blocked: #a371f7;
   --error: #f85149;
   --pending: #d29922;
 
-  --warn: #d29922;
-  --mark: #6f5b1a;
+  --warn: #f0c93b;          /* Sunburst Yellow lifted for the dark ground */
+  --mark: #665400;          /* Sunburst at 40% over black */
+
+  /* Confidence ramp — ordered green → orange, deliberately clear of --error
+     red so a low-confidence value never reads as a failed one. */
+  --conf-max: #3fb950;
+  --conf-high: #9ecb3f;
+  --conf-medium: #e3b341;
+  --conf-low: #f0883e;
+
+  /* Verdict ramp — a value's agreement with the ground-truth reference. These
+     are semantic aliases rather than direct reuse of the status colours: a
+     verdict that happens to share a hue with a status today is still a
+     different axis, and has to stay renamable without disturbing the other.
+     Both axes are on screen at once (the dot is confidence, the trailing mark
+     is the verdict), so they are deliberately NOT interchangeable. */
+  --v-match: var(--extracted);
+  --v-near: var(--structured);
+  --v-mismatch: var(--error);
+  --v-missed: var(--conf-low);
+  --v-spurious: var(--blocked);
+  --v-untested: var(--not-applicable);
+
+  --tooltip-bg: #070e1a;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
 
   --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --radius: 8px;
 }
+
+:root[data-theme="light"] {
+  /* Surfaces — Navy #13294B tinted toward white. */
+  --bg: #f3f4f6;            /* Navy at 5% */
+  --bg-raised: #ffffff;
+  --bg-panel: #e7eaed;      /* Navy at 10% — --text-dim clears 4.6:1 here */
+  --bg-input: #ffffff;
+  --line: #c4c9d2;          /* Navy at 25% */
+  --line-soft: #dcdfe4;     /* Navy at 15% */
+
+  --text: #13294b;          /* Navy, PMS 2767 — 14.7:1 on white */
+  --text-dim: #5a6981;      /* Navy at 70% — 5.6:1 */
+  --text-faint: #7d899c;    /* Navy at 55% */
+
+  --accent: #007fae;        /* brand digital-link blue — 4.6:1 on white */
+
+  --extracted: #1a7f37;
+  --structured: #00707a;    /* Tile Teal darkened — 5.8:1 */
+  --not-found: #6b7480;
+  --not-applicable: #a5adb9;
+  --blocked: #7a41d6;
+  --error: #cf222e;
+  --pending: #9a6700;
+
+  --warn: #7a5b00;          /* Sunburst Yellow darkened — 6.1:1 */
+  --mark: #ffea8c;          /* Sunburst at 45% on white */
+
+  --conf-max: #1a7f37;
+  --conf-high: #869a00;
+  --conf-medium: #b07d00;
+  --conf-low: #bc4c00;
+
+  /* The verdict ramp is defined by alias in both themes, so it follows each
+     theme's status palette automatically. Restated here rather than inherited
+     because the tokens it points at are themselves redefined above. */
+  --v-match: var(--extracted);
+  --v-near: var(--structured);
+  --v-mismatch: var(--error);
+  --v-missed: var(--conf-low);
+  --v-spurious: var(--blocked);
+  --v-untested: var(--not-applicable);
+
+  --tooltip-bg: #ffffff;
+  --shadow: 0 8px 24px rgba(19, 41, 75, 0.18);
+}
+
+/* The one place a theme changes more than a token: the browser's own widgets
+   (scrollbars, the search input's clear affordance) need telling. */
+:root { color-scheme: dark; }
+:root[data-theme="light"] { color-scheme: light; }
 
 * { box-sizing: border-box; }
 
@@ -111,6 +221,14 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 }
 .case-summary b { color: var(--text); font-weight: 600; }
 
+.theme-toggle {
+  flex: 0 0 auto;
+  border-color: var(--line);
+  font-size: 14px;
+  line-height: 1.2;
+  padding: 4px 9px;
+}
+
 /* ------------------------------------------------------------ facts rail */
 
 .facts {
@@ -167,6 +285,18 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 .pane-head .filter { margin-left: auto; }
 
 .check { font-size: 12px; color: var(--text-dim); display: inline-flex; gap: 5px; align-items: center; }
+
+/* A file input styled as a button: the native control renders its own
+   "No file chosen" text that cannot be removed, so it is hidden and the label
+   around it does the work. Clicking the label still opens the picker. */
+.file-pick { cursor: pointer; }
+.file-pick input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.file-pick span {
+  border: 1px solid var(--line); border-radius: 6px;
+  padding: 3px 9px; color: var(--text-dim); background: var(--bg-input);
+}
+.file-pick:hover span { color: var(--text); border-color: var(--accent); }
+.file-pick input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 /* ----------------------------------------------------------- notes list */
 
@@ -273,52 +403,116 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 .group-card.excluded { border-top-color: var(--not-applicable); opacity: 0.72; }
 .group-card.problem { border-top-color: var(--error); }
 
-.group-head { display: flex; align-items: baseline; gap: 8px; }
-.group-head h3 { font-size: 13.5px; }
+/* Stacked: side by side a long name and a long group_id squeeze each other
+   and both wrap. */
+.group-head { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.group-head h3 { font-size: 13.5px; line-height: 1.3; }
 .group-head .gid { font-family: var(--mono); font-size: 11px; color: var(--text-faint); }
 .group-tags { display: flex; gap: 5px; flex-wrap: wrap; }
 
-.bubbles { display: flex; flex-wrap: wrap; gap: 6px; }
+/* A bubble is one line: dot, `item: name`, then the value pushed to the right
+   edge, so a card reads as a column of values you can run your eye down.
 
+   It was briefly a two-line block with the value under the label, which cost a
+   card its height twice over. `.bubbles` was a minmax(200px) track inside a
+   minmax(310px) card, and two 200px tracks need 406px of inner width — 432px
+   of card — which `auto-fill` never grants, since it packs 310px cards before
+   stretching them. So every bubble was both full-width and two lines tall, and
+   the 12-variable `first_course_treatment` card ran 784px in a 310px column
+   (1552px for the whole control room). One line each takes that to 483px and
+   1029px, with the values aligned rather than each stranded on its own row.
+
+   The value line was never the thing that needed the width: values are codes,
+   median two characters, longest eight (the dates). The name is. */
+.bubbles { display: flex; flex-direction: column; gap: 4px; }
+
+/* Four tracks: dot, item id, name, value. `.bub-label` is `display: contents`
+   below, so its two children are items of *this* grid — which is why the value
+   can be right-aligned against the name without touching control.js. */
 .bubble {
-  --dot: var(--not-found);
-  position: relative;
-  display: inline-flex;
+  display: grid;
+  grid-template-columns: 8px auto minmax(0, 1fr) auto;
+  column-gap: 8px;
   align-items: center;
-  gap: 5px;
-  min-width: 58px;
+  text-align: left;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 9px;
   background: var(--bg-panel);
   color: var(--text);
-  font: 11.5px/1 var(--mono);
-  padding: 5px 9px 5px 7px;
+  font: 11.5px/1.35 var(--sans);
+  padding: 4px 9px;
   cursor: pointer;
 }
 .bubble::before {
   content: "";
+  grid-column: 1;
   width: 8px; height: 8px; border-radius: 50%;
-  background: var(--dot);
-  flex: 0 0 auto;
+  background: var(--dot, var(--not-found));
 }
-.bubble:hover { border-color: var(--dot); }
-.bubble[aria-current="true"] { box-shadow: 0 0 0 1px var(--dot); border-color: var(--dot); }
-.bubble.low-confidence { border-style: dashed; }
-.bubble.hollow::before { background: transparent; box-shadow: inset 0 0 0 1.5px var(--dot); }
+.bubble:hover { border-color: var(--dot, var(--line)); }
+.bubble[aria-current="true"] {
+  box-shadow: 0 0 0 1px var(--dot, var(--accent));
+  border-color: var(--dot, var(--accent));
+}
+.bubble.hollow::before {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--dot, var(--not-found));
+}
 
-.bubble.s-extracted        { --dot: var(--extracted); }
-.bubble.s-structured_data  { --dot: var(--structured); }
-.bubble.s-not_found        { --dot: var(--not-found); }
-.bubble.s-not_applicable   { --dot: var(--not-applicable); }
-.bubble.s-blocked          { --dot: var(--blocked); }
-.bubble.s-error            { --dot: var(--error); }
-.bubble.s-pending          { --dot: var(--pending); }
+/* A pass-through wrapper, not a box. */
+.bub-label { display: contents; }
+.bub-id { grid-column: 2; font-family: var(--mono); color: var(--text-dim); }
 
-.bubble .val { color: var(--text-dim); }
+/* The only thing that clips, and only for the handful of names past ~30
+   characters. Both the hover tooltip (control.js bubbleTooltip) and the
+   button's own aria-label carry the name in full, so nothing is lost. */
+.bub-name {
+  grid-column: 3;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bubble .val {
+  grid-column: 4;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: right;
+}
+.bubble .val.none { color: var(--text-faint); font-weight: 400; }
 
-.legend { display: flex; flex-wrap: wrap; gap: 14px; padding: 4px 2px 14px; font-size: 11.5px; color: var(--text-dim); }
+/* Comparing adds a fifth track for the verdict mark. It is opt-in on the
+   container rather than always present because a workbench with no ground-truth
+   file must render exactly as it did before this existed — an empty 5th column
+   would still shift every value left by 20px. */
+.bubbles.compare .bubble { grid-template-columns: 8px auto minmax(0, 1fr) auto 12px; }
+.vmark {
+  grid-column: 5;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--dot, var(--text-faint));
+}
+/* `untested` is not a result, it is the absence of a reference value; it recedes
+   rather than competing with the verdicts that need acting on. */
+.vmark.m-untested { opacity: 0.5; }
+
+.legend {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 5px 14px;
+  padding: 0 2px 6px;
+  font-size: 11.5px;
+  color: var(--text-dim);
+}
+.legend + .legend { padding-bottom: 14px; }
 .legend span { display: inline-flex; align-items: center; gap: 6px; }
-.legend i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.legend .legend-label {
+  min-width: 106px;
+  color: var(--text-faint);
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.legend .dot { margin-right: 0; }
 
 /* --------------------------------------------------------------- table */
 
@@ -347,17 +541,97 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
   cursor: default;
 }
 
+/* One indicator vocabulary, shared by the control-room bubbles, the table and
+   the detail rows: an `s-`/`c-` class sets --dot, the shapes below read it.
+   Because both are plain class selectors, the fallback lives in the var() call
+   rather than in a rule that source order could shadow. */
 .dot {
   display: inline-block; width: 8px; height: 8px; border-radius: 50%;
-  margin-right: 7px; vertical-align: baseline;
+  margin-right: 7px; vertical-align: baseline; flex: 0 0 auto;
+  background: var(--dot, var(--not-found));
 }
-.d-extracted { background: var(--extracted); }
-.d-structured_data { background: var(--structured); }
-.d-not_found { background: var(--not-found); }
-.d-not_applicable { background: var(--not-applicable); }
-.d-blocked { background: var(--blocked); }
-.d-error { background: var(--error); }
-.d-pending { background: var(--pending); }
+.dot.hollow { background: transparent; box-shadow: inset 0 0 0 1.5px var(--dot, var(--not-found)); }
+
+.s-extracted       { --dot: var(--extracted); }
+.s-structured_data { --dot: var(--structured); }
+.s-not_found       { --dot: var(--not-found); }
+.s-not_applicable  { --dot: var(--not-applicable); }
+.s-blocked         { --dot: var(--blocked); }
+.s-error           { --dot: var(--error); }
+.s-pending         { --dot: var(--pending); }
+
+.c-max    { --dot: var(--conf-max); }
+.c-high   { --dot: var(--conf-high); }
+.c-medium { --dot: var(--conf-medium); }
+.c-low    { --dot: var(--conf-low); }
+
+/* Verdict classes set the same --dot property the status/confidence classes do,
+   so the shapes above render a verdict with no rules of their own. They are
+   only ever applied to a *different element* than the status class — the
+   trailing mark, never the dot — because the two axes are read together. */
+.m-match    { --dot: var(--v-match); }
+.m-near     { --dot: var(--v-near); }
+.m-mismatch { --dot: var(--v-mismatch); }
+.m-missed   { --dot: var(--v-missed); }
+.m-spurious { --dot: var(--v-spurious); }
+.m-untested { --dot: var(--v-untested); }
+
+/* An entity carrying reviewer feedback is marked where it is listed, so saved
+   annotations are findable without opening each one in turn. The glyph rides in
+   the existing id track rather than a column of its own — nothing shifts when
+   nothing is annotated. */
+.bubble[data-annotated] .bub-id::after,
+.vtable tr[data-annotated] td:first-child::after,
+.note-row[data-annotated] .note-date::after {
+  content: " \270e";
+  color: var(--accent);
+}
+
+/* ------------------------------------------------------------ feedback */
+
+/* No element styling for form controls existed before this: the only input in
+   the app was `.filter`, styled by class. These follow it — --bg-input ground,
+   --line border, accent on focus — so the form reads as part of the app rather
+   than as the browser's default chrome. */
+.flag-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 4px 14px;
+  margin-bottom: 10px;
+}
+.flag-grid .check { align-items: flex-start; line-height: 1.35; }
+
+.fb-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.fb-label {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--text-faint); min-width: 58px;
+}
+.fb-text, .fb-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--text);
+  font: 12px/1.45 var(--sans);
+  padding: 6px 8px;
+  resize: vertical;
+}
+.fb-input { font-family: var(--mono); }
+.fb-text:focus, .fb-input:focus { outline: none; border-color: var(--accent); }
+.fb-text:disabled, .fb-input:disabled { opacity: .55; cursor: not-allowed; }
+
+.fb-actions { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.fb-save {
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--text);
+  font: 12px var(--sans);
+  padding: 4px 14px;
+  cursor: pointer;
+}
+.fb-save:hover:not(:disabled) { border-color: var(--accent); }
+.fb-save:disabled { opacity: .5; cursor: not-allowed; }
 
 /* -------------------------------------------------------------- detail */
 
@@ -473,13 +747,13 @@ pre.raw {
   position: fixed;
   z-index: 50;
   max-width: 360px;
-  background: #0b0d12;
+  background: var(--tooltip-bg);
   border: 1px solid var(--line);
   border-radius: 6px;
   padding: 8px 10px;
   font-size: 12px;
   line-height: 1.45;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+  box-shadow: var(--shadow);
   pointer-events: none;
 }
 .tooltip h4 { font-size: 12.5px; margin-bottom: 4px; }
@@ -510,4 +784,5 @@ pre.raw {
   .workspace { flex-direction: column; }
   .detail { flex: 1 1 auto; border-left: none; border-top: 1px solid var(--line); }
   .case-summary { display: none; }
+  .theme-toggle { margin-left: auto; }
 }

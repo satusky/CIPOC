@@ -1,16 +1,19 @@
 "use strict";
 /* Control room — variables as bubbles inside their group's card, cards laid out
- * in wave order. Colour encodes recorded status; a dashed border marks a value
- * accepted at low confidence, and a hollow dot marks a variable with no value.
+ * in wave order. A bubble's dot answers whichever question the result raises:
+ * for a coded value, how far to trust it (confidence); for an empty one, why
+ * it is empty (status), drawn hollow so the two never read alike.
  */
 
-const BUBBLE_LEGEND = [
-  ["extracted", "extracted"],
-  ["structured_data", "structured data"],
+/* Statuses a variable can hold *without* a value. `extracted` and
+ * `structured_data` are absent by construction — they always carry one, so
+ * they are coloured by confidence and legended in the confidence row. */
+const NO_VALUE_LEGEND = [
   ["not_found", "not found"],
   ["not_applicable", "not applicable"],
   ["blocked", "blocked"],
   ["error", "error"],
+  ["pending", "pending"],
 ];
 
 function bubbleTooltip(entry) {
@@ -24,6 +27,16 @@ function bubbleTooltip(entry) {
   if (e.presence_confidence) rows.push(["confidence", e.presence_confidence]);
   if (e.extraction_attempts) rows.push(["attempts", String(e.extraction_attempts)]);
   if ((e.spans || []).length) rows.push(["evidence", e.spans.length + " span(s)"]);
+  if (hasTruth()) {
+    /* The bubble's mark says *that* a value disagrees; there is no room on the
+     * line for the value it should have been. The tooltip carries it, so the
+     * expected answer is one hover away rather than a pane away. */
+    const v = verdictFor(entry);
+    rows.push(["verdict", VERDICT_LABEL[v.verdict]]);
+    if (v.verdict !== "untested" && v.expected !== v.got) {
+      rows.push(["expected", v.expected || "no value"]);
+    }
+  }
   if (r.reason) rows.push(["reason", r.reason]);
   if ((e.validation_errors || []).length) rows.push(["invalid", e.validation_errors[0]]);
 
@@ -34,20 +47,35 @@ function bubbleTooltip(entry) {
 
 function bubble(entry) {
   const r = entry.result;
-  const e = r.extraction || {};
-  const low = e.presence_confidence === "low";
-  const hollow = r.value == null;
+  const level = indicatorConfidence(r);
+  const value = hasValue(r) ? String(r.value) : null;
 
   const node = h("button", {
     type: "button",
-    class: "bubble s-" + r.status + (low ? " low-confidence" : "") + (hollow ? " hollow" : ""),
-    dataset: { entity: "variable:" + entry.item_id },
-    title: entry.name,
-    "aria-label": entry.name + " — " + statusLabel(r.status) + (r.value ? ", value " + r.value : ""),
+    class: "bubble " + indicatorClass(r),
+    dataset: { entity: "variable:" + entry.item_id,
+               annotated: isAnnotated("variable", entry.item_id) ? "1" : null },
+    "aria-label": entry.item_id + " " + entry.name + " — " +
+      (value ? "value " + value + ", " + (level || "unrated") + " confidence"
+             : statusLabel(r.status)) +
+      (App.compare ? " \u2014 " + VERDICT_LABEL[verdictFor(entry).verdict] : ""),
     onclick: (ev) => { ev.stopPropagation(); select("variable", entry.item_id); },
   },
-    h("span", { text: String(entry.item_id) }),
-    r.value != null ? h("span", { class: "val", text: r.value }) : null
+    h("span", { class: "bub-label" },
+      h("span", { class: "bub-id", text: entry.item_id + ":" }),
+      h("span", { class: "bub-name", text: entry.name })),
+    /* An em dash rather than nothing when there is no value: the value sits in
+     * its own right-hand column, and a blank cell there reads as a rendering
+     * gap rather than as "this variable has no value". */
+    h("span", { class: value ? "val" : "val none", text: value || "\u2014" }),
+    /* The verdict rides in its own trailing track rather than recolouring the
+     * dot, so confidence and correctness stay legible at the same time — a
+     * max-confidence wrong answer is the thing worth finding, and it only
+     * reads as one if both marks are present. */
+    App.compare ? h("span", {
+      class: "vmark m-" + verdictFor(entry).verdict,
+      text: VERDICT_MARK[verdictFor(entry).verdict],
+    }) : null
   );
   return hoverable(node, () => bubbleTooltip(entry));
 }
@@ -97,14 +125,30 @@ function groupCard(group) {
     : entries;
   if (matcher && visible.length === 0) return null;
 
+  const gv = App.compare ? groupVerdict(group) : null;
+
   const tags = h("div", { class: "group-tags" },
     h("span", { class: "chip" + (state.kind === "excluded" ? "" : " on"), text: state.label }),
+    gv && gv.tested
+      ? h("span", { class: "chip " + (gv.correct === gv.tested ? "good" : "warn"),
+          text: gv.correct + "/" + gv.tested + " correct" })
+      : null,
+    /* A gate that excluded a group the reference says should have run produces
+     * a whole card of identical `missed` verdicts with one upstream cause.
+     * Naming the cause here is what turns six wrong answers into one wrong
+     * gate — the actionable form. */
+    gv && gv.finding
+      ? h("span", { class: "chip bad", text: FINDING_LABEL[gv.finding] })
+      : null,
     (group.gate || []).map((g) => h("span", { class: "chip", text: "gate: " + g })),
     group.applies_to
       ? h("span", { class: "chip", text: "site: " + (group.applies_to.gross_primary_sites || []).join("/") })
       : null,
     group.note_filter ? h("span", { class: "chip", text: "note filter" }) : null,
-    group.extract_as_group === false ? h("span", { class: "chip", text: "per-variable" }) : null
+    group.extract_as_group === false ? h("span", { class: "chip", text: "per-variable" }) : null,
+    isAnnotated("group", group.group_id)
+      ? h("span", { class: "chip on", text: "\u270e annotated" })
+      : null
   );
 
   const card = h("div", {
@@ -117,11 +161,13 @@ function groupCard(group) {
       if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select("group", group.group_id); }
     },
   },
+    /* Stacked, not inline: side by side, a long name and a long group_id
+     * squeeze each other and both wrap. */
     h("div", { class: "group-head" },
       h("h3", { text: group.name }),
       h("span", { class: "gid", text: group.group_id })),
     tags,
-    h("div", { class: "bubbles" }, visible.map(bubble)),
+    h("div", { class: "bubbles" + (App.compare ? " compare" : "") }, visible.map(bubble)),
     state.reason && state.kind === "excluded"
       ? h("p", { class: "faint", style: "margin:0;font-size:11.5px", text: state.reason })
       : null
@@ -129,18 +175,41 @@ function groupCard(group) {
   return hoverable(card, () => groupTooltip(group, state));
 }
 
+function legendRow(label, entries) {
+  const row = h("div", { class: "legend" }, h("span", { class: "legend-label", text: label }));
+  for (const [cls, text] of entries) {
+    row.append(h("span", {}, h("i", { class: "dot " + cls }), text));
+  }
+  return row;
+}
+
+/* Like legendRow, but keyed by the trailing mark rather than a dot — the dot
+ * column already means confidence, and repeating it here would say the marks
+ * and the dots share a vocabulary when the whole point is that they do not. */
+function verdictLegendRow() {
+  const row = h("div", { class: "legend" },
+    h("span", { class: "legend-label", text: "vs. ground truth" }));
+  for (const verdict of VERDICTS) {
+    row.append(h("span", {},
+      h("i", { class: "vmark m-" + verdict, text: VERDICT_MARK[verdict] }),
+      VERDICT_LABEL[verdict]));
+  }
+  return row;
+}
+
 function renderControlRoom() {
   const root = clear($("#control"));
 
-  const legend = h("div", { class: "legend" });
-  for (const [status, label] of BUBBLE_LEGEND) {
-    legend.append(h("span", {}, h("i", { class: "d-" + status }), label));
-  }
-  legend.append(
-    h("span", {}, h("i", { class: "d-extracted", style: "box-shadow:inset 0 0 0 1.5px currentColor;background:transparent" }), "no value"),
-    h("span", { style: "border:1px dashed var(--line);border-radius:999px;padding:1px 8px" }, "low confidence")
+  root.append(
+    legendRow("value \u00b7 confidence",
+      CONFIDENCE_LEVELS.map((level) => ["c-" + level, level])
+        .concat([["s-structured_data", "structured data (unrated)"]])),
+    legendRow("no value", NO_VALUE_LEGEND.map(([s, label]) => ["s-" + s + " hollow", label]))
   );
-  root.append(legend);
+  /* Appended separately, not as a conditional argument: Element.append()
+     stringifies null into a literal "null" text node, unlike h(), which skips
+     falsy children. */
+  if (App.compare) root.append(verdictLegendRow());
 
   let shown = 0;
   for (const wave of waves()) {

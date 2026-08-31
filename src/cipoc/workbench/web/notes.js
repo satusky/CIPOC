@@ -42,7 +42,8 @@ function noteRow(note) {
     h("button", {
       type: "button",
       class: "note-row " + temporality,
-      dataset: { entity: "note:" + note.note_id },
+      dataset: { entity: "note:" + note.note_id,
+                 annotated: isAnnotated("note", note.note_id) ? "1" : null },
       onclick: () => select("note", note.note_id),
     },
       h("div", {},

@@ -1,0 +1,81 @@
+"""The workbench CLI: serve the frontend over one run's state.
+
+    PYTHONPATH=src python -m cipoc.workbench serve \
+        --state tests/test_outputs/case_state.json \
+        --ground-truth gt/case01.json \
+        --feedback feedback/case01.json
+
+Every path is optional. With none, this serves the committed fixture in ``web/``
+and behaves exactly like ``python3 -m http.server -d src/cipoc/workbench/web``,
+minus the inability to save feedback.
+
+Produce a state file with ``scripts/run_case_state.py``; the ground-truth file
+is a JSON object of ``{item_id: value}``, the same shape that script already
+accepts for ``--structured-data``.
+"""
+
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+
+def cmd_serve(args: argparse.Namespace) -> int:
+    # Deferred: both imports come from the optional `workbench` extra, so
+    # `python -m cipoc.workbench --help` works without them installed.
+    try:
+        import uvicorn
+
+        from .server import build_app
+    except ModuleNotFoundError as err:
+        print(
+            f"Missing the workbench extra ({err.name}). Install it with:\n"
+            "    uv sync --extra workbench\n"
+            "or serve the frontend read-only with:\n"
+            "    python3 -m http.server -d src/cipoc/workbench/web 8000",
+            file=sys.stderr,
+        )
+        return 1
+
+    for label, path in (("--state", args.state), ("--ground-truth", args.ground_truth)):
+        if path is not None and not path.is_file():
+            print(f"{label}: {path} does not exist.", file=sys.stderr)
+            return 1
+
+    app = build_app(
+        state_path=args.state,
+        ground_truth_path=args.ground_truth,
+        feedback_path=args.feedback,
+    )
+
+    print(f"State:        {args.state or 'the copy committed in web/'}")
+    print(f"Ground truth: {args.ground_truth or 'none — comparison features stay hidden'}")
+    print(f"Feedback:     {args.feedback or 'none — the annotation form is read-only'}")
+    print(f"\nOpen http://{args.host}:{args.port}/")
+    uvicorn.run(app, host=args.host, port=args.port, log_level="warning")
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(prog="cipoc.workbench", description=__doc__)
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    serve = sub.add_parser("serve", help="Serve the workbench frontend.")
+    serve.add_argument("--state", type=Path, default=None,
+                       help="Orchestrator state JSON (default: the copy committed in web/).")
+    serve.add_argument("--ground-truth", type=Path, default=None,
+                       help="Reference values as a JSON object of {item_id: value}.")
+    serve.add_argument("--feedback", type=Path, default=None,
+                       help="Where to read and write reviewer annotations. Created on first save.")
+    # Localhost by default: the workbench renders raw note text and model output.
+    serve.add_argument("--host", default="127.0.0.1")
+    serve.add_argument("--port", type=int, default=8000)
+    serve.set_defaults(func=cmd_serve)
+
+    args = parser.parse_args(argv)
+    return args.func(args)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

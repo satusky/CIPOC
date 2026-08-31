@@ -28,7 +28,7 @@ function crossLink(kind, id, label) {
     type: "button",
     class: "link",
     text: label,
-    onclick: () => select(kind, id),
+    onclick: () => show(kind, id),
   });
 }
 
@@ -241,6 +241,7 @@ function noteDetail(noteId) {
       : h("p", { class: "faint", text: "No variable cites this note as evidence." })));
 
   body.append(exchangeSection("Scanner calls", noteExchanges(note.note_id)));
+  body.append(feedbackSection("note", noteId));
   body.append(section("Raw", rawBlock("ProcessedClinicalNote", note)));
   return body;
 }
@@ -320,6 +321,33 @@ function groupDetail(groupId) {
       ? h("p", { class: "muted", style: "margin:8px 0 0", text: "Recorded reason: " + state.reason })
       : null));
 
+  /* The group is the only level at which a gating mistake is visible as one
+     fact. Every variable below it will read `missed`, but they share a single
+     upstream cause and fixing them one at a time is the wrong move. */
+  if (hasTruth()) {
+    const gv = groupVerdict(group);
+    body.append(section("Ground truth",
+      gv.tested
+        ? kv([
+            ["tested", gv.tested + " of " + gv.total + " variable(s)"],
+            ["correct", gv.correct + " of " + gv.tested],
+            ["disagreements", VERDICTS
+              .filter((v) => v !== "match" && v !== "untested" && gv.counts[v])
+              .map((v) => gv.counts[v] + " " + VERDICT_LABEL[v]).join(" · ") || "none"],
+          ])
+        : h("p", { class: "faint", style: "margin:0",
+            text: "The reference file mentions none of this group's variables." }),
+      gv.finding
+        ? h("div", { class: "card bad", style: "margin-top:10px" },
+            h("h4", {}, h("span", { class: "chip bad", text: "gate" })),
+            h("p", { style: "margin:0", text: gv.finding === "wrongly_excluded"
+              ? "This group was excluded, but the reference file carries values for its " +
+                "variables — the gate or site rule above rejected a case it should have admitted."
+              : "This group ran and coded values, but the reference file says none of its " +
+                "variables should have one — the gate admitted a case it should have rejected." }))
+        : null));
+  }
+
   const sel = noteSelection(group.group_id);
   if (sel) {
     const rows = h("div", {});
@@ -352,7 +380,7 @@ function groupDetail(groupId) {
   const variables = App.variables.filter((v) => v.group_id === group.group_id);
   body.append(section("Variables (" + variables.length + ")",
     variables.map((v) => h("div", { class: "check-row" },
-      h("span", { class: "dot d-" + v.result.status, style: "margin-top:5px" }),
+      h("span", { class: "dot " + indicatorClass(v.result), style: "margin-top:5px" }),
       h("div", {},
         crossLink("variable", v.item_id, v.item_id + " " + v.name),
         h("span", { class: "chip", style: "margin-left:6px", text: statusLabel(v.result.status) }),
@@ -360,6 +388,7 @@ function groupDetail(groupId) {
         v.result.reason ? h("div", { class: "observed", text: v.result.reason }) : null)))));
 
   body.append(exchangeSection("Group-level calls", groupExchanges(group.group_id)));
+  body.append(feedbackSection("group", groupId));
   body.append(section("Raw", rawBlock("TargetGroup", group)));
   return body;
 }
@@ -390,6 +419,28 @@ function variableDetail(itemId) {
           crossLink("variable", b, String(b))))
       : null],
   ])));
+
+  /* Immediately after Outcome, so the recorded answer and the expected one read
+     adjacently. Absent entirely when there is no reference file, and reduced to
+     a single line when the reference does not mention this item. */
+  if (hasTruth()) {
+    const v = verdictFor(entry);
+    if (v.verdict === "untested") {
+      body.append(section("Ground truth",
+        h("p", { class: "faint", style: "margin:0",
+          text: "The reference file does not mention item " + id + "." })));
+    } else {
+      body.append(section("Ground truth",
+        checkRow(CORRECT.has(v.verdict), VERDICT_LABEL[v.verdict],
+          v.verdict === "match" ? null
+            : "recorded " + (v.got || "no value") + " · expected " + (v.expected || "no value")),
+        v.verdict === "near"
+          ? h("p", { class: "muted", style: "margin:8px 0 0", text:
+              "These agree once case and separators are ignored and leading zeros " +
+              "are dropped — a formatting difference, not a different answer." })
+          : null));
+    }
+  }
 
   if (flags.length) {
     body.append(section("Review flags", flags.map((f) =>
@@ -443,6 +494,7 @@ function variableDetail(itemId) {
       groupCalls.map(exchangeCard)));
   }
 
+  body.append(feedbackSection("variable", id));
   body.append(section("Raw", rawBlock("CaseVariableResult", result)));
   return body;
 }
