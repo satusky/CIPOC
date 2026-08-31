@@ -45,9 +45,8 @@ const $ = (sel) => document.querySelector(sel);
 const clear = (node) => { while (node.firstChild) node.removeChild(node.firstChild); return node; };
 
 /* The lens the control room opens on, and the fallback whenever a stored or
-   requested one is unavailable. Confidence is the reading that varies most
-   between runs and the one this view was built to scan for; status is a click
-   away, and the fill rule marks every valueless variable under any lens. */
+   requested one is unavailable. There is only ever one other (accuracy, and
+   only with a reference file loaded), so most runs never show a toggle. */
 const DEFAULT_LENS = "confidence";
 
 /* --------------------------------------------------------------- run state */
@@ -100,22 +99,22 @@ const hasValue = (result) => result.value != null && result.value !== "";
 
 /* ----------------------------------------------------------------- lenses
  *
- * The control room shows ONE metric at a time. The active lens colours both
- * channels of every bubble — the 8px dot and the 1px outline — from its own
- * ramp, so there is a single vocabulary on screen and a single legend.
+ * A bubble's dot and outline answer whichever question the result actually
+ * raises: for a coded value, how far to trust it (confidence); for an empty
+ * one, why it is empty (status), drawn hollow so the two never read alike.
+ * That is one reading, not two — `extracted` and `not found` are not rival
+ * answers to the same question, and no variable is ever eligible for both
+ * halves. Splitting them across two tabs made the reader toggle to learn
+ * something the single dot had already told them.
  *
- * This replaces an earlier scheme where the dot meant confidence for a value
- * that existed and status for one that did not, while a trailing glyph in a
- * fifth grid track meant the ground-truth verdict. That kept confidence and
- * correctness legible at once — a max-confidence wrong answer being the thing
- * worth finding — but it cost two extra legend rows and made every bubble a
- * two-vocabulary decode. The cross-read now costs one click, and both values
- * are still side by side in the tooltip, the detail pane and the table.
+ * The lens picks between *metrics that genuinely compete for the same pixel*:
+ * this one and, when a reference file is loaded, the ground-truth verdict.
+ * With no reference file there is nothing to choose and the toggle is hidden.
  *
  * Each entry answers three questions and nothing else: which classes exist and
- * in what order (`classes`), what a class is called (`label`), and which class
- * a variable falls in (`reading`). Adding a lens is a table entry, not a
- * branch anywhere below.
+ * in what order (`classes`), what a class is called (`labelFor`), and which
+ * class a variable falls in (`reading`). `classFor` maps a class to its CSS
+ * class — per class, not per lens, because this lens draws from two ramps.
  *
  * `classes` is a thunk because the accuracy lens reads VERDICTS out of
  * truth.js, which is a later <script> — the binding does not exist yet when
@@ -124,32 +123,34 @@ const hasValue = (result) => result.value != null && result.value !== "";
 const LENSES = {
   confidence: {
     label: "Confidence",
-    prefix: "c-",
-    classes: () => CONFIDENCE_LEVELS.concat("unrated"),
-    labelFor: (cls) => cls,
+    /* Confidence levels first, best to worst, then the reasons a variable has
+       no value to rate. Zero-count classes are dropped by lensTally, so the
+       legend only ever spells out the halves this run actually produced. */
+    classes: () => CONFIDENCE_LEVELS.concat(Object.keys(STATUS)),
+    classFor: (cls) => (CONFIDENCE_LEVELS.includes(cls) ? "c-" : "s-") + cls,
+    /* Lower-cased: the legend sets the confidence terms beside the status ones
+       in one row, and STATUS.label is title-cased for the table's own column. */
+    labelFor: (cls) => (CONFIDENCE_LEVELS.includes(cls) ? cls : statusLabel(cls).toLowerCase()),
     /* `structured_data` carries a value but never an extraction, so it has no
-       rating to show; it lands in `unrated` beside the valueless results and is
-       told apart from them by the fill rule below. */
+       rating to show and falls through to its status colour — filled, because
+       it does hold a value. */
     reading: (entry) => {
       const level = (entry.result.extraction || {}).presence_confidence;
-      return hasValue(entry.result) && CONFIDENCE_LEVELS.includes(level) ? level : "unrated";
+      return hasValue(entry.result) && CONFIDENCE_LEVELS.includes(level)
+        ? level : entry.result.status;
     },
-    available: () => true,
-  },
-  status: {
-    label: "Status",
-    prefix: "s-",
-    classes: () => Object.keys(STATUS),
-    labelFor: statusLabel,
-    reading: (entry) => entry.result.status,
+    /* What a screen reader says for a bubble. Separate from labelFor because
+       the legend wants the bare term and speech wants the sentence. */
+    aria: (cls) => (CONFIDENCE_LEVELS.includes(cls) ? cls + " confidence" : statusLabel(cls)),
     available: () => true,
   },
   accuracy: {
     label: "Accuracy",
-    prefix: "m-",
     classes: () => VERDICTS,
+    classFor: (cls) => "m-" + cls,
     labelFor: (cls) => VERDICT_LABEL[cls],
     reading: (entry) => verdictFor(entry).verdict,
+    aria: (cls) => "verdict " + VERDICT_LABEL[cls],
     available: () => hasTruth(),
     /* The one lens whose indicator is a glyph rather than a dot, and it has to
        be. Its two most consequential classes are `match` and `mismatch` —
@@ -162,22 +163,24 @@ const LENSES = {
   },
 };
 
+/* True only when there is a real choice to offer. */
+const lensChoices = () => Object.keys(LENSES).filter((id) => LENSES[id].available());
+
 const activeLens = () => LENSES[App.lens] || LENSES[DEFAULT_LENS];
 
 /* {key, cls, hollow} for one App.variables entry under a lens.
  *
- * `hollow` stays exactly what it has always meant — this variable holds no
- * value — and is deliberately NOT redefined as "the lens has no reading here".
- * It is already correct under all three lenses (no value to rate, no value to
- * compare), and it is the secondary encoding two of the three ramps need: it
- * is what separates `missed` from `mismatch` and `not_found` from
- * `structured_data`, pairs that colour alone does not resolve under CVD. */
+ * `hollow` means exactly one thing under both lenses — this variable holds no
+ * value. It is what tells the confidence half of a reading from the status
+ * half at a glance, and it is the secondary encoding the ramps need where
+ * colour alone fails under CVD: `missed` vs `mismatch`, `not_found` vs
+ * `structured_data`. */
 function indicatorFor(entry, lensId) {
   const lens = LENSES[lensId] || LENSES[DEFAULT_LENS];
   const key = lens.reading(entry);
   return {
     key,
-    cls: lens.prefix + key,
+    cls: lens.classFor(key),
     hollow: !hasValue(entry.result),
     mark: lens.mark ? lens.mark(key) : null,
   };
@@ -208,7 +211,7 @@ function lensTally(lensId) {
     .map((cls) => ({
       ...counts.get(cls),
       label: lens.labelFor(cls),
-      cls: lens.prefix + cls,
+      cls: lens.classFor(cls),
       mark: lens.mark ? lens.mark(cls) : null,
     }));
 }
@@ -496,11 +499,19 @@ function setLens(lens, remember = true) {
   App.lens = lens;
   if (remember) { try { localStorage.setItem(LENS_KEY, lens); } catch (err) { /* blocked */ } }
   App.classFilter.clear();
+  syncLensTabs();
+  render();
+}
+
+/* The toggle is chrome for a choice; with one lens available there is no
+   choice, so the whole control goes away rather than sitting there as a
+   single pressed button. */
+function syncLensTabs() {
   for (const tab of document.querySelectorAll(".lens-tab")) {
-    tab.setAttribute("aria-selected", String(tab.dataset.lens === lens));
+    tab.setAttribute("aria-selected", String(tab.dataset.lens === App.lens));
     tab.hidden = !LENSES[tab.dataset.lens].available();
   }
-  render();
+  $(".lenses").hidden = lensChoices().length < 2;
 }
 
 function render() {
@@ -517,10 +528,8 @@ function renderChrome() {
   const acc = hasTruth() ? caseAccuracy() : null;
 
   /* The accuracy lens exists only when there is something to compare against;
-     with no reference file the toolbar is unchanged. */
-  for (const tab of document.querySelectorAll(".lens-tab")) {
-    tab.hidden = !LENSES[tab.dataset.lens].available();
-  }
+     loading a reference file is what makes the toggle appear at all. */
+  syncLensTabs();
 
   /* The per-status counts that used to sit here (`24 extracted`, `2
      unresolved`) are now the status legend, which carries every status rather

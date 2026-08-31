@@ -307,6 +307,9 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 .modes { display: flex; gap: 4px; }
 
 .lenses { display: flex; gap: 4px; align-items: center; }
+/* `display: flex` outranks the UA's [hidden] rule, so the toggle needs its
+   own — it is hidden whenever there is only one lens to pick. */
+.lenses[hidden] { display: none; }
 .lens-label {
   color: var(--text-faint);
   font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em;
@@ -562,11 +565,6 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
   padding: 0 2px 14px;
   font-size: 11.5px;
   color: var(--text-dim);
-}
-.legend .legend-label {
-  min-width: 84px;
-  color: var(--text-faint);
-  font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em;
 }
 .legend .dot { margin-right: 0; }
 .legend-mark { width: 10px; display: inline-block; }
