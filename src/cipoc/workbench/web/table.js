@@ -27,7 +27,7 @@ const COMPARE_COLUMNS = [
   { key: "verdict",  label: "Verdict",  get: (v) => verdictFor(v).verdict },
 ];
 
-const activeColumns = () => (App.compare ? COLUMNS.concat(COMPARE_COLUMNS) : COLUMNS);
+const activeColumns = () => (hasTruth() ? COLUMNS.concat(COMPARE_COLUMNS) : COLUMNS);
 
 const CONFIDENCE_RANK = { low: 1, medium: 2, high: 3, max: 4 };
 
@@ -50,8 +50,8 @@ function filteredVariables() {
     v.group_name.toLowerCase().includes(q) ||
     v.result.status.includes(q) ||
     (v.result.value || "").toLowerCase().includes(q) ||
-    (App.compare && verdictFor(v).verdict.includes(q)) ||
-    (App.compare && (verdictFor(v).expected || "").toLowerCase().includes(q)));
+    (hasTruth() && verdictFor(v).verdict.includes(q)) ||
+    (hasTruth() && (verdictFor(v).expected || "").toLowerCase().includes(q)));
 }
 
 function sortVariables(entries) {
@@ -91,7 +91,7 @@ function bodyRow(entry) {
   const cells = activeColumns().map((column) => {
     if (column.key === "status") {
       return h("td", {},
-        h("span", { class: "dot " + indicatorClass(r) }),
+        h("span", { class: "dot " + statusDot(r) }),
         statusLabel(r.status));
     }
     if (column.key === "verdict") {

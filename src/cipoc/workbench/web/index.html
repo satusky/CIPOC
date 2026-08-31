@@ -70,11 +70,15 @@
           <input id="var-filter" class="filter" type="search"
                  placeholder="Filter variables&hellip;" aria-label="Filter variables" />
           <label class="check"><input id="group-toggle" type="checkbox" checked /> Grouped</label>
-          <!-- Hidden until a ground-truth file is loaded: with none, the
+          <!-- The control room paints one metric at a time. The Accuracy tab
+               is hidden until a ground-truth file is loaded; with none, the
                toolbar and every view below it are unchanged. -->
-          <label id="compare-control" class="check" hidden>
-            <input id="compare-toggle" type="checkbox" /> Compare
-          </label>
+          <div class="lenses" role="tablist" aria-label="Colour variables by">
+            <span class="lens-label">Lens</span>
+            <button class="lens-tab" role="tab" data-lens="status">Status</button>
+            <button class="lens-tab" role="tab" data-lens="confidence">Confidence</button>
+            <button class="lens-tab" role="tab" data-lens="accuracy" hidden>Accuracy</button>
+          </div>
           <label class="check file-pick" title="Load a ground-truth JSON: {item_id: value}">
             <input id="truth-file" type="file" accept="application/json,.json" />
             <span>Ground truth&hellip;</span>
