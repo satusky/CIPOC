@@ -44,6 +44,12 @@ function h(tag, props, ...children) {
 const $ = (sel) => document.querySelector(sel);
 const clear = (node) => { while (node.firstChild) node.removeChild(node.firstChild); return node; };
 
+/* The lens the control room opens on, and the fallback whenever a stored or
+   requested one is unavailable. Confidence is the reading that varies most
+   between runs and the one this view was built to scan for; status is a click
+   away, and the fill rule marks every valueless variable under any lens. */
+const DEFAULT_LENS = "confidence";
+
 /* --------------------------------------------------------------- run state */
 
 const App = {
@@ -59,7 +65,7 @@ const App = {
   truth: new Map(),         // item_id (number) -> expected value (string)
   truthSource: null,        // where the reference file came from, for the chrome
 
-  lens: "status",           // which metric the control room colours by
+  lens: DEFAULT_LENS,       // which metric the control room colours by
   classFilter: new Set(),   // lens classes the legend has narrowed to; empty = all
 
   feedback: { variable: {}, group: {}, note: {} },
@@ -116,14 +122,6 @@ const hasValue = (result) => result.value != null && result.value !== "";
  * this object is built, only by the time anything renders.
  */
 const LENSES = {
-  status: {
-    label: "Status",
-    prefix: "s-",
-    classes: () => Object.keys(STATUS),
-    labelFor: statusLabel,
-    reading: (entry) => entry.result.status,
-    available: () => true,
-  },
   confidence: {
     label: "Confidence",
     prefix: "c-",
@@ -136,6 +134,14 @@ const LENSES = {
       const level = (entry.result.extraction || {}).presence_confidence;
       return hasValue(entry.result) && CONFIDENCE_LEVELS.includes(level) ? level : "unrated";
     },
+    available: () => true,
+  },
+  status: {
+    label: "Status",
+    prefix: "s-",
+    classes: () => Object.keys(STATUS),
+    labelFor: statusLabel,
+    reading: (entry) => entry.result.status,
     available: () => true,
   },
   accuracy: {
@@ -156,7 +162,7 @@ const LENSES = {
   },
 };
 
-const activeLens = () => LENSES[App.lens] || LENSES.status;
+const activeLens = () => LENSES[App.lens] || LENSES[DEFAULT_LENS];
 
 /* {key, cls, hollow} for one App.variables entry under a lens.
  *
@@ -167,7 +173,7 @@ const activeLens = () => LENSES[App.lens] || LENSES.status;
  * is what separates `missed` from `mismatch` and `not_found` from
  * `structured_data`, pairs that colour alone does not resolve under CVD. */
 function indicatorFor(entry, lensId) {
-  const lens = LENSES[lensId] || LENSES.status;
+  const lens = LENSES[lensId] || LENSES[DEFAULT_LENS];
   const key = lens.reading(entry);
   return {
     key,
@@ -188,7 +194,7 @@ const statusDot = (result) =>
    classes this run never produced — the legend then shows what actually
    happened rather than the vocabulary in the abstract. */
 function lensTally(lensId) {
-  const lens = LENSES[lensId] || LENSES.status;
+  const lens = LENSES[lensId] || LENSES[DEFAULT_LENS];
   const counts = new Map();
   for (const entry of App.variables) {
     const { key, hollow } = indicatorFor(entry, lensId);
@@ -473,12 +479,13 @@ function setMode(mode) {
 
 /* The lens is remembered the way the theme is. A stored `accuracy` is only
    honoured when a reference file is actually loaded — restoring it without one
-   would select a tab that is not on screen and paint every bubble `untested`. */
+   would select a tab that is not on screen and paint every bubble `untested`;
+   it falls back to DEFAULT_LENS instead. */
 const LENS_KEY = "cipoc-lens";
 const storedLens = () => { try { return localStorage.getItem(LENS_KEY); } catch (err) { return null; } };
 
 function setLens(lens) {
-  if (!LENSES[lens] || !LENSES[lens].available()) lens = "status";
+  if (!LENSES[lens] || !LENSES[lens].available()) lens = DEFAULT_LENS;
   App.lens = lens;
   try { localStorage.setItem(LENS_KEY, lens); } catch (err) { /* blocked */ }
   App.classFilter.clear();
