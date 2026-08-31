@@ -4,8 +4,21 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CIPOC Workbench</title>
+  <script>
+    /* Resolve the theme before the first paint. Doing this from app.js would
+       paint the default palette first and flash. The stored value wins; with
+       none, follow the OS. */
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem("cipoc-theme"); } catch (err) { /* blocked */ }
+      var system = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      document.documentElement.dataset.theme = saved === "light" || saved === "dark" ? saved : system;
+    })();
+  </script>
   <link rel="stylesheet" href="styles.css" />
   <script src="app.js" defer></script>
+  <script src="truth.js" defer></script>
+  <script src="feedback.js" defer></script>
   <script src="notes.js" defer></script>
   <script src="control.js" defer></script>
   <script src="table.js" defer></script>
@@ -26,6 +39,8 @@
     </nav>
 
     <div id="case-summary" class="case-summary"></div>
+
+    <button id="theme-toggle" class="icon-btn theme-toggle" type="button"></button>
   </header>
 
   <div id="facts" class="facts" aria-label="Case facts"></div>
@@ -55,6 +70,15 @@
           <input id="var-filter" class="filter" type="search"
                  placeholder="Filter variables&hellip;" aria-label="Filter variables" />
           <label class="check"><input id="group-toggle" type="checkbox" checked /> Grouped</label>
+          <!-- Hidden until a ground-truth file is loaded: with none, the
+               toolbar and every view below it are unchanged. -->
+          <label id="compare-control" class="check" hidden>
+            <input id="compare-toggle" type="checkbox" /> Compare
+          </label>
+          <label class="check file-pick" title="Load a ground-truth JSON: {item_id: value}">
+            <input id="truth-file" type="file" accept="application/json,.json" />
+            <span>Ground truth&hellip;</span>
+          </label>
         </div>
         <div id="control" class="control" hidden></div>
         <div id="table-wrap" class="table-wrap" hidden></div>

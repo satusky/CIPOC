@@ -22,7 +22,16 @@ function h(tag, props, ...children) {
     else if (key === "text") node.textContent = value;
     else if (key === "html") throw new Error("h(): raw HTML is not allowed");
     else if (key.startsWith("on")) node.addEventListener(key.slice(2), value);
-    else if (key === "dataset") Object.assign(node.dataset, value);
+    /* Not Object.assign: assigning null to a dataset property stringifies it,
+       so `{annotated: null}` yields data-annotated="null" — present, and matched
+       by every [data-annotated] selector. Skip absent keys the same way the
+       top-level props above do. */
+    else if (key === "dataset") {
+      for (const [name, item] of Object.entries(value)) {
+        if (item === null || item === undefined || item === false) continue;
+        node.dataset[name] = item;
+      }
+    }
     else node.setAttribute(key, value === true ? "" : value);
   }
   for (const child of children.flat(Infinity)) {
@@ -47,6 +56,14 @@ const App = {
   varFilter: "",
   sort: { key: "item_id", dir: 1 },
 
+  truth: new Map(),         // item_id (number) -> expected value (string)
+  truthSource: null,        // where the reference file came from, for the chrome
+  compare: false,           // show verdict marks (only ever true with a truth file)
+
+  feedback: { variable: {}, group: {}, note: {} },
+  feedbackDraft: new Map(),  // kind:id -> unsaved edits, kept across re-renders
+  feedbackWritable: false,   // false under a plain static server
+
   notes: new Map(),         // note_id (string) -> ProcessedClinicalNote
   groups: [],               // TargetGroup[], in configured order
   groupById: new Map(),
@@ -68,6 +85,26 @@ const STATUS = {
   pending:         { label: "Pending" },
 };
 const statusLabel = (s) => (STATUS[s] || { label: s }).label;
+
+const CONFIDENCE_LEVELS = ["max", "high", "medium", "low"];
+
+/* The coloured dot on a bubble, a table row and a detail row encodes exactly
+ * one thing at a time: how far to trust a value that exists, or — when there
+ * is none — why. So a result carrying both a value and a recorded confidence
+ * is coloured by confidence, and everything else falls back to its status
+ * colour. Both are read off the state; neither is inferred. */
+const hasValue = (result) => result.value != null && result.value !== "";
+
+function indicatorConfidence(result) {
+  if (!hasValue(result)) return null;
+  const level = (result.extraction || {}).presence_confidence;
+  return CONFIDENCE_LEVELS.includes(level) ? level : null;
+}
+
+function indicatorClass(result) {
+  const level = indicatorConfidence(result);
+  return (level ? "c-" + level : "s-" + result.status) + (hasValue(result) ? "" : " hollow");
+}
 
 /* ------------------------------------------------------------------ index */
 
@@ -234,9 +271,52 @@ function hoverable(node, build) {
   return node;
 }
 
+/* ----------------------------------------------------------------- theme */
+
+const THEME_KEY = "cipoc-theme";
+const storedTheme = () => { try { return localStorage.getItem(THEME_KEY); } catch (err) { return null; } };
+
+const Theme = {
+  current: () => (document.documentElement.dataset.theme === "light" ? "light" : "dark"),
+
+  apply(theme) {
+    document.documentElement.dataset.theme = theme;
+    const next = theme === "light" ? "dark" : "light";
+    const button = $("#theme-toggle");
+    button.textContent = theme === "light" ? "\u263D" : "\u2600";
+    button.title = "Switch to " + next + " theme";
+    button.setAttribute("aria-label", button.title);
+  },
+
+  toggle() {
+    const next = Theme.current() === "light" ? "dark" : "light";
+    try { localStorage.setItem(THEME_KEY, next); } catch (err) { /* blocked */ }
+    Theme.apply(next);
+  },
+
+  /* The head script has already painted the resolved theme; this only labels
+   * the control and keeps following the OS until the user states a
+   * preference of their own. */
+  init() {
+    Theme.apply(Theme.current());
+    $("#theme-toggle").addEventListener("click", Theme.toggle);
+    window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", (e) => {
+      if (!storedTheme()) Theme.apply(e.matches ? "light" : "dark");
+    });
+  },
+};
+
 /* --------------------------------------------------------------- routing */
 
+/* Clicking the entity that is already open closes the panel; clicking a
+ * different one keeps it open and swaps the contents. Cross-links inside the
+ * panel navigate with show() so following one never closes it. */
 function select(kind, id) {
+  if (isSelected(kind, id)) clearSelection();
+  else show(kind, id);
+}
+
+function show(kind, id) {
   App.selection = { kind, id: String(id) };
   renderDetail();
   markSelection();
@@ -296,6 +376,13 @@ function renderChrome() {
   const counts = {};
   for (const v of App.variables) counts[v.result.status] = (counts[v.result.status] || 0) + 1;
   const flags = ((App.raw.report || {}).flags || []).length;
+  const acc = hasTruth() ? caseAccuracy() : null;
+
+  /* The compare control exists only when there is something to compare
+     against; with no reference file the toolbar is unchanged. */
+  const control = $("#compare-control");
+  control.hidden = !hasTruth();
+  $("#compare-toggle").checked = App.compare;
 
   clear($("#case-summary")).append(
     h("span", {}, h("b", { text: String(App.notes.size) }), " notes"),
@@ -305,6 +392,20 @@ function renderChrome() {
     h("span", { class: flags ? "chip warn" : "chip" },
       flags ? flags + " review flag" + (flags === 1 ? "" : "s") : "no review flags")
   );
+  /* Appended separately rather than as a conditional argument above:
+     Element.append() renders a null argument as the literal text "null",
+     unlike h(), which skips falsy children. */
+  const annotations = annotationCount();
+  if (annotations) {
+    $("#case-summary").append(h("span", { class: "chip on",
+      text: annotations + " annotation" + (annotations === 1 ? "" : "s") }));
+  }
+  if (acc && acc.tested) {
+    $("#case-summary").append(hoverable(h("span", {
+      class: "chip " + (acc.correct === acc.tested ? "good" : "warn"),
+      text: acc.correct + "/" + acc.tested + " correct",
+    }), accuracyTooltip));
+  }
 
   const facts = App.raw.case_facts || {};
   const order = ["primary_site", "gross_primary_site", "histology", "behavior", "sex", "date_of_diagnosis"];
@@ -333,6 +434,7 @@ function renderChrome() {
 /* ------------------------------------------------------------------ boot */
 
 function wire() {
+  Theme.init();
   for (const tab of document.querySelectorAll(".view-tab")) {
     tab.addEventListener("click", () => setView(tab.dataset.view));
   }
@@ -352,6 +454,11 @@ function wire() {
     App.grouped = e.target.checked;
     render();
   });
+  $("#compare-toggle").addEventListener("change", (e) => {
+    App.compare = e.target.checked;
+    render();
+  });
+  $("#truth-file").addEventListener("change", onTruthFile);
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") clearSelection();
   });
@@ -385,6 +492,11 @@ async function boot() {
     return;
   }
   indexState(raw);
+  /* A reference file is optional and independent of the run: absence is the
+     normal case and leaves every view exactly as it was. loadTruth() is in
+     truth.js and never throws — it returns false when nothing is served. */
+  App.compare = await loadTruth();
+  await loadFeedback();
   renderChrome();
   setMode(App.mode);
   setView(App.view);

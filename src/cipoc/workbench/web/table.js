@@ -19,11 +19,25 @@ const COLUMNS = [
   { key: "evidence",   label: "Evidence",   cls: "num", get: (v) => (((v.result.extraction || {}).spans) || []).length },
 ];
 
+/* Appended only while comparing. Kept out of COLUMNS rather than rendered
+   empty: a table with no ground-truth file must be the table it was, and two
+   blank columns would still take width and still be sortable. */
+const COMPARE_COLUMNS = [
+  { key: "expected", label: "Expected", cls: "code", get: (v) => verdictFor(v).expected || "" },
+  { key: "verdict",  label: "Verdict",  get: (v) => verdictFor(v).verdict },
+];
+
+const activeColumns = () => (App.compare ? COLUMNS.concat(COMPARE_COLUMNS) : COLUMNS);
+
 const CONFIDENCE_RANK = { low: 1, medium: 2, high: 3, max: 4 };
 
 function sortValue(column, entry) {
   const raw = column.get(entry);
   if (column.key === "confidence") return CONFIDENCE_RANK[raw] || 0;
+  /* Alphabetical would open on `match`; VERDICTS is ordered worst-first so one
+     click puts the disagreements at the top, which is the only reason to sort
+     by this column at all. */
+  if (column.key === "verdict") return VERDICT_RANK[raw];
   return raw;
 }
 
@@ -35,11 +49,13 @@ function filteredVariables() {
     v.name.toLowerCase().includes(q) ||
     v.group_name.toLowerCase().includes(q) ||
     v.result.status.includes(q) ||
-    (v.result.value || "").toLowerCase().includes(q));
+    (v.result.value || "").toLowerCase().includes(q) ||
+    (App.compare && verdictFor(v).verdict.includes(q)) ||
+    (App.compare && (verdictFor(v).expected || "").toLowerCase().includes(q)));
 }
 
 function sortVariables(entries) {
-  const column = COLUMNS.find((c) => c.key === App.sort.key) || COLUMNS[0];
+  const column = activeColumns().find((c) => c.key === App.sort.key) || COLUMNS[0];
   return entries.sort((a, b) => {
     const av = sortValue(column, a);
     const bv = sortValue(column, b);
@@ -72,11 +88,18 @@ function headerCell(column) {
 
 function bodyRow(entry) {
   const r = entry.result;
-  const cells = COLUMNS.map((column) => {
+  const cells = activeColumns().map((column) => {
     if (column.key === "status") {
       return h("td", {},
-        h("span", { class: "dot d-" + r.status }),
+        h("span", { class: "dot " + indicatorClass(r) }),
         statusLabel(r.status));
+    }
+    if (column.key === "verdict") {
+      const verdict = verdictFor(entry).verdict;
+      return h("td", {},
+        h("i", { class: "vmark m-" + verdict, style: "margin-right:7px",
+          text: VERDICT_MARK[verdict] }),
+        VERDICT_LABEL[verdict]);
     }
     const value = column.get(entry);
     const cell = h("td", { class: column.cls || null, text: value === 0 ? "0" : String(value || "") });
@@ -86,7 +109,8 @@ function bodyRow(entry) {
 
   const row = h("tr", {
     tabindex: "0",
-    dataset: { entity: "variable:" + entry.item_id },
+    dataset: { entity: "variable:" + entry.item_id,
+               annotated: isAnnotated("variable", entry.item_id) ? "1" : null },
     onclick: () => select("variable", entry.item_id),
     onkeydown: (e) => {
       if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select("variable", entry.item_id); }
@@ -115,7 +139,7 @@ function renderTable() {
       const group = App.groupById.get(groupId);
       const state = groupState(group);
       body.append(h("tr", { class: "group-sep" },
-        h("td", { colspan: String(COLUMNS.length) },
+        h("td", { colspan: String(activeColumns().length) },
           group.name + " · " + rows.length + " of " + state.total + " · " + state.label)));
       for (const entry of rows) body.append(bodyRow(entry));
     }
@@ -124,6 +148,6 @@ function renderTable() {
   }
 
   root.append(h("table", { class: "vtable" },
-    h("thead", {}, h("tr", {}, COLUMNS.map(headerCell))),
+    h("thead", {}, h("tr", {}, activeColumns().map(headerCell))),
     body));
 }

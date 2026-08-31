@@ -24,3 +24,13 @@ dependencies = [
     "graphviz>=0.21",
     "matplotlib>=3.11.0",
 ]
+
+[project.optional-dependencies]
+# The workbench web frontend only. Deliberately kept OUT of the core dependency
+# set so the production DBR-18.2-pinned install is untouched; install with
+# `uv sync --extra workbench` (or `pip install -e '.[workbench]'`). The frontend
+# itself is dependency-free static files under `src/cipoc/workbench/web/`.
+workbench = [
+    "fastapi>=0.136,<1.0",
+    "uvicorn>=0.49,<1.0",
+]
