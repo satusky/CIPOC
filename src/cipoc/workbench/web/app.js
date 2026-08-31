@@ -481,13 +481,20 @@ function setMode(mode) {
    honoured when a reference file is actually loaded — restoring it without one
    would select a tab that is not on screen and paint every bubble `untested`;
    it falls back to DEFAULT_LENS instead. */
-const LENS_KEY = "cipoc-lens";
+/* Bumped when the default changed: the old key had been written on every load
+   by the restore below, so a stored `status` recorded "this page has been
+   opened", not "this reader chose status", and would have pinned every
+   existing browser to the old default forever. */
+const LENS_KEY = "cipoc-lens-v2";
 const storedLens = () => { try { return localStorage.getItem(LENS_KEY); } catch (err) { return null; } };
 
-function setLens(lens) {
+/* `remember` is false for the restore at startup — only a choice gets stored,
+   so the remembered lens stays a preference rather than a snapshot of whatever
+   the default happened to be. */
+function setLens(lens, remember = true) {
   if (!LENSES[lens] || !LENSES[lens].available()) lens = DEFAULT_LENS;
   App.lens = lens;
-  try { localStorage.setItem(LENS_KEY, lens); } catch (err) { /* blocked */ }
+  if (remember) { try { localStorage.setItem(LENS_KEY, lens); } catch (err) { /* blocked */ } }
   App.classFilter.clear();
   for (const tab of document.querySelectorAll(".lens-tab")) {
     tab.setAttribute("aria-selected", String(tab.dataset.lens === lens));
@@ -629,7 +636,7 @@ async function boot() {
   await loadTruth();
   await loadFeedback();
   renderChrome();
-  setLens(storedLens() || App.lens);
+  setLens(storedLens() || App.lens, false);
   setMode(App.mode);
   setView(App.view);
   $("#boot").hidden = true;
