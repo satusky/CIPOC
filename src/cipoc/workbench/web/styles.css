@@ -66,40 +66,40 @@
   --warn: #f0c93b;          /* Sunburst Yellow lifted for the dark ground */
   --mark: #665400;          /* Sunburst at 40% over black */
 
-  /* Confidence ramp — a single-hue amber sequential ramp, 35° of hue spread,
-     monotone in lightness, max → low.
+  /* Confidence ramp — a single-hue coral sequential ramp (OKLCH hue 35°),
+     monotone in lightness, max → low. Chroma rises steeply with the reading's
+     urgency — 0.03 / 0.09 / 0.13 / 0.12 — so `max`, which is half of every
+     coded value, is a warm neutral and only the weak readings carry hue. An
+     evenly-spaced chroma ramp was tried first and washed the whole grid coral:
+     44 bubbles now paint an outline each, and at that area a chroma of 0.05 on
+     the majority class is not quiet.
 
-     It was a green → orange hue walk, which is the wrong form twice over.
-     Confidence is an ORDINAL scale, and an ordinal scale is read by lightness;
-     that ramp's lightness was not even monotone, and its middle two steps were
-     a plateau — #9ecb3f and #e3b341 differ by ΔL 0.007 and ΔE 1.3 under
-     deuteranopia, 10.4 under normal vision. High and medium, the two commonest
-     non-max readings, were the same colour to everyone. That was survivable
-     while the ramp only ever tinted an 8px dot; the lens paints the bubble's
-     outline with it too, and at that area it is not.
+     WHY THIS HUE, and it is not taste. Since the two halves of a reading share
+     one legend row, the ramp sits inline with the status colours, and
+     `structured_data` is the one status drawn FILLED like a confidence step —
+     the fill rule separates the ramp from every other status but not from that
+     one. Holding the pair to the categorical gate (normal-vision ΔE ≥ 15, CVD
+     ΔE ≥ 8, against Tile Teal in both themes) leaves exactly hues 35°–75° of
+     the whole wheel: everything cooler collapses into the teal under protan or
+     deutan simulation. Rose at 355° is the prettiest ramp that fails — 23.4 ΔE
+     to a normal reader, 3.2 to a protan one.
 
-     CHROMA does the shouting, lightness only orders the steps. `max` is the
-     majority reading and needs no attention, so it sits near-neutral (chroma
-     0.03) and just clears the 3:1 mark floor; `low` is the most saturated step
-     the hue can hold. A ramp that instead ran max → low from dim to bright made
-     the commonest reading look like a rendering fault, and a lens whose
-     majority reading shouts is busier than the one it replaced.
+     35° is the coolest hue that survives, and that is the point: it is as far
+     from yellow as the constraint allows. The ramp before it sat at ~70° with
+     chroma 0.03 at the quiet end, which is the definition of khaki — a warm hue
+     at middling chroma and middling lightness is mud, and three of its four
+     steps were in that zone. Coral keeps red in the quiet step instead.
 
      Lightness runs up here and down under [data-theme="light"] — same
      semantics, opposite direction, because the grounds are opposite and
-     "prominent" means brighter on one and darker on the other.
+     "prominent" means brighter on one, darker on the other.
 
-     Amber rather than green: nothing else in a lens ramp is amber, and only one
-     lens is ever on screen, so it cannot collide with --pending. Still clear of
-     --error red, which was the original ramp's good reason for its hues.
-
-     Verified, not eyeballed — every step of the dataviz validator's ordinal
-     check passes against --bg-panel, the surface a bubble actually sits on:
+     Verified, not eyeballed, against --bg-panel, the surface a bubble sits on:
        validate_palette.js "…" --mode dark --surface "#112442" --ordinal */
-  --conf-max: #7d7864;
-  --conf-high: #9e8e63;
-  --conf-medium: #c7a256;
-  --conf-low: #f9b223;
+  --conf-max: #826c66;
+  --conf-high: #b77665;
+  --conf-medium: #e68269;
+  --conf-low: #fd9e85;
 
   /* Verdict ramp — a value's agreement with the ground-truth reference. These
      are semantic aliases rather than direct reuse of the status colours: a
@@ -110,7 +110,12 @@
   --v-match: var(--extracted);
   --v-near: var(--structured);
   --v-mismatch: var(--error);
-  --v-missed: var(--conf-low);
+  /* NOT var(--conf-low), though it was until the ramp turned coral. The two
+     scales never share a screen — accuracy is the other lens — so the alias
+     saved nothing, and it silently dragged this token wherever the confidence
+     ramp went: with a coral `low` it landed 8.7 ΔE from --v-mismatch red, the
+     one distinction the accuracy lens exists to make. Its own value now. */
+  --v-missed: #f9b223;
   --v-spurious: var(--blocked);
   --v-untested: var(--not-applicable);
 
@@ -150,13 +155,18 @@
 
   /* Same ramp mirrored: on this ground `max` is the palest, least saturated
      step and `low` the darkest, most saturated one, so max still recedes and
-     low still shouts. `max` sits at 2.05:1 — right on the ordinal check's
+     low still shouts. `max` sits at 2.10:1 — just over the ordinal check's
      light-end floor, which is what stops "quiet" from becoming "invisible".
-     Passes the same ordinal check against #e7eaed. */
-  --conf-max: #aaa591;
-  --conf-high: #98885b;
-  --conf-medium: #8e6b17;
-  --conf-low: #785307;
+
+     The ladder is deliberately shallower than the dark one (L 0.72 → 0.48, not
+     → 0.39). A warm hue driven that dark is brown whatever its chroma, and the
+     bottom two steps are the ones that have to look urgent; stopping at 0.48
+     keeps `low` a brick red rather than a mud brown, and the ΔL gaps still
+     clear the ordinal floor with room. Passes the same check against #e7eaed. */
+  --conf-max: #b59f99;
+  --conf-high: #bb7968;
+  --conf-medium: #b75137;
+  --conf-low: #a72a02;
 
   /* The verdict ramp is defined by alias in both themes, so it follows each
      theme's status palette automatically. Restated here rather than inherited
@@ -164,7 +174,7 @@
   --v-match: var(--extracted);
   --v-near: var(--structured);
   --v-mismatch: var(--error);
-  --v-missed: var(--conf-low);
+  --v-missed: #785307;      /* own value — see the dark block */
   --v-spurious: var(--blocked);
   --v-untested: var(--not-applicable);
 
@@ -649,10 +659,6 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 .c-high   { --dot: var(--conf-high); }
 .c-medium { --dot: var(--conf-medium); }
 .c-low    { --dot: var(--conf-low); }
-/* Structured-data values (no extraction, so no rating) and every result with no
-   value at all. The fill rule tells the two apart. */
-.c-unrated { --dot: var(--not-applicable); }
-
 /* Verdict classes set the same --dot property the status/confidence classes do,
    so the shapes above render a verdict with no rules of their own. They are
    only ever applied to a *different element* than the status class — the
