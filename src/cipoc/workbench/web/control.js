@@ -1,20 +1,12 @@
 "use strict";
 /* Control room — variables as bubbles inside their group's card, cards laid out
- * in wave order. A bubble's dot answers whichever question the result raises:
- * for a coded value, how far to trust it (confidence); for an empty one, why
- * it is empty (status), drawn hollow so the two never read alike.
+ * in wave order.
+ *
+ * A bubble carries exactly one reading: whichever metric the active lens
+ * selects, painted on both of its channels (the dot and the outline). The lens
+ * vocabulary, its class order and its per-variable reading all live in the
+ * LENSES table in app.js; nothing here knows what a status or a verdict is.
  */
-
-/* Statuses a variable can hold *without* a value. `extracted` and
- * `structured_data` are absent by construction — they always carry one, so
- * they are coloured by confidence and legended in the confidence row. */
-const NO_VALUE_LEGEND = [
-  ["not_found", "not found"],
-  ["not_applicable", "not applicable"],
-  ["blocked", "blocked"],
-  ["error", "error"],
-  ["pending", "pending"],
-];
 
 function bubbleTooltip(entry) {
   const r = entry.result;
@@ -28,9 +20,10 @@ function bubbleTooltip(entry) {
   if (e.extraction_attempts) rows.push(["attempts", String(e.extraction_attempts)]);
   if ((e.spans || []).length) rows.push(["evidence", e.spans.length + " span(s)"]);
   if (hasTruth()) {
-    /* The bubble's mark says *that* a value disagrees; there is no room on the
-     * line for the value it should have been. The tooltip carries it, so the
-     * expected answer is one hover away rather than a pane away. */
+    /* The bubble shows one metric; the tooltip is where the others stay
+     * reachable. With the lens on confidence this is the only place the
+     * verdict appears without switching tabs — and a max-confidence wrong
+     * answer is exactly the pair worth reading together. */
     const v = verdictFor(entry);
     rows.push(["verdict", VERDICT_LABEL[v.verdict]]);
     if (v.verdict !== "untested" && v.expected !== v.got) {
@@ -47,35 +40,33 @@ function bubbleTooltip(entry) {
 
 function bubble(entry) {
   const r = entry.result;
-  const level = indicatorConfidence(r);
+  const lens = activeLens();
+  const ind = indicatorFor(entry, App.lens);
   const value = hasValue(r) ? String(r.value) : null;
 
   const node = h("button", {
     type: "button",
-    class: "bubble " + indicatorClass(r),
+    class: "bubble " + ind.cls + (ind.hollow ? " hollow" : "") + (ind.mark ? " marked" : ""),
     dataset: { entity: "variable:" + entry.item_id,
                annotated: isAnnotated("variable", entry.item_id) ? "1" : null },
+    /* The spoken label states the same one reading the colour does, so the
+       screen-reader pass tracks the lens instead of describing a fixed axis
+       the sighted view may not be showing. */
     "aria-label": entry.item_id + " " + entry.name + " — " +
-      (value ? "value " + value + ", " + (level || "unrated") + " confidence"
-             : statusLabel(r.status)) +
-      (App.compare ? " \u2014 " + VERDICT_LABEL[verdictFor(entry).verdict] : ""),
+      (value ? "value " + value : "no value") + " \u2014 " +
+      lens.label.toLowerCase() + " " + lens.labelFor(ind.key),
     onclick: (ev) => { ev.stopPropagation(); select("variable", entry.item_id); },
   },
+    /* Occupies the indicator column in place of the ::before dot; the column is
+       the same width either way, so switching lens shifts nothing. */
+    ind.mark ? h("i", { class: "vmark bub-mark " + ind.cls, text: ind.mark }) : null,
     h("span", { class: "bub-label" },
       h("span", { class: "bub-id", text: entry.item_id + ":" }),
       h("span", { class: "bub-name", text: entry.name })),
     /* An em dash rather than nothing when there is no value: the value sits in
      * its own right-hand column, and a blank cell there reads as a rendering
      * gap rather than as "this variable has no value". */
-    h("span", { class: value ? "val" : "val none", text: value || "\u2014" }),
-    /* The verdict rides in its own trailing track rather than recolouring the
-     * dot, so confidence and correctness stay legible at the same time — a
-     * max-confidence wrong answer is the thing worth finding, and it only
-     * reads as one if both marks are present. */
-    App.compare ? h("span", {
-      class: "vmark m-" + verdictFor(entry).verdict,
-      text: VERDICT_MARK[verdictFor(entry).verdict],
-    }) : null
+    h("span", { class: value ? "val" : "val none", text: value || "\u2014" })
   );
   return hoverable(node, () => bubbleTooltip(entry));
 }
@@ -112,40 +103,54 @@ function groupTooltip(group, state) {
   );
 }
 
+/* The card's one roll-up chip, for the active lens — and only when it has
+ * something to say. A card whose group ran clean is already saying so with its
+ * green top border, so `complete` and `6/6 correct` are ink that reports the
+ * absence of news; suppressing them is what lets the cards that DO carry news
+ * stand out at a glance.
+ *
+ * The group's static configuration — gate, site applicability, note filter,
+ * per-variable extraction — used to sit here as four more chips of identical
+ * weight. It belongs to no lens, never varies between runs, and is already in
+ * this card's hover tooltip (groupTooltip, below) and in the detail pane's
+ * Configuration and Gating sections.
+ */
+function groupChip(group, state) {
+  if (App.lens === "accuracy" && hasTruth()) {
+    const gv = groupVerdict(group);
+    if (!gv.tested || gv.correct === gv.tested) return null;
+    return h("span", { class: "chip warn", text: gv.correct + "/" + gv.tested + " correct" });
+  }
+  if (App.lens === "confidence") {
+    const weak = App.variables.filter((v) =>
+      v.group_id === group.group_id && ["medium", "low"].includes(indicatorFor(v, "confidence").key));
+    if (!weak.length) return null;
+    return h("span", { class: "chip warn", text: weak.length + " below high" });
+  }
+  if (state.kind === "ran" && state.label === "complete") return null;
+  return h("span", { class: "chip" + (state.kind === "excluded" ? "" : " on"), text: state.label });
+}
+
 function groupCard(group) {
   const state = groupState(group);
   const matcher = App.varFilter;
 
   const entries = App.variables.filter((v) => v.group_id === group.group_id);
-  const visible = matcher
-    ? entries.filter((v) =>
-        String(v.item_id).includes(matcher) ||
-        v.name.toLowerCase().includes(matcher) ||
-        (v.result.value || "").toLowerCase().includes(matcher))
-    : entries;
-  if (matcher && visible.length === 0) return null;
-
-  const gv = App.compare ? groupVerdict(group) : null;
+  const visible = entries.filter((v) => passesLens(v) && (!matcher ||
+    String(v.item_id).includes(matcher) ||
+    v.name.toLowerCase().includes(matcher) ||
+    (v.result.value || "").toLowerCase().includes(matcher)));
+  if ((matcher || App.classFilter.size) && visible.length === 0) return null;
 
   const tags = h("div", { class: "group-tags" },
-    h("span", { class: "chip" + (state.kind === "excluded" ? "" : " on"), text: state.label }),
-    gv && gv.tested
-      ? h("span", { class: "chip " + (gv.correct === gv.tested ? "good" : "warn"),
-          text: gv.correct + "/" + gv.tested + " correct" })
-      : null,
+    groupChip(group, state),
     /* A gate that excluded a group the reference says should have run produces
      * a whole card of identical `missed` verdicts with one upstream cause.
      * Naming the cause here is what turns six wrong answers into one wrong
      * gate — the actionable form. */
-    gv && gv.finding
-      ? h("span", { class: "chip bad", text: FINDING_LABEL[gv.finding] })
+    App.lens === "accuracy" && hasTruth() && groupVerdict(group).finding
+      ? h("span", { class: "chip bad", text: FINDING_LABEL[groupVerdict(group).finding] })
       : null,
-    (group.gate || []).map((g) => h("span", { class: "chip", text: "gate: " + g })),
-    group.applies_to
-      ? h("span", { class: "chip", text: "site: " + (group.applies_to.gross_primary_sites || []).join("/") })
-      : null,
-    group.note_filter ? h("span", { class: "chip", text: "note filter" }) : null,
-    group.extract_as_group === false ? h("span", { class: "chip", text: "per-variable" }) : null,
     isAnnotated("group", group.group_id)
       ? h("span", { class: "chip on", text: "\u270e annotated" })
       : null
@@ -167,7 +172,7 @@ function groupCard(group) {
       h("h3", { text: group.name }),
       h("span", { class: "gid", text: group.group_id })),
     tags,
-    h("div", { class: "bubbles" + (App.compare ? " compare" : "") }, visible.map(bubble)),
+    h("div", { class: "bubbles" }, visible.map(bubble)),
     state.reason && state.kind === "excluded"
       ? h("p", { class: "faint", style: "margin:0;font-size:11.5px", text: state.reason })
       : null
@@ -175,24 +180,52 @@ function groupCard(group) {
   return hoverable(card, () => groupTooltip(group, state));
 }
 
-function legendRow(label, entries) {
-  const row = h("div", { class: "legend" }, h("span", { class: "legend-label", text: label }));
-  for (const [cls, text] of entries) {
-    row.append(h("span", {}, h("i", { class: "dot " + cls }), text));
-  }
-  return row;
-}
-
-/* Like legendRow, but keyed by the trailing mark rather than a dot — the dot
- * column already means confidence, and repeating it here would say the marks
- * and the dots share a vocabulary when the whole point is that they do not. */
-function verdictLegendRow() {
+/* The one legend row — the key for the active lens, and the run's distribution
+ * along it, and the filter over it, all in the same object.
+ *
+ * It replaced three static legend rows (16 entries) stacked above the first
+ * card. Those had to spell out every vocabulary at once because all three were
+ * live simultaneously; with one lens active there is one to spell out, and the
+ * space that buys pays for the counts. Classes this run never produced are
+ * dropped, so the row describes what happened rather than what could.
+ *
+ * The swatch mirrors the bubble it stands for, hollow rule included — that is
+ * how the fill rule gets taught without a sentence explaining it. `valued` is
+ * counted rather than assumed because one class spans both: a `confidence`
+ * reading of `unrated` covers structured-data values (filled) and valueless
+ * results (hollow) alike.
+ */
+function lensLegend() {
+  const lens = activeLens();
+  const rows = lensTally(App.lens);
   const row = h("div", { class: "legend" },
-    h("span", { class: "legend-label", text: "vs. ground truth" }));
-  for (const verdict of VERDICTS) {
-    row.append(h("span", {},
-      h("i", { class: "vmark m-" + verdict, text: VERDICT_MARK[verdict] }),
-      VERDICT_LABEL[verdict]));
+    h("span", { class: "legend-label", text: lens.label }));
+
+  for (const item of rows) {
+    const active = App.classFilter.has(item.key);
+    row.append(h("button", {
+      type: "button",
+      class: "legend-class" + (active ? " on" : ""),
+      "aria-pressed": String(active),
+      title: active ? "Stop filtering by " + item.label : "Show only " + item.label,
+      onclick: () => {
+        if (!App.classFilter.delete(item.key)) App.classFilter.add(item.key);
+        render();
+      },
+    },
+      item.mark
+        ? h("i", { class: "vmark legend-mark " + item.cls, text: item.mark })
+        : h("i", { class: "dot " + item.cls + (item.valued ? "" : " hollow") }),
+      h("span", { text: item.label }),
+      h("b", { text: String(item.count) })
+    ));
+  }
+
+  if (App.classFilter.size) {
+    row.append(h("button", {
+      type: "button", class: "link legend-clear", text: "clear filter",
+      onclick: () => { App.classFilter.clear(); render(); },
+    }));
   }
   return row;
 }
@@ -200,16 +233,7 @@ function verdictLegendRow() {
 function renderControlRoom() {
   const root = clear($("#control"));
 
-  root.append(
-    legendRow("value \u00b7 confidence",
-      CONFIDENCE_LEVELS.map((level) => ["c-" + level, level])
-        .concat([["s-structured_data", "structured data (unrated)"]])),
-    legendRow("no value", NO_VALUE_LEGEND.map(([s, label]) => ["s-" + s + " hollow", label]))
-  );
-  /* Appended separately, not as a conditional argument: Element.append()
-     stringifies null into a literal "null" text node, unlike h(), which skips
-     falsy children. */
-  if (App.compare) root.append(verdictLegendRow());
+  root.append(lensLegend());
 
   let shown = 0;
   for (const wave of waves()) {
@@ -221,5 +245,10 @@ function renderControlRoom() {
       h("div", { class: "wave-grid" }, cards)
     );
   }
-  if (!shown) root.append(h("p", { class: "empty", text: "No variables match this filter." }));
+  if (!shown) {
+    root.append(h("p", { class: "empty",
+      text: App.classFilter.size
+        ? "No variables match this filter in the " + activeLens().label.toLowerCase() + " lens."
+        : "No variables match this filter." }));
+  }
 }

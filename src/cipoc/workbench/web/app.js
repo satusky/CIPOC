@@ -58,7 +58,9 @@ const App = {
 
   truth: new Map(),         // item_id (number) -> expected value (string)
   truthSource: null,        // where the reference file came from, for the chrome
-  compare: false,           // show verdict marks (only ever true with a truth file)
+
+  lens: "status",           // which metric the control room colours by
+  classFilter: new Set(),   // lens classes the legend has narrowed to; empty = all
 
   feedback: { variable: {}, group: {}, note: {} },
   feedbackDraft: new Map(),  // kind:id -> unsaved edits, kept across re-renders
@@ -88,22 +90,128 @@ const statusLabel = (s) => (STATUS[s] || { label: s }).label;
 
 const CONFIDENCE_LEVELS = ["max", "high", "medium", "low"];
 
-/* The coloured dot on a bubble, a table row and a detail row encodes exactly
- * one thing at a time: how far to trust a value that exists, or — when there
- * is none — why. So a result carrying both a value and a recorded confidence
- * is coloured by confidence, and everything else falls back to its status
- * colour. Both are read off the state; neither is inferred. */
 const hasValue = (result) => result.value != null && result.value !== "";
 
-function indicatorConfidence(result) {
-  if (!hasValue(result)) return null;
-  const level = (result.extraction || {}).presence_confidence;
-  return CONFIDENCE_LEVELS.includes(level) ? level : null;
+/* ----------------------------------------------------------------- lenses
+ *
+ * The control room shows ONE metric at a time. The active lens colours both
+ * channels of every bubble — the 8px dot and the 1px outline — from its own
+ * ramp, so there is a single vocabulary on screen and a single legend.
+ *
+ * This replaces an earlier scheme where the dot meant confidence for a value
+ * that existed and status for one that did not, while a trailing glyph in a
+ * fifth grid track meant the ground-truth verdict. That kept confidence and
+ * correctness legible at once — a max-confidence wrong answer being the thing
+ * worth finding — but it cost two extra legend rows and made every bubble a
+ * two-vocabulary decode. The cross-read now costs one click, and both values
+ * are still side by side in the tooltip, the detail pane and the table.
+ *
+ * Each entry answers three questions and nothing else: which classes exist and
+ * in what order (`classes`), what a class is called (`label`), and which class
+ * a variable falls in (`reading`). Adding a lens is a table entry, not a
+ * branch anywhere below.
+ *
+ * `classes` is a thunk because the accuracy lens reads VERDICTS out of
+ * truth.js, which is a later <script> — the binding does not exist yet when
+ * this object is built, only by the time anything renders.
+ */
+const LENSES = {
+  status: {
+    label: "Status",
+    prefix: "s-",
+    classes: () => Object.keys(STATUS),
+    labelFor: statusLabel,
+    reading: (entry) => entry.result.status,
+    available: () => true,
+  },
+  confidence: {
+    label: "Confidence",
+    prefix: "c-",
+    classes: () => CONFIDENCE_LEVELS.concat("unrated"),
+    labelFor: (cls) => cls,
+    /* `structured_data` carries a value but never an extraction, so it has no
+       rating to show; it lands in `unrated` beside the valueless results and is
+       told apart from them by the fill rule below. */
+    reading: (entry) => {
+      const level = (entry.result.extraction || {}).presence_confidence;
+      return hasValue(entry.result) && CONFIDENCE_LEVELS.includes(level) ? level : "unrated";
+    },
+    available: () => true,
+  },
+  accuracy: {
+    label: "Accuracy",
+    prefix: "m-",
+    classes: () => VERDICTS,
+    labelFor: (cls) => VERDICT_LABEL[cls],
+    reading: (entry) => verdictFor(entry).verdict,
+    available: () => hasTruth(),
+    /* The one lens whose indicator is a glyph rather than a dot, and it has to
+       be. Its two most consequential classes are `match` and `mismatch` —
+       correct and wrong — which are green and red, ΔE 2.2 under deuteranopia:
+       indistinguishable. Both carry a value, so the hollow rule cannot separate
+       them either. Shape is the channel that survives, and these verdicts
+       already had a designed glyph vocabulary. It rides in the indicator column
+       the dot would have used, so this costs no width and shifts nothing. */
+    mark: (cls) => VERDICT_MARK[cls],
+  },
+};
+
+const activeLens = () => LENSES[App.lens] || LENSES.status;
+
+/* {key, cls, hollow} for one App.variables entry under a lens.
+ *
+ * `hollow` stays exactly what it has always meant — this variable holds no
+ * value — and is deliberately NOT redefined as "the lens has no reading here".
+ * It is already correct under all three lenses (no value to rate, no value to
+ * compare), and it is the secondary encoding two of the three ramps need: it
+ * is what separates `missed` from `mismatch` and `not_found` from
+ * `structured_data`, pairs that colour alone does not resolve under CVD. */
+function indicatorFor(entry, lensId) {
+  const lens = LENSES[lensId] || LENSES.status;
+  const key = lens.reading(entry);
+  return {
+    key,
+    cls: lens.prefix + key,
+    hollow: !hasValue(entry.result),
+    mark: lens.mark ? lens.mark(key) : null,
+  };
 }
 
-function indicatorClass(result) {
-  const level = indicatorConfidence(result);
-  return (level ? "c-" + level : "s-" + result.status) + (hasValue(result) ? "" : " hollow");
+/* The status dot for the table and the detail pane. Those two show every axis
+   at once in labelled columns, so their dot is fixed on status and does NOT
+   follow the lens — the lens is the control room's way of choosing what to
+   show, and a table has no such shortage of room. */
+const statusDot = (result) =>
+  "s-" + result.status + (hasValue(result) ? "" : " hollow");
+
+/* Counts per class for the active lens, in the lens's own order, dropping the
+   classes this run never produced — the legend then shows what actually
+   happened rather than the vocabulary in the abstract. */
+function lensTally(lensId) {
+  const lens = LENSES[lensId] || LENSES.status;
+  const counts = new Map();
+  for (const entry of App.variables) {
+    const { key, hollow } = indicatorFor(entry, lensId);
+    const row = counts.get(key) || { key, count: 0, valued: 0 };
+    row.count += 1;
+    if (!hollow) row.valued += 1;
+    counts.set(key, row);
+  }
+  return lens.classes()
+    .filter((cls) => counts.has(cls))
+    .map((cls) => ({
+      ...counts.get(cls),
+      label: lens.labelFor(cls),
+      cls: lens.prefix + cls,
+      mark: lens.mark ? lens.mark(cls) : null,
+    }));
+}
+
+/* The legend narrows the grid to one or more classes; it ANDs with the text
+   filter rather than replacing it. */
+function passesLens(entry) {
+  if (!App.classFilter.size) return true;
+  return App.classFilter.has(indicatorFor(entry, App.lens).key);
 }
 
 /* ------------------------------------------------------------------ index */
@@ -363,6 +471,24 @@ function setMode(mode) {
   render();
 }
 
+/* The lens is remembered the way the theme is. A stored `accuracy` is only
+   honoured when a reference file is actually loaded — restoring it without one
+   would select a tab that is not on screen and paint every bubble `untested`. */
+const LENS_KEY = "cipoc-lens";
+const storedLens = () => { try { return localStorage.getItem(LENS_KEY); } catch (err) { return null; } };
+
+function setLens(lens) {
+  if (!LENSES[lens] || !LENSES[lens].available()) lens = "status";
+  App.lens = lens;
+  try { localStorage.setItem(LENS_KEY, lens); } catch (err) { /* blocked */ }
+  App.classFilter.clear();
+  for (const tab of document.querySelectorAll(".lens-tab")) {
+    tab.setAttribute("aria-selected", String(tab.dataset.lens === lens));
+    tab.hidden = !LENSES[tab.dataset.lens].available();
+  }
+  render();
+}
+
 function render() {
   if (App.view === "notes") renderNotes();
   else if (App.mode === "control") renderControlRoom();
@@ -373,22 +499,21 @@ function render() {
 /* --------------------------------------------------------------- chrome */
 
 function renderChrome() {
-  const counts = {};
-  for (const v of App.variables) counts[v.result.status] = (counts[v.result.status] || 0) + 1;
   const flags = ((App.raw.report || {}).flags || []).length;
   const acc = hasTruth() ? caseAccuracy() : null;
 
-  /* The compare control exists only when there is something to compare
-     against; with no reference file the toolbar is unchanged. */
-  const control = $("#compare-control");
-  control.hidden = !hasTruth();
-  $("#compare-toggle").checked = App.compare;
+  /* The accuracy lens exists only when there is something to compare against;
+     with no reference file the toolbar is unchanged. */
+  for (const tab of document.querySelectorAll(".lens-tab")) {
+    tab.hidden = !LENSES[tab.dataset.lens].available();
+  }
 
+  /* The per-status counts that used to sit here (`24 extracted`, `2
+     unresolved`) are now the status legend, which carries every status rather
+     than the two this line had room for. */
   clear($("#case-summary")).append(
     h("span", {}, h("b", { text: String(App.notes.size) }), " notes"),
     h("span", {}, h("b", { text: String(App.variables.length) }), " variables"),
-    h("span", {}, h("b", { text: String(counts.extracted || 0) }), " extracted"),
-    h("span", {}, h("b", { text: String((counts.error || 0) + (counts.blocked || 0)) }), " unresolved"),
     h("span", { class: flags ? "chip warn" : "chip" },
       flags ? flags + " review flag" + (flags === 1 ? "" : "s") : "no review flags")
   );
@@ -454,10 +579,9 @@ function wire() {
     App.grouped = e.target.checked;
     render();
   });
-  $("#compare-toggle").addEventListener("change", (e) => {
-    App.compare = e.target.checked;
-    render();
-  });
+  for (const tab of document.querySelectorAll(".lens-tab")) {
+    tab.addEventListener("click", () => setLens(tab.dataset.lens));
+  }
   $("#truth-file").addEventListener("change", onTruthFile);
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") clearSelection();
@@ -495,9 +619,10 @@ async function boot() {
   /* A reference file is optional and independent of the run: absence is the
      normal case and leaves every view exactly as it was. loadTruth() is in
      truth.js and never throws — it returns false when nothing is served. */
-  App.compare = await loadTruth();
+  await loadTruth();
   await loadFeedback();
   renderChrome();
+  setLens(storedLens() || App.lens);
   setMode(App.mode);
   setView(App.view);
   $("#boot").hidden = true;

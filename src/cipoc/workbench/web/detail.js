@@ -380,7 +380,7 @@ function groupDetail(groupId) {
   const variables = App.variables.filter((v) => v.group_id === group.group_id);
   body.append(section("Variables (" + variables.length + ")",
     variables.map((v) => h("div", { class: "check-row" },
-      h("span", { class: "dot " + indicatorClass(v.result), style: "margin-top:5px" }),
+      h("span", { class: "dot " + statusDot(v.result), style: "margin-top:5px" }),
       h("div", {},
         crossLink("variable", v.item_id, v.item_id + " " + v.name),
         h("span", { class: "chip", style: "margin-left:6px", text: statusLabel(v.result.status) }),

@@ -23,9 +23,16 @@ const VERDICT_LABEL = {
   untested: "untested",
 };
 
-/* The glyph shown in the bubble's trailing track. Chosen so the four that need
- * acting on are visually distinct from each other at 11px, and so `untested`
- * reads as "nothing was asserted" rather than as any kind of result. */
+/* The glyph for a verdict, shown in the accuracy lens's indicator column and in
+ * the table's Verdict cell. Chosen so the four that need acting on are visually
+ * distinct from each other at 11px, and so `untested` reads as "nothing was
+ * asserted" rather than as any kind of result.
+ *
+ * Shape rather than colour alone is load-bearing, not decorative: `match` and
+ * `mismatch` — correct and wrong, the pair this whole lens exists to separate —
+ * are green and red, ΔE 2.2 under deuteranopia, and both carry a value so the
+ * hollow rule cannot tell them apart either. These glyphs are the channel that
+ * survives. Do not reduce the accuracy indicator to a bare dot. */
 const VERDICT_MARK = {
   match: "\u2713",     // ✓
   near: "\u2248",      // ≈
@@ -141,7 +148,6 @@ function indexTruth(raw, source) {
     Object.entries(raw || {}).map(([k, v]) => [Number(k), v == null ? "" : String(v)])
   );
   App.truthSource = App.truth.size ? source : null;
-  if (!App.truth.size) App.compare = false;
 }
 
 /* Server first, then a sibling static file, then nothing. Absence is not an
@@ -183,9 +189,10 @@ function onTruthFile(event) {
       return;
     }
     indexTruth(raw, file.name);
-    App.compare = hasTruth();
     renderChrome();
-    render();
+    /* setLens re-renders, and switches to the lens the file just enabled —
+       picking a reference file is only ever a prelude to reading against it. */
+    setLens(hasTruth() ? "accuracy" : App.lens);
     if (App.selection) renderDetail();
   };
   reader.readAsText(file);
