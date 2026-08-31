@@ -73,10 +73,13 @@
           <!-- The control room paints one metric at a time. The Accuracy tab
                is hidden until a ground-truth file is loaded; with none, the
                toolbar and every view below it are unchanged. -->
-          <div class="lenses" role="tablist" aria-label="Colour variables by">
+          <!-- Hidden until a reference file is loaded: with one lens available
+               there is no choice to offer. Status is deliberately NOT a lens —
+               a bubble already shows status wherever there is no value to rate,
+               so a status tab would only repeat what the dot has said. -->
+          <div class="lenses" role="tablist" aria-label="Colour variables by" hidden>
             <span class="lens-label">Lens</span>
             <button class="lens-tab" role="tab" data-lens="confidence">Confidence</button>
-            <button class="lens-tab" role="tab" data-lens="status">Status</button>
             <button class="lens-tab" role="tab" data-lens="accuracy" hidden>Accuracy</button>
           </div>
           <label class="check file-pick" title="Load a ground-truth JSON: {item_id: value}">

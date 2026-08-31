@@ -53,8 +53,7 @@ function bubble(entry) {
        screen-reader pass tracks the lens instead of describing a fixed axis
        the sighted view may not be showing. */
     "aria-label": entry.item_id + " " + entry.name + " — " +
-      (value ? "value " + value : "no value") + " \u2014 " +
-      lens.label.toLowerCase() + " " + lens.labelFor(ind.key),
+      (value ? "value " + value : "no value") + " \u2014 " + lens.aria(ind.key),
     onclick: (ev) => { ev.stopPropagation(); select("variable", entry.item_id); },
   },
     /* Occupies the indicator column in place of the ::before dot; the column is
@@ -190,16 +189,14 @@ function groupCard(group) {
  * dropped, so the row describes what happened rather than what could.
  *
  * The swatch mirrors the bubble it stands for, hollow rule included — that is
- * how the fill rule gets taught without a sentence explaining it. `valued` is
- * counted rather than assumed because one class spans both: a `confidence`
- * reading of `unrated` covers structured-data values (filled) and valueless
- * results (hollow) alike.
+ * how the fill rule gets taught without a sentence explaining it, and it is
+ * what makes the row's two halves self-evident: the confidence classes are
+ * filled, the no-value statuses are hollow. `valued` is counted off the data
+ * rather than assumed, so a class that ever spans both still draws honestly.
  */
 function lensLegend() {
-  const lens = activeLens();
   const rows = lensTally(App.lens);
-  const row = h("div", { class: "legend" },
-    h("span", { class: "legend-label", text: lens.label }));
+  const row = h("div", { class: "legend" });
 
   for (const item of rows) {
     const active = App.classFilter.has(item.key);
