@@ -86,6 +86,16 @@ function headerCell(column) {
   return th;
 }
 
+/* Hollow comes from the result, not from the class, and it is the same rule the
+ * control-room bubble applies (indicatorFor in app.js): a wash means this
+ * variable holds a value. The two agree by construction for most classes —
+ * `.m-missed` and `.m-untested` carry no wash of their own — but not for all of
+ * them: a correctly-empty variable is a `match` (truth.js, want and got both
+ * empty), and it must not be filled just because the verdict is a good one.
+ */
+const pill = (cls, result, ...children) =>
+  h("span", { class: "pill " + cls + (hasValue(result) ? "" : " hollow") }, children);
+
 function bodyRow(entry) {
   const r = entry.result;
   const cells = activeColumns().map((column) => {
@@ -96,10 +106,20 @@ function bodyRow(entry) {
     }
     if (column.key === "verdict") {
       const verdict = verdictFor(entry).verdict;
-      return h("td", {},
-        h("i", { class: "vmark m-" + verdict, style: "margin-right:7px",
-          text: VERDICT_MARK[verdict] }),
-        VERDICT_LABEL[verdict]);
+      return h("td", {}, pill("m-" + verdict, r,
+        h("i", { class: "vmark", text: VERDICT_MARK[verdict] }),
+        VERDICT_LABEL[verdict]));
+    }
+    /* Not indicatorFor(entry, "confidence"): that lens falls back to the STATUS
+       when a result carries no rating, which is right for a bubble that must say
+       something and wrong for a column headed Confidence — a status-coloured
+       pill under that header would be a reading the column does not claim to
+       show. The cell shows the recorded rating or nothing, exactly as its
+       `get` does, so sorting and filtering still see the same string. */
+    if (column.key === "confidence") {
+      const level = (r.extraction || {}).presence_confidence;
+      if (!CONFIDENCE_LEVELS.includes(level)) return h("td", {});
+      return h("td", {}, pill("c-" + level, r, level));
     }
     const value = column.get(entry);
     const cell = h("td", { class: column.cls || null, text: value === 0 ? "0" : String(value || "") });

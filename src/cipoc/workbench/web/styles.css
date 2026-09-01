@@ -731,7 +731,8 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
    vocabulary below. `.bubble.hollow` (0,2,0) outranks the class rules that set
    --wash (0,1,0), so this holds by specificity rather than by source order. */
 .bubble.hollow,
-.legend-swatch.hollow { --wash: 0%; }
+.legend-swatch.hollow,
+.pill.hollow { --wash: 0%; }
 
 /* A pass-through wrapper, not a box. */
 .bub-label { display: contents; }
@@ -762,8 +763,10 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 /* The verdict used to ride a fifth track here as a glyph, so that confidence
    (the dot) and correctness (the mark) could be read at once. The accuracy lens
    puts the verdict on the dot and the outline instead, which is why the track
-   is gone. .vmark survives for the table's Verdict column, where it is a
-   labelled cell rather than a bare glyph. */
+   is gone. .vmark survives inside the table's verdict pill, where it is the
+   secondary encoding the ramp needs rather than the whole signal: `missed` and
+   `mismatch` are 6.2 ΔE apart under deuteranopia, so wrapping the column in
+   colour does not remove the need for the glyph — it is why the pill keeps it. */
 .vmark {
   text-align: center;
   font-size: 11px;
@@ -771,8 +774,9 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
   color: var(--dot, var(--text-faint));
 }
 /* `untested` is not a result, it is the absence of a reference value; it recedes
-   rather than competing with the verdicts that need acting on. */
-.vmark.m-untested { opacity: 0.5; }
+   rather than competing with the verdicts that need acting on. The class sits on
+   the pill now, not on the glyph, so this reaches the glyph by descent. */
+.m-untested .vmark { opacity: 0.5; }
 
 /* One row: the key for the active lens, the run's distribution along it, and
    the filter over it. Three static rows stood here before — they had to spell
@@ -824,7 +828,18 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 
 .table-wrap { overflow: auto; padding: 0 0 30px; }
 
-.vtable { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+/* --surface is the ground a .pill mixes its wash and rim against, exactly as it
+   is inside a .group-card. The difference is that here it MOVES: a table row
+   repaints on hover and on selection, and a wash mixed against a stale ground
+   reads stale. So the two rules below restate it alongside their `background`,
+   and the two declarations must always change together.
+
+   The control room deliberately does the opposite — a card's ground is frozen
+   because --text-dim on the `low` wash clears AA by 0.11 there. That constraint
+   does not bind here: a pill's label is full --text, and the worst cell in the
+   app is `low` confidence on a selected row at 5.86 (dark; light's worst is
+   `low` on the page ground at 6.24). Every other combination is higher. */
+.vtable { width: 100%; border-collapse: collapse; font-size: 12.5px; --surface: var(--bg); }
 .vtable th, .vtable td { padding: 6px 12px; text-align: left; border-bottom: 1px solid var(--line-soft); }
 .vtable thead th {
   position: sticky; top: 0; z-index: 2;
@@ -836,8 +851,12 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 .vtable thead th[aria-sort]::after { content: " \25B2"; color: var(--accent); }
 .vtable thead th[aria-sort="descending"]::after { content: " \25BC"; }
 .vtable tbody tr { cursor: pointer; }
-.vtable tbody tr:hover { background: var(--bg-raised); }
-.vtable tbody tr[aria-current="true"] { background: var(--bg-panel); box-shadow: inset 3px 0 0 var(--accent); }
+.vtable tbody tr:hover { background: var(--bg-raised); --surface: var(--bg-raised); }
+.vtable tbody tr[aria-current="true"] {
+  background: var(--bg-panel);
+  --surface: var(--bg-panel);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
 .vtable td.num, .vtable td.code { font-family: var(--mono); }
 .vtable tr.group-sep td {
   background: var(--bg);
@@ -847,17 +866,47 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
   cursor: default;
 }
 
+/* The Confidence and Verdict columns read as a scan rather than as prose. Text
+   and a glyph alone made a wrong answer and a right one the same shape, so
+   finding the rows worth acting on meant reading every row.
+
+   A pill is the control-room BUBBLE'S VOCABULARY at cell scale — the same wash
+   ground and same-hue rim, mixed from the same --dot against --surface, taking
+   the same ladder step off the same `.c-`/`.m-` class. It is a different SHAPE
+   because a bubble is a whole row washed, and a table row is already a row that
+   owns a moving background; only the label-sized box fits inside a cell.
+   Deliberately NOT a fifth colour vocabulary — the run-state border it echoes
+   was removed from .group-card for being exactly that.
+
+   Both columns carry one always, rather than only the active lens's column. The
+   control room is the one-lens view by design; the table's whole job is reading
+   confidence and correctness against each other in one pass, and gating a pill
+   on the lens would put the two readings on different screens.
+
+   The status column keeps its bare .dot. Three washed boxes per row is the
+   clutter this is meant to cut, and status is already spelled out in words in
+   its own cell. */
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 1px 8px;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--dot, var(--not-found)) var(--wash, 0%), var(--surface));
+  border: 1px solid color-mix(in srgb, var(--dot, var(--not-found)) var(--rim, 22%), var(--surface));
+  white-space: nowrap;
+}
+
 /* One indicator vocabulary, shared by the control-room bubbles, the legend, the
    table and the detail rows: an `s-`/`c-`/`m-` class sets --dot (and, for the
    two-channel shapes, its ladder step), and every shape below reads it. Because
    these are all plain class selectors, the fallback lives in the var() call
    rather than in a rule that source order could shadow.
 
-   Three shapes read this vocabulary and they are not interchangeable: `.dot`
-   for the table and detail rows, `.vmark` for the table's verdict column, and
-   the bubble/legend-swatch pair, which use the wash+rim ladder instead of a
-   fill. Only the last two obey a lens; the table's dot is fixed on status by
-   design (statusDot in app.js).
+   Four shapes read this vocabulary and they are not interchangeable: `.dot` for
+   the table and detail rows, `.vmark` for the glyph inside a verdict pill, and
+   the bubble/legend-swatch/pill set, which use the wash+rim ladder instead of a
+   fill. Only the bubble and the swatch obey a lens: the table's dot is fixed on
+   status by design (statusDot in app.js), and its pills are fixed on the column
+   they sit in.
 
    FILL IS LOAD-BEARING, in both idioms. It means one thing everywhere — this
    variable holds a value — and it is the secondary encoding two of the lens
