@@ -512,6 +512,21 @@ function syncLensTabs() {
     tab.hidden = !LENSES[tab.dataset.lens].available();
   }
   $(".lenses").hidden = lensChoices().length < 2;
+
+  /* Tells styles.css whether to reserve the bubble's leading glyph column.
+     Keyed on lens AVAILABILITY, not on App.lens: with a reference loaded the
+     column is reserved under both lenses, so toggling between them still shifts
+     no label sideways — the invariant the fixed track was there to protect.
+     With no reference the accuracy lens cannot be chosen at all, and the column
+     would be 20px of dead indent on every row.
+
+     `delete` rather than assigning null, which would write the string "null"
+     and leave the attribute present — and [data-marks] matches on presence. */
+  if (lensChoices().some((id) => LENSES[id].mark)) {
+    document.documentElement.dataset.marks = "1";
+  } else {
+    delete document.documentElement.dataset.marks;
+  }
 }
 
 function render() {

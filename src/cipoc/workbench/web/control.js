@@ -3,7 +3,8 @@
  * in wave order.
  *
  * A bubble carries exactly one reading: whichever metric the active lens
- * selects, painted on both of its channels (the dot and the outline). The lens
+ * selects, painted on both of its channels (a dim ground and a matching
+ * outline, both mixed from the class's own colour — see styles.css). The lens
  * vocabulary, its class order and its per-variable reading all live in the
  * LENSES table in app.js; nothing here knows what a status or a verdict is.
  */
@@ -46,7 +47,7 @@ function bubble(entry) {
 
   const node = h("button", {
     type: "button",
-    class: "bubble " + ind.cls + (ind.hollow ? " hollow" : "") + (ind.mark ? " marked" : ""),
+    class: "bubble " + ind.cls + (ind.hollow ? " hollow" : ""),
     dataset: { entity: "variable:" + entry.item_id,
                annotated: isAnnotated("variable", entry.item_id) ? "1" : null },
     /* The spoken label states the same one reading the colour does, so the
@@ -56,8 +57,9 @@ function bubble(entry) {
       (value ? "value " + value : "no value") + " \u2014 " + lens.aria(ind.key),
     onclick: (ev) => { ev.stopPropagation(); select("variable", entry.item_id); },
   },
-    /* Occupies the indicator column in place of the ::before dot; the column is
-       the same width either way, so switching lens shifts nothing. */
+    /* Occupies the indicator column, which styles.css reserves whenever a glyph
+       lens is AVAILABLE rather than active — so the column is the same width
+       under either lens and switching between them shifts nothing. */
     ind.mark ? h("i", { class: "vmark bub-mark " + ind.cls, text: ind.mark }) : null,
     h("span", { class: "bub-label" },
       h("span", { class: "bub-id", text: entry.item_id + ":" }),
@@ -103,10 +105,14 @@ function groupTooltip(group, state) {
 }
 
 /* The card's one roll-up chip, for the active lens — and only when it has
- * something to say. A card whose group ran clean is already saying so with its
- * green top border, so `complete` and `6/6 correct` are ink that reports the
+ * something to say. `complete` and `6/6 correct` are ink that reports the
  * absence of news; suppressing them is what lets the cards that DO carry news
- * stand out at a glance.
+ * stand out at a glance, and a card with no chip at all is the clean case.
+ *
+ * That silence is now the ONLY thing marking a clean card: the state colour on
+ * the card's top border is gone (see .group-card in styles.css). Which is why
+ * the fallback below still emits `pending` and `nothing coded` — those are not
+ * clean, and with no border left to say so the chip is the whole signal.
  *
  * The group's static configuration — gate, site applicability, note filter,
  * per-variable extraction — used to sit here as four more chips of identical
@@ -188,11 +194,14 @@ function groupCard(group) {
  * space that buys pays for the counts. Classes this run never produced are
  * dropped, so the row describes what happened rather than what could.
  *
- * The swatch mirrors the bubble it stands for, hollow rule included — that is
- * how the fill rule gets taught without a sentence explaining it, and it is
- * what makes the row's two halves self-evident: the confidence classes are
- * filled, the no-value statuses are hollow. `valued` is counted off the data
- * rather than assumed, so a class that ever spans both still draws honestly.
+ * The swatch mirrors the bubble it stands for, fill rule included — that is how
+ * the fill rule gets taught without a sentence explaining it, and it is what
+ * makes the row's two halves self-evident: the confidence classes carry a
+ * washed ground, the no-value statuses sit bare. It is a rounded swatch rather
+ * than a dot because a bubble is no longer drawn with one; a legend showing
+ * dots would be teaching a vocabulary the grid below it does not use. `valued`
+ * is counted off the data rather than assumed, so a class that ever spans both
+ * still draws honestly.
  */
 function lensLegend() {
   const rows = lensTally(App.lens);
@@ -212,7 +221,7 @@ function lensLegend() {
     },
       item.mark
         ? h("i", { class: "vmark legend-mark " + item.cls, text: item.mark })
-        : h("i", { class: "dot " + item.cls + (item.valued ? "" : " hollow") }),
+        : h("i", { class: "legend-swatch " + item.cls + (item.valued ? "" : " hollow") }),
       h("span", { text: item.label }),
       h("b", { text: String(item.count) })
     ));
