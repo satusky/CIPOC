@@ -13,29 +13,20 @@ if TYPE_CHECKING:
 
 
 _ENTRY_FIELD_MAP = {
-      "Data Item Name": "name",
-      "Description": "description",
-      "Data Type": "data_type",
-      "Length": "length",
-      "Allowable Values": "allowable_values",
-      "Format": "format",
-      "Code Descriptions": "valid_codes",
-  }
+    "name": ("item_name", "Data Item Name"),
+    "description": ("description", "Description"),
+    "data_type": ("item_data_type", "Data Type"),
+    "length": ("item_length", "Length"),
+    "allowable_values": ("allowable_values", "Allowable Values"),
+    "format": ("format", "Format"),
+    "coding_instructions": ("instructions_for_coding", "Instructions for Coding"),
+}
 
+_CODE_FIELD_NAMES = ("allowed_codes", "Code Descriptions")
+_CODE_COLUMN_NAMES = ("code",)
+_DESCRIPTION_COLUMN_NAMES = ("description",)
+_MISSING = object()
 
-def _normalize_code_descriptions(codes):
-    """Convert row-oriented code tables to the validator's code dictionary."""
-    if not isinstance(codes, list):
-        return codes
-
-    normalized: dict[str, str] = {}
-    for row in codes:
-        if "code" not in row or "description" not in row:
-            raise ValueError(
-                "Code-description rows must contain code and description fields."
-            )
-        normalized[str(row["code"])] = str(row["description"])
-    return normalized
 
 class VariableValueValidator:
     """Deterministically validate an extracted value against variable metadata."""
@@ -66,7 +57,7 @@ class VariableValueValidator:
                 f"Value exceeds the maximum length of {variable.length} characters."
             )
 
-        # Date syntax takes precedence over scoped code tables. A malformed rule
+        # Date syntax takes precedence over scoped code tables. A malformed table
         # must not turn a format token such as "CCYYMMDD" into an allowable value.
         if self._is_date_variable(variable):
             errors.extend(self._validate_date(value))
@@ -136,7 +127,107 @@ def _collapse_morphology_valid_codes(codes: dict, length) -> dict:
     return collapsed
 
 
-def lookup_variable_info(item_id: int, data_dictionary_path: str | Path) -> VariableInfo | None:
+def _normalize_code_descriptions(codes):
+    """Convert row-oriented site tables to the validator's code dictionary."""
+    if not isinstance(codes, list):
+        return codes
+
+    normalized: dict[str, str] = {}
+    for row in codes:
+        if not isinstance(row, dict):
+            raise ValueError("allowed_codes rows must be JSON objects.")
+        code_column = next((key for key in _CODE_COLUMN_NAMES if key in row), None)
+        description_column = next(
+            (key for key in _DESCRIPTION_COLUMN_NAMES if key in row), None
+        )
+        if code_column is None or description_column is None:
+            raise ValueError(
+                "allowed_codes rows must contain code and description fields."
+            )
+        normalized[str(row[code_column])] = str(row[description_column])
+    return normalized
+
+
+def _normalize_text(value):
+    return "".join(str(part) for part in value) if isinstance(value, list) else value
+
+
+def _entry_codes(entry: dict | None):
+    if entry:
+        for field in _CODE_FIELD_NAMES:
+            if field in entry:
+                return entry[field]
+    return _MISSING
+
+
+def _overlay_site_codes(item_entry: dict | None, site_entry: dict | None) -> dict | None:
+    site_codes = _entry_codes(site_entry)
+    if site_codes is _MISSING:
+        return item_entry
+    merged = dict(item_entry or {})
+    merged["allowed_codes"] = site_codes
+    return merged
+
+
+def resolve_site_key(case_facts: "CaseFacts | None", site_dictionary: dict) -> str | None:
+    """Resolve case facts to a top-level key present in the site dictionary."""
+    if case_facts is None:
+        return None
+
+    if case_facts.gross_primary_site:
+        gross_site = " ".join(
+            re.sub(r"[^a-z0-9]+", " ", case_facts.gross_primary_site.casefold()).split()
+        )
+        matches = [
+            key
+            for key in site_dictionary
+            if " ".join(key.casefold().replace("_", " ").split()) in gross_site
+        ]
+        if matches:
+            return max(matches, key=len)
+
+    if case_facts.primary_site:
+        primary_site = case_facts.primary_site.strip().upper().replace(".", "")
+        for key, entries in site_dictionary.items():
+            site_codes = _entry_codes(entries.get("400"))
+            if site_codes is not _MISSING:
+                site_codes = _normalize_code_descriptions(site_codes)
+            if isinstance(site_codes, dict) and primary_site in site_codes:
+                return key
+    return None
+
+
+def _variable_info(item_id: int, item_entry: dict | None) -> VariableInfo | None:
+    if not item_entry:
+        print(f"No entry exists in the data dictionary for item {item_id}")
+        return None
+
+    fields = {
+        field: next(
+            (item_entry[column] for column in columns if column in item_entry),
+            None,
+        )
+        for field, columns in _ENTRY_FIELD_MAP.items()
+    }
+    codes = _entry_codes(item_entry)
+    fields["valid_codes"] = None if codes is _MISSING else codes
+    fields["description"] = _normalize_text(fields["description"])
+    fields["coding_instructions"] = _normalize_text(fields["coding_instructions"])
+    fields["valid_codes"] = _normalize_code_descriptions(fields["valid_codes"])
+    if isinstance(fields["valid_codes"], dict):
+        fields["valid_codes"] = _collapse_morphology_valid_codes(
+            fields["valid_codes"], fields.get("length")
+        )
+    return VariableInfo(item_id=item_id, **fields)
+
+
+def lookup_variable_info(
+    item_id: int,
+    data_dictionary_path: str | Path,
+    *,
+    site_data_dictionary_path: str | Path | None = None,
+    case_facts: "CaseFacts | None" = None,
+) -> VariableInfo | None:
     """Look up NAACCR variable metadata by item ID from a JSON data dictionary.
 
     Use this tool when you need the name, description, required value format,
@@ -146,6 +237,9 @@ def lookup_variable_info(item_id: int, data_dictionary_path: str | Path) -> Vari
     Args:
         item_id: NAACCR item ID number to look up.
         data_dictionary_path: Path to the NAACCR data dictionary JSON file.
+        site_data_dictionary_path: Optional tissue-keyed dictionary whose code
+            descriptions override the NAACCR entry.
+        case_facts: Facts used to select a tissue from the site dictionary.
 
     Returns:
         A string representation of a VariableInfo object containing the variable metadata if the item exists,
@@ -155,16 +249,14 @@ def lookup_variable_info(item_id: int, data_dictionary_path: str | Path) -> Vari
         data_dictionary = json.load(f)
 
     item_entry = data_dictionary.get(str(item_id))
-    if not item_entry:
-        print(f"No entry exists in the data dictionary for item {item_id}")
-        return
+    if site_data_dictionary_path is not None:
+        with open(site_data_dictionary_path, "r") as f:
+            site_dictionary = json.load(f)
+        site = resolve_site_key(case_facts, site_dictionary)
+        site_entry = site_dictionary.get(site, {}).get(str(item_id)) if site else None
+        item_entry = _overlay_site_codes(item_entry, site_entry)
 
-    fields = {field: item_entry.get(col) for col, field in _ENTRY_FIELD_MAP.items()}
-    if isinstance(fields["description"], list):
-        fields["description"] = "".join(fields["description"])
-    if isinstance(fields["valid_codes"], dict):
-        fields["valid_codes"] = _collapse_morphology_valid_codes(fields["valid_codes"], fields.get("length"))
-    return VariableInfo(item_id=item_id, **fields)
+    return _variable_info(item_id, item_entry)
 
 
 def build_variable_group(
@@ -172,22 +264,34 @@ def build_variable_group(
     data_dictionary_path: str | Path | None,
     *,
     case_facts: "CaseFacts | None" = None,
+    site_data_dictionary_path: str | Path | None = None,
     rule_store: "RuleStore | None" = None,
 ) -> VariableGroupInfo:
-    """Build variable metadata for the requested items, optionally scoped to a case.
-
-    When both ``case_facts`` and ``rule_store`` are supplied, each variable's
-    ``coding_instructions`` is filled from the applicable manual rules and its
-    ``valid_codes`` is replaced by the case-reduced set when a reduction applies.
-    Scoping is deterministic; unknown case facts widen scope rather than narrow it.
-    """
+    """Build variable metadata with optional site tables and manual-rule scoping."""
     if data_dictionary_path is None:
         raise ValueError("Cannot retrieve variable information. Please supply a data dictionary path.")
 
     if isinstance(item_ids, int):
         item_ids = [item_ids]
 
-    item_info = [lookup_variable_info(item, data_dictionary_path) for item in sorted(set(item_ids))]
+    with open(data_dictionary_path, "r") as f:
+        data_dictionary = json.load(f)
+
+    if "items" in data_dictionary:
+        data_dictionary = {str(item["item_number"]): item for item in data_dictionary["items"]}
+
+    site_dictionary: dict = {}
+    if site_data_dictionary_path is not None:
+        with open(site_data_dictionary_path, "r") as f:
+            site_dictionary = json.load(f)
+    site = resolve_site_key(case_facts, site_dictionary)
+
+    item_info = []
+    for item_id in sorted(set(item_ids)):
+        item_entry = data_dictionary.get(str(item_id))
+        site_entry = site_dictionary.get(site, {}).get(str(item_id)) if site else None
+        item_entry = _overlay_site_codes(item_entry, site_entry)
+        item_info.append(_variable_info(item_id, item_entry))
     variables = [item for item in item_info if item is not None]
 
     if case_facts is not None and rule_store is not None:

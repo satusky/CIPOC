@@ -49,14 +49,17 @@ llm:
 # Optional per-agent overrides. Keys are agent names from the `agents` module.
 # Only specify the fields you want to change; everything else falls back to `llm`.
 agents:
-  extractor: {}
-    # Example override:
-    # model: gpt-5.5
-    # reasoning:
-    #   effort: high
+  # note_scanner:
+  #   model: gpt-oss-20b
+  #   max_concurrency: 32
+  #   reasoning:
+  #     effort: low
+  #     summary: null
 
 documents:
   documents_path: documents/
   data_dictionary_path: documents/manuals/naaccr_data_dictionary_v25.json
   rules_path: documents/rules/
-  variable_groups_path: config/variable_groups.json
+  site_data_dictionary_path: documents/cipoc_data_dictionary.json
+  # variable_groups_path: config/variable_groups.json
+  variable_groups_path: config/initial_extraction_test.json

@@ -1,0 +1,173 @@
+{
+  "groups": [
+    {
+      "group_id": "initial_llm_extraction",
+      "name": "Initial LLM Extraction",
+      "stage": "initial",
+      "extract_as_group": true,
+      "variables": [
+        { "item_id": 390, "name": "Date of Diagnosis" },
+        { "item_id": 400, "name": "Primary Site" },
+        { "item_id": 410, "name": "Laterality" }
+      ]
+    },
+    {
+      "group_id": "first_course_treatment",
+      "name": "1st Course Treatment",
+      "stage": "dependent",
+      "extract_as_group": true,
+      "gate": ["treatment_present"],
+      "note_filter": {
+        "keywords": ["chemo", "radiation", "hormone", "immunother", "therapy", "treatment", "surgery", "infusion", "biologic"]
+      },
+      "variables": [
+        { "item_id": 690, "name": "RX Hosp--Radiation" },
+        { "item_id": 700, "name": "RX Hosp--Chemo" },
+        { "item_id": 710, "name": "RX Hosp--Hormone" },
+        { "item_id": 720, "name": "RX Hosp--BRM" },
+        { "item_id": 740, "name": "RX Hosp--DX/Stg Proc" },
+        { "item_id": 1200, "name": "RX Date Surgery" },
+        { "item_id": 1210, "name": "RX Date Radiation" },
+        { "item_id": 1220, "name": "RX Date Chemo" },
+        { "item_id": 1230, "name": "RX Date Hormone" },
+        { "item_id": 1240, "name": "RX Date BRM" },
+        { "item_id": 1270, "name": "Date 1st Crs RX CoC" },
+        { "item_id": 1280, "name": "RX Date DX/Stg Proc" }
+      ]
+    },
+    {
+      "group_id": "metastases",
+      "name": "Metastases",
+      "stage": "dependent",
+      "extract_as_group": true,
+      "gate": ["metastasis_present"],
+      "note_filter": {
+        "keywords": ["metasta", "mets", "distant", "spread"]
+      },
+      "variables": [
+        { "item_id": 1112, "name": "Mets at DX-Bone" },
+        { "item_id": 1113, "name": "Mets at DX-Brain" },
+        { "item_id": 1114, "name": "Mets at Dx-Distant LN" },
+        { "item_id": 1115, "name": "Mets at DX-Liver" },
+        { "item_id": 1116, "name": "Mets at DX-Lung" },
+        { "item_id": 1117, "name": "Mets at DX-Other" }
+      ]
+    },
+    {
+      "group_id": "lymph_node_removal",
+      "name": "Lymph Node Removal",
+      "stage": "dependent",
+      "extract_as_group": true,
+      "gate": ["lymph_nodes_removed"],
+      "note_filter": {
+        "keywords": ["lymph node", "lymphadenectomy", "dissection", "sentinel"]
+      },
+      "variables": [
+        { "item_id": 672, "name": "RX Hosp--Scope Reg LN Sur" },
+        { "item_id": 674, "name": "RX Hosp--Surg Oth Reg/Dis" },
+        { "item_id": 676, "name": "RX Hosp--Reg LN Removed" },
+        { "item_id": 682, "name": "Date Regional Lymph Node Dissection" }
+      ]
+    },
+    {
+      "group_id": "site_specific_codes",
+      "name": "Site Specific Codes",
+      "stage": "dependent",
+      "extract_as_group": false,
+      "variables": [
+        { "item_id": 670, "name": "RX Hosp--Surg Prim Site 03-2022" },
+        { "item_id": 671, "name": "RX Hosp--Surg Prim Site 2023" },
+        { "item_id": 3843, "name": "Grade Clinical" },
+        { "item_id": 3844, "name": "Grade Pathological" }
+      ],
+      "subgroups": [
+        {
+          "group_id": "histologic_type_and_behavior",
+          "name": "Histologic Type and Behavior Code",
+          "extract_as_group": true,
+          "variables": [
+            { "item_id": 522, "name": "Histologic Type ICD-O-3" },
+            { "item_id": 523, "name": "Behavior Code ICD-O-3" }
+          ]
+        }
+      ]
+    },
+    {
+      "group_id": "tnm_staging",
+      "name": "TNM Staging",
+      "stage": "dependent",
+      "extract_as_group": true,
+      "variables": [
+        { "item_id": 1001, "name": "AJCC TNM Clin T" },
+        { "item_id": 1002, "name": "AJCC TNM Clin N" },
+        { "item_id": 1003, "name": "AJCC TNM Clin M" },
+        { "item_id": 1004, "name": "AJCC TNM Clin Stage Group" },
+        { "item_id": 1011, "name": "AJCC TNM Path T" },
+        { "item_id": 1012, "name": "AJCC TNM Path N" },
+        { "item_id": 1013, "name": "AJCC TNM Path M" },
+        { "item_id": 1014, "name": "AJCC TNM Path Stage Group" }
+      ]
+    },
+    {
+      "group_id": "other",
+      "name": "Other",
+      "stage": "dependent",
+      "extract_as_group": false,
+      "variables": [
+        { "item_id": 764, "name": "Summary Stage 2018" },
+        { "item_id": 820, "name": "Regional Nodes Positive" },
+        { "item_id": 830, "name": "Regional Nodes Examined" },
+        { "item_id": 1182, "name": "Lymphovascular Invasion" },
+        { "item_id": 3280, "name": "RX Hosp--Palliative Proc" },
+        { "item_id": 756, "name": "Tumor Size Summary" }
+      ]
+    },
+    {
+      "group_id": "limited_by_primary_site",
+      "name": "Limited By Primary Site",
+      "stage": "dependent",
+      "extract_as_group": true,
+      "variables": [],
+      "subgroups": [
+        {
+          "group_id": "breast_melanoma_only",
+          "name": "Breast/Melanoma Only",
+          "extract_as_group": true,
+          "applies_to": {
+            "gross_primary_sites": ["breast"],
+            "histology_families": ["melanoma"]
+          },
+          "variables": [
+            { "item_id": 832, "name": "Date of Sentinel Lymph Node Biopsy" }
+          ]
+        },
+        {
+          "group_id": "ovary_only",
+          "name": "Ovary Only",
+          "extract_as_group": true,
+          "applies_to": {
+            "gross_primary_sites": ["ovary"]
+          },
+          "variables": [
+            { "item_id": 3836, "name": "FIGO Stage" }
+          ]
+        },
+        {
+          "group_id": "prostate_only",
+          "name": "Prostate Only",
+          "extract_as_group": true,
+          "applies_to": {
+            "gross_primary_sites": ["prostate"]
+          },
+          "variables": [
+            { "item_id": 3838, "name": "Gleason Patterns Clinical" },
+            { "item_id": 3839, "name": "Gleason Patterns Pathological" },
+            { "item_id": 3840, "name": "Gleason Score Clinical" },
+            { "item_id": 3841, "name": "Gleason Score Pathological" },
+            { "item_id": 3842, "name": "Gleason Tertiary Pattern" }
+          ]
+        }
+      ]
+    }
+  ]
+}

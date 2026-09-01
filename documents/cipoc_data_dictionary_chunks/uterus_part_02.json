@@ -1,0 +1,1433 @@
+{
+  "uterus": {
+    "522": {
+      "allowed_codes": [
+        {
+          "code": "9084/0",
+          "description": "Dermoid cyst, NOS; Dermoid, NOS; Teratoma, prepubertal type; Teratoma, mature, prepubertal type"
+        },
+        {
+          "code": "9084/3",
+          "description": "Teratoma with malignant transformation; Teratoma with somatic type malignancies; Dermoid cyst with malignant transformation; Dermoid cyst with secondary tumor"
+        },
+        {
+          "code": "9085/3",
+          "description": "Mixed germ cell tumor; Mixed teratoma and seminoma"
+        },
+        {
+          "code": "9086/3",
+          "description": "Germ cell tumor with associated hematological malignancy"
+        },
+        {
+          "code": "9090/0",
+          "description": "Struma ovarii, NOS"
+        },
+        {
+          "code": "9090/3",
+          "description": "Struma ovarii, malignant"
+        },
+        {
+          "code": "9091/1",
+          "description": "Strumal carcinoid; Struma ovarii and carcinoid"
+        },
+        {
+          "code": "9100/0",
+          "description": "Hydatidiform mole, NOS; Complete hydatidiform mole; Hydatid mole"
+        },
+        {
+          "code": "9100/1",
+          "description": "Invasive hydatidiform mole; Invasive mole, NOS; Chorioadenoma, NOS; Chorioadenoma destruens; Malignant hydatidiform mole"
+        },
+        {
+          "code": "9100/3",
+          "description": "Choriocarcinoma, NOS; Chorioepithelioma; Chorionepithelioma"
+        },
+        {
+          "code": "9101/3",
+          "description": "Choriocarcinoma combined with other germ cell elements; Choriocarcinoma combined with embryonal carcinoma; Choriocarcinoma combined with teratoma"
+        },
+        {
+          "code": "9102/3",
+          "description": "Malignant teratoma, trophoblastic"
+        },
+        {
+          "code": "9103/0",
+          "description": "Partial hydatidiform mole"
+        },
+        {
+          "code": "9104/1",
+          "description": "Placental site trophoblastic tumor"
+        },
+        {
+          "code": "9105/3",
+          "description": "Trophoblastic tumor, epithelioid"
+        },
+        {
+          "code": "9110/0",
+          "description": "Adenoma of rete ovarii; Mesonephroma, benign; Mesonephric adenoma; Wolffian duct adenoma"
+        },
+        {
+          "code": "9110/1",
+          "description": "Wolffian tumor; Wolffian duct tumor; Mesonephric tumor, NOS"
+        },
+        {
+          "code": "9110/3",
+          "description": "Mesonephroma, malignant; Mesonephroma, NOS; Mesonephric adenocarcinoma; Wolffian duct carcinoma; Adenocarcinoma of rete ovarii"
+        },
+        {
+          "code": "9120/0",
+          "description": "Hemangioma, NOS; Angioma, NOS; Chorioangioma; Cherry hemangioma; Sinusoidal hemangioma; Microvenular hemangioma; Glomeruloid hemangioma; Spindle cell hemangioma; Hobnail hemangioma"
+        },
+        {
+          "code": "9120/3",
+          "description": "Hemangiosarcoma; Angiosarcoma"
+        },
+        {
+          "code": "9121/0",
+          "description": "Cavernous hemangioma"
+        },
+        {
+          "code": "9122/0",
+          "description": "Venous hemangioma"
+        },
+        {
+          "code": "9123/0",
+          "description": "Racemose hemangioma; Arteriovenous hemangioma"
+        },
+        {
+          "code": "9124/3",
+          "description": "Kupffer cell sarcoma"
+        },
+        {
+          "code": "9125/0",
+          "description": "Epithelioid hemangioma; Histiocytoid hemangioma; Cutaneous epithelioid angiomatoid nodule"
+        },
+        {
+          "code": "9126/0",
+          "description": "Atypical vascular lesion"
+        },
+        {
+          "code": "9130/0",
+          "description": "Hemangioendothelioma, benign"
+        },
+        {
+          "code": "9130/1",
+          "description": "Hemangioendothelioma, NOS; Angioendothelioma; Kaposiform hemangioendothelioma"
+        },
+        {
+          "code": "9130/3",
+          "description": "Hemangioendothelioma, malignant; Hemangioendothelial sarcoma"
+        },
+        {
+          "code": "9131/0",
+          "description": "Capillary hemangioma; Hemangioma simplex; Infantile hemangioma; Juvenile hemangioma; Plexiform hemangioma; Lobular capillary hemangioma; Congenital hemangioma, NOS; Congenital hemangioma, rapidly involuting; Congenital hemangioma, non-involuting"
+        },
+        {
+          "code": "9132/0",
+          "description": "Intramuscular hemangioma; Intramuscular angioma"
+        },
+        {
+          "code": "9133/3",
+          "description": "Epithelioid hemangioendothelioma, NOS; Epithelioid hemangioendothelioma, malignant; Intravascular bronchial alveolar tumor"
+        },
+        {
+          "code": "9135/1",
+          "description": "Papillary intralymphatic angioendothelioma; Endovascular papillary angioendothelioma; Dabska tumor"
+        },
+        {
+          "code": "9136/1",
+          "description": "Spindle cell hemangioendothelioma; Spindle cell angioendothelioma; Retiform hemangioendothelioma; Composite hemangioendothelioma"
+        },
+        {
+          "code": "9137/0",
+          "description": "Myointimoma"
+        },
+        {
+          "code": "9137/3",
+          "description": "Intimal sarcoma"
+        },
+        {
+          "code": "9138/1",
+          "description": "Pseudomyogenic (epithelioid sarcoma-like) hemangioendothelioma"
+        },
+        {
+          "code": "9141/0",
+          "description": "Angiokeratoma"
+        },
+        {
+          "code": "9142/0",
+          "description": "Verrucous keratotic hemangioma; Verrucous venous malformation"
+        },
+        {
+          "code": "9160/0",
+          "description": "Angiofibroma, NOS; Fibrous papule of nose; Involuting nevus; Juvenile angiofibroma; Cellular angiofibroma; Giant cell angiofibroma"
+        },
+        {
+          "code": "9161/0",
+          "description": "Acquired tufted hemangioma; Tufted hemangioma"
+        },
+        {
+          "code": "9161/1",
+          "description": "Hemangioblastoma; Angioblastoma"
+        },
+        {
+          "code": "9170/0",
+          "description": "Lymphangioma, NOS; Lymphangioendothelioma, NOS"
+        },
+        {
+          "code": "9170/3",
+          "description": "Lymphangiosarcoma; Lymphangioendothelial sarcoma; Lymphangioendothelioma, malignant"
+        },
+        {
+          "code": "9171/0",
+          "description": "Capillary lymphangioma"
+        },
+        {
+          "code": "9172/0",
+          "description": "Cavernous lymphangioma"
+        },
+        {
+          "code": "9173/0",
+          "description": "Cystic lymphangioma; Hygroma, NOS; Cystic hygroma"
+        },
+        {
+          "code": "9174/0",
+          "description": "Lymphangiomyoma"
+        },
+        {
+          "code": "9174/1",
+          "description": "Lymphangioleiomyomatosis; Lymphangiomyomatosis"
+        },
+        {
+          "code": "9175/0",
+          "description": "Hemolymphangioma"
+        },
+        {
+          "code": "9180/0",
+          "description": "Osteoma, NOS"
+        },
+        {
+          "code": "9180/3",
+          "description": "Osteosarcoma, NOS; Osteogenic sarcoma, NOS; Osteoblastic sarcoma; Osteochondrosarcoma; Osteosarcoma, extraskeletal"
+        },
+        {
+          "code": "9181/3",
+          "description": "Chondroblastic osteosarcoma"
+        },
+        {
+          "code": "9182/3",
+          "description": "Fibroblastic osteosarcoma; Osteofibrosarcoma"
+        },
+        {
+          "code": "9183/3",
+          "description": "Telangiectatic osteosarcoma"
+        },
+        {
+          "code": "9184/3",
+          "description": "Osteosarcoma in Paget disease of bone; Secondary osteosarcoma"
+        },
+        {
+          "code": "9185/3",
+          "description": "Small cell osteosarcoma; Round cell osteosarcoma"
+        },
+        {
+          "code": "9186/3",
+          "description": "Central osteosarcoma, NOS; Conventional central osteosarcoma; Medullary osteosarcoma"
+        },
+        {
+          "code": "9187/3",
+          "description": "Low grade central osteosarcoma; Low grade intramedullary osteosarcoma; Intraosseous well differentiated osteosarcoma; Intraosseous low grade osteosarcoma"
+        },
+        {
+          "code": "9191/0",
+          "description": "Osteoid osteoma, NOS"
+        },
+        {
+          "code": "9192/3",
+          "description": "Parosteal osteosarcoma; Juxtacortical osteosarcoma"
+        },
+        {
+          "code": "9193/3",
+          "description": "Periosteal osteosarcoma"
+        },
+        {
+          "code": "9194/3",
+          "description": "High grade surface osteosarcoma"
+        },
+        {
+          "code": "9195/3",
+          "description": "Intracortical osteosarcoma"
+        },
+        {
+          "code": "9200/0",
+          "description": "Osteoblastoma, NOS; Giant osteoid osteoma"
+        },
+        {
+          "code": "9200/1",
+          "description": "Aggressive osteoblastoma"
+        },
+        {
+          "code": "9210/0",
+          "description": "Osteochondroma; Cartilaginous exostosis; Ecchondroma; Osteocartilaginous exostosis"
+        },
+        {
+          "code": "9210/1",
+          "description": "Osteochondromatosis, NOS; Ecchondrosis"
+        },
+        {
+          "code": "9211/0",
+          "description": "Osteochondromyxoma"
+        },
+        {
+          "code": "9212/0",
+          "description": "Bizarre parosteal osteochondromatous proliferation"
+        },
+        {
+          "code": "9213/0",
+          "description": "Subungual exostosis"
+        },
+        {
+          "code": "9220/0",
+          "description": "Chondroma, NOS; Enchondroma"
+        },
+        {
+          "code": "9220/1",
+          "description": "Chondromatosis, NOS"
+        },
+        {
+          "code": "9220/3",
+          "description": "Chondrosarcoma, NOS; Fibrochondrosarcoma; Chondrosarcoma, grade 2; Chondrosarcoma, grade 3"
+        },
+        {
+          "code": "9221/0",
+          "description": "Periosteal chondroma; Juxtacortical chondroma"
+        },
+        {
+          "code": "9221/3",
+          "description": "Periosteal chondrosarcoma; Juxtacortical chondrosarcoma"
+        },
+        {
+          "code": "9222/1",
+          "description": "Atypical cartilaginous tumor; Chondrosarcoma, grade 1"
+        },
+        {
+          "code": "9230/1",
+          "description": "Chondroblastoma, NOS; Chondromatous giant cell tumor; Codman tumor"
+        },
+        {
+          "code": "9230/3",
+          "description": "Chondroblastoma, malignant"
+        },
+        {
+          "code": "9231/3",
+          "description": "Myxoid chondrosarcoma"
+        },
+        {
+          "code": "9240/3",
+          "description": "Mesenchymal chondrosarcoma"
+        },
+        {
+          "code": "9241/0",
+          "description": "Chondromyxoid fibroma"
+        },
+        {
+          "code": "9242/3",
+          "description": "Clear cell chondrosarcoma"
+        },
+        {
+          "code": "9243/3",
+          "description": "Dedifferentiated chondrosarcoma"
+        },
+        {
+          "code": "9250/1",
+          "description": "Giant cell tumor of bone, NOS; Osteoclastoma, NOS"
+        },
+        {
+          "code": "9250/3",
+          "description": "Giant cell tumor of bone, malignant; Giant cell sarcoma of bone; Osteoclastoma, malignant"
+        },
+        {
+          "code": "9251/1",
+          "description": "Giant cell tumor of soft parts, NOS"
+        },
+        {
+          "code": "9251/3",
+          "description": "Malignant giant cell tumor of soft parts"
+        },
+        {
+          "code": "9252/0",
+          "description": "Tenosynovial giant cell tumor, NOS; Tenosynovial giant cell tumor, localised; Fibrous histiocytoma of tendon sheath; Giant cell tumor of tendon sheath, NOS"
+        },
+        {
+          "code": "9252/1",
+          "description": "Tenosynovial giant cell tumor, diffuse; Pigmented villonodular synovitis"
+        },
+        {
+          "code": "9252/3",
+          "description": "Malignant tenosynovial giant cell tumor; Giant cell tumor of tendon sheath, malignant"
+        },
+        {
+          "code": "9260/0",
+          "description": "Aneurysmal bone cyst"
+        },
+        {
+          "code": "9261/3",
+          "description": "Adamantinoma of long bones"
+        },
+        {
+          "code": "9262/0",
+          "description": "Ossifying fibroma; Fibro-osteoma; Osteofibroma"
+        },
+        {
+          "code": "9270/0",
+          "description": "Odontogenic tumor, benign"
+        },
+        {
+          "code": "9270/1",
+          "description": "Odontogenic tumor, NOS"
+        },
+        {
+          "code": "9270/3",
+          "description": "Odontogenic tumor, malignant; Ameloblastic carcinoma; Odontogenic carcinoma; Odontogenic sarcoma; Primary intraosseous carcinoma"
+        },
+        {
+          "code": "9271/0",
+          "description": "Ameloblastic fibrodentinoma; Dentinoma"
+        },
+        {
+          "code": "9272/0",
+          "description": "Cementoma, NOS; Periapical cemental dysplasia; Periapical cemento-osseous dysplasia"
+        },
+        {
+          "code": "9273/0",
+          "description": "Cementoblastoma, benign"
+        },
+        {
+          "code": "9274/0",
+          "description": "Cemento-ossifying fibroma; Cementifying fibroma"
+        },
+        {
+          "code": "9275/0",
+          "description": "Gigantiform cementoma; Florid osseous dysplasia"
+        },
+        {
+          "code": "9280/0",
+          "description": "Odontoma, NOS"
+        },
+        {
+          "code": "9281/0",
+          "description": "Compound odontoma"
+        },
+        {
+          "code": "9282/0",
+          "description": "Complex odontoma"
+        },
+        {
+          "code": "9290/0",
+          "description": "Ameloblastic fibro-odontoma; Fibroameloblastic odontoma"
+        },
+        {
+          "code": "9290/3",
+          "description": "Ameloblastic odontosarcoma; Ameloblastic fibro-odontosarcoma; Ameloblastic fibrodentinosarcoma"
+        },
+        {
+          "code": "9300/0",
+          "description": "Adenomatoid odontogenic tumor; Adenoameloblastoma"
+        },
+        {
+          "code": "9301/0",
+          "description": "Calcifying odontogenic cyst"
+        },
+        {
+          "code": "9302/0",
+          "description": "Dentinogenic ghost cell tumor; Odontogenic ghost cell tumor"
+        },
+        {
+          "code": "9302/3",
+          "description": "Ghost cell odontogenic carcinoma"
+        },
+        {
+          "code": "9310/0",
+          "description": "Ameloblastoma, NOS; Adamantinoma, NOS"
+        },
+        {
+          "code": "9310/3",
+          "description": "Ameloblastoma, metastasizing; Ameloblastoma, malignant; Adamantinoma, malignant"
+        },
+        {
+          "code": "9311/0",
+          "description": "Odontoameloblastoma"
+        },
+        {
+          "code": "9312/0",
+          "description": "Squamous odontogenic tumor"
+        },
+        {
+          "code": "9320/0",
+          "description": "Odontogenic myxoma; Odontogenic myxofibroma"
+        },
+        {
+          "code": "9321/0",
+          "description": "Odontogenic fibroma, NOS; Central odontogenic fibroma"
+        },
+        {
+          "code": "9322/0",
+          "description": "Peripheral odontogenic fibroma"
+        },
+        {
+          "code": "9330/0",
+          "description": "Ameloblastic fibroma"
+        },
+        {
+          "code": "9330/3",
+          "description": "Ameloblastic fibrosarcoma; Ameloblastic sarcoma; Odontogenic fibrosarcoma"
+        },
+        {
+          "code": "9340/0",
+          "description": "Calcifying epithelial odontogenic tumor; Pindborg tumor"
+        },
+        {
+          "code": "9341/3",
+          "description": "Clear cell odontogenic carcinoma; Clear cell odontogenic tumor"
+        },
+        {
+          "code": "9342/3",
+          "description": "Odontogenic carcinosarcoma"
+        },
+        {
+          "code": "9350/1",
+          "description": "Craniopharyngioma; Rathke pouch tumor"
+        },
+        {
+          "code": "9351/1",
+          "description": "Craniopharyngioma, adamantinomatous"
+        },
+        {
+          "code": "9352/1",
+          "description": "Craniopharyngioma, papillary"
+        },
+        {
+          "code": "9360/1",
+          "description": "Pinealoma"
+        },
+        {
+          "code": "9361/1",
+          "description": "Pineocytoma"
+        },
+        {
+          "code": "9362/3",
+          "description": "Pineoblastoma; Mixed pineal tumor; Mixed pineocytoma-pineoblastoma; Pineal parenchymal tumor of intermediate differentiation; Transitional pineal tumor"
+        },
+        {
+          "code": "9363/0",
+          "description": "Melanotic neuroectodermal tumor; Melanoameloblastoma; Melanotic progonoma; Retinal anlage tumor"
+        },
+        {
+          "code": "9364/3",
+          "description": "Ewing sarcoma; Peripheral neuroectodermal tumor; Neuroectodermal tumor, NOS; Peripheral primitive neuroectodermal tumor; PPNET"
+        },
+        {
+          "code": "9365/3",
+          "description": "Askin tumor"
+        },
+        {
+          "code": "9370/0",
+          "description": "Benign notochordal tumor"
+        },
+        {
+          "code": "9370/3",
+          "description": "Chordoma, NOS"
+        },
+        {
+          "code": "9371/3",
+          "description": "Chondroid chordoma"
+        },
+        {
+          "code": "9372/3",
+          "description": "Dedifferentiated chordoma"
+        },
+        {
+          "code": "9373/0",
+          "description": "Parachordoma"
+        },
+        {
+          "code": "9380/3",
+          "description": "Glioma, malignant; Glioma, NOS"
+        },
+        {
+          "code": "9381/3",
+          "description": "Gliomatosis cerebri"
+        },
+        {
+          "code": "9382/3",
+          "description": "Oligoastrocytoma, NOS; Mixed glioma; Anaplastic oligoastrocytoma"
+        },
+        {
+          "code": "9383/1",
+          "description": "Subependymoma; Subependymal astrocytoma, NOS; Subependymal glioma; Mixed subependymoma-ependymoma"
+        },
+        {
+          "code": "9384/1",
+          "description": "Subependymal giant cell astrocytoma"
+        },
+        {
+          "code": "9385/3",
+          "description": "Diffuse midline glioma, H3 K27M-mutant; Diffuse intrinsic pontine glioma, H3 K27M-mutant"
+        },
+        {
+          "code": "9390/0",
+          "description": "Choroid plexus papilloma, NOS"
+        },
+        {
+          "code": "9390/1",
+          "description": "Atypical choroid plexus papilloma"
+        },
+        {
+          "code": "9390/3",
+          "description": "Choroid plexus carcinoma; Choroid plexus papilloma, anaplastic; Choroid plexus papilloma, malignant"
+        },
+        {
+          "code": "9391/1",
+          "description": "Sellar ependymoma"
+        },
+        {
+          "code": "9391/3",
+          "description": "Ependymoma, NOS; Epithelial ependymoma; Cellular ependymoma; Clear cell ependymoma; Tanycytic ependymoma"
+        },
+        {
+          "code": "9392/3",
+          "description": "Ependymoma, anaplastic; Ependymoblastoma"
+        },
+        {
+          "code": "9393/3",
+          "description": "Papillary ependymoma"
+        },
+        {
+          "code": "9394/1",
+          "description": "Myxopapillary ependymoma"
+        },
+        {
+          "code": "9395/3",
+          "description": "Papillary tumor of the pineal region"
+        },
+        {
+          "code": "9396/3",
+          "description": "Ependymoma, RELA fusion-positive"
+        },
+        {
+          "code": "9400/3",
+          "description": "Astrocytoma, NOS; Astrocytic glioma; Astroglioma; Astrocytoma, low grade; Cystic astrocytoma; Diffuse astrocytoma; Diffuse astrocytoma, low grade; Diffuse astrocytoma, IDH-mutant; Diffuse astrocytoma, IDH-wildtype"
+        },
+        {
+          "code": "9401/3",
+          "description": "Astrocytoma, anaplastic; Astrocytoma, anaplastic, IDH-mutant; Astrocytoma, anaplastic, IDH-wildtype"
+        },
+        {
+          "code": "9410/3",
+          "description": "Protoplasmic astrocytoma"
+        },
+        {
+          "code": "9411/3",
+          "description": "Gemistocytic astrocytoma, NOS; Gemistocytc astrocytoma, IDH-mutant; Gemistocytoma"
+        },
+        {
+          "code": "9412/1",
+          "description": "Desmoplastic infantile astrocytoma; Desmoplastic infantile ganglioglioma"
+        },
+        {
+          "code": "9413/0",
+          "description": "Dysembryoplastic neuroepithelial tumor"
+        },
+        {
+          "code": "9420/3",
+          "description": "Fibrillary astrocytoma; Fibrous astrocytoma"
+        },
+        {
+          "code": "9421/1",
+          "description": "Pilocytic astrocytoma; Spongioblastoma, NOS; Juvenile astrocytoma; Piloid astrocytoma"
+        },
+        {
+          "code": "9423/3",
+          "description": "Polar spongioblastoma; Primitive polar spongioblastoma; Spongioblastoma polare"
+        },
+        {
+          "code": "9424/3",
+          "description": "Pleomorphic xanthoastrocytoma; Anaplastic pleomorphic xanthoastrocytoma"
+        },
+        {
+          "code": "9425/3",
+          "description": "Pilomyxoid astrocytoma"
+        },
+        {
+          "code": "9430/3",
+          "description": "Astroblastoma"
+        },
+        {
+          "code": "9431/1",
+          "description": "Angiocentric glioma"
+        },
+        {
+          "code": "9432/1",
+          "description": "Pituicytoma"
+        },
+        {
+          "code": "9440/3",
+          "description": "Glioblastoma, NOS; Epithelioid glioblastoma; Glioblastoma, IDH-wildtype; Glioblastoma, primary, NOS; Glioblastoma multiforme; Spongioblastoma multiforme; Diffuse midline glioma, NOS; Diffuse intrinsic pontine glioma"
+        },
+        {
+          "code": "9441/3",
+          "description": "Giant cell glioblastoma; Monstrocellular sarcoma"
+        },
+        {
+          "code": "9442/1",
+          "description": "Gliofibroma"
+        },
+        {
+          "code": "9442/3",
+          "description": "Gliosarcoma; Glioblastoma with sarcomatous component"
+        },
+        {
+          "code": "9444/1",
+          "description": "Chordoid glioma; Chordoid glioma of third ventricle"
+        },
+        {
+          "code": "9445/3",
+          "description": "Glioblastoma, IDH-mutant; Glioblastoma, secondary, IDH-mutant; Glioblastoma, secondary, NOS"
+        },
+        {
+          "code": "9450/3",
+          "description": "Oligodendroglioma, NOS; Oligodendroglioma, IDH-mutant and 1p/19q-codeleted"
+        },
+        {
+          "code": "9451/3",
+          "description": "Oligodendroglioma, anaplastic, NOS; Oligodendroglioma, anaplastic, IDH-mutant and 1p/19q codeleted"
+        },
+        {
+          "code": "9460/3",
+          "description": "Oligodendroblastoma"
+        },
+        {
+          "code": "9470/3",
+          "description": "Medulloblastoma, NOS; Classic medulloblastoma; Melanotic medulloblastoma"
+        },
+        {
+          "code": "9471/3",
+          "description": "Desmoplastic nodular medulloblastoma; Circumscribed arachnoidal cerebellar sarcoma; Desmoplastic medulloblastoma; Medulloblastoma with extensive nodularity; Medulloblastoma, SHH-activated and TP53-wildtype; Medulloblastoma, SHH activated, NOS"
+        },
+        {
+          "code": "9472/3",
+          "description": "Medullomyoblastoma"
+        },
+        {
+          "code": "9473/3",
+          "description": "CNS embryonal tumor, NOS; Primitive neuroectodermal tumor, NOS; PNET, NOS; Central primitive neuroectodermal tumor; CPNET; Supratentorial PNET"
+        },
+        {
+          "code": "9474/3",
+          "description": "Large cell medulloblastoma; Anaplastic medulloblastoma"
+        },
+        {
+          "code": "9475/3",
+          "description": "Medullobloastoma, WNT-activated, NOS; Medulloblastoma, WNT-activated, classic; Medulloblastoma, WNT-activated, large cell type; Medulloblastoma, WNT-activated, anaplastic type"
+        },
+        {
+          "code": "9476/3",
+          "description": "Medulloblastoma, SHH-activated and TP53-mutant"
+        },
+        {
+          "code": "9477/3",
+          "description": "Medulloblastoma, non-WNT/non-SHH; Medulloblastoma, group 3; Medulloblastoma, group 4"
+        },
+        {
+          "code": "9478/3",
+          "description": "Embryonal tumor with multilayered rosettes with C19MC alteration; Embryonal tumor with multilayered rosettes, NOS"
+        },
+        {
+          "code": "9480/3",
+          "description": "Cerebellar sarcoma, NOS"
+        },
+        {
+          "code": "9490/0",
+          "description": "Ganglioneuroma"
+        },
+        {
+          "code": "9490/3",
+          "description": "Ganglioneuroblastoma; CNS ganglioneuroblastoma"
+        },
+        {
+          "code": "9491/0",
+          "description": "Ganglioneuromatosis"
+        },
+        {
+          "code": "9492/0",
+          "description": "Gangliocytoma, NOS"
+        },
+        {
+          "code": "9493/0",
+          "description": "Dysplastic gangliocytoma of cerebellum (Lhermitte-Duclos)"
+        },
+        {
+          "code": "9500/3",
+          "description": "Neuroblastoma, NOS; Central neuroblastoma; CNS neuroblastoma; Sympathicoblastoma"
+        },
+        {
+          "code": "9501/0",
+          "description": "Medulloepithelioma, benign; Diktyoma, benign"
+        },
+        {
+          "code": "9501/3",
+          "description": "Medulloepithelioma, NOS; Diktyoma, malignant"
+        },
+        {
+          "code": "9502/0",
+          "description": "Teratoid medulloepithelioma, benign"
+        },
+        {
+          "code": "9502/3",
+          "description": "Teratoid medulloepithelioma, NOS"
+        },
+        {
+          "code": "9503/3",
+          "description": "Neuroepithelioma, NOS"
+        },
+        {
+          "code": "9504/3",
+          "description": "Spongioneuroblastoma"
+        },
+        {
+          "code": "9505/1",
+          "description": "Ganglioglioma, NOS; Glioneuroma; Neuroastrocytoma"
+        },
+        {
+          "code": "9505/3",
+          "description": "Ganglioglioma, anaplastic"
+        },
+        {
+          "code": "9506/1",
+          "description": "Central neurocytoma; Neurocytoma, NOS; Cerebellar liponeurocytoma; Lipomatous medulloblastoma; Medullocytoma; Neurolipocytoma; Extraventricular neurocytoma"
+        },
+        {
+          "code": "9507/0",
+          "description": "Pacinian tumor"
+        },
+        {
+          "code": "9508/3",
+          "description": "Atypical teratoid/rhabdoid tumor; CNS embryonal tumor with rhabdoid features"
+        },
+        {
+          "code": "9509/1",
+          "description": "Papillary glioneuronal tumor; Rosette-forming glioneuronal tumor"
+        },
+        {
+          "code": "9510/0",
+          "description": "Retinocytoma"
+        },
+        {
+          "code": "9510/3",
+          "description": "Retinoblastoma, NOS"
+        },
+        {
+          "code": "9511/3",
+          "description": "Retinoblastoma, differentiated"
+        },
+        {
+          "code": "9512/3",
+          "description": "Retinoblastoma, undifferentiated"
+        },
+        {
+          "code": "9513/3",
+          "description": "Retinoblastoma, diffuse"
+        },
+        {
+          "code": "9514/1",
+          "description": "Retinoblastoma, spontaneously regressed"
+        },
+        {
+          "code": "9520/3",
+          "description": "Olfactory neurogenic tumor"
+        },
+        {
+          "code": "9521/3",
+          "description": "Olfactory neurocytoma; Esthesioneurocytoma"
+        },
+        {
+          "code": "9522/3",
+          "description": "Olfactory neuroblastoma; Esthesioneuroblastoma"
+        },
+        {
+          "code": "9523/3",
+          "description": "Olfactory neuroepithelioma; Esthesioneuroepithelioma"
+        },
+        {
+          "code": "9530/0",
+          "description": "Meningioma, NOS; Lymphoplasmacyte-rich meningioma; Metaplastic meningioma; Microcystic meningioma; Secretory meningioma"
+        },
+        {
+          "code": "9530/3",
+          "description": "Meningioma, malignant; Leptomeningeal sarcoma; Meningeal sarcoma; Meningioma, anaplastic; Meningothelial sarcoma"
+        },
+        {
+          "code": "9531/0",
+          "description": "Meningothelial meningioma; Endotheliomatous meningioma; Syncytial meningioma"
+        },
+        {
+          "code": "9532/0",
+          "description": "Fibrous meningioma; Fibroblastic meningioma"
+        },
+        {
+          "code": "9533/0",
+          "description": "Psammomatous meningioma"
+        },
+        {
+          "code": "9534/0",
+          "description": "Angiomatous meningioma"
+        },
+        {
+          "code": "9535/0",
+          "description": "Hemangioblastic meningioma; Angioblastic meningioma"
+        },
+        {
+          "code": "9537/0",
+          "description": "Transitional meningioma; Mixed meningioma"
+        },
+        {
+          "code": "9538/1",
+          "description": "Clear cell meningioma; Chordoid meningioma"
+        },
+        {
+          "code": "9538/3",
+          "description": "Papillary meningioma; Rhabdoid meningioma"
+        },
+        {
+          "code": "9539/1",
+          "description": "Atypical meningioma"
+        },
+        {
+          "code": "9539/3",
+          "description": "Meningeal sarcomatosis"
+        },
+        {
+          "code": "9540/0",
+          "description": "Neurofibroma, NOS"
+        },
+        {
+          "code": "9540/3",
+          "description": "Malignant peripheral nerve sheath tumor, NOS; MPNST, NOS; Neurofibrosarcoma; Neurogenic sarcoma; Neurosarcoma; Melanotic MPNST; Melanotic psammomatous MPNST; MPNST with glandular differentiation; MPNST with mesenchymal differentiation; MPNST with perineurial differentiation"
+        },
+        {
+          "code": "9541/0",
+          "description": "Melanotic neurofibroma"
+        },
+        {
+          "code": "9542/3",
+          "description": "Malignant peripheral nerve sheath tumor, epithelioid; Epithelioid MPNST"
+        },
+        {
+          "code": "9550/0",
+          "description": "Plexiform neurofibroma; Plexiform neuroma"
+        },
+        {
+          "code": "9560/0",
+          "description": "Schwannoma, NOS; Neurilemoma, NOS; Neurinoma; Acoustic neuroma; Ancient schwannoma; Cellular schwannoma; Degenerated schwannoma; Plexiform schwannoma; Psammomatous schwannoma"
+        },
+        {
+          "code": "9560/1",
+          "description": "Melanotic schwannoma; Pigmented schwannoma"
+        },
+        {
+          "code": "9560/3",
+          "description": "Neurilemoma, malignant; Malignant schwannoma, NOS; Neurilemosarcoma"
+        },
+        {
+          "code": "9561/3",
+          "description": "Malignant peripheral nerve sheath tumor with rhabdomyoblastic differentiation; Malignant schwannoma with rhabdomyoblastic differentiation; MPNST with rhabdomyoblastic differentiation; Triton tumor, malignant"
+        },
+        {
+          "code": "9562/0",
+          "description": "Nerve sheath myxoma; Neurothekeoma; Cellular neurothekeoma"
+        },
+        {
+          "code": "9563/0",
+          "description": "Nerve sheath tumor, NOS; Hybrid nerve sheath tumor"
+        },
+        {
+          "code": "9570/0",
+          "description": "Neuroma, NOS; Solitary circumscribed neuroma"
+        },
+        {
+          "code": "9571/0",
+          "description": "Perineurioma, NOS; Intraneural perineurioma; Soft tissue perineurioma"
+        },
+        {
+          "code": "9571/3",
+          "description": "Perineurioma, malignant"
+        },
+        {
+          "code": "9580/0",
+          "description": "Granular cell tumor, NOS; Granular cell myoblastoma, NOS"
+        },
+        {
+          "code": "9580/3",
+          "description": "Granular cell tumor, malignant; Granular cell myoblastoma, malignant"
+        },
+        {
+          "code": "9581/3",
+          "description": "Alveolar soft part sarcoma"
+        },
+        {
+          "code": "9582/0",
+          "description": "Granular cell tumor of the sellar region"
+        },
+        {
+          "code": "9700/3",
+          "description": "Mycosis fungoides; Pagetoid reticulosis; Granulomatous slack skin"
+        },
+        {
+          "code": "9701/3",
+          "description": "Sezary syndrome; Sezary disease"
+        }
+      ]
+    },
+    "672": {
+      "naaccr_version": "24",
+      "item_number": 672,
+      "item_name": "RX Hosp--Scope Reg LN Sur",
+      "item_data_type": "digits",
+      "item_length": 1,
+      "year_implemented": 1997.0,
+      "version_implemented": "5.1",
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "rxHospScopeRegLnSur",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Hospital-Specific",
+      "source_of_standard": "CoC",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Describes the removal, biopsy, or aspiration of regional lymph node(s) performed at the reporting facility for diagnosis and/or staging or as a part of the first course of therapy.",
+      "rationale": "This item is important for evaluating quality of care and treatment practices relating to initial diagnosis, staging and/or first course of therapy. If central registries wish to study the treatment given at particular facilities, the facility-level treatment fields must be used. The summary treatment fields, conversely, combine information for all reporting facilities that provide first course of treatment for the tumor. Facility-specific fields allow studies of detailed referral patterns and treatment by type of healthcare setting. Knowing the extent of treatment given at a particular facility also helps resolve consolidation issues. If central registries wish to study the treatment given at particular reporting facilities, the reporting facility-level treatment fields must be used. The summary treatment fields, conversely, combine information across all reporting facilities that provide first course of treatment for the tumor. Reporting facility-specific fields allow studies of detailed referral patterns and treatment by type of reporting facility. Knowing the extent of treatment given at a particular reporting facility also helps resolve coding issues.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": "Refer to the most recent version of *STORE* for instructions that should be applied to all surgically treated cases for all types of cancers. The treatment of breast and skin cancers are where the distinction between sentinel lymph node biopsies (SLNBx) and more extensive dissection of regional lymph nodes is most frequently encountered. For all other sites, non-sentinel regional node dissections are typical, and codes 2, 6 and 7 are infrequently used",
+      "npcr_collect": ".",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": ".",
+      "alternate_names": [
+        "'Scope of Regional Lymph Node Surgery at this Facility (CoC)'"
+      ],
+      "format": null,
+      "code_description": null,
+      "code_note": "*Note:* One important use of registry data is the tracking of treatment patterns over time. To compare contemporary treatment to previously published treatment based on former codes, or to data unmodified from pre-1998 definitions, the ability to differentiate surgeries in which four or more regional lymph nodes are removed is desirable. However, it is very important to note that the distinction between codes 4 and 5 is made to permit comparison of current surgical procedures with procedures coded in the past when the removal of fewer than 4 nodes was not reflected in surgery codes. It is not intended to reflect clinical significance when applied to a particular surgical procedure. It is important to avoid inferring, by data presentation or other methods, that one category is preferable to another within the intent of these items.",
+      "allowable_values": "0-7, 9",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "0",
+          "description": "No regional lymph nodes removed. No lymph nodes found in the pathologic specimen. Diagnosed at autopsy."
+        },
+        {
+          "code": "1",
+          "description": "Biopsy or aspiration of regional lymph node, NOS."
+        },
+        {
+          "code": "2",
+          "description": "Sentinel lymph node biopsy."
+        },
+        {
+          "code": "3",
+          "description": "Regional lymph node(s) removed and the number of nodes removed is unknown or not stated; the procedure is not specified as sentinel node biopsy. Regional lymph nodes removed, NOS."
+        },
+        {
+          "code": "4",
+          "description": "1 to 3 regional lymph nodes removed."
+        },
+        {
+          "code": "5",
+          "description": "4 or more regional lymph nodes removed."
+        },
+        {
+          "code": "6",
+          "description": "Sentinel node biopsy and code 3, 4, or 5 at same time or timing not stated."
+        },
+        {
+          "code": "7",
+          "description": "Sentinel node biopsy and code 3, 4, or 5 at different times."
+        },
+        {
+          "code": "9",
+          "description": "Unknown or not applicable. It is unknown whether regional lymph node surgery was performed. Death certificate only case; unknown or ill-defined primary site; hematopoietic, reticuloendothelial, ummunoproliferative or myeloproliferative disease."
+        }
+      ]
+    },
+    "674": {
+      "naaccr_version": "24",
+      "item_number": 674,
+      "item_name": "RX Hosp--Surg Oth Reg/Dis",
+      "item_data_type": "digits",
+      "item_length": 1,
+      "year_implemented": 1997.0,
+      "version_implemented": "5.1",
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "rxHospSurgOthRegDis",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Hospital-Specific",
+      "source_of_standard": "CoC",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Records the surgical removal of distant lymph nodes or other tissue(s)/organ(s) beyond the primary site performed at this facility as a part of first course of treatment.",
+      "rationale": "The removal of non-primary tissue documents the extent of surgical treatment and is useful in evaluating the extent of metastatic involvement.   \n  \nIf central registries wish to study the treatment given at particular facilities, the facility-level treatment fields must be used. The summary treatment fields, conversely, combine information for all reporting facilities that provide first course of treatment for the tumor. Facility-specific fields allow studies of detailed referral patterns and treatment by type of healthcare setting. Knowing what part of the treatment was given at a particular facility also helps resolve consolidation issues.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": "Refer to the most recent version of *STORE* for additional instructions.",
+      "npcr_collect": ".",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": ".",
+      "alternate_names": [
+        "'Surgery of Other Regional Site(s)",
+        " Distant Site(s)",
+        " or Distant Lymph Node(s) at this Facility (CoC)'\n 'Surgical Procedure/Other Site at this Facility'"
+      ],
+      "format": null,
+      "code_description": null,
+      "code_note": null,
+      "allowable_values": "0-5, 9",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "0",
+          "description": "None; no non-primary site resection was performed. Diagnosed at autopsy."
+        },
+        {
+          "code": "1",
+          "description": "Non-primary surgical procedure performed, unknown if whether site is regional or distant."
+        },
+        {
+          "code": "2",
+          "description": "Non-primary surgical procedure to other regional sites"
+        },
+        {
+          "code": "3",
+          "description": "Non-primary surgical procedure to *distant lymph node(s)*."
+        },
+        {
+          "code": "4",
+          "description": "Non-primary surgical procedure to distant site."
+        },
+        {
+          "code": "5",
+          "description": "Any combination of codes 2, 3, or 4."
+        },
+        {
+          "code": "9",
+          "description": "Unknown; it is unknown whether any surgical procedure of a non-primary site was performed. Death certificate only."
+        }
+      ]
+    },
+    "676": {
+      "naaccr_version": "24",
+      "item_number": 676,
+      "item_name": "RX Hosp--Reg LN Removed",
+      "item_data_type": "digits",
+      "item_length": 2,
+      "year_implemented": 1997.0,
+      "version_implemented": "5.1",
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "rxHospRegLnRemoved",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Hospital-Specific",
+      "source_of_standard": "CoC",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Describes number of regional lymph nodes removed at the reporting facility as part of the first course of treatment.",
+      "rationale": "If central registries wish to study the treatment given at particular facilities, the facility-level treatment fields must be used. The summary treatment fields, conversely, combine information for all reporting facilities that provide first course of treatment for the tumor. Facility-specific fields allow studies of detailed referral patterns and treatment by type of healthcare setting. Knowing the extent of treatment given at a particular facility also helps resolve consolidation issues.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": "Refer to ROADS for additional coding instructions.",
+      "npcr_collect": ".",
+      "coc_collect": "RH",
+      "seer_collect": ".",
+      "cccr_collect": ".",
+      "alternate_names": [
+        "'Number of Regional Lymph Nodes Examined at This Facility (CoC)'\n 'RX Hosp--Reg LN Examined'"
+      ],
+      "format": "Right justified, zero filled",
+      "code_description": null,
+      "code_note": "*Note:* As of January 1, 2003, this data item is no longer required or recommended by CoC. However, the item was collected in the past and it is recommended that historic data be retained.",
+      "allowable_values": "00-90, 95-99",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "00",
+          "description": "No regional lymph nodes removed"
+        },
+        {
+          "code": "01",
+          "description": "One regional lymph node removed"
+        },
+        {
+          "code": "02",
+          "description": "Two regional lymph nodes removed"
+        },
+        {
+          "code": "..",
+          "description": "None"
+        },
+        {
+          "code": "90",
+          "description": "Ninety or more regional lymph nodes removed"
+        },
+        {
+          "code": "95",
+          "description": "No regional lymph node(s) removed, but aspiration of regional lymph node(s) was performed"
+        },
+        {
+          "code": "96",
+          "description": "Regional lymph node removal documented as a sampling and number of lymph nodes unknown/not stated"
+        },
+        {
+          "code": "97",
+          "description": "Regional lymph node removal documented as a dissection and number of lymph nodes unknown/not stated"
+        },
+        {
+          "code": "98",
+          "description": "Regional lymph nodes surgically removed, but number of lymph nodes unknown/not stated and not documented as sampling or dissection"
+        },
+        {
+          "code": "99",
+          "description": "Unknown; not stated; death certificate-only"
+        }
+      ]
+    },
+    "682": {
+      "naaccr_version": "24",
+      "item_number": 682,
+      "item_name": "Date Regional Lymph Node Dissection",
+      "item_data_type": "date",
+      "item_length": 8,
+      "year_implemented": 2018.0,
+      "version_implemented": "18",
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "dateRegionalLNDissection",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Stage/Prognostic Factors",
+      "source_of_standard": "NAACCR",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Records the date non-sentinel regional node dissection was performed. This data item is required for CoC-accredited facilities as of cases diagnosed 01/01/2018 and later.\u00a0",
+      "rationale": "It is a known fact that sentinel lymph node biopsies have been under-reported. Additionally, the timing and results of sentinel lymph node biopsy procedures are used in quality of care measures. This data item can be used to more accurately assess the date of regional node dissection separate from the date of sentinel lymph node biopsy if performed.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": null,
+      "npcr_collect": ".",
+      "coc_collect": "R",
+      "seer_collect": "RC",
+      "cccr_collect": ".",
+      "alternate_names": null,
+      "format": "YYYYMMDD",
+      "code_description": null,
+      "code_note": null,
+      "allowable_values": "Valid dates",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": []
+    },
+    "690": {
+      "naaccr_version": "24",
+      "item_number": 690,
+      "item_name": "RX Hosp--Radiation",
+      "item_data_type": "digits",
+      "item_length": 1,
+      "year_implemented": null,
+      "version_implemented": null,
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "rxHospRadiation",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Hospital-Specific",
+      "source_of_standard": "SEER",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Defines the type of radiation therapy the patient received at the reporting facility as a part of the first course of treatment.",
+      "rationale": "If central registries wish to study the treatment given at particular facilities, the facility-level treatment fields must be used. The summary treatment fields, conversely, combine information for all facilities that provide first course of treatment for the tumor. Facility-specific fields allow studies of detailed referral patterns and treatment by type of healthcare setting. Knowing what part of the treatment was given at a particular facility also helps resolve consolidation issues.",
+      "clarification": null,
+      "general_notes": null,
+      "instructions_for_coding": null,
+      "npcr_collect": ".",
+      "coc_collect": ".",
+      "seer_collect": "RH",
+      "cccr_collect": ".",
+      "alternate_names": [
+        "'Radiation at this Facility (CoC)'"
+      ],
+      "format": null,
+      "code_description": null,
+      "code_note": "*Note*: CoC no longer requires this item effective January 1, 2002. SEER continues to support it as a historically collected and currently transmitted data item.",
+      "allowable_values": "0-5, 9",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "0",
+          "description": "None"
+        },
+        {
+          "code": "1",
+          "description": "Beam radiation"
+        },
+        {
+          "code": "2",
+          "description": "Radioactive implants"
+        },
+        {
+          "code": "3",
+          "description": "Radioisotopes"
+        },
+        {
+          "code": "4",
+          "description": "Combination of 1 with 2 or 3"
+        },
+        {
+          "code": "5",
+          "description": "Radiation, NOS-method or source not specified"
+        },
+        {
+          "code": "9",
+          "description": "Unknown if radiation therapy administered"
+        }
+      ]
+    },
+    "700": {
+      "naaccr_version": "24",
+      "item_number": 700,
+      "item_name": "RX Hosp--Chemo",
+      "item_data_type": "digits",
+      "item_length": 2,
+      "year_implemented": null,
+      "version_implemented": null,
+      "year_retired": null,
+      "version_retired": null,
+      "xml_naaccr_id": "rxHospChemo",
+      "xml_parent_id": "Tumor",
+      "record_types": "A,C,I,M",
+      "section": "Hospital-Specific",
+      "source_of_standard": "CoC",
+      "date_created": null,
+      "date_modified": null,
+      "description": "Records the type of chemotherapy administered at the reporting facility as a part of first course therapy or the reason chemotherapy was not given.",
+      "rationale": "Systemic therapy may involve the administration of one or a combination of agents. This data item allows for the evaluation of chemotherapeutic agents given as part of the first course of therapy. Furthermore, it is useful to know the reason chemotherapy was not administered when evaluating quality of care.   \n  \nIf central registries wish to study the treatment given at particular facilities, the facility-level treatment fields must be used. The summary treatment fields, conversely, combine information for all facilities that provide first course of treatment for the tumor. Facility-specific fields allow studies of detailed referral patterns and treatment by type of healthcare setting. Knowing what part of the treatment was given at a particular facility also helps resolve consolidation issues.",
+      "clarification": null,
+      "general_notes": "*Note*: Prior to 2013, targeted therapies that invoke an immune response, such as Herceptin, had been coded as chemotherapy. Effective with cases diagnosed January 1, 2013, and forward these therapies are classified as biological response modifiers. Coding instructions for these changes have been added to the remarks field for the applicable drugs in the SEER\\*RX Interactive Drug Database ( <http://seer.cancer.gov/tools/seerrx/>).",
+      "instructions_for_coding": "Refer to the most recent *STORE* and SEER RX for additional complete coding directions.",
+      "npcr_collect": ".",
+      "coc_collect": "R",
+      "seer_collect": "R",
+      "cccr_collect": ".",
+      "alternate_names": [
+        "'Chemotherapy at this Facility (CoC)'"
+      ],
+      "format": "Right justified, zero filled",
+      "code_description": null,
+      "code_note": null,
+      "allowable_values": "00-03, 82, 85-88, 99",
+      "record_layout_table_note": null,
+      "required_status_table_note": null,
+      "data_descriptor_table_note": null,
+      "record_layout_note": null,
+      "required_status_note": null,
+      "data_descriptor_note": null,
+      "data_dictionary_description_note": null,
+      "data_dictionary_rationale_note": null,
+      "retired": "No",
+      "allowed_codes": [
+        {
+          "code": "00",
+          "description": "None, chemotherapy was not part of the first course of therapy or there was progression of disease prior to administration; Not customary therapy for this cancer. Diagnosed at autopsy."
+        },
+        {
+          "code": "01",
+          "description": "Chemotherapy was administered, but type and number of agents is not documented in patient record."
+        },
+        {
+          "code": "02",
+          "description": "Chemotherapy, single agent."
+        },
+        {
+          "code": "03",
+          "description": "Chemotherapy, multiple agents."
+        },
+        {
+          "code": "82",
+          "description": "Chemotherapy was not recommended/administered because it was contraindicated due to patient risk factors (comorbid conditions, advanced age) or there was progression of disease prior to planned administration."
+        },
+        {
+          "code": "85",
+          "description": "Chemotherapy was not administered because the patient died prior to planned or recommended therapy."
+        },
+        {
+          "code": "86",
+          "description": "Chemotherapy was recommended by the patient's physician, but was not administered as part of first-course therapy. No reason was stated in the patient record."
+        },
+        {
+          "code": "87",
+          "description": "Chemotherapy was not administered; it was recommended by the patient's physician, but this treatment was refused by the patient, the patient's family member, or the patient's guardian. The refusal was noted in the patient record."
+        },
+        {
+          "code": "88",
+          "description": "Chemotherapy was recommended, but it is unknown if it was administered."
+        },
+        {
+          "code": "99",
+          "description": "It is unknown whether chemotherapy was recommended or administered because it is not stated in patient record. Death certificate-only case"
+        }
+      ]
+    }
+  }
+}
