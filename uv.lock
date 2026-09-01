@@ -246,9 +246,16 @@ dependencies = [
     { name = "tqdm" },
 ]
 
+[package.optional-dependencies]
+workbench = [
+    { name = "fastapi" },
+    { name = "uvicorn" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "databricks-sdk", specifier = "==0.67.0" },
+    { name = "fastapi", marker = "extra == 'workbench'", specifier = ">=0.136,<1.0" },
     { name = "grandalf", specifier = ">=0.8" },
     { name = "graphviz", specifier = ">=0.21" },
     { name = "ipython", specifier = ">=9.14.1" },
@@ -264,7 +271,9 @@ requires-dist = [
     { name = "pydantic", specifier = "==2.10.6" },
     { name = "pyyaml", specifier = "==6.0.2" },
     { name = "tqdm", specifier = "==4.67.1" },
+    { name = "uvicorn", marker = "extra == 'workbench'", specifier = ">=0.49,<1.0" },
 ]
+provides-extras = ["workbench"]
 
 [[package]]
 name = "click"
