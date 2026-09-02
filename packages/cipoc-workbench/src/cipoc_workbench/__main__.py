@@ -32,7 +32,7 @@ def cmd_serve(args: argparse.Namespace) -> int:
         feedback_path=args.feedback,
     )
 
-    print(f"State:        {args.state or 'the copy committed in web/'}")
+    print(f"State:        {args.state or 'the bundled example'}")
     print(f"Ground truth: {args.ground_truth or 'none — comparison features stay hidden'}")
     print(f"Feedback:     {args.feedback or 'none — the annotation form is read-only'}")
     print(f"\nOpen http://{args.host}:{args.port}/")

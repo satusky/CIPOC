@@ -20,4 +20,4 @@ cipoc-workbench = "cipoc_workbench.__main__:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-cipoc_workbench = ["web/*"]
+cipoc_workbench = ["example/*.json", "web/*"]

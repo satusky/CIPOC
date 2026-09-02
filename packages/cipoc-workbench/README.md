@@ -21,6 +21,7 @@ cipoc-workbench serve \
 
 Every path is optional. Run `cipoc-workbench serve` without arguments to view
 the bundled example. By default, the server listens on `127.0.0.1:8000`.
+The bundled input files are under `src/cipoc_workbench/example/`.
 
 For an offline installation, build a wheelhouse on a compatible connected
 machine:
