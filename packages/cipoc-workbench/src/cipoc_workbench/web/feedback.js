@@ -7,7 +7,7 @@
  * because the ways a gate can be wrong and the ways a coded value can be wrong
  * have nothing in common.
  *
- * Persistence needs the workbench server (`python -m cipoc.workbench serve`).
+ * Persistence needs the workbench server (`cipoc-workbench serve`).
  * Under a plain static server the form still renders, disabled, with the
  * command that enables it — failing at save time, after someone has typed a
  * paragraph, would be the worse trade.
@@ -205,7 +205,7 @@ function feedbackSection(kind, id) {
     disabled
       ? h("p", { class: "faint", style: "margin:0 0 10px" },
           "Read-only: no workbench server. Start one with ",
-          h("code", { class: "mono", text: "python -m cipoc.workbench serve --feedback FILE" }),
+          h("code", { class: "mono", text: "cipoc-workbench serve --feedback FILE" }),
           " to save annotations.")
       : null,
     boxes,

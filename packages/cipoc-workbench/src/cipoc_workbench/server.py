@@ -6,10 +6,8 @@ dump. Everything it needs to *display* a run is available over plain
 do: hand the page a ground-truth file chosen at launch, and accept the
 annotations a reviewer writes back.
 
-``fastapi`` / ``uvicorn`` are workbench-only dependencies (the ``workbench``
-extra), so this module is imported only when actually serving — never by
-``cipoc.workbench`` itself, and never by the runtime package. That keeps the
-airgapped DBR-18.2 install free of a web framework.
+The package is independent from the CIPOC runtime and depends only on its web
+server libraries. It communicates with CIPOC through the case-state JSON file.
 
 The frontend degrades rather than breaks: every endpoint here is optional from
 its point of view. Served without ``--ground-truth`` the comparison features
