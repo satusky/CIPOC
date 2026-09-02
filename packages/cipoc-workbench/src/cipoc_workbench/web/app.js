@@ -634,8 +634,8 @@ function bootError(err) {
     h("div", {},
       h("p", { text: "Could not load " + STATE_URL + " — " + err.message }),
       h("p", { class: "muted" },
-        "Browsers block file:// fetches. Serve this directory, e.g. ",
-        h("code", { text: "python3 -m http.server -d src/cipoc/workbench/web 8000" }),
+        "Browsers block file:// fetches. Start the installed server with ",
+        h("code", { text: "cipoc-workbench serve" }),
         " then open ",
         h("code", { text: "http://127.0.0.1:8000" }),
         "."))

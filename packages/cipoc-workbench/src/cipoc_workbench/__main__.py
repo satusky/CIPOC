@@ -1,17 +1,12 @@
-"""The workbench CLI: serve the frontend over one run's state.
+"""Serve a CIPOC extraction run in the review workbench.
 
-    PYTHONPATH=src python -m cipoc.workbench serve \
+    cipoc-workbench serve \
         --state tests/test_outputs/case_state.json \
         --ground-truth gt/case01.json \
         --feedback feedback/case01.json
 
-Every path is optional. With none, this serves the committed fixture in ``web/``
-and behaves exactly like ``python3 -m http.server -d src/cipoc/workbench/web``,
-minus the inability to save feedback.
-
-Produce a state file with ``scripts/run_case_state.py``; the ground-truth file
-is a JSON object of ``{item_id: value}``, the same shape that script already
-accepts for ``--structured-data``.
+Every path is optional. With none, this serves the example bundled with the
+package. The ground-truth file is a JSON object of ``{item_id: value}``.
 """
 
 from __future__ import annotations
@@ -22,21 +17,9 @@ from pathlib import Path
 
 
 def cmd_serve(args: argparse.Namespace) -> int:
-    # Deferred: both imports come from the optional `workbench` extra, so
-    # `python -m cipoc.workbench --help` works without them installed.
-    try:
-        import uvicorn
+    import uvicorn
 
-        from .server import build_app
-    except ModuleNotFoundError as err:
-        print(
-            f"Missing the workbench extra ({err.name}). Install it with:\n"
-            "    uv sync --extra workbench\n"
-            "or serve the frontend read-only with:\n"
-            "    python3 -m http.server -d src/cipoc/workbench/web 8000",
-            file=sys.stderr,
-        )
-        return 1
+    from .server import build_app
 
     for label, path in (("--state", args.state), ("--ground-truth", args.ground_truth)):
         if path is not None and not path.is_file():
@@ -58,7 +41,7 @@ def cmd_serve(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="cipoc.workbench", description=__doc__)
+    parser = argparse.ArgumentParser(prog="cipoc-workbench", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
 
     serve = sub.add_parser("serve", help="Serve the workbench frontend.")

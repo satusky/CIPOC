@@ -87,6 +87,27 @@ Requires Python ≥ 3.11 (see `.python-version`). Source lives under `src/`, so 
 commands with `PYTHONPATH=src` unless the package is installed into the
 environment.
 
+### Workbench
+
+The review workbench is a separate package and does not install CIPOC's runtime
+dependencies. Install it with standard `pip`:
+
+```bash
+python -m pip install ./packages/cipoc-workbench
+```
+
+Then serve a case-state JSON file:
+
+```bash
+cipoc-workbench serve \
+    --state tests/test_outputs/case_state.json \
+    --ground-truth ground_truth.json \
+    --feedback feedback.json
+```
+
+All three paths are optional. Without arguments, the workbench serves its
+bundled example at `http://127.0.0.1:8000/`.
+
 ## Configuration
 
 Runtime config is loaded from `config/config.yaml` via
@@ -193,6 +214,9 @@ src/cipoc/
     ├── utils.py           # YAML config loader + CipocConfig
     ├── progress_tracking.py  # run_with_progress graph runner
     └── databricks_utils.py
+
+packages/
+└── cipoc-workbench/       # Standalone browser-based result review package
 
 config/          # config.yaml + variable_groups.json
 documents/
