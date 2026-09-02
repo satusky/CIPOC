@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
-WEB_DIR = Path(__file__).resolve().parent / "web"
+PACKAGE_DIR = Path(__file__).resolve().parent
+EXAMPLE_DIR = PACKAGE_DIR / "example"
+WEB_DIR = PACKAGE_DIR / "web"
 
-__all__ = ["WEB_DIR"]
+__all__ = ["EXAMPLE_DIR", "WEB_DIR"]

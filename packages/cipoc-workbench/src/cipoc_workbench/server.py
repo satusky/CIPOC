@@ -28,8 +28,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-
-WEB_DIR = Path(__file__).resolve().parent / "web"
+from . import EXAMPLE_DIR, WEB_DIR
 
 # The entity kinds an annotation can attach to. Fixed rather than open: a typo in
 # a URL would otherwise silently create a fourth bucket nothing ever reads.
@@ -111,6 +110,7 @@ def build_app(
 ) -> FastAPI:
     """Build the FastAPI app serving the workbench frontend and its side files."""
     app = FastAPI(title="CIPOC Workbench", docs_url=None, redoc_url=None)
+    case_state_path = state_path or EXAMPLE_DIR / "case_state.json"
 
     @app.get("/api/ground-truth")
     def ground_truth() -> JSONResponse:
@@ -158,16 +158,13 @@ def build_app(
         _write_json_atomic(feedback_path, document)
         return JSONResponse({"kind": kind, "id": entity_id, "annotation": record})
 
-    if state_path is not None:
-        # Served at the path the frontend already fetches, so STATE_URL in
-        # app.js — and the whole no-server fallback — stays untouched. Declared
-        # before the static mount, which would otherwise serve the committed
-        # copy sitting in web/.
-        @app.get("/case_state.json")
-        def case_state() -> FileResponse:
-            if not state_path.is_file():
-                raise HTTPException(status_code=404, detail=f"{state_path} does not exist.")
-            return FileResponse(state_path, media_type="application/json")
+    # Keep the frontend URL stable while allowing example data to live outside
+    # the static application assets.
+    @app.get("/case_state.json")
+    def case_state() -> FileResponse:
+        if not case_state_path.is_file():
+            raise HTTPException(status_code=404, detail=f"{case_state_path} does not exist.")
+        return FileResponse(case_state_path, media_type="application/json")
 
     app.mount("/", StaticFiles(directory=str(WEB_DIR), html=True), name="web")
     return app
