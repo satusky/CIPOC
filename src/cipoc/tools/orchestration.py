@@ -19,6 +19,9 @@ from cipoc.models import (
     NoteCorpusDescriptors,
     NoteDigest,
     NoteFilter,
+    NoteFilterEvaluation,
+    NoteSelectionRejectionCode,
+    NoteSelectionUnevaluatedCode,
     ProcessedClinicalNote,
     ReviewFlag,
     ReviewFlagType,
@@ -173,50 +176,77 @@ def _parse_note_date(value: str | None) -> date | None:
         return None
 
 
+def evaluate_note_filter(
+    note: ProcessedClinicalNote,
+    note_filter: NoteFilter | None,
+    *,
+    anchor: date | None = None,
+) -> NoteFilterEvaluation:
+    """Evaluate every configured note-filter dimension and explain the result.
+
+    Each dimension is evaluated independently and combined with AND; a dimension
+    left empty/``None`` imposes no restriction. A ``None`` filter passes every
+    note. Configured checks that are currently disabled or lack required context
+    are reported as unevaluated and do not reject the note.
+    """
+    if note_filter is None:
+        return NoteFilterEvaluation(passes=True)
+
+    rejection_reasons: list[NoteSelectionRejectionCode] = []
+    unevaluated_checks: list[NoteSelectionUnevaluatedCode] = []
+
+    # Note type: case-insensitive exact match against the allowed set.
+    if note_filter.note_types:
+        allowed = {t.strip().casefold() for t in note_filter.note_types}
+        if (note.note_type or "").strip().casefold() not in allowed:
+            rejection_reasons.append(NoteSelectionRejectionCode.NOTE_TYPE_MISMATCH)
+
+    # Keyword filtering remains disabled because these values are LLM-generated.
+    if note_filter.keywords:
+        unevaluated_checks.append(
+            NoteSelectionUnevaluatedCode.KEYWORD_FILTER_DISABLED
+        )
+
+    # Cancer status: note's temporality set must intersect the allowed statuses.
+    if note_filter.cancer_status:
+        if not (note.cancer_status or set()).intersection(note_filter.cancer_status):
+            rejection_reasons.append(
+                NoteSelectionRejectionCode.CANCER_STATUS_MISMATCH
+            )
+
+    # Date window: note within `within_days` of the anchor (skipped without one).
+    if note_filter.within_days is not None:
+        if anchor is None:
+            unevaluated_checks.append(
+                NoteSelectionUnevaluatedCode.TEMPORAL_ANCHOR_UNAVAILABLE
+            )
+        else:
+            note_date = _parse_note_date(note.date)
+            if note_date is None:
+                rejection_reasons.append(
+                    NoteSelectionRejectionCode.MISSING_OR_INVALID_DATE
+                )
+            elif abs((note_date - anchor).days) > note_filter.within_days:
+                rejection_reasons.append(
+                    NoteSelectionRejectionCode.OUTSIDE_DATE_WINDOW
+                )
+
+    return NoteFilterEvaluation(
+        passes=not rejection_reasons,
+        rejection_reasons=rejection_reasons,
+        unevaluated_checks=unevaluated_checks,
+    )
+
+
 def note_matches_filter(
     note: ProcessedClinicalNote,
     note_filter: NoteFilter | None,
     *,
     anchor: date | None = None,
 ) -> bool:
-    """Return True when a note satisfies every constraint set on the filter.
+    """Return whether a note passes its deterministic filter."""
 
-    Each dimension is evaluated independently and combined with AND; a dimension
-    left empty/``None`` imposes no restriction. A ``None`` filter passes every
-    note. The ``within_days`` date dimension is skipped when no ``anchor`` is
-    supplied, since it cannot be evaluated without one.
-    """
-    if note_filter is None:
-        return True
-
-    # Note type: case-insensitive exact match against the allowed set.
-    if note_filter.note_types:
-        allowed = {t.strip().casefold() for t in note_filter.note_types}
-        if (note.note_type or "").strip().casefold() not in allowed:
-            return False
-
-    ##### Commented out for now because the keywords are LLM generated and will usually not pass
-    # Keywords: any stem is a case-insensitive substring of a flag or the summary.
-    # if note_filter.keywords:
-    #     haystack = [f.casefold() for f in (note.flags or [])]
-    #     if note.summary:
-    #         haystack.append(note.summary.casefold())
-    #     stems = [k.strip().casefold() for k in note_filter.keywords if k.strip()]
-    #     if not any(stem in hay for stem in stems for hay in haystack):
-    #         return False
-
-    # Cancer status: note's temporality set must intersect the allowed statuses.
-    if note_filter.cancer_status:
-        if not (note.cancer_status or set()).intersection(note_filter.cancer_status):
-            return False
-
-    # Date window: note within `within_days` of the anchor (skipped without one).
-    if note_filter.within_days is not None and anchor is not None:
-        note_date = _parse_note_date(note.date)
-        if note_date is None or abs((note_date - anchor).days) > note_filter.within_days:
-            return False
-
-    return True
+    return evaluate_note_filter(note, note_filter, anchor=anchor).passes
 
 
 def prefilter_notes(

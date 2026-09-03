@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 
 from typing import Literal
 from typing_extensions import Annotated
@@ -19,6 +20,64 @@ CONCEPT_DESCRIPTIONS: dict[str, str] = {
 CONCEPTS = list(CONCEPT_DESCRIPTIONS)
 
 CancerStatus = Literal["historical", "recent", "current"]
+
+
+class NoteSelectionRejectionCode(str, Enum):
+    """Controlled reasons a note failed deterministic group filtering."""
+
+    NOTE_TYPE_MISMATCH = "note_type_mismatch"
+    CANCER_STATUS_MISMATCH = "cancer_status_mismatch"
+    MISSING_OR_INVALID_DATE = "missing_or_invalid_date"
+    OUTSIDE_DATE_WINDOW = "outside_date_window"
+
+
+class NoteSelectionUnevaluatedCode(str, Enum):
+    """Configured note checks that could not be applied during selection."""
+
+    KEYWORD_FILTER_DISABLED = "keyword_filter_disabled"
+    TEMPORAL_ANCHOR_UNAVAILABLE = "temporal_anchor_unavailable"
+
+
+class NoteFilterEvaluation(BaseModel):
+    """Explainable result of applying one deterministic note filter."""
+
+    passes: bool = Field(description="Whether the note passed every evaluated check.")
+    rejection_reasons: list[NoteSelectionRejectionCode] = Field(
+        default_factory=list,
+        description="All deterministic reasons the note was rejected.",
+    )
+    unevaluated_checks: list[NoteSelectionUnevaluatedCode] = Field(
+        default_factory=list,
+        description="Configured checks that were skipped during evaluation.",
+    )
+
+
+class NoteSelectionProvenance(BaseModel):
+    """Durable evidence-selection funnel for one variable group."""
+
+    group_id: str = Field(description="Variable group whose notes were selected.")
+    requested_item_ids: list[int] = Field(
+        default_factory=list,
+        description="NAACCR item IDs requested from the group branch.",
+    )
+    candidate_note_ids: list[int | str] = Field(
+        default_factory=list,
+        description="Note IDs that passed deterministic filtering.",
+    )
+    rejected_note_ids: dict[
+        int | str, list[NoteSelectionRejectionCode]
+    ] = Field(
+        default_factory=dict,
+        description="Rejected note IDs mapped to all deterministic rejection reasons.",
+    )
+    selected_note_ids: list[int | str] = Field(
+        default_factory=list,
+        description="Candidate note IDs accepted after retriever output validation.",
+    )
+    unevaluated_checks: list[NoteSelectionUnevaluatedCode] = Field(
+        default_factory=list,
+        description="Configured deterministic checks that were not evaluated.",
+    )
 
 
 class TextSpan(BaseModel):

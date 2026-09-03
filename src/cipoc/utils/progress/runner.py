@@ -14,7 +14,7 @@ from langgraph.graph.state import CompiledStateGraph
 
 from cipoc.tools import GroupNode
 
-from .events import normalize
+from .events import ProgressEvent, normalize
 from .layout import build_rows
 from .model import ProgressModel, Snapshot, TaskKind
 from .renderers import AnsiAltScreen, NotebookDisplay, PlainLog, Renderer, ansi_lines
@@ -325,13 +325,15 @@ def run_with_progress(
     group_hierarchy: Iterable[GroupNode] | None = None,
     show_note_counts: bool = False,
     pause_before_summary: bool = False,
+    event_observer: Callable[[ProgressEvent], None] | None = None,
 ) -> Any:
     """Run ``graph`` with live progress and return its last root state.
 
     ``show_branches`` preserves the existing public API and identifies a
     standalone extractor run; its requested variables are discovered from
     ``graph_input`` by :class:`ProgressModel`. ``group_hierarchy`` optionally
-    restores nesting lost by the orchestrator's flattened planning groups.
+    restores nesting lost by the orchestrator's flattened planning groups. The
+    optional observer sees every normalized event immediately before the model.
     """
     started_at = time.monotonic()
     model = ProgressModel(
@@ -366,6 +368,8 @@ def run_with_progress(
             event = normalize(raw_item, subgraphs=subgraphs)
             if event is None:
                 continue
+            if event_observer is not None:
+                event_observer(event)
             model.ingest(event, time.monotonic())
             if event.kind == "values" and event.is_root:
                 final_result = event.payload

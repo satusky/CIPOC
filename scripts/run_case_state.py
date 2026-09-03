@@ -1,15 +1,15 @@
 """Run the orchestrator over one case and save its full output state as JSON.
 
 ``OrchestratorAgent.run()`` returns only the durable :class:`Case`, and the
-compiled graph's ``output_schema`` narrows ``invoke()`` to the five channels
+compiled graph's ``output_schema`` narrows ``invoke()`` to the durable channels
 ``to_case()`` consumes. Both drop the scanned note corpus, the note digests, the
 corpus descriptors, and the planned target groups -- exactly the material a
 reviewer needs to see what the run actually did.
 
 This script therefore drives ``agent.compiled_graph`` itself (the accessor
-``BaseAgent`` exposes for external harnesses) in ``values`` stream mode, which
-emits whole-state snapshots and bypasses the output schema, and writes the last
-root state to disk.
+``BaseAgent`` exposes for external harnesses) in ``values`` and ``tasks`` stream
+modes. The last root values event is the full state, while task events populate
+optional execution-observability channels.
 
     PYTHONPATH=src python -m scripts.run_case_state \
         --notes tests/fixtures/note_bundle.json \
@@ -23,19 +23,29 @@ import json
 from datetime import date, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 from pydantic import BaseModel
 
 from cipoc.agents import OrchestratorAgent
 from cipoc.models import ClinicalNote
 from cipoc.tools import load_group_hierarchy, load_variable_groups
-from cipoc.utils import run_with_progress
+from cipoc.utils import ObservabilityCollector, run_with_progress
+from cipoc.utils.progress.events import normalize
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_NOTES = REPO_ROOT / "tests" / "fixtures" / "note_bundle.json"
 DEFAULT_OUTPUT = REPO_ROOT / "tests" / "test_outputs" / "case_state.json"
+
+_REJECTION_MESSAGES = {
+    "note_type_mismatch": "Note type did not match the configured note filter.",
+    "cancer_status_mismatch": (
+        "Cancer status did not match the configured note filter."
+    ),
+    "missing_or_invalid_date": "Note date was missing or invalid.",
+    "outside_date_window": "Note date was outside the configured date window.",
+}
 
 
 def to_jsonable(value: Any) -> Any:
@@ -68,6 +78,69 @@ def to_jsonable(value: Any) -> Any:
     if value is None or isinstance(value, (str, int, float, bool)):
         return value
     return str(value)
+
+
+def _retriever_offered(exchanges: list[dict[str, Any]]) -> list[Any] | None:
+    """Return the last successful retriever's raw proposed note IDs, if captured."""
+    for exchange in reversed(exchanges):
+        if exchange.get("node") != "identify_relevant_notes" or exchange.get("error"):
+            continue
+        response = exchange.get("response")
+        if isinstance(response, Mapping):
+            note_ids = response.get("note_ids")
+            if note_ids is None:
+                note_ids = response.get("relevant_note_ids")
+        else:
+            note_ids = response
+        if isinstance(note_ids, (list, tuple)):
+            return list(note_ids)
+    return None
+
+
+def _workbench_note_selection(
+    durable: Any,
+    llm_exchanges: Mapping[str, list[dict[str, Any]]],
+) -> dict[str, dict[str, Any]]:
+    """Adapt typed durable provenance to the Workbench's display contract."""
+    if not isinstance(durable, Mapping):
+        return {}
+
+    converted = {}
+    for key, raw_selection in durable.items():
+        selection = (
+            raw_selection.model_dump(mode="json")
+            if isinstance(raw_selection, BaseModel)
+            else raw_selection
+        )
+        if not isinstance(selection, Mapping):
+            continue
+
+        filtered_out = {}
+        rejected = selection.get("rejected_note_ids", {})
+        if isinstance(rejected, Mapping):
+            for note_id, reasons in rejected.items():
+                readable = []
+                for reason in reasons or []:
+                    code = str(getattr(reason, "value", reason))
+                    readable.append(
+                        _REJECTION_MESSAGES.get(
+                            code, code.replace("_", " ").capitalize() + "."
+                        )
+                    )
+                filtered_out[str(note_id)] = " ".join(readable)
+
+        group_key = str(key)
+        workbench_selection = {
+            "group_id": selection.get("group_id"),
+            "candidate_note_ids": list(selection.get("candidate_note_ids", []) or []),
+            "filtered_out": filtered_out,
+            "selected_note_ids": list(selection.get("selected_note_ids", []) or []),
+        }
+        offered = _retriever_offered(llm_exchanges.get(group_key, []))
+        if offered is not None:
+            workbench_selection["retriever_offered"] = offered
+        converted[group_key] = workbench_selection
+    return converted
 
 
 def _load_json(path: Path) -> Any:
@@ -135,6 +208,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Run without the live progress display.",
     )
+    parser.add_argument(
+        "--no-llm-capture",
+        action="store_true",
+        help="Omit model prompts and responses from the output artifact.",
+    )
     return parser
 
 
@@ -144,6 +222,7 @@ def run_case_state(
     structured_data: dict[int, str] | None = None,
     max_concurrency: int | None = None,
     progress: bool = True,
+    capture_llm: bool = True,
 ) -> dict[str, Any]:
     """Run the orchestrator and return its last root state, JSON-ready."""
     agent = OrchestratorAgent()
@@ -151,9 +230,11 @@ def run_case_state(
         "note_corpus": {note["note_id"]: ClinicalNote(**note) for note in raw_notes},
         "structured_data": structured_data or {},
     }
-    graph_config = (
+    base_graph_config = (
         {"max_concurrency": max_concurrency} if max_concurrency is not None else None
     )
+    collector = ObservabilityCollector(capture_llm=capture_llm)
+    graph_config = collector.graph_config(base_graph_config)
 
     if progress:
         groups_path = agent._config.documents().variable_groups_path
@@ -166,19 +247,34 @@ def run_case_state(
             target_groups=load_variable_groups(groups_path),
             group_hierarchy=load_group_hierarchy(groups_path),
             pause_before_summary=True,
+            event_observer=collector.observe,
         )
     else:
-        # stream_mode="values" emits whole-state snapshots, so the last one is the
-        # full CaseState -- unlike invoke(), which is narrowed by output_schema.
         final_state = None
-        for state in agent.compiled_graph.stream(
-            graph_input, config=graph_config, stream_mode="values"
-        ):
-            final_state = state
+        stream_kwargs = {
+            "stream_mode": ["values", "tasks"],
+            "subgraphs": True,
+        }
+        if graph_config is not None:
+            stream_kwargs["config"] = graph_config
+        for raw_item in agent.compiled_graph.stream(graph_input, **stream_kwargs):
+            event = normalize(raw_item, subgraphs=True)
+            if event is None:
+                continue
+            collector.observe(event)
+            if event.kind == "values" and event.is_root:
+                final_state = event.payload
         if final_state is None:
             raise RuntimeError("The orchestrator graph produced no state.")
 
-    return to_jsonable(final_state)
+    result = to_jsonable(final_state)
+    observability = collector.snapshot()
+    llm_exchanges = observability.get("llm_exchanges", {})
+    result["note_selection"] = _workbench_note_selection(
+        result.get("note_selection", {}), llm_exchanges
+    )
+    result.update(observability)
+    return result
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -192,6 +288,7 @@ def main(argv: list[str] | None = None) -> int:
         structured_data=structured_data,
         max_concurrency=args.max_concurrency,
         progress=not args.no_progress,
+        capture_llm=not args.no_llm_capture,
     )
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
