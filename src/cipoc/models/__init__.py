@@ -18,6 +18,10 @@ from .notes import (
     CancerMention,
     NoteDigest,
     NoteCorpusDescriptors,
+    NoteSelectionRejectionCode,
+    NoteSelectionUnevaluatedCode,
+    NoteFilterEvaluation,
+    NoteSelectionProvenance,
 )
 
 from .variables import (
@@ -88,6 +92,10 @@ __all__ = [
     "ManualSource",
     "RuleStoreManifest",
     "VariableStatus",
+    "NoteSelectionRejectionCode",
+    "NoteSelectionUnevaluatedCode",
+    "NoteFilterEvaluation",
+    "NoteSelectionProvenance",
     "CaseVariableResult",
     "ReviewFlagType",
     "ReviewFlag",

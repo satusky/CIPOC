@@ -13,7 +13,7 @@ from langgraph.graph.message import add_messages
 from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
-from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_variable_groups, prefilter_notes, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key
+from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key
 from cipoc.utils import CipocConfig, run_with_progress
 from cipoc.models import (
     Case,
@@ -24,6 +24,8 @@ from cipoc.models import (
     ConfidenceLevel,
     NoteDigest,
     NoteCorpusDescriptors,
+    NoteSelectionProvenance,
+    NoteSelectionUnevaluatedCode,
     TargetGroup,
     VariableGroupOutput,
     VariableInfo,
@@ -66,6 +68,10 @@ class CaseState(BaseModel):
         default_factory=dict,
         description="Per-variable orchestration results keyed by item ID; written concurrently by extraction branches.",
     )
+    note_selection: Annotated[dict[str, NoteSelectionProvenance], dict_merge_reducer] = Field(
+        default_factory=dict,
+        description="Per-group note-selection provenance merged from extraction branches.",
+    )
     fatal_blocker: str | None = Field(
         default=None,
         description="Reason no further extraction can be attempted for this case.",
@@ -104,6 +110,7 @@ class CaseState(BaseModel):
         return Case(
             case_facts=self.case_facts,
             variable_results=dict(self.variable_results),
+            note_selection=dict(self.note_selection),
             fatal_blocker=self.fatal_blocker,
             report=self.report,
         )
@@ -121,13 +128,15 @@ class ExtractorBranchInput(BaseModel):
 class ExtractBranchState(ExtractorBranchInput):
     """Per-group state for the extract subgraph (retrieve_notes -> extract).
 
-    ``variable_results`` shares the parent ``CaseState`` key and reducer, so each
-    branch's results merge back into the case as the fan-out joins. The note
-    inputs deliberately do not share parent channel names, so nothing but
-    ``variable_results`` is written back.
+    ``variable_results`` and ``note_selection`` share parent ``CaseState`` keys
+    and reducers, so each branch's outputs merge back into the case as the fan-out
+    joins. The note inputs deliberately do not share parent channel names.
     """
     retrieved_note_ids: list[int | str] = Field(default_factory=list)
     variable_results: Annotated[dict[int, CaseVariableResult], dict_merge_reducer] = Field(
+        default_factory=dict,
+    )
+    note_selection: Annotated[dict[str, NoteSelectionProvenance], dict_merge_reducer] = Field(
         default_factory=dict,
     )
 
@@ -151,6 +160,7 @@ class OrchestratorOutput(BaseModel):
     case_facts: CaseFacts | None = None
     target_variables: list[TargetGroup] = Field(default_factory=list)
     variable_results: dict[int, CaseVariableResult] = Field(default_factory=dict)
+    note_selection: dict[str, NoteSelectionProvenance] = Field(default_factory=dict)
     fatal_blocker: str | None = None
     report: CaseReport | None = None
 
@@ -385,32 +395,91 @@ class OrchestratorAgent(BaseAgent):
         )
 
     # --- Extract subgraph nodes ---
+    @staticmethod
+    def _retrieve_prep(
+        state: ExtractBranchState,
+    ) -> tuple[RetrieverInput | None, NoteSelectionProvenance]:
+        """Build the retriever request and durable deterministic funnel record."""
+        group = state.requested_variables
+        if group.group_id is None:
+            raise ValueError("A group reaching note retrieval must have a group_id.")
+
+        candidate_note_ids: list[int | str] = []
+        rejected_note_ids = {}
+        unevaluated_checks: list[NoteSelectionUnevaluatedCode] = []
+
+        for note in state.branch_note_corpus.values():
+            evaluation = evaluate_note_filter(note, group.note_filter, anchor=None)
+            if evaluation.passes:
+                candidate_note_ids.append(note.note_id)
+            else:
+                rejected_note_ids[note.note_id] = evaluation.rejection_reasons
+            for check in evaluation.unevaluated_checks:
+                if check not in unevaluated_checks:
+                    unevaluated_checks.append(check)
+
+        # Unevaluated checks are properties of the configured funnel, so retain
+        # them even when the incoming corpus itself is empty.
+        if not state.branch_note_corpus and group.note_filter is not None:
+            if group.note_filter.keywords:
+                unevaluated_checks.append(
+                    NoteSelectionUnevaluatedCode.KEYWORD_FILTER_DISABLED
+                )
+            if group.note_filter.within_days is not None:
+                unevaluated_checks.append(
+                    NoteSelectionUnevaluatedCode.TEMPORAL_ANCHOR_UNAVAILABLE
+                )
+
+        selection = NoteSelectionProvenance(
+            group_id=group.group_id,
+            requested_item_ids=[variable.item_id for variable in group.variables],
+            candidate_note_ids=candidate_note_ids,
+            rejected_note_ids=rejected_note_ids,
+            unevaluated_checks=unevaluated_checks,
+        )
+        if not candidate_note_ids:
+            return None, selection
+
+        candidate_ids = set(candidate_note_ids)
+        return RetrieverInput(
+            requested_variables=group.to_variable_group(),
+            available_digests={
+                note_id: digest
+                for note_id, digest in state.branch_note_digests.items()
+                if note_id in candidate_ids
+            },
+        ), selection
+
+    @staticmethod
+    def _retrieve_result(
+        request: RetrieverInput | None,
+        selection: NoteSelectionProvenance,
+        relevant_ids: list[int | str] | None,
+    ) -> dict:
+        """Restrict model output to offered IDs and finish the durable record."""
+        offered_ids = set(request.available_digests) if request is not None else set()
+        selected_ids = [
+            note_id for note_id in (relevant_ids or []) if note_id in offered_ids
+        ]
+        completed = selection.model_copy(
+            update={"selected_note_ids": selected_ids}
+        )
+        return {
+            "retrieved_note_ids": selected_ids,
+            "note_selection": {f"group:{selection.group_id}": completed},
+        }
+
     def retrieve_notes(self, state: ExtractBranchState) -> dict:
         """Narrow the corpus for one group through the two-stage selection funnel:
         the deterministic hard filter on the group's own NoteFilter, then the
         retriever soft filter judging relevance to the group's variables."""
-        group = state.requested_variables
-        # Hard filter reuses prefilter_notes with the group's NoteFilter. anchor=None
-        # for now, so the within_days dimension is skipped until a temporal anchor
-        # is derived.
-        kept = prefilter_notes(state.branch_note_corpus.values(), group.note_filter, anchor=None)
-        kept_ids = [note.note_id for note in kept]
-        if not kept_ids:
-            return {"retrieved_note_ids": []}
+        request, selection = self._retrieve_prep(state)
+        if request is None:
+            return self._retrieve_result(request, selection, None)
         # Soft filter: the retriever ranks the surviving digests for this group's
         # variables and returns None when nothing is plausibly relevant.
-        relevant_ids = self._retriever.run(
-            RetrieverInput(
-                requested_variables=group.to_variable_group(),
-                available_digests={
-                    note_id: digest
-                    for note_id, digest in state.branch_note_digests.items()
-                    if note_id in kept_ids
-                },
-            ),
-            progress=False,
-        )
-        return {"retrieved_note_ids": relevant_ids or []}
+        relevant_ids = self._retriever.run(request, progress=False)
+        return self._retrieve_result(request, selection, relevant_ids)
 
     def extract(self, state: ExtractBranchState) -> dict:
         """Extract the group's variables from the retrieved notes and fold the

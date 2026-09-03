@@ -69,6 +69,10 @@ class BaseAgent(ABC):
         self._graph = self._build_graph()
 
     @property
+    def compiled_graph(self) -> CompiledStateGraph:
+        return self._graph
+
+    @property
     def retry_policy(self) -> RetryPolicy:
         """Retry policy for this agent's LLM-backed nodes.
 
