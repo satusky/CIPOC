@@ -91,7 +91,7 @@ def main() -> None:
     notes = _load_notes(args.notes)
     structured_data = _load_structured_data(args.structured_data)
 
-    case = OrchestratorAgent().run(
+    run_result = OrchestratorAgent().run(
         [note.model_dump() for note in notes],
         structured_data=structured_data,
         progress=not args.no_progress,
@@ -103,7 +103,7 @@ def main() -> None:
         nlp_date=args.nlp_date,
     ).export(
         notes=notes,
-        case=case,
+        case=run_result.case,
         output_directory=args.output_directory,
     )
 

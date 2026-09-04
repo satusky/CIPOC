@@ -1,8 +1,14 @@
 import json
+import hashlib
+import time
 from collections import Counter
+from datetime import datetime, timezone
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
+from uuid import uuid4
 
 from operator import add
+from typing import Any, Callable, Mapping
 from typing_extensions import Annotated, Literal
 from pydantic import BaseModel, Field
 
@@ -14,7 +20,8 @@ from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
 from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key
-from cipoc.utils import CipocConfig, run_with_progress
+from cipoc.utils import CipocConfig, ObservabilityCollector, run_graph_stream
+from cipoc.utils.progress.events import ProgressEvent
 from cipoc.models import (
     Case,
     CaseFacts,
@@ -26,6 +33,14 @@ from cipoc.models import (
     NoteCorpusDescriptors,
     NoteSelectionProvenance,
     NoteSelectionUnevaluatedCode,
+    OrchestratorConfigFingerprint,
+    OrchestratorRunCorpus,
+    OrchestratorRunError,
+    OrchestratorRunFailure,
+    OrchestratorRunInfo,
+    OrchestratorRunInputs,
+    OrchestratorRunResult,
+    RunObservability,
     TargetGroup,
     VariableGroupOutput,
     VariableInfo,
@@ -38,7 +53,7 @@ from cipoc.models import (
 )
 
 from .base import BaseAgent
-from .extractor import ExtractorAgent, ExtractorInput
+from .extractor import ExtractorAgent, ExtractorInput, ExtractorState
 from .note_scanner import NoteScannerAgent, ScannerState
 from .note_retriever import NoteRetrieverAgent, RetrieverInput
 
@@ -178,6 +193,7 @@ class OrchestratorAgent(BaseAgent):
         self._retriever = NoteRetrieverAgent(config=self._config)
         self._extractor = ExtractorAgent(config=self._config)
         variable_groups_path = self._config.documents().variable_groups_path
+        self._variable_groups_path = variable_groups_path
         self._target_variables = load_variable_groups(variable_groups_path)
         self._target_group_hierarchy = load_group_hierarchy(variable_groups_path)
         # Config groups carry only item_id/name; the NAACCR dictionary supplies
@@ -461,8 +477,14 @@ class OrchestratorAgent(BaseAgent):
         selected_ids = [
             note_id for note_id in (relevant_ids or []) if note_id in offered_ids
         ]
+        discarded_ids = [
+            note_id for note_id in (relevant_ids or []) if note_id not in offered_ids
+        ]
         completed = selection.model_copy(
-            update={"selected_note_ids": selected_ids}
+            update={
+                "selected_note_ids": selected_ids,
+                "discarded_note_ids": discarded_ids,
+            }
         )
         return {
             "retrieved_note_ids": selected_ids,
@@ -519,6 +541,83 @@ class OrchestratorAgent(BaseAgent):
 
 
     # --- Public API ---
+    @staticmethod
+    def _sha256_digest(path: Path | str | None) -> str | None:
+        if path is None:
+            return None
+        digest = hashlib.sha256()
+        with open(path, "rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(chunk)
+        return f"sha256:{digest.hexdigest()}"
+
+    @staticmethod
+    def _retry_fingerprint(policy: Any) -> dict[str, Any]:
+        values = policy._asdict() if hasattr(policy, "_asdict") else vars(policy)
+        result = {}
+        for name, value in values.items():
+            if callable(value):
+                module = getattr(value, "__module__", "")
+                qualified_name = getattr(value, "__qualname__", repr(value))
+                value = f"{module}.{qualified_name}" if module else qualified_name
+            result[name] = value
+        return result
+
+    def _config_fingerprint(self) -> OrchestratorConfigFingerprint:
+        components = {
+            "orchestrator": self,
+            "note_scanner": self._scanner,
+            "note_retriever": self._retriever,
+            "extractor": self._extractor,
+        }
+        agent_llm_config = {
+            name: component._llm_config.model_dump(
+                mode="json", exclude={"api_key", "tools"}
+            )
+            for name, component in components.items()
+        }
+        retry = {
+            name: self._retry_fingerprint(component._retry_policy)
+            for name, component in components.items()
+        }
+
+        prompt_dir = Path(__file__).resolve().parents[1] / "prompts"
+        prompt_digests = {
+            prompt_path.name: self._sha256_digest(prompt_path)
+            for prompt_path in sorted(prompt_dir.glob("*.py"))
+        }
+        try:
+            cipoc_version = version("cipoc")
+        except PackageNotFoundError:
+            cipoc_version = None
+
+        return OrchestratorConfigFingerprint(
+            agent_llm_config=agent_llm_config,
+            retry=retry,
+            max_extraction_attempts=ExtractorState.model_fields[
+                "max_extraction_attempts"
+            ].default,
+            variable_groups_digest=self._sha256_digest(self._variable_groups_path),
+            data_dictionary_digest=self._sha256_digest(self._data_dictionary_path),
+            site_data_dictionary_digest=self._sha256_digest(
+                self._site_data_dictionary_path
+            ),
+            prompt_digests=prompt_digests,
+            cipoc_version=cipoc_version,
+        )
+
+    @staticmethod
+    def _corpus_from_state(
+        state: Mapping[str, Any] | None,
+    ) -> OrchestratorRunCorpus | None:
+        if state is None:
+            return None
+        return OrchestratorRunCorpus(
+            note_corpus=state.get("note_corpus", {}),
+            note_digests=state.get("note_digests", {}),
+            note_corpus_descriptors=state.get("note_corpus_descriptors"),
+        )
+
     def run(
         self,
         raw_notes: list[dict],
@@ -526,42 +625,148 @@ class OrchestratorAgent(BaseAgent):
         *,
         progress: bool = True,
         max_concurrency: int | None = None,
-    ) -> Case:
+        capture_llm_content: bool = True,
+        max_content_chars: int | None = None,
+        pause_before_summary: bool = True,
+        config: Mapping[str, Any] | None = None,
+        event_observer: Callable[[ProgressEvent], None] | None = None,
+    ) -> OrchestratorRunResult:
         """Extract the configured variable groups from ``raw_notes``.
 
         ``structured_data`` optionally supplies already-known coded values keyed
         by NAACCR item ID; those variables are seeded as structured-data results
         and skip extraction. Set ``progress`` to false to run without rendering
         the live progress display. ``max_concurrency`` controls LangGraph's
-        parallel task limit. Returns the durable ``Case`` snapshot.
+        parallel task limit. Prompt/response capture can be disabled independently
+        from model metadata and usage collection. Returns the complete versioned
+        run artifact; graph failures raise ``OrchestratorRunError`` with a partial
+        failure artifact.
         """
+        if not isinstance(raw_notes, list):
+            raise TypeError("raw_notes must be a list.")
+        if structured_data is not None and not isinstance(structured_data, Mapping):
+            raise TypeError("structured_data must be a mapping or None.")
+        if not isinstance(progress, bool):
+            raise TypeError("progress must be a boolean.")
+        if not isinstance(capture_llm_content, bool):
+            raise TypeError("capture_llm_content must be a boolean.")
+        if not isinstance(pause_before_summary, bool):
+            raise TypeError("pause_before_summary must be a boolean.")
+        if config is not None and not isinstance(config, Mapping):
+            raise TypeError("config must be a mapping or None.")
+        if event_observer is not None and not callable(event_observer):
+            raise TypeError("event_observer must be callable or None.")
+        if max_concurrency is not None and (
+            isinstance(max_concurrency, bool)
+            or not isinstance(max_concurrency, int)
+        ):
+            raise TypeError("max_concurrency must be an integer or None.")
         if max_concurrency is not None and max_concurrency < 1:
             raise ValueError("max_concurrency must be at least 1.")
+        if max_content_chars is not None and (
+            isinstance(max_content_chars, bool)
+            or not isinstance(max_content_chars, int)
+        ):
+            raise TypeError("max_content_chars must be an integer or None.")
+        if max_content_chars is not None and max_content_chars < 0:
+            raise ValueError("max_content_chars must be non-negative.")
 
-        graph_input = {
-            "note_corpus": {note["note_id"]: ClinicalNote(**note) for note in raw_notes},
-            "structured_data": structured_data or {},
-        }
-        graph_config = (
-            {"max_concurrency": max_concurrency}
-            if max_concurrency is not None
-            else None
+        notes = [ClinicalNote.model_validate(note) for note in raw_notes]
+        validated_input = OrchestratorInput(
+            note_corpus={note.note_id: note for note in notes},
+            structured_data={} if structured_data is None else structured_data,
         )
-        if progress:
-            final_state = run_with_progress(
+        graph_input = {
+            "note_corpus": validated_input.note_corpus,
+            "structured_data": validated_input.structured_data,
+        }
+        run_inputs = OrchestratorRunInputs(
+            target_variables=self._target_variables,
+            structured_data=validated_input.structured_data,
+        )
+        graph_config = dict(config or {})
+        configured_concurrency = graph_config.get("max_concurrency")
+        if max_concurrency is not None:
+            graph_config["max_concurrency"] = max_concurrency
+        elif configured_concurrency is not None and (
+            isinstance(configured_concurrency, bool)
+            or not isinstance(configured_concurrency, int)
+            or configured_concurrency < 1
+        ):
+            raise ValueError("config max_concurrency must be a positive integer.")
+
+        run_id = uuid4()
+        started_at = datetime.now(timezone.utc)
+        started_monotonic = time.monotonic()
+        fingerprint = self._config_fingerprint()
+        collector = ObservabilityCollector(
+            capture_llm_content=capture_llm_content,
+            max_content_chars=max_content_chars,
+        )
+        observed_config = collector.graph_config(graph_config)
+        last_root_state: Mapping[str, Any] | None = None
+
+        def observe(event: ProgressEvent) -> None:
+            nonlocal last_root_state
+            collector.observe(event)
+            if event.kind == "values" and event.is_root:
+                last_root_state = event.payload
+            if event_observer is not None:
+                event_observer(event)
+
+        try:
+            final_state = run_graph_stream(
                 self._graph,
                 graph_input,
-                config=graph_config,
+                config=observed_config,
                 subgraphs=True,
+                progress=progress,
                 description="Orchestrator",
                 target_groups=self._target_variables,
                 group_hierarchy=self._target_group_hierarchy,
-                pause_before_summary=True,
+                pause_before_summary=pause_before_summary,
+                event_observer=observe,
             )
-        else:
-            final_state = self._graph.invoke(graph_input, config=graph_config)
-
-        return CaseState(**final_state).to_case()
+            finished_at = datetime.now(timezone.utc)
+            full_state = CaseState.model_validate(final_state)
+            corpus = self._corpus_from_state(final_state)
+            if corpus is None:
+                raise RuntimeError("Completed graph produced no corpus state.")
+            return OrchestratorRunResult(
+                run=OrchestratorRunInfo(
+                    run_id=run_id,
+                    started_at=started_at,
+                    finished_at=finished_at,
+                    duration_seconds=time.monotonic() - started_monotonic,
+                    status="completed",
+                    config_fingerprint=fingerprint,
+                ),
+                case=full_state.to_case(),
+                inputs=run_inputs,
+                corpus=corpus,
+                observability=RunObservability.model_validate(collector.snapshot()),
+            )
+        except Exception as error:
+            finished_at = datetime.now(timezone.utc)
+            try:
+                partial_corpus = self._corpus_from_state(last_root_state)
+            except Exception:
+                partial_corpus = None
+            failure = OrchestratorRunFailure(
+                run=OrchestratorRunInfo(
+                    run_id=run_id,
+                    started_at=started_at,
+                    finished_at=finished_at,
+                    duration_seconds=time.monotonic() - started_monotonic,
+                    status="failed",
+                    config_fingerprint=fingerprint,
+                ),
+                inputs=run_inputs,
+                corpus=partial_corpus,
+                observability=RunObservability.model_validate(collector.snapshot()),
+                error=f"{type(error).__name__}: {error}",
+            )
+            raise OrchestratorRunError(failure) from error
 
 
 if __name__ == "__main__":
@@ -596,9 +801,9 @@ if __name__ == "__main__":
     with open(note_path, "r") as f:
         raw_notes = json.load(f)
 
-    case = agent.run(raw_notes, structured_data=structured_data)
+    run_result = agent.run(raw_notes, structured_data=structured_data)
     result_path = Path(__file__).resolve().parents[3] / "tests" / "test_outputs" / "orchestrator_test.json"
     result_path.parent.mkdir(parents=True, exist_ok=True)
     with open(result_path, "w") as f:
-        json.dump(case.model_dump(), f, indent=2, default=str)
-    # print(json.dumps(case.model_dump(), indent=2, default=str))
+        json.dump(run_result.model_dump(mode="json"), f, indent=2)
+    # print(run_result.model_dump_json(indent=2))

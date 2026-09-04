@@ -56,12 +56,11 @@ class NoteRetrieverAgent(BaseAgent):
             RelevantNoteIDs, state.messages + [HumanMessage(SELECT_NOTES_PROMPT), HumanMessage("Note digests:\n" + digest_string)]
         )
 
-        input_note_ids = set(state.available_digests)
-        valid_ids = [note_id for note_id in response.note_ids if note_id in input_note_ids]
-
-        if not valid_ids:
+        if not response.note_ids:
             return {"relevant_note_ids": None}
-        return {"relevant_note_ids": valid_ids}
+        # The orchestrator validates these against the offered IDs and records
+        # any hallucinated IDs in durable note-selection provenance.
+        return {"relevant_note_ids": response.note_ids}
 
 
     # --- Graph wiring (compiled once per instance) ---

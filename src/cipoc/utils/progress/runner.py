@@ -312,6 +312,153 @@ def _finalize_renderer(
     return interrupted or close_interrupt
 
 
+def _teardown_progress(
+    painter: _RepaintLoop,
+    renderer: Renderer,
+    model: ProgressModel,
+    *,
+    pause_before_summary: bool,
+    run_error: BaseException | None,
+) -> None:
+    """Preserve the progress runner's interrupt-aware terminal teardown."""
+    cleanup_interrupt: BaseException | None = None
+    pause_interrupt: BaseException | None = None
+    hold_final_frame = (
+        pause_before_summary
+        and run_error is None
+        and isinstance(renderer, AnsiAltScreen)
+    )
+    try:
+        cleanup_interrupt = painter.stop(hold_final_frame=hold_final_frame)
+    except (KeyboardInterrupt, SystemExit) as error:
+        cleanup_interrupt = error
+    except Exception:
+        pass
+    if not painter.started:
+        cleanup_interrupt = cleanup_interrupt or _finalize_renderer(
+            renderer,
+            model.snapshot(),
+            painter.tick,
+        )
+    elif hold_final_frame and painter.waiting_for_report:
+        try:
+            if cleanup_interrupt is None:
+                input()
+        except EOFError:
+            pass
+        except (KeyboardInterrupt, SystemExit) as error:
+            pause_interrupt = error
+        finally:
+            try:
+                cleanup_interrupt = cleanup_interrupt or painter.release_final_frame(
+                    write_summary=pause_interrupt is None
+                )
+            except (KeyboardInterrupt, SystemExit) as error:
+                cleanup_interrupt = cleanup_interrupt or error
+            except Exception:
+                pass
+    elif not painter.is_alive:
+        cleanup_interrupt = cleanup_interrupt or painter.cleanup_interrupt
+    if run_error is None:
+        if pause_interrupt is not None:
+            raise pause_interrupt
+        if cleanup_interrupt is not None:
+            raise cleanup_interrupt
+
+
+def run_graph_stream(
+    graph: CompiledStateGraph,
+    graph_input: Any,
+    *,
+    config: Mapping[str, Any] | None = None,
+    subgraphs: bool = False,
+    progress: bool = False,
+    description: str = "Agent",
+    node_kinds: Mapping[str, TaskKind] | None = None,
+    show_branches: bool = False,
+    target_groups: Any = None,
+    group_hierarchy: Iterable[GroupNode] | None = None,
+    show_note_counts: bool = False,
+    pause_before_summary: bool = False,
+    event_observer: Callable[[ProgressEvent], None] | None = None,
+) -> Any:
+    """Stream ``graph`` once and return its last root full-state value.
+
+    Event normalization and final-state selection are shared by headless and
+    displayed runs. When ``progress`` is true, the existing renderer lifecycle
+    wraps that same loop. The optional observer always sees each normalized
+    event before presentation consumes it.
+    """
+    model: ProgressModel | None = None
+    renderer: Renderer | None = None
+    painter: _RepaintLoop | None = None
+    if progress:
+        started_at = time.monotonic()
+        model = ProgressModel(
+            description,
+            started_at,
+            target_groups=target_groups,
+            group_hierarchy=group_hierarchy,
+            graph_input=graph_input,
+            node_kinds=node_kinds,
+            show_note_counts=show_note_counts,
+            include_input_group=show_branches,
+        )
+        renderer = _select_renderer(sys.stdout)
+        painter = _RepaintLoop(renderer, model.snapshot())
+    final_result: Any = None
+    run_error: BaseException | None = None
+
+    try:
+        if painter is not None:
+            try:
+                painter.start()
+            except Exception as error:
+                # Progress is optional. A thread creation failure must not prevent
+                # the graph itself from running; the caller will render teardown.
+                painter.error = error
+        stream_kwargs = {
+            "stream_mode": ["values", "tasks"],
+            "subgraphs": subgraphs,
+        }
+        if config is not None:
+            stream_kwargs["config"] = config
+        for raw_item in graph.stream(graph_input, **stream_kwargs):
+            event = normalize(raw_item, subgraphs=subgraphs)
+            if event is None:
+                continue
+            if event_observer is not None:
+                event_observer(event)
+            if model is not None:
+                model.ingest(event, time.monotonic())
+            if event.kind == "values" and event.is_root:
+                final_result = event.payload
+            if painter is not None and model is not None:
+                painter.publish(model.snapshot())
+
+        if final_result is None:
+            raise RuntimeError("Graph produced no final state.")
+        if painter is not None and model is not None:
+            model.finish()
+            painter.publish(model.snapshot())
+        return final_result
+    except BaseException as error:
+        run_error = error
+        if painter is not None and model is not None:
+            model.fail(error)
+            painter.publish(model.snapshot())
+        raise
+    finally:
+        if painter is not None and renderer is not None and model is not None:
+            _teardown_progress(
+                painter,
+                renderer,
+                model,
+                pause_before_summary=pause_before_summary,
+                run_error=run_error,
+            )
+
+
 def run_with_progress(
     graph: CompiledStateGraph,
     graph_input: Any,
@@ -327,108 +474,22 @@ def run_with_progress(
     pause_before_summary: bool = False,
     event_observer: Callable[[ProgressEvent], None] | None = None,
 ) -> Any:
-    """Run ``graph`` with live progress and return its last root state.
-
-    ``show_branches`` preserves the existing public API and identifies a
-    standalone extractor run; its requested variables are discovered from
-    ``graph_input`` by :class:`ProgressModel`. ``group_hierarchy`` optionally
-    restores nesting lost by the orchestrator's flattened planning groups. The
-    optional observer sees every normalized event immediately before the model.
-    """
-    started_at = time.monotonic()
-    model = ProgressModel(
-        description,
-        started_at,
+    """Run ``graph`` with live progress and return its last root state."""
+    return run_graph_stream(
+        graph,
+        graph_input,
+        config=config,
+        subgraphs=subgraphs,
+        progress=True,
+        description=description,
+        node_kinds=node_kinds,
+        show_branches=show_branches,
         target_groups=target_groups,
         group_hierarchy=group_hierarchy,
-        graph_input=graph_input,
-        node_kinds=node_kinds,
         show_note_counts=show_note_counts,
-        include_input_group=show_branches,
+        pause_before_summary=pause_before_summary,
+        event_observer=event_observer,
     )
-    renderer = _select_renderer(sys.stdout)
-    painter = _RepaintLoop(renderer, model.snapshot())
-    final_result: Any = None
-    run_error: BaseException | None = None
-
-    try:
-        try:
-            painter.start()
-        except Exception as error:
-            # Progress is optional. A thread creation failure must not prevent
-            # the graph itself from running; the caller will render teardown.
-            painter.error = error
-        stream_kwargs = {
-            "stream_mode": ["values", "tasks"],
-            "subgraphs": subgraphs,
-        }
-        if config is not None:
-            stream_kwargs["config"] = config
-        for raw_item in graph.stream(graph_input, **stream_kwargs):
-            event = normalize(raw_item, subgraphs=subgraphs)
-            if event is None:
-                continue
-            if event_observer is not None:
-                event_observer(event)
-            model.ingest(event, time.monotonic())
-            if event.kind == "values" and event.is_root:
-                final_result = event.payload
-            painter.publish(model.snapshot())
-
-        if final_result is None:
-            raise RuntimeError("Graph produced no final state.")
-        model.finish()
-        painter.publish(model.snapshot())
-        return final_result
-    except BaseException as error:
-        run_error = error
-        model.fail(error)
-        painter.publish(model.snapshot())
-        raise
-    finally:
-        cleanup_interrupt: BaseException | None = None
-        pause_interrupt: BaseException | None = None
-        hold_final_frame = (
-            pause_before_summary
-            and run_error is None
-            and isinstance(renderer, AnsiAltScreen)
-        )
-        try:
-            cleanup_interrupt = painter.stop(hold_final_frame=hold_final_frame)
-        except (KeyboardInterrupt, SystemExit) as error:
-            cleanup_interrupt = error
-        except Exception:
-            pass
-        if not painter.started:
-            cleanup_interrupt = cleanup_interrupt or _finalize_renderer(
-                renderer,
-                model.snapshot(),
-                painter.tick,
-            )
-        elif hold_final_frame and painter.waiting_for_report:
-            try:
-                if cleanup_interrupt is None:
-                    input()
-            except EOFError:
-                pass
-            except (KeyboardInterrupt, SystemExit) as error:
-                pause_interrupt = error
-            finally:
-                try:
-                    cleanup_interrupt = cleanup_interrupt or painter.release_final_frame(
-                        write_summary=pause_interrupt is None
-                    )
-                except (KeyboardInterrupt, SystemExit) as error:
-                    cleanup_interrupt = cleanup_interrupt or error
-                except Exception:
-                    pass
-        elif not painter.is_alive:
-            cleanup_interrupt = cleanup_interrupt or painter.cleanup_interrupt
-        if run_error is None:
-            if pause_interrupt is not None:
-                raise pause_interrupt
-            if cleanup_interrupt is not None:
-                raise cleanup_interrupt
 
 
-__all__ = ["run_with_progress"]
+__all__ = ["run_graph_stream", "run_with_progress"]

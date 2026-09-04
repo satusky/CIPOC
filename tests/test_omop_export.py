@@ -3,7 +3,10 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
+from scripts import export_omop
 from cipoc.export import OmopExporter
 from cipoc.models import (
     Case,
@@ -241,6 +244,51 @@ class OmopExporterTests(unittest.TestCase):
 
         self.assertEqual(result.note_nlp_count, 1)
         self.assertEqual(nlp_rows[0]["offset"], "")
+
+
+class OmopExportScriptTests(unittest.TestCase):
+    def test_main_passes_run_result_case_to_exporter(self):
+        case = Case()
+        run_result = SimpleNamespace(case=case)
+        exported = SimpleNamespace(
+            note_count=1,
+            note_path=Path("note.csv"),
+            note_nlp_count=0,
+            note_nlp_path=Path("note_nlp.csv"),
+            error_count=0,
+            error_path=Path("omop_errors.json"),
+        )
+        args = SimpleNamespace(
+            notes=Path("notes.json"),
+            person_id="person-1",
+            output_directory=Path("output"),
+            nlp_date=None,
+            nlp_system="CIPOC",
+            structured_data=None,
+            max_concurrency=None,
+            no_progress=True,
+        )
+        note = ClinicalNote(
+            note_id=1,
+            date="2025-02-24",
+            note_type="Pathology Report",
+            content="No reportable finding.",
+        )
+        parser = SimpleNamespace(parse_args=lambda: args)
+        agent = SimpleNamespace(run=lambda *args, **kwargs: run_result)
+        exporter = SimpleNamespace(export=lambda **kwargs: exported)
+
+        with (
+            patch.object(export_omop, "build_parser", return_value=parser),
+            patch.object(export_omop, "_load_notes", return_value=[note]),
+            patch.object(export_omop, "_load_structured_data", return_value=None),
+            patch.object(export_omop, "OrchestratorAgent", return_value=agent),
+            patch.object(export_omop, "OmopExporter", return_value=exporter),
+            patch.object(exporter, "export", wraps=exporter.export) as export,
+        ):
+            export_omop.main()
+
+        self.assertIs(export.call_args.kwargs["case"], case)
 
 
 if __name__ == "__main__":

@@ -10,6 +10,7 @@ from cipoc.agents.orchestrator import (
     OrchestratorOutput,
     dict_merge_reducer,
 )
+from cipoc.agents.note_retriever import NoteRetrieverAgent, RelevantNoteIDs, RetrieverState
 from cipoc.models import (
     Case,
     NoteDigest,
@@ -34,6 +35,11 @@ class FakeRetriever:
         return self.result
 
 
+class FakeStructuredRetrieverModel:
+    def structured(self, schema, messages):
+        return RelevantNoteIDs(note_ids=["path-1", "invented"])
+
+
 class NoteSelectionProvenanceTests(unittest.TestCase):
     def setUp(self):
         self.selection = NoteSelectionProvenance(
@@ -51,6 +57,7 @@ class NoteSelectionProvenanceTests(unittest.TestCase):
                 ],
             },
             selected_note_ids=["path-1"],
+            discarded_note_ids=["invented-A"],
             unevaluated_checks=[
                 NoteSelectionUnevaluatedCode.KEYWORD_FILTER_DISABLED,
                 NoteSelectionUnevaluatedCode.TEMPORAL_ANCHOR_UNAVAILABLE,
@@ -72,6 +79,7 @@ class NoteSelectionProvenanceTests(unittest.TestCase):
             serialized["unevaluated_checks"],
             ["keyword_filter_disabled", "temporal_anchor_unavailable"],
         )
+        self.assertEqual(serialized["discarded_note_ids"], ["invented-A"])
 
     def test_case_rejects_selection_key_that_does_not_match_group(self):
         with self.assertRaises(ValidationError):
@@ -185,11 +193,31 @@ class RetrievalFunnelTests(unittest.TestCase):
         )
         self.assertEqual(selection.selected_note_ids, ["path-1"])
         self.assertEqual(
+            selection.discarded_note_ids,
+            ["path-2", "old-rad", "invented"],
+        )
+        self.assertEqual(
             list(agent._retriever.requests[0].available_digests), ["path-1"]
         )
         serialized = Case(note_selection=update["note_selection"]).model_dump(mode="json")
-        self.assertNotIn("invented", str(serialized))
+        self.assertEqual(
+            serialized["note_selection"]["group:diagnosis"]["discarded_note_ids"],
+            ["path-2", "old-rad", "invented"],
+        )
         self.assertNotIn("old-rad", serialized["note_selection"]["group:diagnosis"]["selected_note_ids"])
+
+    def test_retriever_preserves_unoffered_ids_for_orchestrator_validation(self):
+        retriever = object.__new__(NoteRetrieverAgent)
+        retriever.agent = FakeStructuredRetrieverModel()
+        state = RetrieverState(
+            requested_variables=self.group.to_variable_group(),
+            available_digests={"path-1": self.digest(self.pathology)},
+            messages=[],
+        )
+
+        update = retriever.identify_relevant_notes(state)
+
+        self.assertEqual(update["relevant_note_ids"], ["path-1", "invented"])
 
     def test_empty_candidates_record_the_funnel_without_calling_retriever(self):
         agent = self.agent(["invented"])
@@ -200,6 +228,7 @@ class RetrievalFunnelTests(unittest.TestCase):
         self.assertEqual(update["retrieved_note_ids"], [])
         self.assertEqual(selection.candidate_note_ids, [])
         self.assertEqual(selection.selected_note_ids, [])
+        self.assertEqual(selection.discarded_note_ids, [])
         self.assertEqual(list(selection.rejected_note_ids), ["old-rad"])
         self.assertEqual(agent._retriever.requests, [])
 
@@ -212,6 +241,7 @@ class RetrievalFunnelTests(unittest.TestCase):
         self.assertEqual(update["retrieved_note_ids"], [])
         self.assertEqual(selection.candidate_note_ids, ["path-1"])
         self.assertEqual(selection.selected_note_ids, [])
+        self.assertEqual(selection.discarded_note_ids, [])
         self.assertEqual(len(agent._retriever.requests), 1)
 
     def test_empty_corpus_retains_configured_unevaluated_checks(self):

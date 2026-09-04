@@ -57,6 +57,29 @@ from .case import (
     Case,
 )
 
+from .observability import (
+    AttemptMode,
+    LLMAgent,
+    TokenDetails,
+    NormalizedTokenUsage,
+    LLMUsageBucket,
+    LLMUsageSummary,
+    LLMPromptMessage,
+    LLMExchange,
+    VariableAttempt,
+    RunObservability,
+)
+
+from .run import (
+    OrchestratorConfigFingerprint,
+    OrchestratorRunCorpus,
+    OrchestratorRunError,
+    OrchestratorRunFailure,
+    OrchestratorRunInfo,
+    OrchestratorRunInputs,
+    OrchestratorRunResult,
+)
+
 
 __all__ = [
     "ConfidenceLevel",
@@ -101,4 +124,21 @@ __all__ = [
     "ReviewFlag",
     "CaseReport",
     "Case",
+    "AttemptMode",
+    "LLMAgent",
+    "TokenDetails",
+    "NormalizedTokenUsage",
+    "LLMUsageBucket",
+    "LLMUsageSummary",
+    "LLMPromptMessage",
+    "LLMExchange",
+    "VariableAttempt",
+    "RunObservability",
+    "OrchestratorConfigFingerprint",
+    "OrchestratorRunCorpus",
+    "OrchestratorRunError",
+    "OrchestratorRunFailure",
+    "OrchestratorRunInfo",
+    "OrchestratorRunInputs",
+    "OrchestratorRunResult",
 ]

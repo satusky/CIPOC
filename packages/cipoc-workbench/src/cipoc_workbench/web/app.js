@@ -1,7 +1,7 @@
 "use strict";
 /* CIPOC workbench — shell, data indexing, routing and shared helpers.
  *
- * Input is one JSON file: the orchestrator's final output state. Nothing here
+ * Input is one JSON file: a canonical OrchestratorRunResult. Nothing here
  * re-implements orchestration logic; every status, reason and value is read
  * from the state as recorded. The one thing the UI derives is *presentation*
  * grouping (waves, per-group roll-ups), which is layout, not a decision.
@@ -52,7 +52,12 @@ const DEFAULT_LENS = "confidence";
 /* --------------------------------------------------------------- run state */
 
 const App = {
-  raw: null,
+  schemaVersion: null,
+  run: {},
+  case: {},
+  inputs: {},
+  corpus: {},
+  observability: {},
   view: "variables",
   mode: "control",
   grouped: true,
@@ -72,6 +77,8 @@ const App = {
   feedbackWritable: false,   // false under a plain static server
 
   notes: new Map(),         // note_id (string) -> ProcessedClinicalNote
+  noteDigests: new Map(),
+  descriptors: {},
   groups: [],               // TargetGroup[], in configured order
   groupById: new Map(),
   results: new Map(),       // item_id (number) -> CaseVariableResult
@@ -225,16 +232,41 @@ function passesLens(entry) {
 
 /* ------------------------------------------------------------------ index */
 
+function normalizeRunResult(result) {
+  if (!result || typeof result !== "object" || Array.isArray(result)) {
+    throw new Error("Expected an OrchestratorRunResult JSON object.");
+  }
+  if (result.schema_version !== "1.0") {
+    const version = result.schema_version == null ? "missing" : String(result.schema_version);
+    throw new Error("Unsupported schema_version " + version + "; expected 1.0.");
+  }
+
+  for (const domain of ["run", "case", "inputs", "corpus", "observability"]) {
+    if (!result[domain] || typeof result[domain] !== "object" || Array.isArray(result[domain])) {
+      throw new Error("OrchestratorRunResult is missing the " + domain + " object.");
+    }
+  }
+  return result;
+}
+
 function indexState(raw) {
-  App.raw = raw;
+  const result = normalizeRunResult(raw);
+  App.schemaVersion = result.schema_version;
+  App.run = result.run;
+  App.case = result.case;
+  App.inputs = result.inputs;
+  App.corpus = result.corpus;
+  App.observability = result.observability;
 
-  App.notes = new Map(Object.entries(raw.note_corpus || {}));
+  App.notes = new Map(Object.entries(App.corpus.note_corpus || {}));
+  App.noteDigests = new Map(Object.entries(App.corpus.note_digests || {}));
+  App.descriptors = App.corpus.note_corpus_descriptors || {};
 
-  App.groups = raw.target_variables || [];
+  App.groups = App.inputs.target_variables || [];
   App.groupById = new Map(App.groups.map((g) => [g.group_id, g]));
 
   App.results = new Map(
-    Object.entries(raw.variable_results || {}).map(([k, v]) => [Number(k), v])
+    Object.entries(App.case.variable_results || {}).map(([k, v]) => [Number(k), v])
   );
 
   App.variables = [];
@@ -252,13 +284,12 @@ function indexState(raw) {
     }
   }
 
-  App.exchanges = raw.llm_exchanges || {};
-  App.noteSelections = raw.note_selection || {};
-  App.attempts = raw.variable_attempts || {};
+  App.exchanges = App.observability.llm_exchanges || {};
+  App.noteSelections = App.case.note_selection || {};
+  App.attempts = App.observability.variable_attempts || {};
 }
 
-/* Lookups over the recorded side-channels. All tolerate absence: a state dump
- * that predates prompt capture renders every view, minus those panels. */
+/* Lookups over the recorded observability channels. */
 const exchangesFor = (key) => App.exchanges[key] || [];
 const noteExchanges = (noteId) => exchangesFor("note:" + noteId);
 const groupExchanges = (groupId) => exchangesFor("group:" + groupId);
@@ -267,7 +298,28 @@ const variableExchanges = (itemId) => exchangesFor(variableKey(itemId));
 const variableAttempts = (itemId) => App.attempts[variableKey(itemId)] || [];
 const noteSelection = (groupId) => App.noteSelections["group:" + groupId] || null;
 
-const hasCapture = () => Object.keys(App.exchanges).length > 0;
+const hasCapture = () => App.observability.llm_content_captured === true;
+
+const NOTE_SELECTION_REJECTION_MESSAGES = {
+  note_type_mismatch: "Note type did not match the configured note filter.",
+  cancer_status_mismatch: "Cancer status did not match the configured note filter.",
+  missing_or_invalid_date: "Note date was missing or invalid.",
+  outside_date_window: "Note date was outside the configured date window.",
+};
+
+const NOTE_SELECTION_UNEVALUATED_MESSAGES = {
+  keyword_filter_disabled: "Keyword filtering was configured but was not evaluated.",
+  temporal_anchor_unavailable: "The date-window check was not evaluated because no temporal anchor was available.",
+};
+
+function presentationMessage(messages, code) {
+  return messages[code] || String(code).replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase()) + ".";
+}
+
+function rejectionMessage(codes) {
+  return (codes || []).map((code) =>
+    presentationMessage(NOTE_SELECTION_REJECTION_MESSAGES, code)).join(" ");
+}
 
 /* Which groups considered, rejected or selected a note. */
 function groupsTouchingNote(noteId) {
@@ -280,9 +332,13 @@ function groupsTouchingNote(noteId) {
     let role = null;
     let reason = null;
     if (hit(sel.selected_note_ids)) role = "selected";
-    else if (Object.prototype.hasOwnProperty.call(sel.filtered_out || {}, id)) {
+    else if (hit(sel.discarded_note_ids)) {
+      role = "discarded proposal";
+      reason = "The retriever proposed this ID even though it was not offered.";
+    }
+    else if (Object.prototype.hasOwnProperty.call(sel.rejected_note_ids || {}, id)) {
       role = "filtered out";
-      reason = sel.filtered_out[id];
+      reason = rejectionMessage(sel.rejected_note_ids[id]);
     } else if (hit(sel.candidate_note_ids)) {
       role = "not selected";
       reason = "Survived the note filter but the retriever did not judge it relevant.";
@@ -539,7 +595,7 @@ function render() {
 /* --------------------------------------------------------------- chrome */
 
 function renderChrome() {
-  const flags = ((App.raw.report || {}).flags || []).length;
+  const flags = ((App.case.report || {}).flags || []).length;
   const acc = hasTruth() ? caseAccuracy() : null;
 
   /* The accuracy lens exists only when there is something to compare against;
@@ -555,6 +611,14 @@ function renderChrome() {
     h("span", { class: flags ? "chip warn" : "chip" },
       flags ? flags + " review flag" + (flags === 1 ? "" : "s") : "no review flags")
   );
+  if (App.run.run_id) {
+    const duration = Number.isFinite(App.run.duration_seconds)
+      ? " · " + App.run.duration_seconds.toFixed(1) + "s" : "";
+    $("#case-summary").append(h("span", {
+      title: [App.run.started_at, App.run.finished_at].filter(Boolean).join(" to "),
+      text: "run " + String(App.run.run_id).slice(0, 8) + duration,
+    }));
+  }
   /* Appended separately rather than as a conditional argument above:
      Element.append() renders a null argument as the literal text "null",
      unlike h(), which skips falsy children. */
@@ -570,7 +634,7 @@ function renderChrome() {
     }), accuracyTooltip));
   }
 
-  const facts = App.raw.case_facts || {};
+  const facts = App.case.case_facts || {};
   const order = ["primary_site", "gross_primary_site", "histology", "behavior", "sex", "date_of_diagnosis"];
   const rail = clear($("#facts"));
   rail.append(h("span", { class: "faint", style: "font-size:11px;text-transform:uppercase;letter-spacing:.08em" },
@@ -582,13 +646,13 @@ function renderChrome() {
       h("span", { class: "v", text: value == null || value === "" ? "unknown" : String(value) })
     ));
   }
-  if (App.raw.fatal_blocker) {
-    rail.append(h("span", { class: "chip bad", text: "fatal: " + App.raw.fatal_blocker }));
+  if (App.case.fatal_blocker) {
+    rail.append(h("span", { class: "chip bad", text: "fatal: " + App.case.fatal_blocker }));
   }
   if (!hasCapture()) {
     rail.append(h("span", {
       class: "chip",
-      title: "This state dump carries no llm_exchanges channel, so prompt and response panels are unavailable.",
+      title: "LLM content capture was disabled, so prompt and response bodies are unavailable.",
       text: "no prompt capture",
     }));
   }
@@ -644,16 +708,14 @@ function bootError(err) {
 
 async function boot() {
   wire();
-  let raw;
   try {
     const response = await fetch(STATE_URL, { cache: "no-store" });
     if (!response.ok) throw new Error("HTTP " + response.status);
-    raw = await response.json();
+    indexState(await response.json());
   } catch (err) {
     bootError(err);
     return;
   }
-  indexState(raw);
   /* A reference file is optional and independent of the run: absence is the
      normal case and leaves every view exactly as it was. loadTruth() is in
      truth.js and never throws — it returns false when nothing is served. */

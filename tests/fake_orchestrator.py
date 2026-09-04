@@ -34,6 +34,7 @@ from cipoc.agents.extractor import (
 from cipoc.agents.note_retriever import RetrieverInput, RetrieverOutput, RetrieverState
 from cipoc.agents.note_scanner import ScannerInput, ScannerOutput, ScannerState
 from cipoc.agents.orchestrator import OrchestratorAgent
+from cipoc.llm import OpenAIConfig, llm_retry_policy
 from cipoc.models import (
     CancerMention,
     ClinicalNote,
@@ -395,13 +396,27 @@ def build_fake_orchestrator(script: Script | None = None) -> OrchestratorAgent:
     script = script or Script()
     agent = object.__new__(OrchestratorAgent)
     agent._config = CipocConfig({"documents": {"variable_groups_path": str(VARIABLE_GROUPS)}})
+    llm_config = OpenAIConfig(
+        model="fake-model",
+        api_key="fake-api-key",
+        base_url="https://example.invalid",
+        reasoning=None,
+    )
+    retry_policy = llm_retry_policy(max_attempts=2, jitter=False)
+    agent._llm_config = llm_config
+    agent._retry_policy = retry_policy
     agent._value_validator = None
     agent._scanner = FakeNoteScanner(script)
     agent._retriever = FakeNoteRetriever(script)
     agent._extractor = FakeExtractor(script)
+    for subagent in (agent._scanner, agent._retriever, agent._extractor):
+        subagent._llm_config = llm_config
+        subagent._retry_policy = retry_policy
     agent._target_variables = load_variable_groups(VARIABLE_GROUPS)
     agent._target_group_hierarchy = load_group_hierarchy(VARIABLE_GROUPS)
+    agent._variable_groups_path = VARIABLE_GROUPS
     agent._data_dictionary_path = None
+    agent._site_data_dictionary_path = None
     agent._rule_store = None
     agent._scope_group = lambda group, case_facts: group  # type: ignore[method-assign]
     agent._graph = agent._build_graph()

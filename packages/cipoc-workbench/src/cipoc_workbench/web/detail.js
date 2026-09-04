@@ -114,29 +114,37 @@ function exchangeCard(exchange, index) {
     meta.push(usage.input_tokens + " in / " + usage.output_tokens + " out");
   }
 
+  const promptMessages = exchange.prompt_messages;
   const messages = h("div", {});
-  for (const message of exchange.prompt_messages || []) {
+  for (const message of promptMessages || []) {
     messages.append(h("div", { class: "msg " + (message.role || "human") },
       h("span", { class: "role", text: message.role || "message" }),
-      h("pre", { text: message.content || "" })));
+      h("pre", { text: message.content || "" }),
+      message.truncated
+        ? h("span", { class: "chip warn", text: "truncated from " + message.original_char_count + " characters" })
+        : null));
   }
 
   return h("div", { class: "card" + (exchange.error ? " bad" : "") },
     head,
     meta.length ? h("p", { class: "faint", style: "margin:0 0 6px;font-size:11.5px", text: meta.join(" · ") }) : null,
-    h("details", { open: index === 0 ? true : null },
-      h("summary", { text: "Prompt (" + (exchange.prompt_messages || []).length + " messages)" }),
-      messages),
+    promptMessages == null
+      ? h("p", { class: "faint", text: "Prompt and response bodies were not captured." })
+      : h("details", { open: index === 0 ? true : null },
+          h("summary", { text: "Prompt (" + promptMessages.length + " messages)" }),
+          messages),
     exchange.error
       ? h("p", { class: "errors", text: exchange.error })
-      : rawBlock("Response", exchange.response));
+      : exchange.response == null
+        ? null
+        : rawBlock("Response", exchange.response));
 }
 
 function exchangeSection(title, exchanges) {
   if (!exchanges.length) {
     if (!hasCapture()) {
       return section(title,
-        h("p", { class: "faint", text: "This state dump carries no prompt capture." }));
+        h("p", { class: "faint", text: "LLM content capture was disabled." }));
     }
     return section(title, h("p", { class: "faint", text: "No model calls recorded." }));
   }
@@ -262,8 +270,8 @@ function groupDetail(groupId) {
 
   const state = groupState(group);
   const body = h("div", {});
-  const descriptors = App.raw.note_corpus_descriptors || {};
-  const facts = App.raw.case_facts || {};
+  const descriptors = App.descriptors;
+  const facts = App.case.case_facts || {};
 
   body.append(section("Configuration", kv([
     ["group id", group.group_id],
@@ -360,17 +368,37 @@ function groupDetail(groupId) {
           crossLink("note", noteId, "note " + noteId + (note ? " · " + note.note_type : "")),
           h("span", { class: "chip", style: "margin-left:6px", text: chosen ? "selected" : "not selected" }))));
     }
-    for (const [noteId, reason] of Object.entries(sel.filtered_out || {})) {
+    for (const [noteId, reasons] of Object.entries(sel.rejected_note_ids || {})) {
       rows.append(h("div", { class: "check-row" },
         h("span", { class: "mark-fail", text: "✕" }),
         h("div", {},
           crossLink("note", noteId, "note " + noteId),
           h("span", { class: "chip", style: "margin-left:6px", text: "filtered out" }),
-          h("div", { class: "observed", text: reason }))));
+          h("div", { class: "observed", text: rejectionMessage(reasons) }))));
+    }
+    for (const noteId of sel.discarded_note_ids || []) {
+      const label = "note " + noteId;
+      rows.append(h("div", { class: "check-row" },
+        h("span", { class: "mark-fail", text: "!" }),
+        h("div", {},
+          App.notes.has(String(noteId)) ? crossLink("note", noteId, label) : h("span", { text: label }),
+          h("span", { class: "chip warn", style: "margin-left:6px", text: "discarded proposal" }),
+          h("div", { class: "observed", text: "The retriever proposed an ID that was not offered to it." }))));
+    }
+    for (const code of sel.unevaluated_checks || []) {
+      rows.append(h("div", { class: "check-row" },
+        h("span", { class: "mark-fail", text: "—" }),
+        h("div", {},
+          h("span", { class: "chip", text: "not evaluated" }),
+          h("div", { class: "observed", text:
+            presentationMessage(NOTE_SELECTION_UNEVALUATED_MESSAGES, code) }))));
     }
     body.append(section(
       "Note selection — " + (sel.selected_note_ids || []).length + " of " +
-      ((sel.candidate_note_ids || []).length + Object.keys(sel.filtered_out || {}).length),
+      ((sel.candidate_note_ids || []).length + Object.keys(sel.rejected_note_ids || {}).length),
+      (sel.requested_item_ids || []).length
+        ? h("p", { class: "faint", text: "Requested items: " + sel.requested_item_ids.join(", ") })
+        : null,
       rows));
   } else {
     body.append(section("Note selection",
@@ -403,7 +431,7 @@ function variableDetail(itemId) {
   const result = entry.result;
   const extraction = result.extraction;
   const body = h("div", {});
-  const flags = ((App.raw.report || {}).flags || []).filter((f) => f.item_id === id);
+  const flags = ((App.case.report || {}).flags || []).filter((f) => f.item_id === id);
 
   body.append(section("Outcome", kv([
     ["item id", id],
@@ -482,7 +510,7 @@ function variableDetail(itemId) {
       ? attempts.map(attemptCard)
       : h("p", { class: "faint", text: result.status === "structured_data"
           ? "Supplied as structured data; no extraction was attempted."
-          : "No attempt records in this state dump." })));
+          : "No attempt records in this run artifact." })));
 
   body.append(exchangeSection("Variable-level calls", variableExchanges(id)));
 
