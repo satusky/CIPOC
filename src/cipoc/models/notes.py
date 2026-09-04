@@ -74,6 +74,10 @@ class NoteSelectionProvenance(BaseModel):
         default_factory=list,
         description="Candidate note IDs accepted after retriever output validation.",
     )
+    discarded_note_ids: list[int | str] = Field(
+        default_factory=list,
+        description="Note IDs proposed by the retriever that were not offered to it.",
+    )
     unevaluated_checks: list[NoteSelectionUnevaluatedCode] = Field(
         default_factory=list,
         description="Configured deterministic checks that were not evaluated.",

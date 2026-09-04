@@ -29,7 +29,8 @@ const noteTemporality = (note) => {
 
 function sortedNotes() {
   return [...App.notes.values()].sort((a, b) =>
-    String(a.date || "").localeCompare(String(b.date || "")) || (a.note_id - b.note_id));
+    String(a.date || "").localeCompare(String(b.date || "")) ||
+    String(a.note_id).localeCompare(String(b.note_id), undefined, { numeric: false }));
 }
 
 function noteRow(note) {

@@ -1,6 +1,9 @@
-import unittest
+import ast
+import inspect
 import threading
-from types import SimpleNamespace
+import textwrap
+import unittest
+from typing import TypedDict
 from unittest.mock import patch
 from uuid import uuid4
 
@@ -11,12 +14,16 @@ from langchain_core.outputs import ChatGeneration, ChatResult, LLMResult
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import RetryPolicy
 
-from scripts import run_case_state as exporter
-from cipoc.models import ProcessedClinicalNote
+from cipoc.agents.extractor import ExtractorAgent
+from cipoc.agents.note_retriever import NoteRetrieverAgent
+from cipoc.agents.note_scanner import NoteScannerAgent
+from cipoc.models import LLMUsageSummary, RunObservability
 from cipoc.utils.observability import (
     LLMCaptureHandler,
     ObservabilityCollector,
+    aggregate_llm_usage,
     merge_callback_config,
+    normalize_token_usage,
 )
 from cipoc.utils.progress.events import ProgressEvent, normalize
 from cipoc.utils.progress.model import ProgressModel
@@ -87,116 +94,6 @@ class _Renderer:
         pass
 
 
-class _ObservedGraph:
-    def __init__(self):
-        self.calls = []
-
-    def stream(self, graph_input, **kwargs):
-        self.calls.append(kwargs)
-        group_scope = ("extract_branch:group",)
-        retrieve_scope = (*group_scope, "retrieve_notes:retrieve")
-        extract_scope = (*group_scope, "extract:extract")
-        variable_scope = (*extract_scope, "variable_branch:variable")
-        yield (), "tasks", {
-            "id": "group",
-            "name": "extract_branch",
-            "input": {"requested_variables": {"group_id": "initial"}},
-        }
-        yield group_scope, "tasks", {
-            "id": "retrieve",
-            "name": "retrieve_notes",
-            "input": {},
-        }
-        yield retrieve_scope, "tasks", {
-            "id": "retriever",
-            "name": "identify_relevant_notes",
-            "input": {"requested_variables": {"group_id": "initial"}},
-        }
-        callbacks = kwargs.get("config", {}).get("callbacks", [])
-        callback = next(
-            (item for item in callbacks if isinstance(item, LLMCaptureHandler)), None
-        )
-        if callback is not None:
-            run_id = uuid4()
-            callback.on_chat_model_start(
-                {},
-                [[HumanMessage(content="select notes")]],
-                run_id=run_id,
-                metadata={
-                    "langgraph_node": "identify_relevant_notes",
-                    "langgraph_checkpoint_ns": "|".join(
-                        (*retrieve_scope, "identify_relevant_notes:retriever")
-                    ),
-                    "ls_model_name": "retriever-test",
-                },
-            )
-            callback.on_llm_end(
-                llm_result(AIMessage(content='{"note_ids":[1,999]}')),
-                run_id=run_id,
-            )
-        yield retrieve_scope, "tasks", {
-            "id": "retriever",
-            "name": "identify_relevant_notes",
-            "result": {"relevant_note_ids": [1]},
-            "error": None,
-        }
-        yield group_scope, "tasks", {
-            "id": "extract",
-            "name": "extract",
-            "input": {},
-        }
-        yield extract_scope, "tasks", {
-            "id": "variable",
-            "name": "variable_branch",
-            "input": {
-                "task": {
-                    "variable": {"item_id": 390},
-                    "extraction_mode": "individual",
-                    "extraction_attempts": 0,
-                }
-            },
-        }
-        yield variable_scope, "tasks", {
-            "id": "validate",
-            "name": "validate_extraction",
-            "result": {
-                "task": {
-                    "variable": {"item_id": 390},
-                    "extraction_mode": "individual",
-                    "extraction_attempts": 1,
-                    "candidate": None,
-                    "validation_errors": ["missing"],
-                    "is_valid": False,
-                }
-            },
-            "error": None,
-        }
-        yield (), "values", {
-            "answer": 1,
-            "note_selection": {
-                "group:initial": {
-                    "group_id": "initial",
-                    "requested_item_ids": [390],
-                    "candidate_note_ids": [1],
-                    "rejected_note_ids": {
-                        2: ["note_type_mismatch", "cancer_status_mismatch"]
-                    },
-                    "selected_note_ids": [1],
-                    "unevaluated_checks": ["keyword_filter_disabled"],
-                }
-            },
-        }
-        yield ("late-child:child",), "values", {"answer": "not-root"}
-
-
-class _ObservedAgent:
-    def __init__(self, graph):
-        self.compiled_graph = graph
-        self._config = SimpleNamespace(
-            documents=lambda: SimpleNamespace(variable_groups_path="unused.json")
-        )
-
-
 class ObserverTests(unittest.TestCase):
     def test_runner_observes_each_event_before_model_ingestion(self):
         order = []
@@ -231,187 +128,6 @@ class ObserverTests(unittest.TestCase):
                 ("model", "values"),
             ],
         )
-
-    def test_exporter_feeds_identical_events_with_and_without_progress(self):
-        note = {
-            "note_id": 1,
-            "date": "2026-01-01",
-            "note_type": "test",
-            "content": "",
-        }
-        results = []
-        graphs = []
-        groups = [
-            {
-                "group_id": "initial",
-                "name": "Initial",
-                "variables": [{"item_id": 390, "name": "Diagnosis Date"}],
-            }
-        ]
-        for progress in (True, False):
-            graph = _ObservedGraph()
-            graphs.append(graph)
-            with (
-                patch.object(exporter, "OrchestratorAgent", return_value=_ObservedAgent(graph)),
-                patch.object(exporter, "load_variable_groups", return_value=groups),
-                patch.object(exporter, "load_group_hierarchy", return_value=[]),
-                patch(
-                    "cipoc.utils.progress.runner._select_renderer",
-                    return_value=_Renderer(),
-                ),
-            ):
-                results.append(
-                    exporter.run_case_state(
-                        [note], progress=progress, max_concurrency=4
-                    )
-                )
-
-        self.assertEqual(results[0], results[1])
-        self.assertEqual(
-            results[0]["variable_attempts"]["group:initial/variable:390"][0]["mode"],
-            "individual",
-        )
-        self.assertEqual(results[0]["answer"], 1)
-        self.assertEqual(
-            results[0]["llm_exchanges"]["group:initial"][0]["response"],
-            {"note_ids": [1, 999]},
-        )
-        self.assertEqual(
-            results[0]["note_selection"]["group:initial"],
-            {
-                "group_id": "initial",
-                "candidate_note_ids": [1],
-                "filtered_out": {
-                    "2": (
-                        "Note type did not match the configured note filter. "
-                        "Cancer status did not match the configured note filter."
-                    )
-                },
-                "selected_note_ids": [1],
-                "retriever_offered": [1, 999],
-            },
-        )
-        for graph in graphs:
-            self.assertEqual(graph.calls[0]["stream_mode"], ["values", "tasks"])
-            self.assertTrue(graph.calls[0]["subgraphs"])
-            self.assertIn("callbacks", graph.calls[0]["config"])
-            self.assertEqual(graph.calls[0]["config"]["max_concurrency"], 4)
-
-    def test_exporter_can_disable_llm_capture_without_other_observability(self):
-        note = {
-            "note_id": 1,
-            "date": "2026-01-01",
-            "note_type": "test",
-            "content": "",
-        }
-        graph = _ObservedGraph()
-        groups = [
-            {
-                "group_id": "initial",
-                "name": "Initial",
-                "variables": [{"item_id": 390, "name": "Diagnosis Date"}],
-            }
-        ]
-        with (
-            patch.object(exporter, "OrchestratorAgent", return_value=_ObservedAgent(graph)),
-            patch.object(exporter, "load_variable_groups", return_value=groups),
-            patch.object(exporter, "load_group_hierarchy", return_value=[]),
-        ):
-            result = exporter.run_case_state(
-                [note], progress=False, capture_llm=False, max_concurrency=3
-            )
-
-        self.assertNotIn("llm_exchanges", result)
-        self.assertIn("variable_attempts", result)
-        self.assertNotIn(
-            "retriever_offered", result["note_selection"]["group:initial"]
-        )
-        self.assertEqual(graph.calls[0]["config"], {"max_concurrency": 3})
-
-    def test_exporter_parser_enables_llm_capture_unless_disabled(self):
-        parser = exporter.build_parser()
-
-        self.assertFalse(parser.parse_args([]).no_llm_capture)
-        self.assertTrue(parser.parse_args(["--no-llm-capture"]).no_llm_capture)
-
-    def test_serializer_preserves_live_models_object_keys_sets_and_scan_fields(self):
-        processed = ProcessedClinicalNote(
-            **load_notes()[0].model_dump(), summary="scanned", flags=["flag"]
-        )
-
-        serialized = exporter.to_jsonable(
-            {7: {"values": {"b", "a"}}, "note_corpus": {processed.note_id: processed}}
-        )
-
-        self.assertEqual(serialized["7"]["values"], ["a", "b"])
-        self.assertIn("summary", serialized["note_corpus"][str(processed.note_id)])
-        self.assertEqual(
-            serialized["note_corpus"][str(processed.note_id)]["summary"], "scanned"
-        )
-
-    def test_fake_orchestrator_export_matches_complete_workbench_contract(self):
-        raw_notes = [note.model_dump(mode="json") for note in load_notes()]
-        results = []
-        for progress in (True, False):
-            agent = build_fake_orchestrator(
-                Script(outcomes={390: Outcome(repairs=1)})
-            )
-            with (
-                patch.object(exporter, "OrchestratorAgent", return_value=agent),
-                patch(
-                    "cipoc.utils.progress.runner._select_renderer",
-                    return_value=_Renderer(),
-                ),
-            ):
-                results.append(
-                    exporter.run_case_state(
-                        raw_notes, progress=progress, capture_llm=True
-                    )
-                )
-
-        for channel in (
-            "case_facts",
-            "variable_results",
-            "note_selection",
-            "variable_attempts",
-            "llm_exchanges",
-        ):
-            self.assertEqual(results[0][channel], results[1][channel])
-        result = results[0]
-
-        self.assertIn("note_corpus", result)
-        self.assertIn("llm_exchanges", result)
-        self.assertIn("note_selection", result)
-        self.assertIn("variable_attempts", result)
-        # The deterministic fake executes LLM-named graph nodes without calling a
-        # model, so the channel exists but correctly contains no exchanges.
-        self.assertEqual(result["llm_exchanges"], {})
-        self.assertTrue(result["note_selection"])
-        for selection in result["note_selection"].values():
-            self.assertEqual(
-                set(selection),
-                {
-                    "group_id",
-                    "candidate_note_ids",
-                    "filtered_out",
-                    "selected_note_ids",
-                },
-            )
-            self.assertTrue(
-                all(
-                    isinstance(reason, str)
-                    for reason in selection["filtered_out"].values()
-                )
-            )
-        attempts = result["variable_attempts"][
-            "group:initial_llm_extraction/variable:390"
-        ]
-        self.assertEqual([attempt["mode"] for attempt in attempts], ["group", "repair"])
-        self.assertEqual(
-            set(attempts[0]),
-            {"attempt", "mode", "candidate", "validation_errors", "is_valid"},
-        )
-
 
 class CollectorTests(unittest.TestCase):
     def setUp(self):
@@ -742,6 +458,117 @@ class LLMCaptureTests(unittest.TestCase):
         )
         self.assertIsNone(exchange["error"])
         self.assertNotIn("retry_ordinal", exchange)
+        self.assertTrue(self.collector.snapshot()["llm_content_captured"])
+
+    def test_metadata_only_never_stores_prompt_or_response_bodies(self):
+        collector = ObservabilityCollector(capture_llm_content=False)
+        callback = collector.llm_callback
+        branch = start((), "note_branch", "note-50", {"note_id": 50})
+        model = start(branch.scope, "summarize_note", "llm", {})
+        collector.observe(branch)
+        collector.observe(model)
+        call_metadata = metadata(model, model="metadata-model")
+
+        failed, succeeded = uuid4(), uuid4()
+        callback.on_chat_model_start(
+            {},
+            [[HumanMessage(content="sensitive prompt")]],
+            run_id=failed,
+            metadata=call_metadata,
+        )
+        callback.on_llm_error(TimeoutError("throttled"), run_id=failed)
+        callback.on_chat_model_start(
+            {},
+            [[HumanMessage(content="another sensitive prompt")]],
+            run_id=succeeded,
+            metadata=call_metadata,
+        )
+        callback.on_llm_end(
+            llm_result(
+                AIMessage(
+                    content='{"secret":"response body"}',
+                    usage_metadata={
+                        "input_tokens": 9,
+                        "output_tokens": 4,
+                        "total_tokens": 13,
+                    },
+                )
+            ),
+            run_id=succeeded,
+        )
+
+        self.assertNotIn("prompt_messages", callback._calls[0])
+        self.assertNotIn("response", callback._calls[0])
+        self.assertNotIn("prompt_messages", callback._calls[1])
+        self.assertNotIn("response", callback._calls[1])
+        self.assertNotIn("sensitive prompt", repr(callback._calls))
+        self.assertNotIn("response body", repr(callback._calls))
+
+        snapshot = collector.snapshot()
+        exchanges = snapshot["llm_exchanges"]["note:50"]
+        self.assertFalse(snapshot["llm_content_captured"])
+        self.assertFalse(snapshot["content_truncated"])
+        self.assertEqual(exchanges[0]["error"], "TimeoutError: throttled")
+        self.assertEqual(exchanges[1]["retry_ordinal"], 1)
+        self.assertEqual(exchanges[1]["model"], "metadata-model")
+        self.assertEqual(
+            exchanges[1]["usage"],
+            {"input_tokens": 9, "output_tokens": 4, "total_tokens": 13},
+        )
+        self.assertTrue(
+            all(
+                "prompt_messages" not in exchange and "response" not in exchange
+                for exchange in exchanges
+            )
+        )
+        RunObservability.model_validate(snapshot)
+
+    def test_bounded_capture_truncates_prompts_only_with_explicit_metadata(self):
+        collector = ObservabilityCollector(
+            capture_llm_content=True, max_content_chars=5
+        )
+        callback = collector.llm_callback
+        branch = start((), "note_branch", "note-50", {"note_id": 50})
+        model = start(branch.scope, "summarize_note", "llm", {})
+        collector.observe(branch)
+        collector.observe(model)
+        run_id = uuid4()
+        response = {"summary": "this response remains exact"}
+
+        callback.on_chat_model_start(
+            {},
+            [[SystemMessage(content="short"), HumanMessage(content="0123456789")]],
+            run_id=run_id,
+            metadata=metadata(model),
+        )
+        callback.on_llm_end(
+            llm_result(AIMessage(content='{"summary":"this response remains exact"}')),
+            run_id=run_id,
+        )
+
+        snapshot = collector.snapshot()
+        exchange = snapshot["llm_exchanges"]["note:50"][0]
+        self.assertEqual(snapshot["max_content_chars"], 5)
+        self.assertTrue(snapshot["content_truncated"])
+        self.assertEqual(
+            exchange["prompt_messages"],
+            [
+                {
+                    "role": "system",
+                    "content": "short",
+                    "truncated": False,
+                    "original_char_count": 5,
+                },
+                {
+                    "role": "human",
+                    "content": "01234",
+                    "truncated": True,
+                    "original_char_count": 10,
+                },
+            ],
+        )
+        self.assertEqual(exchange["response"], response)
+        RunObservability.model_validate(snapshot)
 
     def test_tool_call_arguments_are_the_structured_response(self):
         model = self.scanner_call(node="detect_concepts")
@@ -803,6 +630,58 @@ class LLMCaptureTests(unittest.TestCase):
         self.assertEqual(
             exchange["usage"],
             {"input_tokens": 12, "output_tokens": 4, "total_tokens": 16},
+        )
+
+    def test_callback_prefers_usage_metadata_and_fills_only_missing_details(self):
+        model = self.scanner_call(node="detect_concepts")
+        run_id = uuid4()
+        self.callback.on_chat_model_start(
+            {}, [[HumanMessage(content="detect")]], run_id=run_id,
+            metadata=metadata(model),
+        )
+        self.callback.on_llm_end(
+            {
+                "generations": [[{
+                    "message": {
+                        "content": '{"cancer":true}',
+                        "usage_metadata": {
+                            "input_tokens": 10,
+                            "output_tokens": 4,
+                            "total_tokens": 14,
+                            "input_token_details": {"cache_read": 3},
+                            "output_token_details": {"reasoning": 2},
+                        },
+                        "response_metadata": {
+                            "token_usage": {
+                                "prompt_tokens": 100,
+                                "completion_tokens": 40,
+                                "total_tokens": 140,
+                                "prompt_tokens_details": {
+                                    "cached_tokens": 3,
+                                    "cache_creation_tokens": 1,
+                                },
+                                "completion_tokens_details": {
+                                    "reasoning_tokens": 2,
+                                    "accepted_prediction_tokens": 1,
+                                },
+                            }
+                        },
+                    }
+                }]]
+            },
+            run_id=run_id,
+        )
+
+        exchange = self.collector.snapshot()["llm_exchanges"]["note:50"][0]
+        self.assertEqual(exchange["usage"]["input_tokens"], 10)
+        self.assertEqual(exchange["usage"]["output_tokens"], 4)
+        self.assertEqual(
+            exchange["usage"]["input_token_details"],
+            {"cache_read": 3, "cache_creation": 1},
+        )
+        self.assertEqual(
+            exchange["usage"]["output_token_details"],
+            {"reasoning": 2, "accepted_prediction": 1},
         )
 
     def test_raw_openai_tool_call_arguments_are_parsed(self):
@@ -943,6 +822,225 @@ class LLMCaptureTests(unittest.TestCase):
         self.assertEqual([call["response"]["order"] for call in exchanges], [1, 2])
 
 
+class LLMUsageTests(unittest.TestCase):
+    def test_normalizes_scalar_provider_shapes(self):
+        cases = [
+            (
+                {"input_tokens": 8, "output_tokens": 3, "total_tokens": 11},
+                (8, 3, 11),
+            ),
+            (
+                {"prompt_tokens": 9, "completion_tokens": 4, "total_tokens": 13},
+                (9, 4, 13),
+            ),
+            (
+                {"input_token_count": 7, "output_token_count": 2},
+                (7, 2, 9),
+            ),
+        ]
+        for source, expected in cases:
+            with self.subTest(source=source):
+                usage = normalize_token_usage(source)
+                self.assertIsNotNone(usage)
+                self.assertEqual(
+                    (usage.input_tokens, usage.output_tokens, usage.total_tokens),
+                    expected,
+                )
+
+    def test_details_are_recursive_canonical_and_unknown_fields_survive(self):
+        usage = normalize_token_usage(
+            {
+                "input_tokens": 100,
+                "output_tokens": 30,
+                "total_tokens": 130,
+                "input_token_details": {
+                    "cache_read": 40,
+                    "nested": {"cache_creation": 7, "vendor_input": 3},
+                    "audio": 2,
+                },
+                "output_token_details": {
+                    "reasoning": 20,
+                    "audio": 1,
+                    "accepted_prediction": 4,
+                    "rejected_prediction": 2,
+                    "nested": {"vendor_output": 5},
+                },
+            }
+        )
+
+        self.assertEqual(
+            usage.input_token_details.root,
+            {
+                "cache_read": 40,
+                "cache_creation": 7,
+                "vendor_input": 3,
+                "audio": 2,
+            },
+        )
+        self.assertEqual(
+            usage.output_token_details.root,
+            {
+                "reasoning": 20,
+                "audio": 1,
+                "accepted_prediction": 4,
+                "rejected_prediction": 2,
+                "vendor_output": 5,
+            },
+        )
+
+    def test_authoritative_usage_avoids_duplicate_metadata_views(self):
+        usage = normalize_token_usage(
+            {
+                "input_tokens": 100,
+                "output_tokens": 20,
+                "total_tokens": 120,
+                "input_token_details": {"cache_read": 30},
+                "output_token_details": {"reasoning": 10},
+            },
+            {
+                "prompt_tokens": 999,
+                "completion_tokens": 999,
+                "total_tokens": 1998,
+                "prompt_tokens_details": {
+                    "cached_tokens": 30,
+                    "cache_creation_tokens": 6,
+                },
+                "completion_tokens_details": {
+                    "reasoning_tokens": 10,
+                    "accepted_prediction_tokens": 3,
+                    "rejected_prediction_tokens": 1,
+                },
+            },
+        )
+
+        self.assertEqual(
+            (usage.input_tokens, usage.output_tokens, usage.total_tokens),
+            (100, 20, 120),
+        )
+        self.assertEqual(
+            usage.input_token_details.root,
+            {"cache_read": 30, "cache_creation": 6},
+        )
+        self.assertEqual(
+            usage.output_token_details.root,
+            {
+                "reasoning": 10,
+                "accepted_prediction": 3,
+                "rejected_prediction": 1,
+            },
+        )
+
+    def test_aggregates_counts_tokens_details_and_dimension_buckets(self):
+        exchanges = {
+            "group:initial/variable:390": [
+                {
+                    "entity_key": "group:initial/variable:390",
+                    "agent": "extractor",
+                    "node": "repair_invalid_extraction",
+                    "attempt": 2,
+                    "model": "gpt-test",
+                    "usage": {
+                        "input_tokens": 10,
+                        "output_tokens": 4,
+                        "total_tokens": 14,
+                        "input_token_details": {"cache_read": 3},
+                        "output_token_details": {"reasoning": 2},
+                    },
+                    "error": "TimeoutError: transient",
+                },
+                {
+                    "entity_key": "group:initial/variable:390",
+                    "agent": "extractor",
+                    "node": "repair_invalid_extraction",
+                    "attempt": 2,
+                    "retry_ordinal": 1,
+                    "model": "gpt-test",
+                    "usage": None,
+                    "error": None,
+                },
+            ],
+            "note:50": [
+                {
+                    "entity_key": "note:50",
+                    "agent": "note_scanner",
+                    "node": "summarize_note",
+                    "attempt": 1,
+                    "model": None,
+                    "usage": {
+                        "input_tokens": 0,
+                        "output_tokens": 0,
+                        "total_tokens": 0,
+                    },
+                    "error": None,
+                }
+            ],
+        }
+
+        summary = aggregate_llm_usage(exchanges)
+
+        self.assertIsInstance(summary, LLMUsageSummary)
+        self.assertEqual(summary.logical_calls, 2)
+        self.assertEqual(summary.model_invocations, 3)
+        self.assertEqual(summary.retry_invocations, 1)
+        self.assertEqual(summary.successful_invocations, 2)
+        self.assertEqual(summary.failed_invocations, 1)
+        self.assertEqual(summary.usage_reported_invocations, 2)
+        self.assertEqual(summary.missing_usage_invocations, 1)
+        self.assertEqual(
+            (summary.input_tokens, summary.output_tokens, summary.total_tokens),
+            (10, 4, 14),
+        )
+        self.assertEqual(summary.input_token_details.root, {"cache_read": 3})
+        self.assertEqual(summary.output_token_details.root, {"reasoning": 2})
+        self.assertEqual(summary.by_agent["extractor"].model_invocations, 2)
+        self.assertEqual(
+            summary.by_node["repair_invalid_extraction"].logical_calls, 1
+        )
+        self.assertEqual(summary.by_model["gpt-test"].retry_invocations, 1)
+        self.assertEqual(summary.by_model["unknown"].model_invocations, 1)
+
+    def test_snapshot_uses_one_call_snapshot_for_exchanges_and_summary(self):
+        collector = ObservabilityCollector(capture_llm_content=False)
+        branch = start((), "note_branch", "note-50", {"note_id": 50})
+        model = start(branch.scope, "summarize_note", "llm", {})
+        collector.observe(branch)
+        collector.observe(model)
+        run_id = uuid4()
+        collector.llm_callback.on_chat_model_start(
+            {}, [[HumanMessage(content="not retained")]], run_id=run_id,
+            metadata=metadata(model),
+        )
+        collector.llm_callback.on_llm_end(
+            llm_result(
+                AIMessage(
+                    content="not retained",
+                    usage_metadata={
+                        "input_tokens": 2,
+                        "output_tokens": 1,
+                        "total_tokens": 3,
+                    },
+                )
+            ),
+            run_id=run_id,
+        )
+
+        with patch.object(
+            collector.llm_callback,
+            "_snapshot",
+            wraps=collector.llm_callback._snapshot,
+        ) as captured_snapshot:
+            snapshot = collector.snapshot()
+
+        captured_snapshot.assert_called_once_with()
+        self.assertEqual(len(snapshot["llm_exchanges"]["note:50"]), 1)
+        self.assertEqual(snapshot["llm_usage_summary"]["model_invocations"], 1)
+        self.assertEqual(snapshot["llm_usage_summary"]["total_tokens"], 3)
+        self.assertNotIn(
+            "prompt_messages", snapshot["llm_exchanges"]["note:50"][0]
+        )
+        RunObservability.model_validate(snapshot)
+
+
 class CallbackConfigTests(unittest.TestCase):
     def test_merge_preserves_callbacks_and_max_concurrency(self):
         existing = BaseCallbackHandler()
@@ -968,13 +1066,17 @@ class CallbackConfigTests(unittest.TestCase):
         self.assertIn(capture, merged["callbacks"].inheritable_handlers)
         self.assertNotIn(capture, manager.inheritable_handlers)
 
-    def test_capture_is_opt_in(self):
+    def test_content_is_opt_in_but_callback_attachment_is_unconditional(self):
         collector = ObservabilityCollector()
         config = {"max_concurrency": 3}
 
-        self.assertIsNone(collector.llm_callback)
-        self.assertEqual(collector.graph_config(config), config)
-        self.assertNotIn("llm_exchanges", collector.snapshot())
+        self.assertIsInstance(collector.llm_callback, LLMCaptureHandler)
+        merged = collector.graph_config(config)
+        self.assertEqual(merged["max_concurrency"], 3)
+        self.assertEqual(merged["callbacks"], [collector.llm_callback])
+        snapshot = collector.snapshot()
+        self.assertFalse(snapshot["llm_content_captured"])
+        self.assertEqual(snapshot["llm_exchanges"], {})
 
 
 class _CountingHandler(BaseCallbackHandler):
@@ -1004,10 +1106,11 @@ class _DeterministicChatModel(BaseChatModel):
 
 class _FlakyChatModel(_DeterministicChatModel):
     calls: int = 0
+    fail_times: int = 1
 
     def _generate(self, messages, stop=None, run_manager=None, **kwargs):
         self.calls += 1
-        if self.calls == 1:
+        if self.calls <= self.fail_times:
             raise TimeoutError("transient")
         return super()._generate(messages, stop, run_manager, **kwargs)
 
@@ -1031,6 +1134,41 @@ def _model_graph(node, wrapper):
     graph.add_edge(START, node)
     graph.add_edge(node, END)
     return graph.compile()
+
+
+class _RepairLoopState(TypedDict):
+    requested_variables: dict
+    task: dict
+    remaining_repairs: int
+
+
+class LLMNodeInvocationInvariantTests(unittest.TestCase):
+    def test_each_production_llm_node_has_one_structured_call_site(self):
+        llm_nodes = {
+            "detect_concepts": NoteScannerAgent.detect_concepts,
+            "summarize_note": NoteScannerAgent.summarize_note,
+            "get_cancer_mentions": NoteScannerAgent.get_cancer_mentions,
+            "identify_relevant_notes": NoteRetrieverAgent.identify_relevant_notes,
+            "extract_group_values": ExtractorAgent.extract_group_values,
+            "extract_individual_value": ExtractorAgent.extract_individual_value,
+            "repair_invalid_extraction": ExtractorAgent.repair_invalid_extraction,
+        }
+
+        for node, method in llm_nodes.items():
+            with self.subTest(node=node):
+                tree = ast.parse(textwrap.dedent(inspect.getsource(method)))
+                structured_calls = [
+                    candidate
+                    for candidate in ast.walk(tree)
+                    if isinstance(candidate, ast.Call)
+                    and isinstance(candidate.func, ast.Attribute)
+                    and candidate.func.attr == "structured"
+                ]
+                self.assertEqual(
+                    len(structured_calls),
+                    1,
+                    f"{node} must make exactly one model invocation per graph task",
+                )
 
 
 class CallbackInheritanceTests(unittest.TestCase):
@@ -1107,8 +1245,81 @@ class CallbackInheritanceTests(unittest.TestCase):
             ["scanner-model", "retriever-model", "extractor-model"],
         )
 
+    def test_graph_loop_reentry_uses_a_new_checkpoint_namespace(self):
+        model = _DeterministicChatModel(model_name="repair-model")
+
+        def repair(state):
+            model.invoke([HumanMessage(content="repair")])
+            task = dict(state["task"])
+            task["extraction_attempts"] += 1
+            return {
+                "task": task,
+                "remaining_repairs": state["remaining_repairs"] - 1,
+            }
+
+        def route(state):
+            if state["remaining_repairs"]:
+                return "repair_invalid_extraction"
+            return END
+
+        repair_builder = StateGraph(_RepairLoopState)
+        repair_builder.add_node("repair_invalid_extraction", repair)
+        repair_builder.add_edge(START, "repair_invalid_extraction")
+        repair_builder.add_conditional_edges("repair_invalid_extraction", route)
+
+        builder = StateGraph(_RepairLoopState)
+        builder.add_node("variable_branch", repair_builder.compile())
+        builder.add_edge(START, "variable_branch")
+        builder.add_edge("variable_branch", END)
+        graph = builder.compile()
+
+        collector = ObservabilityCollector(capture_llm=True)
+        graph_input = {
+            "requested_variables": {"group_id": "initial"},
+            "task": {
+                "variable": {"item_id": 390},
+                "extraction_mode": "group",
+                "extraction_attempts": 1,
+            },
+            "remaining_repairs": 3,
+        }
+        repair_starts = []
+        for item in graph.stream(
+            graph_input,
+            config=collector.graph_config(),
+            stream_mode=["values", "tasks"],
+            subgraphs=True,
+        ):
+            event = normalize(item, subgraphs=True)
+            if event is None:
+                continue
+            collector.observe(event)
+            if event.kind == "task_start" and event.node == "repair_invalid_extraction":
+                repair_starts.append(event)
+
+        captured_calls = collector.llm_callback._snapshot()
+        namespaces = [call.namespace for call in captured_calls]
+        self.assertEqual(len(repair_starts), 3)
+        self.assertEqual(len(captured_calls), len(repair_starts))
+        self.assertEqual(namespaces, [event.scope for event in repair_starts])
+        self.assertEqual(len(set(namespaces)), 3)
+        self.assertEqual(
+            [call.transport_retry_ordinal for call in captured_calls],
+            [None, None, None],
+        )
+
+        exchanges = collector.snapshot()["llm_exchanges"][
+            "group:initial/variable:390"
+        ]
+        self.assertEqual([call["attempt"] for call in exchanges], [2, 3, 4])
+        self.assertTrue(all("retry_ordinal" not in call for call in exchanges))
+        summary = collector.snapshot()["llm_usage_summary"]
+        self.assertEqual(summary["logical_calls"], 3)
+        self.assertEqual(summary["model_invocations"], 3)
+        self.assertEqual(summary["retry_invocations"], 0)
+
     def test_langgraph_retry_preserves_semantic_attempt_and_marks_transport_retry(self):
-        model = _FlakyChatModel(model_name="flaky-model")
+        model = _FlakyChatModel(model_name="flaky-model", fail_times=2)
 
         def repair(state):
             model.invoke([HumanMessage(content="repair")])
@@ -1122,7 +1333,7 @@ class CallbackInheritanceTests(unittest.TestCase):
                 initial_interval=0.0,
                 backoff_factor=1.0,
                 max_interval=0.0,
-                max_attempts=2,
+                max_attempts=3,
                 retry_on=lambda error: True,
             ),
         )
@@ -1144,6 +1355,7 @@ class CallbackInheritanceTests(unittest.TestCase):
                 "extraction_attempts": 1,
             },
         }
+        repair_starts = []
         for item in graph.stream(
             graph_input,
             config=collector.graph_config(),
@@ -1153,16 +1365,40 @@ class CallbackInheritanceTests(unittest.TestCase):
             event = normalize(item, subgraphs=True)
             if event is not None:
                 collector.observe(event)
+                if (
+                    event.kind == "task_start"
+                    and event.node == "repair_invalid_extraction"
+                ):
+                    repair_starts.append(event)
 
         exchanges = collector.snapshot()["llm_exchanges"][
             "group:initial/variable:390"
         ]
-        self.assertEqual(model.calls, 2)
-        self.assertEqual([call["attempt"] for call in exchanges], [2, 2])
+        captured_calls = collector.llm_callback._snapshot()
+        self.assertEqual(len(repair_starts), 1)
+        self.assertEqual(model.calls, 3)
+        self.assertEqual(len(captured_calls), 3)
+        self.assertEqual(
+            [call.namespace for call in captured_calls],
+            [repair_starts[0].scope] * 3,
+        )
+        self.assertEqual(
+            [call.transport_retry_ordinal for call in captured_calls],
+            [None, 1, 2],
+        )
+        self.assertEqual([call["attempt"] for call in exchanges], [2, 2, 2])
         self.assertNotIn("retry_ordinal", exchanges[0])
         self.assertEqual(exchanges[1]["retry_ordinal"], 1)
+        self.assertEqual(exchanges[2]["retry_ordinal"], 2)
         self.assertEqual(exchanges[0]["error"], "TimeoutError: transient")
-        self.assertEqual(exchanges[1]["response"], {"ok": True})
+        self.assertEqual(exchanges[1]["error"], "TimeoutError: transient")
+        self.assertEqual(exchanges[2]["response"], {"ok": True})
+        summary = collector.snapshot()["llm_usage_summary"]
+        self.assertEqual(summary["logical_calls"], 1)
+        self.assertEqual(summary["model_invocations"], 3)
+        self.assertEqual(summary["retry_invocations"], 2)
+        self.assertEqual(summary["failed_invocations"], 2)
+        self.assertEqual(summary["successful_invocations"], 1)
 
 
 if __name__ == "__main__":

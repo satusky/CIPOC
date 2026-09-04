@@ -1,13 +1,13 @@
 """FastAPI app serving the workbench: static frontend, plus reference and feedback state.
 
-The workbench frontend is a directory of static files that reads one JSON state
-dump. Everything it needs to *display* a run is available over plain
-``http.server`` — this module exists for the two things a static server cannot
-do: hand the page a ground-truth file chosen at launch, and accept the
-annotations a reviewer writes back.
+The workbench frontend is a directory of static files that reads one canonical
+run-result JSON artifact. Everything it needs to *display* a run is available
+over plain ``http.server`` — this module exists for the two things a static
+server cannot do: hand the page a ground-truth file chosen at launch, and accept
+the annotations a reviewer writes back.
 
 The package is independent from the CIPOC runtime and depends only on its web
-server libraries. It communicates with CIPOC through the case-state JSON file.
+server libraries. It communicates with CIPOC through the versioned JSON artifact.
 
 The frontend degrades rather than breaks: every endpoint here is optional from
 its point of view. Served without ``--ground-truth`` the comparison features

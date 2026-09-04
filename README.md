@@ -71,9 +71,9 @@ initialize ──► scan_notes ──► characterize_corpus ──► check_st
   notes, validating each value against the data dictionary (with a repair loop
   for invalid extractions). Code descriptions are scoped by gross primary site.
 - **Loop & finalize** — newly coded scoping facts feed the next planning pass;
-  when nothing remains eligible (or a fatal blocker is hit), the run finalizes
-  into a `Case` with per-variable results and a review report flagging errors,
-  invalid extractions, and low-confidence values.
+  when nothing remains eligible (or a fatal blocker is hit), the graph finalizes
+  a `Case` with per-variable results and a review report. The public run result
+  wraps that durable clinical snapshot with inputs, corpus, and observability.
 
 ## Installation
 
@@ -96,7 +96,7 @@ dependencies. Install it with standard `pip`:
 python -m pip install ./packages/cipoc-workbench
 ```
 
-Then serve a case-state JSON file:
+Then serve a canonical `OrchestratorRunResult` JSON artifact:
 
 ```bash
 cipoc-workbench serve \
@@ -139,22 +139,92 @@ groups with gating conditions, note filters, and NAACCR item IDs.
 
 ```bash
 # End-to-end run over the shared note bundle fixture
-PYTHONPATH=src python src/cipoc/agents/orchestrator.py
+PYTHONPATH=src python -m cipoc.agents.orchestrator
 
 # Optionally seed already-known coded values (skip their extraction)
-PYTHONPATH=src python src/cipoc/agents/orchestrator.py \
+PYTHONPATH=src python -m cipoc.agents.orchestrator \
     --structured-data '{"400": "C509"}'
 ```
 
 Programmatically:
 
 ```python
-from cipoc.agents.orchestrator import OrchestratorAgent
+from cipoc.agents import OrchestratorAgent
+from cipoc.models import OrchestratorRunError
 
 agent = OrchestratorAgent()
-case = agent.run(raw_notes)              # raw_notes: list[dict], each a ClinicalNote
-print(case.model_dump())                 # per-variable results + review report
+try:
+    result = agent.run(raw_notes)  # raw_notes: list[dict], each a ClinicalNote
+except OrchestratorRunError as error:
+    failure = error.failure        # partial inputs, corpus, and observability
+    raise
+
+case = result.case                 # durable clinical output
+print(case.model_dump())
 ```
+
+`run()` returns an `OrchestratorRunResult` only after the graph completes and the
+clinical `Case` is finalized. A graph failure raises `OrchestratorRunError`; its
+`failure` attribute is an `OrchestratorRunFailure` with the partial diagnostic
+artifact and no `case` field.
+
+### Write a Workbench artifact
+
+Use the thin run-result CLI to execute a case and write the canonical JSON:
+
+```bash
+PYTHONPATH=src python -m scripts.run_case_state \
+    --notes tests/fixtures/note_bundle.json \
+    --output tests/test_outputs/case_state.json
+
+# Retain exchange metadata and usage, but omit model prompts and responses.
+PYTHONPATH=src python -m scripts.run_case_state \
+    --notes tests/fixtures/note_bundle.json \
+    --output tests/test_outputs/case_state.json \
+    --no-llm-content-capture
+
+# Alternatively, retain only a bounded prefix of each prompt message.
+PYTHONPATH=src python -m scripts.run_case_state \
+    --notes tests/fixtures/note_bundle.json \
+    --output tests/test_outputs/case_state.json \
+    --max-content-chars 20000
+```
+
+The versioned `schema_version: "1.0"` artifact has five domains:
+
+- `run` - run identity, timing, completion status, configuration fingerprint,
+  and `contains_phi`;
+- `case` - the durable clinical output, including variable results, case facts,
+  note-selection provenance, and review flags;
+- `inputs` - configured target groups and caller-supplied structured values;
+- `corpus` - full processed notes, note digests, and corpus descriptors;
+- `observability` - variable attempts, LLM exchanges, capture settings, and
+  provider-reported usage totals and breakdowns.
+
+This is the JSON boundary consumed directly by the standalone Workbench. Failed
+runs are serialized by this CLI as `OrchestratorRunFailure` diagnostics and exit
+nonzero; they are not completed Workbench result artifacts.
+
+LLM exchange metadata, retries, errors, variable attempts, and usage collection
+remain enabled when `capture_llm_content=False` or
+`--no-llm-content-capture` is used. Only prompt and parsed response bodies are
+omitted. Prompt capture is unbounded by default. `max_content_chars` or
+`--max-content-chars` optionally limits each retained prompt message and records
+both per-message truncation metadata and the run-level `content_truncated` flag;
+parsed responses are not truncated.
+
+> **PHI:** Every run artifact is PHI-bearing. Disabling LLM content capture does
+> not de-identify it because `corpus.note_corpus` still contains the full clinical
+> notes. Retained prompts and responses may also contain PHI.
+
+Token usage is provider-reported, not independently calculated. Totals cover the
+invocations for which callbacks expose usage; failed calls and retries internal
+to a provider SDK may not report usage or appear as separate invocations. Check
+`usage_reported_invocations` and `missing_usage_invocations` before treating a
+total as complete. Input/output detail counts, such as cached input or reasoning
+output tokens, are breakdowns of the corresponding totals, not additional
+tokens. The artifact does not estimate monetary cost, retain hidden reasoning,
+or contain a raw graph-event timeline.
 
 ### Run individual agents
 
@@ -212,7 +282,8 @@ src/cipoc/
 │   └── coding_context.py  # Legacy compiled-rule utilities (not used at runtime)
 └── utils/
     ├── utils.py           # YAML config loader + CipocConfig
-    ├── progress_tracking.py  # run_with_progress graph runner
+    ├── progress/          # shared graph stream runner + live dashboard
+    ├── observability.py   # LLM exchange capture and usage aggregation
     └── databricks_utils.py
 
 packages/
@@ -225,7 +296,7 @@ documents/
 ├── cipoc_data_dictionary.json  # tissue-keyed code descriptions used at runtime
 └── rules/       # legacy compiled rule store (not used at runtime)
 extract_rules/   # site/histology/coding-rule JSONs and conversion helpers
-scripts/         # offline rule-compilation pipeline
+scripts/         # run-result, OMOP, graph-rendering, and offline utility CLIs
 planning/        # design notes and MVP plans (planning/old/ = superseded reference)
 tests/fixtures/     # synthetic notes and note bundles for smoke checks
 tests/test_outputs/ # saved outputs from agent demo (__main__) runs
@@ -246,3 +317,7 @@ tools. Key groups:
   selecting tissue-specific data-dictionary values.
 - **Case** — `Case`, `CaseVariableResult`, `VariableStatus`, `CaseReport`,
   `ReviewFlag`/`ReviewFlagType`.
+- **Observability** — typed model exchanges, variable attempts, normalized token
+  usage, and capture metadata.
+- **Run** — `OrchestratorRunResult`, `OrchestratorRunFailure`,
+  `OrchestratorRunError`, and the versioned run/input/corpus contracts.

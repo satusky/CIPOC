@@ -46,7 +46,7 @@ def main(argv: list[str] | None = None) -> int:
 
     serve = sub.add_parser("serve", help="Serve the workbench frontend.")
     serve.add_argument("--state", type=Path, default=None,
-                       help="Orchestrator state JSON (default: the copy committed in web/).")
+                       help="OrchestratorRunResult JSON (default: the bundled example).")
     serve.add_argument("--ground-truth", type=Path, default=None,
                        help="Reference values as a JSON object of {item_id: value}.")
     serve.add_argument("--feedback", type=Path, default=None,
