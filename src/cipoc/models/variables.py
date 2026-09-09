@@ -1,6 +1,7 @@
 from enum import Enum
+from typing import Annotated
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, field_validator, model_validator
 
 from .base import ConfidenceLevel, confidence_field
 from .notes import TextSpan, CancerStatus
@@ -35,9 +36,32 @@ class CorpusGate(str, Enum):
 
 
 class SiteApplicability(BaseModel):
-    """Primary-site/histology restriction for a site-limited group."""
+    """A leaf's restrictions are OR alternatives; use all_of for conjunction.
+
+    Composite nodes use either any_of or all_of, without leaf restrictions.
+    Unknown facts keep scope open unless the expression is definitively false.
+    """
     gross_primary_sites: list[str] = Field(default_factory=list, description="Tissue-level primary sites the group applies to.")
-    histology_families: list[str] = Field(default_factory=list, description="Histology families the group applies to.")
+    primary_sites: list[Annotated[str, Field(pattern=r"^C[0-9]{3}(-C[0-9]{3})?$")]] = Field(default_factory=list, description="ICD-O-3 topography codes or inclusive ranges, e.g. C440-C449.")
+    histology_families: list[str] = Field(default_factory=list, description="Histology family labels, preserved as serialized. Runtime configuration supports melanoma (8720-8790), independent of site.")
+    any_of: list["SiteApplicability"] = Field(default_factory=list, description="OR alternatives; excludes only when every alternative is definitively false.")
+    all_of: list["SiteApplicability"] = Field(default_factory=list, description="AND conditions; any definitively false condition excludes this alternative.")
+
+    @field_validator("primary_sites")
+    @classmethod
+    def _ordered_site_ranges(cls, values: list[str]) -> list[str]:
+        for value in values:
+            low, _, high = value.partition("-")
+            if high and low > high:
+                raise ValueError(f"Primary-site range is reversed: {value}")
+        return values
+
+    @model_validator(mode="after")
+    def _unambiguous_expression(self):
+        leaf = bool(self.gross_primary_sites or self.primary_sites or self.histology_families)
+        if sum((leaf, bool(self.any_of), bool(self.all_of))) > 1:
+            raise ValueError("Use leaf restrictions, any_of, or all_of, not a mixture.")
+        return self
 
 
 class NoteFilter(BaseModel):
@@ -70,7 +94,7 @@ class VariableOutput(BaseModel):
     item_id: int = Field(description="Item ID number.")
     value: str | None = Field(description="Coded value for the variable. Must be selected from the valid codes and in the appropriate format. Return `None` if no value can be determined.")
     explanation: str = Field(description="Reasoning used for assigning the selected value.")
-    most_important_note: int | None = Field(description="ID of note containing the most evidence for the value extracted. `None` if no value could be determined.")
+    most_important_note: int | str | None = Field(description="ID of note containing the most evidence for the value extracted. `None` if no value could be determined.")
     spans: list[TextSpan] = Field(description="List of text span(s) in the clinical note that provide evidence for this claim. A span containing newline characters should be split into multiple spans at the newlines.")
     presence_confidence: ConfidenceLevel = confidence_field()
 

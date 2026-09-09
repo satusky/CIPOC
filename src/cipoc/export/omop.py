@@ -12,6 +12,7 @@ from pydantic import BaseModel, ValidationError
 
 from cipoc.models import Case, ClinicalNote
 
+from ._files import staged_output_paths
 from .models import (
     NOTE_FIELDS,
     NOTE_NLP_FIELDS,
@@ -45,9 +46,12 @@ class OmopExporter:
         self.person_id = person_id
         self.nlp_system = nlp_system
         self.nlp_datetime = _format_datetime(nlp_datetime)
-        self.nlp_date = _format_date(nlp_date) or _date_from_datetime(
-            self.nlp_datetime
-        ) or date.today().isoformat()
+        if nlp_date is not None:
+            self.nlp_date = _format_date(nlp_date)
+        elif self.nlp_datetime:
+            self.nlp_date = _date_from_datetime(self.nlp_datetime)
+        else:
+            self.nlp_date = date.today().isoformat()
         self.note_type = note_type
         self.encoding = encoding
         self.language = language
@@ -62,10 +66,11 @@ class OmopExporter:
         """Write ``note.csv``, ``note_nlp.csv``, then ``omop_errors.json``.
 
         Incomplete rows are retained in the error file with their populated fields
-        instead of being mixed into the loadable OMOP files.
+        instead of being mixed into the loadable OMOP files. All files are staged
+        and closed before individual replacements; publication is not a multi-file
+        transaction, and a replacement failure can leave a mixed bundle.
         """
         output_directory = Path(output_directory)
-        output_directory.mkdir(parents=True, exist_ok=True)
 
         source_notes = list(notes)
         note_rows, note_errors = self._build_note_rows(source_notes)
@@ -80,14 +85,14 @@ class OmopExporter:
         note_nlp_path = output_directory / "note_nlp.csv"
         error_path = output_directory / "omop_errors.json"
 
-        # NOTE is intentionally materialized first because NOTE_NLP references it.
-        _write_csv(note_path, NOTE_FIELDS, note_rows)
-        _write_csv(note_nlp_path, NOTE_NLP_FIELDS, note_nlp_rows)
         errors = note_errors + note_nlp_errors
-        error_path.write_text(
-            OmopErrorReport(errors=errors).model_dump_json(indent=2),
-            encoding="utf-8",
-        )
+        error_json = OmopErrorReport(errors=errors).model_dump_json(indent=2)
+        with staged_output_paths(
+            output_directory, ("note.csv", "note_nlp.csv", "omop_errors.json")
+        ) as (staged_note, staged_note_nlp, staged_errors):
+            _write_csv(staged_note, NOTE_FIELDS, note_rows)
+            _write_csv(staged_note_nlp, NOTE_NLP_FIELDS, note_nlp_rows)
+            staged_errors.write_text(error_json, encoding="utf-8")
 
         return OmopExportResult(
             note_path=note_path,
@@ -269,7 +274,9 @@ def _validation_issues(error: ValidationError) -> list[OmopValidationIssue]:
             type=issue["type"],
             message=issue["msg"],
         )
-        for issue in error.errors(include_url=False)
+        for issue in error.errors(
+            include_url=False, include_input=False, include_context=False
+        )
     ]
 
 
@@ -292,9 +299,12 @@ def _format_datetime(value: datetime | str | None) -> str:
 
 
 def _date_from_datetime(value: str) -> str:
-    if not value:
+    try:
+        return datetime.fromisoformat(value).date().isoformat()
+    except (TypeError, ValueError):
+        # Keep the original timestamp for row validation, not a constructor error
+        # or a fabricated default date.
         return ""
-    return value.split("T", maxsplit=1)[0].split(" ", maxsplit=1)[0]
 
 
 def _build_snippet(

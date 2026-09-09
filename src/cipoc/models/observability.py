@@ -50,7 +50,10 @@ class NormalizedTokenUsage(_ObservabilityModel):
 class LLMUsageBucket(NormalizedTokenUsage):
     """Invocation counts and token usage for one aggregate grouping."""
 
-    logical_calls: _NonNegativeInt = 0
+    logical_calls: _NonNegativeInt = Field(
+        default=0,
+        description="Logical calls whose initial invocation belongs to this bucket; retries may report a different model.",
+    )
     model_invocations: _NonNegativeInt = 0
     successful_invocations: _NonNegativeInt = 0
     failed_invocations: _NonNegativeInt = 0
@@ -137,13 +140,11 @@ class LLMPromptMessage(_ObservabilityModel):
         return self
 
 
-class LLMExchange(_ObservabilityModel):
-    """One completed model callback lifecycle correlated to a graph entity."""
-
-    entity_key: str = Field(min_length=1)
+class _LLMInvocation(_ObservabilityModel):
+    invocation_id: str | None = Field(default=None, min_length=1)
+    namespace: list[str] = Field(default_factory=list)
     agent: LLMAgent
     node: str = Field(min_length=1)
-    attempt: _PositiveInt = Field(description="Semantic extraction attempt number.")
     retry_ordinal: _PositiveInt | None = Field(
         default=None,
         description="Transport retry ordinal; absent for the first invocation.",
@@ -153,6 +154,24 @@ class LLMExchange(_ObservabilityModel):
     response: JsonValue | None = None
     usage: NormalizedTokenUsage | None = None
     error: str | None = None
+
+
+class LLMExchange(_LLMInvocation):
+    """One completed model callback lifecycle correlated to a graph entity."""
+
+    entity_key: str = Field(min_length=1)
+    attempt: _PositiveInt = Field(description="Semantic extraction attempt number.")
+
+
+class UnattributedLLMExchange(_LLMInvocation):
+    """A retained invocation whose clinical entity/attempt could not be established."""
+
+    invocation_id: str = Field(min_length=1)
+
+
+class ObservabilityIssue(_ObservabilityModel):
+    code: str = Field(min_length=1)
+    message: str = Field(min_length=1)
 
 
 class VariableAttempt(_ObservabilityModel):
@@ -171,9 +190,15 @@ class RunObservability(_ObservabilityModel):
     llm_content_captured: bool
     max_content_chars: _NonNegativeInt | None = None
     content_truncated: bool = False
+    collection_status: Literal["complete", "partial", "unavailable"] | None = Field(
+        default=None,
+        description="Callback collection health, not provider usage completeness; absent in legacy 1.0 artifacts.",
+    )
+    collection_issues: list[ObservabilityIssue] = Field(default_factory=list)
     variable_attempts: dict[str, list[VariableAttempt]] = Field(default_factory=dict)
     llm_exchanges: dict[str, list[LLMExchange]] = Field(default_factory=dict)
-    llm_usage_summary: LLMUsageSummary = Field(default_factory=LLMUsageSummary)
+    unattributed_exchanges: list[UnattributedLLMExchange] = Field(default_factory=list)
+    llm_usage_summary: LLMUsageSummary | None = Field(default_factory=LLMUsageSummary)
 
     @model_validator(mode="before")
     @classmethod
@@ -208,6 +233,7 @@ class RunObservability(_ObservabilityModel):
     @model_validator(mode="after")
     def validate_content_capture(self):
         any_truncated = False
+        all_exchanges: list[_LLMInvocation] = list(self.unattributed_exchanges)
         for entity_key, exchanges in self.llm_exchanges.items():
             if not entity_key:
                 raise ValueError("LLM exchange map keys cannot be empty.")
@@ -217,36 +243,44 @@ class RunObservability(_ObservabilityModel):
                         f"LLM exchange entity key {exchange.entity_key!r} does not "
                         f"match map key {entity_key!r}."
                     )
-                if not self.llm_content_captured and (
-                    exchange.prompt_messages is not None or exchange.response is not None
+            all_exchanges.extend(exchanges)
+        for exchange in all_exchanges:
+            if not self.llm_content_captured and (
+                exchange.prompt_messages is not None or exchange.response is not None
+            ):
+                raise ValueError(
+                    "Prompt and response content must be absent when LLM content "
+                    "capture is disabled."
+                )
+            if self.llm_content_captured and exchange.prompt_messages is None:
+                raise ValueError(
+                    "Prompt messages must be present when LLM content capture "
+                    "is enabled."
+                )
+            for message in exchange.prompt_messages or ():
+                if self.max_content_chars is not None and (
+                    len(message.content) > self.max_content_chars
                 ):
-                    raise ValueError(
-                        "Prompt and response content must be absent when LLM content "
-                        "capture is disabled."
-                    )
-                if self.llm_content_captured and exchange.prompt_messages is None:
-                    raise ValueError(
-                        "Prompt messages must be present when LLM content capture "
-                        "is enabled."
-                    )
-                for message in exchange.prompt_messages or ():
-                    if self.max_content_chars is not None and (
-                        len(message.content) > self.max_content_chars
-                    ):
+                    raise ValueError("Retained prompt content exceeds max_content_chars.")
+                if message.truncated:
+                    if self.max_content_chars is None:
                         raise ValueError(
-                            "Retained prompt content exceeds max_content_chars."
+                            "Truncated prompt content requires max_content_chars."
                         )
-                    if message.truncated:
-                        if self.max_content_chars is None:
-                            raise ValueError(
-                                "Truncated prompt content requires max_content_chars."
-                            )
-                        any_truncated = True
+                    any_truncated = True
 
         if self.content_truncated != any_truncated:
             raise ValueError(
                 "content_truncated must report whether any prompt message was truncated."
             )
+        if self.collection_status == "complete" and (
+            self.collection_issues or self.unattributed_exchanges or self.llm_usage_summary is None
+        ):
+            raise ValueError("Complete collection requires an available summary and no collection issues.")
+        if self.collection_status in {"partial", "unavailable"} and not self.collection_issues:
+            raise ValueError("Incomplete collection requires an explicit diagnostic issue.")
+        if self.collection_status == "unavailable" and self.llm_usage_summary is not None:
+            raise ValueError("Unavailable collection cannot claim a usage summary.")
         return self
 
 
@@ -258,7 +292,9 @@ __all__ = [
     "LLMUsageBucket",
     "LLMUsageSummary",
     "NormalizedTokenUsage",
+    "ObservabilityIssue",
     "RunObservability",
     "TokenDetails",
+    "UnattributedLLMExchange",
     "VariableAttempt",
 ]

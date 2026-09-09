@@ -61,7 +61,7 @@ const App = {
   view: "variables",
   mode: "control",
   grouped: true,
-  selection: null,          // {kind: 'note'|'group'|'variable', id}
+  selection: null,          // {kind: 'note'|'group'|'variable'|'telemetry', id}
   noteFilter: "",
   varFilter: "",
   sort: { key: "item_id", dir: 1 },
@@ -236,9 +236,9 @@ function normalizeRunResult(result) {
   if (!result || typeof result !== "object" || Array.isArray(result)) {
     throw new Error("Expected an OrchestratorRunResult JSON object.");
   }
-  if (result.schema_version !== "1.0") {
+  if (!["1.0", "1.1"].includes(result.schema_version)) {
     const version = result.schema_version == null ? "missing" : String(result.schema_version);
-    throw new Error("Unsupported schema_version " + version + "; expected 1.0.");
+    throw new Error("Unsupported schema_version " + version + "; expected 1.0 or 1.1.");
   }
 
   for (const domain of ["run", "case", "inputs", "corpus", "observability"]) {
@@ -300,6 +300,28 @@ const noteSelection = (groupId) => App.noteSelections["group:" + groupId] || nul
 
 const hasCapture = () => App.observability.llm_content_captured === true;
 
+const collectionStatus = () => App.observability.collection_status || "unknown";
+
+const TREATMENT_CONCEPTS = ["surgery", "chemotherapy", "radiation", "hormonal_therapy", "immunotherapy"];
+const conceptPresence = (concept) => concept?.presence === true ? "present"
+  : concept?.presence === false ? "absent" : "unknown (not recorded)";
+
+/* Describe the recorded configuration, not whether the case matches it.
+   Keep unfamiliar leaf fields visible while preserving explicit AND/OR groups. */
+function applicabilityLabel(restriction) {
+  const parts = [];
+  for (const [key, value] of Object.entries(restriction || {})) {
+    if (value == null || (Array.isArray(value) && !value.length)) continue;
+    if (["any_of", "all_of"].includes(key) && Array.isArray(value)) {
+      parts.push("(" + value.map(applicabilityLabel).join(key === "any_of" ? " OR " : " AND ") + ")");
+    } else {
+      parts.push(key.replace(/_/g, " ") + ": " +
+        (Array.isArray(value) ? value.join(", ") : typeof value === "object" ? JSON.stringify(value) : String(value)));
+    }
+  }
+  return parts.join(" / ") || "unrestricted";
+}
+
 const NOTE_SELECTION_REJECTION_MESSAGES = {
   note_type_mismatch: "Note type did not match the configured note filter.",
   cancer_status_mismatch: "Cancer status did not match the configured note filter.",
@@ -351,9 +373,11 @@ function groupsTouchingNote(noteId) {
 /* Variables whose evidence cites a note. */
 function variablesCitingNote(noteId) {
   const id = String(noteId);
-  return App.variables.filter((v) =>
-    (((v.result.extraction || {}).spans) || []).some((s) => String(s.note_id) === id)
-  );
+  return App.variables.filter((v) => {
+    const extraction = v.result.extraction || {};
+    return (extraction.most_important_note != null && String(extraction.most_important_note) === id) ||
+      (extraction.spans || []).some((s) => String(s.note_id) === id);
+  });
 }
 
 /* ------------------------------------------------------ group roll-up state
@@ -639,6 +663,16 @@ function renderChrome() {
   const rail = clear($("#facts"));
   rail.append(h("span", { class: "faint", style: "font-size:11px;text-transform:uppercase;letter-spacing:.08em" },
     "Case facts"));
+  const status = collectionStatus();
+  const issues = App.observability.collection_issues || [];
+  rail.append(h("button", {
+    type: "button",
+    class: "chip telemetry-link" + (status === "complete" && !issues.length ? "" : " warn"),
+    dataset: { entity: "telemetry:run" },
+    title: "Inspect collection issues, provider usage and unattributed invocations",
+    text: "telemetry " + status + (issues.length ? " (" + issues.length + " issue" + (issues.length === 1 ? "" : "s") + ")" : ""),
+    onclick: () => select("telemetry", "run"),
+  }));
   for (const key of order) {
     const value = facts[key];
     rail.append(h("span", { class: "fact" + (value ? "" : " unset") },

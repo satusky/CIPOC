@@ -88,6 +88,11 @@ class ExtractorAgent(BaseAgent):
     # Initial nodes
     def initialize(self, state: ExtractorState) -> dict:
         """Seed the conversation with the shared persona and the variables to extract."""
+        variables = state.requested_variables.variables
+        if not variables or len({variable.item_id for variable in variables}) != len(variables):
+            raise ValueError("Extraction requires a nonempty group of unique requested item IDs.")
+        for variable in variables:
+            self._value_validator.preflight(variable)
         return {"messages": [SystemMessage(EXTRACTOR_SYSTEM_PROMPT)]}
 
     def load_notes(self, state: ExtractorState) -> dict:
@@ -133,6 +138,9 @@ class ExtractorAgent(BaseAgent):
         )
 
         output_counts = Counter(output.item_id for output in group_output.variables)
+        unexpected_ids = sorted(set(output_counts) - {
+            variable.item_id for variable in state.requested_variables.variables
+        })
         outputs_by_id = {
             output.item_id: output
             for output in group_output.variables
@@ -152,7 +160,7 @@ class ExtractorAgent(BaseAgent):
                             else ["Group extraction returned this variable more than once."]
                             if output_counts[variable.item_id] > 1
                             else []
-                        ),
+                        ) + ([f"Group extraction returned unexpected item IDs: {unexpected_ids}."] if unexpected_ids else []),
                         extraction_attempts=1,
                     ),
                     notes=state.notes or [],
@@ -167,6 +175,14 @@ class ExtractorAgent(BaseAgent):
         return Command(goto=sends)
 
     def merge_variable_results(self, state: ExtractorState) -> dict:
+        requested_ids = {variable.item_id for variable in state.requested_variables.variables}
+        counts = Counter(result.item_id for result in state.variable_results)
+        duplicates = sorted(item_id for item_id, count in counts.items() if count > 1)
+        unexpected = sorted(set(counts) - requested_ids)
+        if duplicates or unexpected:
+            raise ValueError(
+                f"Invalid completed branch IDs: duplicates={duplicates}, unexpected={unexpected}."
+            )
         results_by_id = {result.item_id: result for result in state.variable_results}
 
         ordered_results = [
@@ -231,6 +247,11 @@ class ExtractorAgent(BaseAgent):
                 errors.append("Supporting text spans must be empty when no value is returned.")
             elif state.task.candidate.value is not None and not state.task.candidate.spans:
                 errors.append("No supporting text spans were returned.")
+            citation = state.task.candidate.most_important_note
+            if state.task.candidate.value is None and citation is not None:
+                errors.append("Primary citation must be null when no value is returned.")
+            if citation is not None and not any(str(note.note_id) == str(citation) for note in state.notes):
+                errors.append(f"Primary citation cites note id '{citation}', which is not one of the provided notes.")
             for index, span in enumerate(state.task.candidate.spans, start=1):
                 if not span.text.strip():
                     errors.append(f"Supporting text span {index} is empty.")
@@ -315,7 +336,7 @@ class ExtractorAgent(BaseAgent):
             presence_confidence=ConfidenceLevel.LOW,
         )
         validated = ValidatedVariableOutput(
-            **candidate.model_dump(),
+            **{**candidate.model_dump(), "item_id": state.task.variable.item_id},
             is_valid=state.task.is_valid,
             validation_errors=list(state.task.validation_errors),
             extraction_attempts=state.task.extraction_attempts,

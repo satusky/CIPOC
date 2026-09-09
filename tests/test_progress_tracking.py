@@ -9,7 +9,12 @@ from cipoc.agents.note_retriever import NoteRetrieverAgent
 from cipoc.agents.note_scanner import NoteScannerAgent
 from cipoc.models import ClinicalNote
 from cipoc.utils.progress.renderers import AnsiAltScreen, NotebookDisplay, PlainLog
-from cipoc.utils.progress.runner import _select_renderer, run_with_progress
+from cipoc.utils.progress.runner import (
+    _select_renderer,
+    run_graph_stream,
+    run_with_progress,
+    validate_graph_concurrency,
+)
 
 
 class _TTY(io.StringIO):
@@ -110,6 +115,129 @@ class RendererSelectionTests(unittest.TestCase):
             ),
             PlainLog,
         )
+
+
+class GraphConcurrencyTests(unittest.TestCase):
+    def test_real_nested_graph_stream_completes_with_two_workers(self):
+        from langgraph.graph import StateGraph, START, END
+
+        child = StateGraph(dict)
+        child.add_node("answer", lambda state: {"answer": 42})
+        child.add_edge(START, "answer")
+        child.add_edge("answer", END)
+        parent = StateGraph(dict)
+        parent.add_node("child", child.compile())
+        parent.add_edge(START, "child")
+        parent.add_edge("child", END)
+        self.assertEqual(
+            run_graph_stream(
+                parent.compile(), {}, config={"max_concurrency": 2}, subgraphs=True,
+            ),
+            {"answer": 42},
+        )
+
+    def test_nested_cap_one_fails_before_display_observer_or_graph_work(self):
+        for progress in (False, True):
+            graph = _Graph([])
+            observer = Mock()
+            with self.subTest(progress=progress), patch(
+                "cipoc.utils.progress.runner._select_renderer"
+            ) as renderer:
+                with self.assertRaisesRegex(ValueError, "LangGraph 1.0.3"):
+                    run_graph_stream(
+                        graph, {}, config={"max_concurrency": 1},
+                        subgraphs=True, progress=progress, event_observer=observer,
+                    )
+                renderer.assert_not_called()
+                observer.assert_not_called()
+                self.assertEqual(graph.calls, [])
+
+    def test_bound_and_inherited_config_follow_pinned_graph_precedence(self):
+        from langchain_core.runnables.config import var_child_runnable_config
+        from langgraph.graph import StateGraph, START, END
+
+        builder = StateGraph(dict)
+        builder.add_node("work", lambda state: state)
+        builder.add_edge(START, "work")
+        builder.add_edge("work", END)
+        graph = builder.compile()
+        token = var_child_runnable_config.set({"max_concurrency": 1})
+        try:
+            for bound, call, rejected in (
+                (None, None, True),
+                (None, {"max_concurrency": None}, True),
+                ({"max_concurrency": 1}, {}, True),
+                ({"max_concurrency": 1}, {"max_concurrency": None}, True),
+                ({"max_concurrency": 2}, None, False),
+                ({"max_concurrency": 1}, {"max_concurrency": 3}, False),
+                ({"max_concurrency": 2}, {"max_concurrency": 1}, True),
+            ):
+                configured = graph.with_config(bound)
+                before = dict(configured.config)
+                with self.subTest(bound=bound, call=call):
+                    if rejected:
+                        with self.assertRaisesRegex(ValueError, "max_concurrency=1"):
+                            validate_graph_concurrency(configured, call, subgraphs=True)
+                    else:
+                        validate_graph_concurrency(configured, call, subgraphs=True)
+                    self.assertEqual(configured.config, before)
+        finally:
+            var_child_runnable_config.reset(token)
+
+    def test_runner_checks_inherited_and_bound_config_before_rendering(self):
+        from langchain_core.runnables.config import var_child_runnable_config
+
+        for inherited, bound in (({"max_concurrency": 1}, None), (None, {"max_concurrency": 1})):
+            graph = _Graph([])
+            graph.config = bound
+            token = var_child_runnable_config.set(inherited)
+            try:
+                with patch("cipoc.utils.progress.runner._select_renderer") as renderer:
+                    with self.assertRaisesRegex(ValueError, "max_concurrency=1"):
+                        run_with_progress(graph, {}, subgraphs=True)
+                    renderer.assert_not_called()
+                    self.assertEqual(graph.calls, [])
+            finally:
+                var_child_runnable_config.reset(token)
+
+    def test_validation_does_not_populate_caller_or_bound_metadata(self):
+        graph = _Graph([])
+        graph.config = {"metadata": {}, "configurable": {"bound": "value"}}
+        config = {
+            "max_concurrency": 1, "metadata": {}, "configurable": {"caller": "value"},
+        }
+        with self.assertRaisesRegex(ValueError, "max_concurrency=1"):
+            validate_graph_concurrency(graph, config, subgraphs=True)
+        self.assertEqual(graph.config["metadata"], {})
+        self.assertEqual(config["metadata"], {})
+
+    def test_safe_limits_are_forwarded_unchanged(self):
+        for cap in (None, 2, 7):
+            graph = _Graph([((), "values", {"answer": 42})])
+            config = {"max_concurrency": cap}
+            self.assertEqual(
+                run_graph_stream(graph, {}, config=config, subgraphs=True),
+                {"answer": 42},
+            )
+            self.assertIs(graph.calls[0][1]["config"], config)
+            self.assertEqual(config["max_concurrency"], cap)
+
+    def test_non_nested_non_eager_stream_can_still_use_one_worker(self):
+        graph = _Graph([("values", {"answer": 42})])
+        self.assertEqual(
+            run_graph_stream(graph, {}, config={"max_concurrency": 1}),
+            {"answer": 42},
+        )
+        graph.stream_eager = True
+        with self.assertRaisesRegex(ValueError, "max_concurrency=1"):
+            validate_graph_concurrency(graph, {"max_concurrency": 1})
+
+    def test_invalid_graph_capacities_fail_before_work(self):
+        for cap in (True, False, 0, -1, 1.5, "2"):
+            graph = _Graph([])
+            with self.subTest(cap=cap), self.assertRaisesRegex(ValueError, "positive integer"):
+                run_graph_stream(graph, {}, config={"max_concurrency": cap}, subgraphs=True)
+            self.assertEqual(graph.calls, [])
 
 
 class ProgressRunnerTests(unittest.TestCase):

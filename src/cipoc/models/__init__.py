@@ -66,6 +66,8 @@ from .observability import (
     LLMUsageSummary,
     LLMPromptMessage,
     LLMExchange,
+    UnattributedLLMExchange,
+    ObservabilityIssue,
     VariableAttempt,
     RunObservability,
 )
@@ -132,6 +134,8 @@ __all__ = [
     "LLMUsageSummary",
     "LLMPromptMessage",
     "LLMExchange",
+    "UnattributedLLMExchange",
+    "ObservabilityIssue",
     "VariableAttempt",
     "RunObservability",
     "OrchestratorConfigFingerprint",

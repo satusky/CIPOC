@@ -81,9 +81,7 @@ function groupTooltip(group, state) {
   ];
   if ((group.gate || []).length) rows.push(["gate", group.gate.join(", ")]);
   if (group.applies_to) {
-    const sites = (group.applies_to.gross_primary_sites || []).join(", ");
-    const fams = (group.applies_to.histology_families || []).join(", ");
-    rows.push(["applies to", [sites, fams].filter(Boolean).join(" / ") || "—"]);
+    rows.push(["applies to", applicabilityLabel(group.applies_to)]);
   }
   if ((group.note_filter || {}).keywords) {
     rows.push(["note filter", group.note_filter.keywords.length + " keyword(s)"]);

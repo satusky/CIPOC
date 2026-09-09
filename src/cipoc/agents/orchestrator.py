@@ -10,7 +10,7 @@ from uuid import uuid4
 from operator import add
 from typing import Any, Callable, Mapping
 from typing_extensions import Annotated, Literal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.state import CompiledStateGraph
@@ -22,6 +22,7 @@ from cipoc.llm import BaseAgentModel
 from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key
 from cipoc.utils import CipocConfig, ObservabilityCollector, run_graph_stream
 from cipoc.utils.progress.events import ProgressEvent
+from cipoc.utils.progress.runner import validate_graph_concurrency
 from cipoc.models import (
     Case,
     CaseFacts,
@@ -169,6 +170,20 @@ class OrchestratorInput(BaseModel):
         description="Optional known coded values keyed by NAACCR item ID; seeded as structured-data results, skipping extraction.",
     )
 
+    @model_validator(mode="after")
+    def validate_note_identity(self):
+        if not self.note_corpus:
+            raise ValueError("At least one clinical note is required; structured-only runs are not supported.")
+        seen: set[str] = set()
+        for key, note in self.note_corpus.items():
+            canonical = str(key)
+            if canonical in seen:
+                raise ValueError("Note corpus contains duplicate canonical note IDs.")
+            if canonical != str(note.note_id):
+                raise ValueError("Note corpus key does not match its note ID.")
+            seen.add(canonical)
+        return self
+
 
 class OrchestratorOutput(BaseModel):
     """Exactly the channels ``CaseState.to_case()`` consumes to build the snapshot."""
@@ -252,6 +267,8 @@ class OrchestratorAgent(BaseAgent):
         case_facts up front so it can scope dependent groups even when no
         extraction ever runs for that group.
         """
+        # Direct graph callers must obey the same input invariants as run().
+        OrchestratorInput(note_corpus=state.note_corpus, structured_data=state.structured_data)
         structured = state.structured_data or {}
         results: dict[int, CaseVariableResult] = {}
         for group in self._target_variables:
@@ -280,13 +297,18 @@ class OrchestratorAgent(BaseAgent):
     
     def note_branch(self, note: ClinicalNote):
         processed_note = self._scanner.run(note, progress=False)
-        return {"note_corpus": {processed_note.note_id: processed_note}}
+        if not isinstance(processed_note, ProcessedClinicalNote):
+            raise TypeError("Scanner must return a completed ProcessedClinicalNote.")
+        if str(processed_note.note_id) != str(note.note_id):
+            raise ValueError("Scanner changed the input note identity.")
+        processed_note = processed_note.model_copy(update={"note_id": note.note_id})
+        return {"note_corpus": {note.note_id: processed_note}}
     
     def characterize_corpus(self, state: CaseState) -> dict:
         descriptors = build_corpus_descriptors(state.note_corpus)
         digests = build_corpus_digests(state.note_corpus)
         case_facts = state.case_facts
-        if case_facts is None or case_facts.gross_primary_site is None:
+        if case_facts is None or (not case_facts.primary_site and not case_facts.gross_primary_site):
             site_dictionary = {}
             site_dictionary_path = getattr(self, "_site_data_dictionary_path", None)
             if site_dictionary_path is not None:
@@ -312,10 +334,9 @@ class OrchestratorAgent(BaseAgent):
                         )
                         for tissue in tissues
                     }
-                    resolved_sites.discard(None)
                 else:
                     resolved_sites = tissues
-                if len(resolved_sites) == 1:
+                if len(resolved_sites) == 1 and None not in resolved_sites:
                     case_facts = (case_facts or CaseFacts()).model_copy(
                         update={"gross_primary_site": resolved_sites.pop()}
                     )
@@ -352,8 +373,8 @@ class OrchestratorAgent(BaseAgent):
 
         ``build_variable_group`` returns a plain ``VariableGroupInfo`` (no gating),
         so its enriched variables are merged back onto the pending ``TargetGroup``
-        by item ID; the original ordering is kept and any variable the dictionary
-        does not know is left as-is rather than dropped.
+        by item ID; the original ordering is kept. Missing or unusable dictionary
+        metadata fails explicitly before the group makes model calls.
         """
         enriched = build_variable_group(
             [variable.item_id for variable in group.variables],
@@ -365,7 +386,7 @@ class OrchestratorAgent(BaseAgent):
         return group.model_copy(
             update={
                 "variables": [
-                    enriched_by_id.get(variable.item_id, variable)
+                    enriched_by_id[variable.item_id]
                     for variable in group.variables
                 ]
             }
@@ -473,13 +494,18 @@ class OrchestratorAgent(BaseAgent):
         relevant_ids: list[int | str] | None,
     ) -> dict:
         """Restrict model output to offered IDs and finish the durable record."""
-        offered_ids = set(request.available_digests) if request is not None else set()
-        selected_ids = [
-            note_id for note_id in (relevant_ids or []) if note_id in offered_ids
-        ]
-        discarded_ids = [
-            note_id for note_id in (relevant_ids or []) if note_id not in offered_ids
-        ]
+        offered_ids = {
+            str(note_id): note_id for note_id in request.available_digests
+        } if request is not None else {}
+        selected_ids: list[int | str] = []
+        discarded_ids: list[int | str] = []
+        for proposal in relevant_ids or []:
+            if str(proposal) not in offered_ids:
+                discarded_ids.append(proposal)
+            else:
+                original_id = offered_ids[str(proposal)]
+                if original_id not in selected_ids:
+                    selected_ids.append(original_id)
         completed = selection.model_copy(
             update={
                 "selected_note_ids": selected_ids,
@@ -570,12 +596,43 @@ class OrchestratorAgent(BaseAgent):
             "note_retriever": self._retriever,
             "extractor": self._extractor,
         }
-        agent_llm_config = {
-            name: component._llm_config.model_dump(
-                mode="json", exclude={"api_key", "tools"}
-            )
-            for name, component in components.items()
+        safe_fields = {
+            "provider": (str,), "model": (str,),
+            "structured_output_method": (str,), "endpoint_compatibility": (str,),
+            "max_concurrency": (int,), "use_responses_api": (bool,),
+            "reasoning_effort": (str,), "temperature": (int, float),
+            "top_p": (int, float), "frequency_penalty": (int, float),
+            "presence_penalty": (int, float), "max_tokens": (int,),
+            "max_completion_tokens": (int,), "seed": (int,),
         }
+        agent_llm_config = {}
+        for name, component in components.items():
+            settings = component._llm_config
+            safe = {}
+            # Project before serialization: arbitrary extras can contain both
+            # credentials and unserializable SDK objects. URLs can contain secrets too.
+            for key, allowed_types in safe_fields.items():
+                if not hasattr(settings, key):
+                    continue
+                value = getattr(settings, key)
+                if value is not None and type(value) not in allowed_types:
+                    raise ValueError(f"Invalid type for fingerprint setting {key}.")
+                safe[key] = value
+            if hasattr(settings, "reasoning"):
+                reasoning = settings.reasoning
+                safe["reasoning"] = None
+                if reasoning is not None:
+                    safe_reasoning = {}
+                    for key, choices in {
+                        "effort": {"low", "medium", "high"},
+                        "summary": {"detailed", "auto"},
+                    }.items():
+                        value = reasoning.get(key) if isinstance(reasoning, Mapping) else getattr(reasoning, key, None)
+                        if value is not None and (type(value) is not str or value not in choices):
+                            raise ValueError(f"Invalid reasoning fingerprint setting {key}.")
+                        safe_reasoning[key] = value
+                    safe["reasoning"] = safe_reasoning
+            agent_llm_config[name] = safe
         retry = {
             name: self._retry_fingerprint(component._retry_policy)
             for name, component in components.items()
@@ -618,6 +675,34 @@ class OrchestratorAgent(BaseAgent):
             note_corpus_descriptors=state.get("note_corpus_descriptors"),
         )
 
+    @staticmethod
+    def _failure_corpus(
+        state: Mapping[str, Any] | None,
+        completed: Mapping[int | str, ProcessedClinicalNote],
+        original_notes: list[ClinicalNote],
+    ) -> OrchestratorRunCorpus | None:
+        state = state or {}
+        available = {
+            str(key): note for key, note in state.get("note_corpus", {}).items()
+            if isinstance(note, ProcessedClinicalNote)
+        }
+        available.update({str(key): note for key, note in completed.items()})
+        notes = {
+            original.note_id: available[str(original.note_id)]
+            for original in original_notes if str(original.note_id) in available
+        }
+        if not notes:
+            return None
+        characterized = (
+            len(notes) == len(original_notes)
+            and state.get("note_corpus_descriptors") is not None
+        )
+        return OrchestratorRunCorpus(
+            note_corpus=notes,
+            note_digests=state.get("note_digests", {}) if characterized else {},
+            note_corpus_descriptors=state.get("note_corpus_descriptors") if characterized else None,
+        )
+
     def run(
         self,
         raw_notes: list[dict],
@@ -635,7 +720,8 @@ class OrchestratorAgent(BaseAgent):
 
         ``structured_data`` optionally supplies already-known coded values keyed
         by NAACCR item ID; those variables are seeded as structured-data results
-        and skip extraction. Set ``progress`` to false to run without rendering
+        and skip extraction. Empty note lists are rejected, even when structured
+        values are supplied. Set ``progress`` to false to run without rendering
         the live progress display. ``max_concurrency`` controls LangGraph's
         parallel task limit. Prompt/response capture can be disabled independently
         from model metadata and usage collection. Returns the complete versioned
@@ -671,7 +757,17 @@ class OrchestratorAgent(BaseAgent):
         if max_content_chars is not None and max_content_chars < 0:
             raise ValueError("max_content_chars must be non-negative.")
 
+        if not raw_notes:
+            raise ValueError("At least one clinical note is required; structured-only runs are not supported.")
         notes = [ClinicalNote.model_validate(note) for note in raw_notes]
+        seen_ids: dict[str, int] = {}
+        for position, note in enumerate(notes):
+            canonical = str(note.note_id)
+            if canonical in seen_ids:
+                raise ValueError(
+                    f"Duplicate canonical note ID at input positions {seen_ids[canonical]} and {position}."
+                )
+            seen_ids[canonical] = position
         validated_input = OrchestratorInput(
             note_corpus={note.note_id: note for note in notes},
             structured_data={} if structured_data is None else structured_data,
@@ -694,6 +790,7 @@ class OrchestratorAgent(BaseAgent):
             or configured_concurrency < 1
         ):
             raise ValueError("config max_concurrency must be a positive integer.")
+        validate_graph_concurrency(self._graph, graph_config, subgraphs=True)
 
         run_id = uuid4()
         started_at = datetime.now(timezone.utc)
@@ -714,6 +811,9 @@ class OrchestratorAgent(BaseAgent):
             if event_observer is not None:
                 event_observer(event)
 
+        run_error: Exception | None = None
+        full_state: CaseState | None = None
+        corpus: OrchestratorRunCorpus | None = None
         try:
             final_state = run_graph_stream(
                 self._graph,
@@ -727,46 +827,81 @@ class OrchestratorAgent(BaseAgent):
                 pause_before_summary=pause_before_summary,
                 event_observer=observe,
             )
-            finished_at = datetime.now(timezone.utc)
             full_state = CaseState.model_validate(final_state)
+            expected_items = {
+                variable.item_id for group in self._target_variables for variable in group.variables
+            }
+            if (
+                expected_items - full_state.variable_results.keys()
+                or full_state.outstanding_item_ids or full_state.report is None
+            ):
+                raise RuntimeError("Graph terminated before all requested variables were finalized.")
+            if (
+                {str(key) for key in full_state.note_corpus} != set(seen_ids)
+                or any(not isinstance(note, ProcessedClinicalNote) for note in full_state.note_corpus.values())
+            ):
+                raise RuntimeError("Completed graph did not retain every processed input note.")
             corpus = self._corpus_from_state(final_state)
             if corpus is None:
                 raise RuntimeError("Completed graph produced no corpus state.")
-            return OrchestratorRunResult(
-                run=OrchestratorRunInfo(
-                    run_id=run_id,
-                    started_at=started_at,
-                    finished_at=finished_at,
-                    duration_seconds=time.monotonic() - started_monotonic,
-                    status="completed",
-                    config_fingerprint=fingerprint,
-                ),
-                case=full_state.to_case(),
-                inputs=run_inputs,
-                corpus=corpus,
-                observability=RunObservability.model_validate(collector.snapshot()),
-            )
         except Exception as error:
-            finished_at = datetime.now(timezone.utc)
-            try:
-                partial_corpus = self._corpus_from_state(last_root_state)
-            except Exception:
-                partial_corpus = None
-            failure = OrchestratorRunFailure(
-                run=OrchestratorRunInfo(
-                    run_id=run_id,
-                    started_at=started_at,
-                    finished_at=finished_at,
-                    duration_seconds=time.monotonic() - started_monotonic,
-                    status="failed",
-                    config_fingerprint=fingerprint,
-                ),
-                inputs=run_inputs,
-                corpus=partial_corpus,
-                observability=RunObservability.model_validate(collector.snapshot()),
-                error=f"{type(error).__name__}: {error}",
+            run_error = error
+
+        # Finalize only after graph cleanup has joined its running workers.
+        # Never repeat a failing snapshot while building the failure envelope.
+        try:
+            observability = RunObservability.model_validate(collector.snapshot())
+        except Exception as error:
+            observability = RunObservability(
+                llm_content_captured=capture_llm_content,
+                max_content_chars=max_content_chars,
+                collection_status="unavailable",
+                collection_issues=[{
+                    "code": "telemetry_finalization_error",
+                    "message": f"Telemetry finalization failed ({type(error).__name__}); usage is unavailable.",
+                }],
+                llm_usage_summary=None,
             )
-            raise OrchestratorRunError(failure) from error
+            if run_error is None:
+                run_error = error
+
+        run_info = OrchestratorRunInfo(
+            run_id=run_id,
+            started_at=started_at,
+            finished_at=datetime.now(timezone.utc),
+            duration_seconds=time.monotonic() - started_monotonic,
+            status="failed" if run_error is not None else "completed",
+            config_fingerprint=fingerprint,
+        )
+        if run_error is None:
+            try:
+                return OrchestratorRunResult(
+                    run=run_info, case=full_state.to_case(), inputs=run_inputs,
+                    corpus=corpus, observability=observability,
+                )
+            except Exception as error:
+                run_error = error
+                run_info = run_info.model_copy(update={"status": "failed"})
+
+        try:
+            partial_corpus = self._failure_corpus(last_root_state, collector.completed_notes(), notes)
+        except Exception as error:
+            partial_corpus = None
+            values = observability.model_dump()
+            values["collection_status"] = (
+                "unavailable" if observability.collection_status == "unavailable" else "partial"
+            )
+            values["collection_issues"].append({
+                "code": "failure_corpus_error",
+                "message": f"Partial corpus assembly failed ({type(error).__name__}).",
+            })
+            observability = RunObservability.model_validate(values)
+        failure = OrchestratorRunFailure(
+            run=run_info, inputs=run_inputs, corpus=partial_corpus,
+            observability=observability,
+            error=f"{type(run_error).__name__}: {run_error}",
+        )
+        raise OrchestratorRunError(failure) from run_error
 
 
 if __name__ == "__main__":

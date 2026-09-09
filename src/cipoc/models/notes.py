@@ -13,6 +13,8 @@ CONCEPT_DESCRIPTIONS: dict[str, str] = {
     "metastasis": "Any indication that cancer has spread beyond its primary site (distant or regional metastatic disease).",
     "surgery": "Any cancer-directed surgical procedure (e.g. resection, excision, mastectomy, lobectomy).",
     "chemotherapy": "Any systemic cytotoxic chemotherapy that was administered or planned.",
+    "hormonal_therapy": "Any cancer-directed hormonal or endocrine therapy that was administered or planned (e.g. tamoxifen, aromatase inhibitors, androgen deprivation). Exclude non-cancer hormone replacement or other non-cancer endocrine treatment.",
+    "immunotherapy": "Any cancer-directed immunotherapy or biologic response modifier that was administered or planned (e.g. immune checkpoint inhibitors, CAR T-cell therapy). Exclude non-cancer immunotherapy such as allergy desensitization or autoimmune treatment.",
     "radiation": "Any radiation therapy that was administered or planned.",
     "lymph_nodes_removed": "Any removal or surgical sampling of lymph nodes (e.g. lymphadenectomy, sentinel node biopsy, regional node dissection).",
 }

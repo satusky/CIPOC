@@ -46,6 +46,7 @@ def result_with_usage(summary=None):
         corpus=corpus(),
         observability=RunObservability(
             llm_content_captured=False,
+            collection_status="complete",
             llm_usage_summary=summary or LLMUsageSummary(),
         ),
     )
@@ -159,6 +160,7 @@ class RunCaseStateCliTests(unittest.TestCase):
             corpus=None,
             observability=RunObservability(
                 llm_content_captured=False,
+                collection_status="complete",
                 llm_usage_summary=usage_summary(partial=True),
             ),
             error="RuntimeError: endpoint unavailable",
@@ -205,6 +207,32 @@ class RunCaseStateCliTests(unittest.TestCase):
         self.assertNotIn("normalize(", source)
         self.assertNotIn("_workbench_note_selection", source)
         self.assertNotIn("_retriever_offered", source)
+
+    def test_cli_reports_unavailable_telemetry_without_zero_usage_or_crashing(self):
+        failure = OrchestratorRunFailure(
+            run=run_info(status="failed"), inputs=inputs(), corpus=None,
+            observability=RunObservability(
+                llm_content_captured=False, collection_status="unavailable",
+                collection_issues=[{"code": "telemetry_finalization_error", "message": "Summary unavailable."}],
+                llm_usage_summary=None,
+            ),
+            error="RuntimeError: original graph failure",
+        )
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "failure.json"
+            with (
+                patch.object(cli, "_load_notes", return_value=[{"note_id": "synthetic"}]),
+                patch.object(cli, "run_case_state", side_effect=OrchestratorRunError(failure)),
+                redirect_stdout(stdout), redirect_stderr(stderr),
+            ):
+                code = cli.main(["--output", str(output)])
+            self.assertEqual(code, 1)
+            self.assertEqual(OrchestratorRunFailure.model_validate_json(output.read_text()), failure)
+        self.assertIn("Telemetry collection: unavailable", stdout.getvalue())
+        self.assertIn("Usage: unavailable", stdout.getvalue())
+        self.assertNotIn("total=0", stdout.getvalue())
+        self.assertIn("original graph failure", stderr.getvalue())
 
     def test_capture_help_warns_that_corpus_phi_remains(self):
         parser = cli.build_parser()

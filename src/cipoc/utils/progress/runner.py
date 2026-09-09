@@ -10,6 +10,7 @@ import threading
 import time
 from typing import Any, Callable, Iterable, Mapping, TextIO
 
+from langgraph._internal._config import ensure_config
 from langgraph.graph.state import CompiledStateGraph
 
 from cipoc.tools import GroupNode
@@ -366,6 +367,38 @@ def _teardown_progress(
             raise cleanup_interrupt
 
 
+def validate_graph_concurrency(
+    graph: CompiledStateGraph,
+    config: Mapping[str, Any] | None = None,
+    *,
+    subgraphs: bool = False,
+) -> None:
+    """Fail before synchronous streaming can deadlock in LangGraph 1.0.3.
+
+    Use the pinned runtime's config resolution: inherited runnable context,
+    graph.with_config(), then non-None call overrides. This only validates; it
+    never rewrites concurrency. Per-model LLM capacity is independent and may be 1.
+    Call with the same graph/config/subgraphs settings as ``run_graph_stream``.
+    """
+    # Project only this field so validation cannot populate caller metadata as
+    # a side effect of LangGraph's full config normalization.
+    bound = getattr(graph, "config", None)
+    effective = ensure_config(
+        {"max_concurrency": bound.get("max_concurrency")} if bound is not None else None,
+        {"max_concurrency": config.get("max_concurrency")} if config is not None else None,
+    )
+    capacity = effective.get("max_concurrency")
+    if capacity is not None and (type(capacity) is not int or capacity < 1):
+        raise ValueError("Graph max_concurrency must be a positive integer or None.")
+    if capacity == 1 and (subgraphs or getattr(graph, "stream_eager", False)):
+        raise ValueError(
+            "Graph max_concurrency=1 is unsafe for synchronous nested/eager "
+            "streaming in LangGraph 1.0.3: its stream waiter can occupy the only "
+            "worker and deadlock. Set graph max_concurrency to at least 2 or "
+            "leave it unset. The independent per-model LLM cap may still be 1."
+        )
+
+
 def run_graph_stream(
     graph: CompiledStateGraph,
     graph_input: Any,
@@ -389,6 +422,7 @@ def run_graph_stream(
     wraps that same loop. The optional observer always sees each normalized
     event before presentation consumes it.
     """
+    validate_graph_concurrency(graph, config, subgraphs=subgraphs)
     model: ProgressModel | None = None
     renderer: Renderer | None = None
     painter: _RepaintLoop | None = None
@@ -492,4 +526,4 @@ def run_with_progress(
     )
 
 
-__all__ = ["run_graph_stream", "run_with_progress"]
+__all__ = ["run_graph_stream", "run_with_progress", "validate_graph_concurrency"]

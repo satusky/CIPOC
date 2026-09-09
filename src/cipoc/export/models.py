@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date, datetime
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
@@ -24,8 +25,33 @@ def _required_string(value: Any) -> str:
     return value
 
 
+def _required_date(value: Any) -> str:
+    value = _required_string(value)
+    try:
+        if date.fromisoformat(value).isoformat() == value:
+            return value
+    except ValueError:
+        pass
+    raise ValueError("Value must be a calendar-valid date in YYYY-MM-DD format.")
+
+
+def _optional_datetime(value: Any) -> str | None:
+    if value is None or value == "":
+        return value
+    value = _required_string(value)
+    try:
+        datetime.fromisoformat(value)
+    except ValueError:
+        raise ValueError(
+            "Value must be an ISO datetime with a valid date and time."
+        ) from None
+    return value
+
+
 RequiredCsvValue = Annotated[int | str, BeforeValidator(_required_csv_value)]
 RequiredString = Annotated[str, BeforeValidator(_required_string)]
+RequiredDate = Annotated[str, BeforeValidator(_required_date)]
+OptionalDatetime = Annotated[str | None, BeforeValidator(_optional_datetime)]
 OptionalCsvValue = int | str | None
 OptionalStringValue = str | None
 
@@ -37,8 +63,8 @@ class OmopNoteRow(BaseModel):
 
     note_id: RequiredCsvValue
     person_id: RequiredCsvValue
-    note_date: RequiredString
-    note_datetime: OptionalStringValue = None
+    note_date: RequiredDate
+    note_datetime: OptionalDatetime = None
     note_type_concept_id: RequiredCsvValue
     note_class_concept_id: RequiredCsvValue
     note_title: OptionalStringValue = None
@@ -65,8 +91,8 @@ class OmopNoteNlpRow(BaseModel):
     note_nlp_concept_id: OptionalCsvValue = None
     note_nlp_source_concept_id: OptionalCsvValue = None
     nlp_system: OptionalStringValue = None
-    nlp_date: RequiredString
-    nlp_datetime: OptionalStringValue = None
+    nlp_date: RequiredDate
+    nlp_datetime: OptionalDatetime = None
     term_exists: OptionalStringValue = None
     term_temporal: OptionalStringValue = None
     term_modifiers: OptionalStringValue = None

@@ -20,6 +20,7 @@ from cipoc.models.observability import (
     NormalizedTokenUsage,
     VariableAttempt,
 )
+from cipoc.models.notes import ProcessedClinicalNote
 
 from .progress.events import ProgressEvent, field
 
@@ -403,6 +404,7 @@ class LLMCaptureHandler(BaseCallbackHandler):
         *,
         capture_llm_content: bool = True,
         max_content_chars: int | None = None,
+        task_observer: Callable[[ProgressEvent], None] | None = None,
     ) -> None:
         if max_content_chars is not None and (
             isinstance(max_content_chars, bool)
@@ -415,8 +417,55 @@ class LLMCaptureHandler(BaseCallbackHandler):
         self._calls: list[dict[str, Any]] = []
         self._pending: dict[str, int] = {}
         self._starts: dict[tuple[tuple[str, ...], str], int] = {}
+        self._task_observer = task_observer
+        self._task_runs: dict[str, ProgressEvent] = {}
+        self._collection_issues: list[dict[str, str]] = []
         self.capture_llm_content = capture_llm_content
         self.max_content_chars = max_content_chars
+
+    def _notify_task(self, event: ProgressEvent) -> None:
+        if self._task_observer is None:
+            return
+        try:
+            self._task_observer(event)
+        except Exception as error:
+            with self._lock:
+                self._collection_issues.append({
+                    "code": "task_capture_error",
+                    "message": f"Unable to capture {event.node} task metadata ({type(error).__name__}).",
+                })
+
+    def on_chain_start(
+        self, serialized, inputs, *, run_id, name=None, tags=None, metadata=None, **kwargs
+    ) -> None:
+        if self._task_observer is None:
+            return
+        node = str((metadata or {}).get("langgraph_node", ""))
+        namespace = _parse_namespace(metadata)
+        # Nested runnables inherit task metadata too, but are not task starts.
+        if (
+            name != node or not namespace or not namespace[-1].startswith(f"{node}:")
+            or not any(tag.startswith("graph:step:") for tag in tags or ())
+        ):
+            return
+        event = ProgressEvent(
+            kind="task_start", namespace=namespace[:-1], node=node,
+            task_id=namespace[-1][len(node) + 1:], payload=inputs,
+        )
+        with self._lock:
+            self._task_runs[str(run_id)] = replace(event, payload=None)
+        # Never hold the callback lock while entering the collector.
+        self._notify_task(event)
+
+    def on_chain_end(self, outputs, *, run_id, **kwargs) -> None:
+        with self._lock:
+            event = self._task_runs.pop(str(run_id), None)
+        if event is not None:
+            self._notify_task(replace(event, kind="task_end", payload=outputs))
+
+    def on_chain_error(self, error, *, run_id, **kwargs) -> None:
+        with self._lock:
+            self._task_runs.pop(str(run_id), None)
 
     def on_chat_model_start(
         self,
@@ -476,8 +525,9 @@ class LLMCaptureHandler(BaseCallbackHandler):
         graph_node = str((metadata or {}).get("langgraph_node", ""))
         retry_key = (namespace, graph_node)
         with self._lock:
-            prior_starts = self._starts.get(retry_key, 0)
-            self._starts[retry_key] = prior_starts + 1
+            prior_starts = self._starts.get(retry_key, 0) if namespace and graph_node else 0
+            if namespace and graph_node:
+                self._starts[retry_key] = prior_starts + 1
             self._pending[str(run_id)] = len(self._calls)
             call = {
                 "complete": False,
@@ -556,6 +606,16 @@ class LLMCaptureHandler(BaseCallbackHandler):
                 if call.get("complete")
             ]
 
+    def collection_issues(self) -> list[dict[str, str]]:
+        with self._lock:
+            issues = deepcopy(self._collection_issues)
+            if self._pending:
+                issues.append({
+                    "code": "incomplete_invocations",
+                    "message": f"{len(self._pending)} model invocation(s) have no completion callback.",
+                })
+            return issues
+
 
 def merge_callback_config(
     config: Mapping[str, Any] | None, callback: BaseCallbackHandler
@@ -626,7 +686,7 @@ def aggregate_llm_usage(
         return bucket_data.setdefault(
             (dimension, key),
             {
-                "logical_keys": set(),
+                "logical_calls": 0,
                 "model_invocations": 0,
                 "successful_invocations": 0,
                 "failed_invocations": 0,
@@ -641,8 +701,7 @@ def aggregate_llm_usage(
             },
         )
 
-    def add(bucket: dict[str, Any], logical_key: tuple[str, str, int], exchange: Any) -> None:
-        bucket["logical_keys"].add(logical_key)
+    def add(bucket: dict[str, Any], exchange: Any) -> None:
         bucket["model_invocations"] += 1
         failed = _exchange_value(exchange, "error") is not None
         bucket["failed_invocations" if failed else "successful_invocations"] += 1
@@ -651,6 +710,8 @@ def aggregate_llm_usage(
             retry_ordinal = _exchange_value(exchange, "transport_retry_ordinal")
         if retry_ordinal is not None:
             bucket["retry_invocations"] += 1
+        else:
+            bucket["logical_calls"] += 1
 
         raw_usage = _exchange_value(exchange, "usage")
         if raw_usage is None:
@@ -672,25 +733,38 @@ def aggregate_llm_usage(
             for key, count in getattr(usage, name).root.items():
                 target[key] = target.get(key, 0) + count
 
+    sequences: dict[tuple, int] = {}
+    invocation_ids: set[str] = set()
     for entity_hint, exchange in _exchange_items(exchanges):
         entity = str(_exchange_value(exchange, "entity_key", entity_hint) or "unknown")
         node = str(_exchange_value(exchange, "node") or "unknown")
         agent = str(_exchange_value(exchange, "agent") or "unknown")
         model = str(_exchange_value(exchange, "model") or "unknown")
         attempt = int(_exchange_value(exchange, "attempt", 1) or 1)
-        logical_key = (entity, node, attempt)
+        namespace = tuple(_exchange_value(exchange, "namespace", ()) or ())
+        logical_key = (namespace, node) if namespace else (entity, node, attempt)
+        invocation_id = _exchange_value(exchange, "invocation_id")
+        if invocation_id is not None:
+            if invocation_id in invocation_ids:
+                raise ValueError("Duplicate model invocation identity.")
+            invocation_ids.add(invocation_id)
+        ordinal = _exchange_value(exchange, "retry_ordinal")
+        if ordinal is None:
+            ordinal = _exchange_value(exchange, "transport_retry_ordinal")
+        expected = sequences.get(logical_key, 0)
+        if (ordinal or 0) != expected:
+            raise ValueError("Model invocation sequence has missing, repeated, or misattributed attempts.")
+        sequences[logical_key] = expected + 1
         for dimension, key in (
             ("total", "total"),
             ("agent", agent),
             ("node", node),
             ("model", model),
         ):
-            add(accumulator(dimension, key), logical_key, exchange)
+            add(accumulator(dimension, key), exchange)
 
     def finish(data: dict[str, Any]) -> LLMUsageBucket:
-        values = dict(data)
-        values["logical_calls"] = len(values.pop("logical_keys"))
-        return LLMUsageBucket(**values)
+        return LLMUsageBucket(**data)
 
     total = finish(accumulator("total", "total"))
     return LLMUsageSummary(
@@ -733,11 +807,15 @@ class ObservabilityCollector:
         self._entity_scopes: dict[tuple[str, ...], str] = {}
         self._task_bindings: dict[tuple[str, ...], TaskBinding] = {}
         self._variable_attempts: dict[str, list[VariableAttempt]] = {}
+        self._validation_scopes: set[tuple[str, ...]] = set()
+        self._completed_notes: dict[str, ProcessedClinicalNote] = {}
+        self._collection_issues: list[dict[str, str]] = []
         self.capture_llm_content = capture_llm_content
         self.max_content_chars = max_content_chars
         self._llm_callback = LLMCaptureHandler(
             capture_llm_content=capture_llm_content,
             max_content_chars=max_content_chars,
+            task_observer=self.observe,
         )
 
     @property
@@ -756,11 +834,27 @@ class ObservabilityCollector:
         with self._lock:
             if event.kind == "task_start":
                 self._observe_start(event)
-            elif event.kind == "task_end" and event.node == "validate_extraction":
-                self._observe_validation(event)
+            elif event.kind == "task_end" and event.error is None:
+                if event.node == "validate_extraction":
+                    self._observe_validation(event)
+                elif event.node == "note_branch":
+                    for note_id, note in (field(event.payload, "note_corpus", {}) or {}).items():
+                        # Only completed branch outputs qualify, never raw root inputs.
+                        processed = ProcessedClinicalNote.model_validate(note)
+                        if str(note_id) != str(processed.note_id):
+                            raise ValueError("Completed scan has inconsistent note identity.")
+                        self._completed_notes[str(note_id)] = processed.model_copy(deep=True)
 
     def __call__(self, event: ProgressEvent) -> None:
         self.observe(event)
+
+    def completed_notes(self) -> dict[int | str, ProcessedClinicalNote]:
+        """Completed scans, including siblings finishing during stream cleanup."""
+        with self._lock:
+            return {
+                note.note_id: note.model_copy(deep=True)
+                for note in self._completed_notes.values()
+            }
 
     def binding_for(
         self,
@@ -795,18 +889,20 @@ class ObservabilityCollector:
                     for key, attempts in self._variable_attempts.items()
                 },
                 "llm_exchanges": {},
+                "unattributed_exchanges": [],
+                "collection_issues": deepcopy(self._collection_issues)
+                + self._llm_callback.collection_issues(),
             }
             exchanges: dict[str, list[dict[str, Any]]] = {}
+            usage_records: list[dict[str, Any]] = []
             for call in captured_calls:
-                binding = self.binding_for(call.namespace)
-                if binding is None:
-                    continue
-                node = call.graph_node or binding.graph_node
+                binding = self._task_bindings.get(call.namespace)
+                node = call.graph_node or "unknown"
                 exchange = {
-                    "entity_key": binding.entity_key,
+                    "invocation_id": call.run_id,
+                    "namespace": list(call.namespace),
                     "agent": _LLM_AGENT_BY_NODE.get(node, "unknown"),
                     "node": node,
-                    "attempt": binding.semantic_attempt or 1,
                     "model": call.model,
                     "usage": deepcopy(call.usage),
                     "error": call.error,
@@ -821,11 +917,29 @@ class ObservabilityCollector:
                         snapshot["content_truncated"] = True
                 if call.transport_retry_ordinal is not None:
                     exchange["retry_ordinal"] = call.transport_retry_ordinal
-                exchanges.setdefault(binding.entity_key, []).append(exchange)
+                if (
+                    binding is not None and binding.graph_node == node
+                    and binding.semantic_attempt is not None and binding.semantic_attempt > 0
+                ):
+                    exchange["entity_key"] = binding.entity_key
+                    exchange["attempt"] = binding.semantic_attempt
+                    exchanges.setdefault(binding.entity_key, []).append(exchange)
+                else:
+                    snapshot["unattributed_exchanges"].append(exchange)
+                    snapshot["collection_issues"].append({
+                        "code": "missing_task_binding",
+                        "message": f"Invocation {call.run_id} has no exact entity/attempt binding for node {node}.",
+                    })
+                usage_records.append(exchange)
             snapshot["llm_exchanges"] = exchanges
-            snapshot["llm_usage_summary"] = aggregate_llm_usage(exchanges).model_dump(
-                mode="json"
-            )
+            try:
+                snapshot["llm_usage_summary"] = aggregate_llm_usage(usage_records).model_dump(mode="json")
+            except ValueError as error:
+                snapshot["llm_usage_summary"] = None
+                snapshot["collection_issues"].append({
+                    "code": "invalid_invocation_sequence", "message": str(error),
+                })
+            snapshot["collection_status"] = "partial" if snapshot["collection_issues"] else "complete"
             return snapshot
 
     def _observe_start(self, event: ProgressEvent) -> None:
@@ -835,14 +949,32 @@ class ObservabilityCollector:
             return
 
         semantic_attempt = self._semantic_attempt(event)
-        self._entity_scopes[event.scope] = entity_key
-        self._task_bindings[event.scope] = TaskBinding(
+        binding = TaskBinding(
             entity_key=entity_key,
             graph_node=event.node,
             semantic_attempt=semantic_attempt,
         )
+        existing = self._task_bindings.get(event.scope)
+        if existing is not None:
+            if existing.entity_key != entity_key or (
+                existing.semantic_attempt is not None and semantic_attempt is not None
+                and existing.semantic_attempt != semantic_attempt
+            ):
+                issue = {
+                    "code": "conflicting_task_binding",
+                    "message": f"Conflicting entity/attempt metadata for task {event.node}:{event.task_id}.",
+                }
+                if issue not in self._collection_issues:
+                    self._collection_issues.append(issue)
+                return
+            if existing.semantic_attempt is not None:
+                return
+        self._entity_scopes[event.scope] = entity_key
+        self._task_bindings[event.scope] = binding
 
     def _observe_validation(self, event: ProgressEvent) -> None:
+        if event.scope in self._validation_scopes:
+            return
         task = field(event.payload, "task")
         if task is None:
             return
@@ -875,12 +1007,13 @@ class ObservabilityCollector:
             ],
             is_valid=bool(field(task, "is_valid", False)),
         )
+        self._validation_scopes.add(event.scope)
         self._variable_attempts.setdefault(variable_key, []).append(record)
 
     def _entity_from_start(
         self, event: ProgressEvent, inherited: str | None
     ) -> str | None:
-        if event.node == "note_branch":
+        if event.node in {"note_branch", "detect_concepts", "summarize_note", "get_cancer_mentions"}:
             note_id = field(event.payload, "note_id")
             if note_id is None:
                 note_id = field(field(event.payload, "note"), "note_id")
@@ -906,7 +1039,10 @@ class ObservabilityCollector:
 
     @staticmethod
     def _semantic_attempt(event: ProgressEvent) -> int | None:
-        if event.node == "extract_group_values":
+        if event.node in {
+            "extract_group_values", "detect_concepts", "summarize_note",
+            "get_cancer_mentions", "identify_relevant_notes",
+        }:
             return 1
         if event.node not in {
             "extract_individual_value",

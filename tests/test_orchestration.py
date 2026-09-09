@@ -17,6 +17,7 @@ from cipoc.models import (
     OrchestratorRunResult,
     ProcessedClinicalNote,
     TextSpan,
+    VariableOutput,
 )
 from cipoc.tools import build_corpus_descriptors, load_variable_groups, site_applies
 from cipoc.utils.progress.events import normalize
@@ -46,6 +47,19 @@ class SiteApplicabilityTests(unittest.TestCase):
 
         self.assertTrue(site_applies(group.applies_to, CaseFacts(primary_site="C50.4")))
         self.assertFalse(site_applies(group.applies_to, CaseFacts(primary_site="C34.9")))
+
+
+class VariableCitationTests(unittest.TestCase):
+    def test_primary_citation_preserves_original_scalar_through_json(self):
+        for note_id in (1, "001", "note-A", None):
+            with self.subTest(note_id=note_id):
+                candidate = VariableOutput(
+                    item_id=400, value="C504", explanation="Synthetic evidence",
+                    most_important_note=note_id, spans=[], presence_confidence="max",
+                )
+                restored = VariableOutput.model_validate_json(candidate.model_dump_json())
+                self.assertEqual(restored.most_important_note, note_id)
+                self.assertIs(type(restored.most_important_note), type(note_id))
 
 
 class CorpusCharacterizationTests(unittest.TestCase):
@@ -425,7 +439,8 @@ class OrchestratorRunTests(unittest.TestCase):
         self.assertEqual(failure.run.status, "failed")
         self.assertIsInstance(raised.exception.__cause__, ValueError)
         self.assertIn("invalid completed corpus", failure.error)
-        self.assertIsNone(failure.corpus)
+        self.assertIsNotNone(failure.corpus)
+        self.assertEqual(len(failure.corpus.note_corpus), len(load_notes()))
 
     def test_run_validates_stream_options(self):
         agent = build_fake_orchestrator()

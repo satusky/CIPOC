@@ -392,7 +392,8 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 }
 .view-tab:focus-visible, .mode-tab:focus-visible, .lens-tab:focus-visible,
 .icon-btn:focus-visible, .bubble:focus-visible, .note-row:focus-visible,
-.group-card:focus-visible, .vtable tbody tr:focus-visible, .link:focus-visible {
+.group-card:focus-visible, .vtable tbody tr:focus-visible, .link:focus-visible,
+.telemetry-link:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -440,6 +441,8 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 .fact .k { color: var(--text-faint); }
 .fact .v { font-family: var(--mono); }
 .fact.unset .v { color: var(--text-faint); font-style: italic; }
+.telemetry-link { flex: 0 0 auto; cursor: pointer; background: transparent; }
+.telemetry-link:hover, .telemetry-link[aria-current="true"] { background: var(--bg-panel); }
 
 /* ------------------------------------------------------------- workspace */
 
@@ -1052,7 +1055,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
   padding: 9px 11px;
   margin-bottom: 8px;
 }
-.card > h4 { font-size: 12px; margin-bottom: 5px; display: flex; gap: 8px; align-items: baseline; }
+.card > h4 { font-size: 12px; margin-bottom: 5px; display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; overflow-wrap: anywhere; }
 .card.bad { border-color: color-mix(in srgb, var(--error) 45%, var(--line)); }
 .card.good { border-color: color-mix(in srgb, var(--extracted) 35%, var(--line)); }
 

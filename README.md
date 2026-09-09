@@ -69,7 +69,8 @@ initialize ──► scan_notes ──► characterize_corpus ──► check_st
   relevance to the group's variables.
 - **Extract** — `ExtractorAgent` codes the group's variables from the retrieved
   notes, validating each value against the data dictionary (with a repair loop
-  for invalid extractions). Code descriptions are scoped by gross primary site.
+  for invalid extractions). An informative coded primary site takes precedence
+  over gross-site inference when selecting scoped code descriptions.
 - **Loop & finalize** — newly coded scoping facts feed the next planning pass;
   when nothing remains eligible (or a fatal blocker is hit), the graph finalizes
   a `Case` with per-variable results and a review report. The public run result
@@ -133,6 +134,21 @@ export AZURE_OPENAI_API_KEY=...
 The variables to extract are defined in `config/variable_groups.json` as ordered
 groups with gating conditions, note filters, and NAACCR item IDs.
 
+Endpoints must be explicit, nonblank HTTP(S) URLs. Configuration fingerprints
+record only allowlisted model settings, not credentials, headers, arbitrary
+extras, or raw endpoint URLs.
+
+`llm.max_concurrency` is a process-wide synchronous budget per model at an
+endpoint. Live CIPOC wrappers using the same normalized endpoint and configured
+model name share a budget and must agree on capacity, including `None` for
+unbounded operation. Different models at the same URL have independent budgets
+and may use different limits; there is no aggregate URL-wide cap. Constructor
+model overrides determine the budget, not provider-reported model versions.
+Async methods, direct SDK access, and separate processes do not share this guarantee.
+The independent `run(max_concurrency=...)` graph setting must be at least 2 or
+unset: concurrency 1 deadlocks nested synchronous streaming in pinned LangGraph
+1.0.3 and is rejected before execution. Per-model LLM capacity 1 remains supported.
+
 ## Usage
 
 ### Run the full orchestrator
@@ -168,6 +184,11 @@ clinical `Case` is finalized. A graph failure raises `OrchestratorRunError`; its
 `failure` attribute is an `OrchestratorRunFailure` with the partial diagnostic
 artifact and no `case` field.
 
+Input validation rejects empty note lists (including structured-only requests)
+and duplicate canonical IDs before execution. Integer `1` and string `"1"`
+identify the same note; `"001"` remains distinct. Accepted scalar IDs retain
+their types, including primary citations and evidence spans.
+
 ### Write a Workbench artifact
 
 Use the thin run-result CLI to execute a case and write the canonical JSON:
@@ -190,7 +211,9 @@ PYTHONPATH=src python -m scripts.run_case_state \
     --max-content-chars 20000
 ```
 
-The versioned `schema_version: "1.0"` artifact has five domains:
+New artifacts use `schema_version: "1.1"`; updated runtime and Workbench readers
+continue accepting saved `1.0` artifacts without recoding historical results.
+The artifact has five domains:
 
 - `run` - run identity, timing, completion status, configuration fingerprint,
   and `contains_phi`;
@@ -212,6 +235,20 @@ omitted. Prompt capture is unbounded by default. `max_content_chars` or
 `--max-content-chars` optionally limits each retained prompt message and records
 both per-message truncation metadata and the run-level `content_truncated` flag;
 parsed responses are not truncated.
+
+Version 1.1 records observability `collection_status` (`complete`, `partial`, or
+`unavailable`), typed `collection_issues`, and `unattributed_exchanges` when a
+callback cannot be bound to an exact entity/attempt. Unavailable usage is `null`,
+never fabricated zero totals. A missing collection status in a legacy artifact
+means it was not recorded. Collection health is separate from provider usage
+coverage. In usage buckets, `logical_calls` counts starts in that bucket; a model
+bucket may have retries but zero starts when a deployment alias resolves to a
+different reported model on retry.
+
+Inherited task callbacks preserve completed sibling scans and repair attribution
+during failure cleanup even when the stream stops delivering events. Failure
+artifacts retain available processed notes, never substitute raw notes with
+default-negative scan results, and never contain a partial clinical `case`.
 
 > **PHI:** Every run artifact is PHI-bearing. Disabling LLM content capture does
 > not de-identify it because `corpus.note_corpus` still contains the full clinical
@@ -242,9 +279,16 @@ to ASCII when no network is available); rendered diagrams live under
 
 ### Smoke checks
 
-There is no formal CI or comprehensive test suite yet; validation is
-fixture-based smoke checks plus deterministic unit tests
-(`tests/test_progress_tracking.py`). A quick import/compile check:
+There is no formal CI. The offline stdlib `unittest` suite covers production
+graphs with deterministic model doubles, validation/scoping, retry/concurrency,
+observability/failure handling, and export boundaries:
+
+```bash
+PYTHONPATH=src python -m unittest discover -s tests -t .
+```
+
+This does not replace native Databricks and live-endpoint smoke checks. A quick
+import/compile check:
 
 ```bash
 PYTHONPATH=src python -m py_compile src/cipoc/agents/orchestrator.py
@@ -253,11 +297,41 @@ PYTHONPATH=src python -m py_compile src/cipoc/agents/orchestrator.py
 ## Site-scoped data dictionary
 
 Variable metadata comes from the NAACCR dictionary configured by
-`documents.data_dictionary_path`. When case facts identify a supported gross
-primary site, the corresponding entry in `documents/cipoc_data_dictionary.json`
-replaces the variable's unscoped `allowed_codes`. Unknown sites and items not
-present in the site dictionary retain their NAACCR values. Runtime extraction
-does not load or compile rules from `documents/rules/`.
+`documents.data_dictionary_path`. An informative coded primary site selects the
+matching entry in `documents/cipoc_data_dictionary.json`; gross-site inference
+is a fallback only when no primary code was supplied. Unknown, malformed, or
+unsupported primary codes retain base metadata rather than narrowing through
+a conflicting gross site. Unsupported or ambiguous tissue mentions do not
+establish an unambiguous gross site.
+
+The validator understands literal codes and supported fixed-width ranges, checks
+usable type/format constraints, and rejects missing or unsupported validation
+metadata before extraction calls. Clean null answers become `NOT_FOUND`, not
+repair failures. Explicit scoped tables remain authoritative; broad base
+allowable-value declarations do not restore codes excluded by those tables.
+
+Histology and behavior run in the initial stage so dependent applicability can
+use their terminal results. Item 832 targets breast OR (cutaneous site AND
+melanoma histology). Unknown facts keep scope open unless the expression is
+definitively false. Hormonal therapy and immunotherapy are separate scanner
+concepts included in the treatment gate.
+
+These checks enforce supplied storage domains, not the completeness of the
+reference data or all site/year-specific clinical coding rules. In particular,
+the local base item-400 dictionary has gaps in cutaneous topography coverage,
+and item 671's declared ranges are not a complete procedure codebook. Review
+and correct reference data before relying on those cases in production.
+Runtime extraction does not load or compile rules from `documents/rules/`.
+
+### OMOP publication
+
+OMOP rows validate calendar dates and supported ISO datetimes; invalid rows are
+reported rather than silently defaulted. Merging validates CSV syntax, record
+widths, row schemas, IDs, and references before publishing output, and supports
+large multiline note fields. Export and merge stage every file before replacing
+destinations. Replacements are atomic per file on supporting filesystems, not a
+multi-file crash transaction; Databricks filesystem semantics require separate
+deployment verification.
 
 ## Repository layout
 

@@ -123,7 +123,7 @@ def corpus():
 
 
 def observability():
-    return RunObservability(llm_content_captured=False)
+    return RunObservability(llm_content_captured=False, collection_status="complete")
 
 
 class OrchestratorRunModelTests(unittest.TestCase):
@@ -139,7 +139,7 @@ class OrchestratorRunModelTests(unittest.TestCase):
         restored = OrchestratorRunResult.model_validate_json(result.model_dump_json())
 
         self.assertEqual(restored, result)
-        self.assertEqual(restored.schema_version, "1.0")
+        self.assertEqual(restored.schema_version, "1.1")
         self.assertEqual(restored.run.started_at.tzinfo, timezone.utc)
         self.assertNotIn(
             "api_key",
@@ -158,6 +158,25 @@ class OrchestratorRunModelTests(unittest.TestCase):
 
         with self.assertRaises(ValidationError):
             OrchestratorRunResult.model_validate(result)
+
+    def test_legacy_observability_is_readable_but_new_artifacts_require_status(self):
+        result = OrchestratorRunResult(
+            run=run_info(), case=Case(), inputs=inputs(), corpus=corpus(),
+            observability=observability(),
+        ).model_dump(mode="json")
+        result["observability"].pop("collection_status")
+        with self.assertRaisesRegex(ValidationError, "explicit observability collection status"):
+            OrchestratorRunResult.model_validate(result)
+        result["schema_version"] = "1.0"
+        # Historical targeting labels remain readable without executing today's
+        # configuration checks or recomputing past clinical decisions.
+        result["inputs"]["target_variables"][0]["applies_to"] = {
+            "histology_families": ["legacy-family"],
+        }
+        restored = OrchestratorRunResult.model_validate(result)
+        self.assertIsNone(restored.observability.collection_status)
+        self.assertEqual(restored.schema_version, "1.0")
+        self.assertEqual(restored.inputs.target_variables[0].applies_to.histology_families, ["legacy-family"])
 
     def test_fingerprint_rejects_secrets_and_non_json_values(self):
         values = fingerprint().model_dump()

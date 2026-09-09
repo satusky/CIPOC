@@ -147,8 +147,10 @@ def run_case_state(
     )
 
 
-def usage_lines(summary: LLMUsageSummary) -> list[str]:
+def usage_lines(summary: LLMUsageSummary | None) -> list[str]:
     """Render concise provider-reported usage totals for terminal output."""
+    if summary is None:
+        return ["Usage: unavailable; telemetry did not produce a valid summary."]
     lines = [
         (
             f"Tokens: input={summary.input_tokens:,} "
@@ -191,6 +193,10 @@ def _write_artifact(path: Path, artifact: RunArtifact) -> None:
 def _print_outcome(path: Path, artifact: RunArtifact) -> None:
     size_kb = path.stat().st_size / 1024
     print(f"Wrote {path} ({size_kb:.1f} KB)")
+    if artifact.observability.collection_status in {"partial", "unavailable"}:
+        print(f"Telemetry collection: {artifact.observability.collection_status}")
+        for issue in artifact.observability.collection_issues:
+            print(f"  {issue.code}: {issue.message}")
     for line in usage_lines(artifact.observability.llm_usage_summary):
         print(line)
 

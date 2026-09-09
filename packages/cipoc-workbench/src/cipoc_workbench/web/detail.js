@@ -100,19 +100,31 @@ function evidenceList(spans, { showNote = true } = {}) {
 
 /* -------------------------------------------------------- LLM exchanges */
 
-function exchangeCard(exchange, index) {
-  const usage = exchange.usage || {};
-  const head = h("h4", {},
-    h("span", { text: exchange.node }),
-    h("span", { class: "chip", text: exchange.agent }),
-    exchange.attempt > 1 ? h("span", { class: "chip warn", text: "attempt " + exchange.attempt }) : null,
-    exchange.error ? h("span", { class: "chip bad", text: "error" }) : null);
-
-  const meta = [];
-  if (exchange.model) meta.push("model " + exchange.model);
-  if (usage.total_tokens) {
-    meta.push(usage.input_tokens + " in / " + usage.output_tokens + " out");
+function usageDetails(usage) {
+  if (usage == null) {
+    return h("p", { class: "faint", text: "Usage unavailable; no provider token counts recorded." });
   }
+  const fields = ["input_tokens", "output_tokens", "total_tokens", "logical_calls", "model_invocations",
+    "successful_invocations", "failed_invocations", "retry_invocations",
+    "usage_reported_invocations", "missing_usage_invocations"];
+  return h("div", {},
+    kv(fields.filter((key) => key.endsWith("_tokens") || key in usage)
+      .map((key) => [key.replace(/_/g, " "), usage[key] ?? "not recorded"])),
+    ["input_token_details", "output_token_details"].map((key) =>
+      Object.keys(usage[key] || {}).length
+        ? rawBlock(key.replace(/_/g, " ") + " (breakdown, not additional tokens)", usage[key]) : null));
+}
+
+function exchangeCard(exchange, index, { unattributed = false } = {}) {
+  const head = h("h4", {},
+    h("span", { text: exchange.node || "unknown node" }),
+    h("span", { class: "chip", text: exchange.agent || "unknown agent" }),
+    unattributed ? h("span", { class: "chip warn", text: "unattributed" }) : null,
+    !unattributed && exchange.attempt > 1
+      ? h("span", { class: "chip warn", text: "attempt " + exchange.attempt }) : null,
+    exchange.retry_ordinal != null
+      ? h("span", { class: "chip warn", text: "transport retry " + exchange.retry_ordinal }) : null,
+    exchange.error ? h("span", { class: "chip bad", text: "error" }) : null);
 
   const promptMessages = exchange.prompt_messages;
   const messages = h("div", {});
@@ -127,28 +139,61 @@ function exchangeCard(exchange, index) {
 
   return h("div", { class: "card" + (exchange.error ? " bad" : "") },
     head,
-    meta.length ? h("p", { class: "faint", style: "margin:0 0 6px;font-size:11.5px", text: meta.join(" · ") }) : null,
+    kv([
+      ["model", exchange.model || "not recorded"],
+      ["invocation id", exchange.invocation_id],
+      ["namespace", exchange.namespace == null ? null : JSON.stringify(exchange.namespace)],
+    ]),
+    usageDetails(exchange.usage),
     promptMessages == null
-      ? h("p", { class: "faint", text: "Prompt and response bodies were not captured." })
+      ? h("p", { class: "faint", text: exchange.response == null
+          ? "Prompt and response bodies were not captured." : "Prompt messages were not captured." })
       : h("details", { open: index === 0 ? true : null },
           h("summary", { text: "Prompt (" + promptMessages.length + " messages)" }),
           messages),
-    exchange.error
-      ? h("p", { class: "errors", text: exchange.error })
-      : exchange.response == null
-        ? null
-        : rawBlock("Response", exchange.response));
+    exchange.error ? h("p", { class: "errors", text: exchange.error }) : null,
+    exchange.response == null ? null : rawBlock("Response", exchange.response),
+    rawBlock(unattributed ? "Raw invocation" : "Raw exchange", exchange));
 }
 
 function exchangeSection(title, exchanges) {
+  const status = collectionStatus();
+  const warning = status === "complete" ? null : h("p", { class: "faint", text:
+    "Telemetry collection: " + status + ". Missing records do not establish that no calls occurred." });
   if (!exchanges.length) {
-    if (!hasCapture()) {
-      return section(title,
-        h("p", { class: "faint", text: "LLM content capture was disabled." }));
-    }
-    return section(title, h("p", { class: "faint", text: "No model calls recorded." }));
+    return section(title, warning, h("p", { class: "faint", text: "No model calls recorded for this entity." }));
   }
-  return section(title + " (" + exchanges.length + ")", exchanges.map(exchangeCard));
+  return section(title + " (" + exchanges.length + ")", warning, exchanges.map(exchangeCard));
+}
+
+function telemetryDetail() {
+  const telemetry = App.observability;
+  const status = collectionStatus();
+  const issues = telemetry.collection_issues || [];
+  const unattributed = telemetry.unattributed_exchanges || [];
+  return h("div", {},
+    section("Collection", kv([
+      ["status", status === "unknown" ? "unknown (not recorded in schema " + App.schemaVersion + ")" : status],
+      ["content capture", hasCapture() ? "enabled" : "disabled"],
+      ["unattributed invocations", unattributed.length],
+    ]), h("p", { class: "faint", text:
+      "Collection status describes telemetry, not clinical completion. Partial or unavailable telemetry may omit calls, attempts or usage." })),
+    section("Collection issues", issues.length
+      ? issues.map((issue) => h("div", { class: "card" },
+          h("h4", { text: issue.code }), h("p", { text: issue.message })))
+      : h("p", { class: "faint", text: "No collection issues recorded." })),
+    section("Provider usage", h("p", { class: "faint", text:
+      "Recorded provider totals only, not a billing total. Missing callbacks and provider-internal retries may leave usage incomplete. Token details are breakdowns, not additions." }),
+      telemetry.llm_usage_summary == null
+        ? h("p", { class: "faint", text: "Usage summary unavailable. Missing usage is not zero usage." })
+        : h("div", {}, usageDetails(telemetry.llm_usage_summary),
+            rawBlock("Usage summary and buckets", telemetry.llm_usage_summary))),
+    section("Unattributed invocations (" + unattributed.length + ")",
+      h("p", { class: "faint", text:
+        "Diagnostic records only: these invocations are not assigned to a variable or a semantic extraction attempt. Their usage is not added to the recorded summary by the Workbench." }),
+      unattributed.length
+        ? unattributed.map((exchange, index) => exchangeCard(exchange, index, { unattributed: true }))
+        : h("p", { class: "faint", text: "No unattributed invocations recorded." })));
 }
 
 /* ----------------------------------------------------------- attempts */
@@ -166,6 +211,8 @@ function attemptCard(attempt) {
       ["value", candidate.value == null ? "—" : candidate.value],
       ["confidence", candidate.presence_confidence || null],
       ["explanation", candidate.explanation || null],
+      ["most important note", candidate.most_important_note != null
+        ? crossLink("note", candidate.most_important_note, "#" + candidate.most_important_note) : null],
     ]),
     errors.length
       ? h("ul", { class: "errors" }, errors.map((e) => h("li", { text: e })))
@@ -208,11 +255,12 @@ function noteDetail(noteId) {
       : null));
 
   const concepts = h("div", {});
-  for (const [name, concept] of Object.entries(note.concepts || {})) {
+  for (const name of new Set([...Object.keys(note.concepts || {}), ...TREATMENT_CONCEPTS])) {
+    const concept = (note.concepts || {})[name] || {};
     concepts.append(h("div", { class: "card" },
       h("h4", {},
         h("span", { text: name.replace(/_/g, " ") }),
-        h("span", { class: concept.presence ? "chip good" : "chip", text: concept.presence ? "present" : "absent" }),
+        h("span", { class: concept.presence === true ? "chip good" : "chip", text: conceptPresence(concept) }),
         concept.confidence ? h("span", { class: "chip", text: concept.confidence }) : null),
       concept.presence ? evidenceList(concept.evidence, { showNote: false }) : null));
   }
@@ -292,10 +340,10 @@ function groupDetail(groupId) {
       const related = {
         metastasis_present: ["metastasis"],
         lymph_nodes_removed: ["lymph_nodes_removed"],
-        treatment_present: ["surgery", "chemotherapy", "radiation"],
+        treatment_present: TREATMENT_CONCEPTS,
       }[gate] || [];
       const observed = related
-        .map((c) => c + ": " + ((concepts[c] || {}).presence ? "present" : "absent"))
+        .map((c) => c + ": " + conceptPresence(concepts[c]))
         .join(" · ");
       checks.append(checkRow(state.kind !== "excluded", "corpus gate — " + gate, observed || null));
     }
@@ -304,11 +352,10 @@ function groupDetail(groupId) {
   }
 
   if (group.applies_to) {
-    const sites = (group.applies_to.gross_primary_sites || []).join(", ") || "—";
-    const fams = (group.applies_to.histology_families || []).join(", ");
     checks.append(checkRow(state.kind !== "excluded",
-      "site applicability — " + sites + (fams ? " / " + fams : ""),
-      "case: gross_primary_site=" + (facts.gross_primary_site || "unknown") +
+      "site applicability — " + applicabilityLabel(group.applies_to),
+      "case: primary_site=" + (facts.primary_site || "unknown") +
+      ", gross_primary_site=" + (facts.gross_primary_site || "unknown") +
       ", histology=" + (facts.histology || "unknown")));
   } else {
     checks.append(checkRow(true, "site applicability — unrestricted", null));
@@ -495,7 +542,8 @@ function variableDetail(itemId) {
         : null));
 
     /* Show the cited note text with this variable's own spans marked. */
-    const primary = App.notes.get(String(extraction.most_important_note));
+    const primary = extraction.most_important_note == null ? null
+      : App.notes.get(String(extraction.most_important_note));
     if (primary) {
       const spans = (extraction.spans || []).filter(
         (s) => String(s.note_id) === String(primary.note_id));
@@ -536,7 +584,10 @@ function renderDetail() {
   const { kind, id } = App.selection;
   let title = "";
   let body;
-  if (kind === "note") {
+  if (kind === "telemetry") {
+    title = "Run telemetry";
+    body = telemetryDetail();
+  } else if (kind === "note") {
     const note = App.notes.get(String(id));
     title = note ? (note.note_type || "Note") + " · " + (note.date || "undated") : "Note " + id;
     body = noteDetail(id);
