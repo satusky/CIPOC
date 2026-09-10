@@ -1,4 +1,5 @@
 import unittest
+from datetime import datetime, timedelta, timezone
 
 from pydantic import ValidationError
 
@@ -12,6 +13,7 @@ from cipoc.models import (
     TokenDetails,
     VariableAttempt,
 )
+from cipoc.models.observability import UnattributedLLMExchange
 
 
 def usage_bucket(**overrides):
@@ -34,6 +36,39 @@ def usage_bucket(**overrides):
 
 
 class ObservabilityModelTests(unittest.TestCase):
+    def test_invocation_measurements_are_optional_utc_and_wall_clock_independent(self):
+        for model, identity in (
+            (LLMExchange, {"entity_key": "note:1", "attempt": 1}),
+            (UnattributedLLMExchange, {"invocation_id": "unbound"}),
+        ):
+            common = {"agent": "note_scanner", "node": "summarize_note", **identity}
+            legacy = model(**common)
+            for field in ("started_at", "finished_at", "service_seconds", "queue_seconds", "usage_reported_fields"):
+                self.assertIsNone(getattr(legacy, field))
+            invocation = model(
+                **common,
+                started_at=datetime(2026, 9, 9, 12, tzinfo=timezone(timedelta(hours=2))),
+                finished_at=datetime(2026, 9, 9, 9, tzinfo=timezone.utc),
+                service_seconds=2.5, queue_seconds=0,
+                usage=NormalizedTokenUsage(),
+                usage_reported_fields=["input_tokens", "output_tokens", "total_tokens"],
+            )
+            self.assertEqual(invocation.started_at.hour, 10)
+            self.assertEqual(invocation.started_at.tzinfo, timezone.utc)
+            self.assertLess(invocation.finished_at, invocation.started_at)
+            self.assertEqual(model.model_validate_json(invocation.model_dump_json()), invocation)
+            for field in ("started_at", "finished_at"):
+                with self.assertRaises(ValidationError):
+                    model(**common, **{field: datetime(2026, 9, 9)})
+            for field in ("service_seconds", "queue_seconds"):
+                for invalid in (-1, float("nan"), float("inf")):
+                    with self.subTest(field=field, invalid=invalid), self.assertRaises(ValidationError):
+                        model(**common, **{field: invalid})
+            for fields in (["input_tokens", "input_tokens"], ["cache_read"], ["input_tokens"]):
+                with self.assertRaises(ValidationError):
+                    model(**common, usage_reported_fields=fields)
+            self.assertEqual(model(**common, usage_reported_fields=[]).usage_reported_fields, [])
+
     def test_current_artifact_fields_validate_and_entity_key_is_retained(self):
         observability = RunObservability(
             llm_content_captured=True,

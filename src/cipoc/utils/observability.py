@@ -4,14 +4,22 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass, replace
+from datetime import datetime, timezone
 import json
+import math
 import threading
+from time import monotonic
 from typing import Any, Callable, Iterable, Mapping
 from uuid import UUID
 
 from langchain_core.callbacks import BaseCallbackHandler
 from pydantic import BaseModel
 
+from cipoc.llm.usage_evidence import (
+    TOKEN_ALIASES as _TOKEN_ALIASES,
+    finish_usage_evidence,
+    start_usage_evidence,
+)
 from cipoc.models.observability import (
     AttemptMode,
     LLMExchange,
@@ -46,6 +54,11 @@ class _CapturedLLMCall:
     prompt_messages: list[dict[str, Any]] | None = None
     response: Any = None
     usage: dict[str, Any] | None = None
+    usage_reported_fields: list[str] | None = None
+    started_at: str | None = None
+    finished_at: str | None = None
+    service_seconds: float | None = None
+    queue_seconds: float | None = None
     error: str | None = None
     transport_retry_ordinal: int | None = None
 
@@ -165,22 +178,6 @@ def _first_generation(response: Any) -> Any:
         choices = _value(response, "choices", []) or []
         return choices[0] if choices else response
 
-
-_TOKEN_ALIASES = {
-    "input_tokens": (
-        "input_tokens",
-        "prompt_tokens",
-        "input_token_count",
-        "prompt_token_count",
-    ),
-    "output_tokens": (
-        "output_tokens",
-        "completion_tokens",
-        "output_token_count",
-        "completion_token_count",
-    ),
-    "total_tokens": ("total_tokens", "total_token_count"),
-}
 
 _DETAIL_CONTAINERS = {
     "input_token_details": "input",
@@ -342,8 +339,9 @@ def _read_llm_result(
     response: Any,
     *,
     capture_content: bool = True,
-) -> tuple[Any, dict[str, Any] | None, str | None]:
-    """Extract visible structured output, normalized usage, and model name."""
+    usage_evidence: tuple[tuple[str, int | None], ...] | None = None,
+) -> tuple[Any, dict[str, Any] | None, str | None, list[str] | None]:
+    """Keep usage precedence and verify scalars only against pre-SDK evidence."""
     generation = _first_generation(response)
     message = _value(generation, "message") or generation
 
@@ -372,7 +370,16 @@ def _read_llm_result(
         model = _value(source, "model_name") or _value(source, "model")
         if model:
             break
-    return parsed, usage, str(model) if model else None
+    reported_fields = None
+    if usage_evidence is not None:
+        reported_fields = []
+        if usage is not None:
+            evidence = dict(usage_evidence)
+            for canonical, aliases in _TOKEN_ALIASES.items():
+                explicit = [evidence[alias] for alias in aliases if alias in evidence]
+                if explicit and all(type(value) is int and value >= 0 and value == usage[canonical] for value in explicit):
+                    reported_fields.append(canonical)
+    return parsed, usage, str(model) if model else None, reported_fields
 
 
 def _parse_namespace(metadata: Mapping[str, Any] | None) -> tuple[str, ...]:
@@ -422,6 +429,29 @@ class LLMCaptureHandler(BaseCallbackHandler):
         self._collection_issues: list[dict[str, str]] = []
         self.capture_llm_content = capture_llm_content
         self.max_content_chars = max_content_chars
+
+    def _clocks(self, run_id: UUID, boundary: str) -> tuple[str | None, float | None]:
+        """Optional timing must never prevent lifecycle or usage collection."""
+        issues = []
+        timestamp = ticks = None
+        try:
+            timestamp = datetime.now(timezone.utc).isoformat()
+        except Exception as error:
+            issues.append(f"UTC clock ({type(error).__name__})")
+        try:
+            ticks = monotonic()
+            if not math.isfinite(ticks):
+                raise ValueError("Invalid monotonic clock")
+        except Exception as error:
+            ticks = None
+            issues.append(f"monotonic clock ({type(error).__name__})")
+        if issues:
+            with self._lock:
+                self._collection_issues.append({
+                    "code": "invocation_timing_error",
+                    "message": f"Invocation {run_id} {boundary}: unavailable " + ", ".join(issues) + ".",
+                })
+        return timestamp, ticks
 
     def _notify_task(self, event: ProgressEvent) -> None:
         if self._task_observer is None:
@@ -478,6 +508,7 @@ class LLMCaptureHandler(BaseCallbackHandler):
         metadata: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
+        started_at, started_monotonic = self._clocks(run_id, "start")
         prompt_factory = None
         if self.capture_llm_content:
             prompt_factory = lambda: [
@@ -485,7 +516,7 @@ class LLMCaptureHandler(BaseCallbackHandler):
                 for batch in messages
                 for message in batch
             ]
-        self._start(serialized, prompt_factory, run_id, metadata)
+        self._start(serialized, prompt_factory, run_id, metadata, started_at, started_monotonic)
 
     def on_llm_start(
         self,
@@ -498,6 +529,7 @@ class LLMCaptureHandler(BaseCallbackHandler):
         metadata: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
+        started_at, started_monotonic = self._clocks(run_id, "start")
         prompt_factory = None
         if self.capture_llm_content:
             prompt_factory = lambda: [
@@ -512,6 +544,8 @@ class LLMCaptureHandler(BaseCallbackHandler):
             prompt_factory,
             run_id,
             metadata,
+            started_at,
+            started_monotonic,
         )
 
     def _start(
@@ -520,11 +554,27 @@ class LLMCaptureHandler(BaseCallbackHandler):
         prompt_factory: Callable[[], list[dict[str, Any]]] | None,
         run_id: UUID,
         metadata: Mapping[str, Any] | None,
+        started_at: str | None,
+        started_monotonic: float | None,
     ) -> None:
+        start_usage_evidence(run_id)
         namespace = _parse_namespace(metadata)
         graph_node = str((metadata or {}).get("langgraph_node", ""))
         retry_key = (namespace, graph_node)
+        queue_seconds = (metadata or {}).get("cipoc_queue_seconds")
+        queue_error = (metadata or {}).get("cipoc_queue_timing_error")
+        if (
+            queue_error or isinstance(queue_seconds, bool)
+            or not isinstance(queue_seconds, (int, float))
+            or not math.isfinite(queue_seconds) or queue_seconds < 0
+        ):
+            queue_seconds = None
         with self._lock:
+            if queue_error:
+                self._collection_issues.append({
+                    "code": "queue_timing_error",
+                    "message": f"Invocation {run_id}: local permit wait measurement unavailable.",
+                })
             prior_starts = self._starts.get(retry_key, 0) if namespace and graph_node else 0
             if namespace and graph_node:
                 self._starts[retry_key] = prior_starts + 1
@@ -536,6 +586,9 @@ class LLMCaptureHandler(BaseCallbackHandler):
                 "run_id": str(run_id),
                 "model": _model_name(serialized, metadata),
                 "transport_retry_ordinal": prior_starts or None,
+                "started_at": started_at,
+                "started_monotonic": started_monotonic,
+                "queue_seconds": queue_seconds,
             }
             if prompt_factory is not None:
                 call["prompt_messages"] = prompt_factory()
@@ -549,13 +602,15 @@ class LLMCaptureHandler(BaseCallbackHandler):
         parent_run_id: UUID | None = None,
         **kwargs: Any,
     ) -> None:
-        parsed, usage, model = _read_llm_result(
-            response, capture_content=self.capture_llm_content
+        finished_at, finished_monotonic = self._clocks(run_id, "end")
+        parsed, usage, model, reported_fields = _read_llm_result(
+            response, capture_content=self.capture_llm_content,
+            usage_evidence=finish_usage_evidence(run_id),
         )
-        fields = {"usage": usage, "model": model}
+        fields = {"usage": usage, "model": model, "usage_reported_fields": reported_fields}
         if self.capture_llm_content:
             fields["response"] = parsed
-        self._finish(run_id, **fields)
+        self._finish(run_id, finished_at, finished_monotonic, **fields)
 
     def on_llm_error(
         self,
@@ -565,9 +620,11 @@ class LLMCaptureHandler(BaseCallbackHandler):
         parent_run_id: UUID | None = None,
         **kwargs: Any,
     ) -> None:
-        self._finish(run_id, error=f"{type(error).__name__}: {error}")
+        finished_at, finished_monotonic = self._clocks(run_id, "error")
+        finish_usage_evidence(run_id)
+        self._finish(run_id, finished_at, finished_monotonic, error=f"{type(error).__name__}: {error}")
 
-    def _finish(self, run_id: UUID, **fields: Any) -> None:
+    def _finish(self, run_id: UUID, finished_at: str | None, finished_monotonic: float | None, **fields: Any) -> None:
         with self._lock:
             index = self._pending.pop(str(run_id), None)
             if index is None:
@@ -582,6 +639,17 @@ class LLMCaptureHandler(BaseCallbackHandler):
                     }
                 )
             call = self._calls[index]
+            call["finished_at"] = finished_at
+            started = call.pop("started_monotonic", None)
+            if started is not None and finished_monotonic is not None:
+                duration = finished_monotonic - started
+                if math.isfinite(duration) and duration >= 0:
+                    call["service_seconds"] = duration
+                else:
+                    self._collection_issues.append({
+                        "code": "invocation_timing_error",
+                        "message": f"Invocation {run_id}: invalid monotonic duration.",
+                    })
             for name, value in fields.items():
                 if value is not None or name != "model" or call.get("model") is None:
                     call[name] = value
@@ -599,6 +667,11 @@ class LLMCaptureHandler(BaseCallbackHandler):
                     prompt_messages=deepcopy(call.get("prompt_messages")),
                     response=deepcopy(call.get("response")),
                     usage=deepcopy(call.get("usage")),
+                    usage_reported_fields=deepcopy(call.get("usage_reported_fields")),
+                    started_at=call.get("started_at"),
+                    finished_at=call.get("finished_at"),
+                    service_seconds=call.get("service_seconds"),
+                    queue_seconds=call.get("queue_seconds"),
                     error=call.get("error"),
                     transport_retry_ordinal=call.get("transport_retry_ordinal"),
                 )
@@ -905,6 +978,11 @@ class ObservabilityCollector:
                     "node": node,
                     "model": call.model,
                     "usage": deepcopy(call.usage),
+                    "usage_reported_fields": deepcopy(call.usage_reported_fields),
+                    "started_at": call.started_at,
+                    "finished_at": call.finished_at,
+                    "service_seconds": call.service_seconds,
+                    "queue_seconds": call.queue_seconds,
                     "error": call.error,
                 }
                 if self.capture_llm_content:

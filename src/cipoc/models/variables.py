@@ -94,7 +94,7 @@ class VariableOutput(BaseModel):
     item_id: int = Field(description="Item ID number.")
     value: str | None = Field(description="Coded value for the variable. Must be selected from the valid codes and in the appropriate format. Return `None` if no value can be determined.")
     explanation: str = Field(description="Reasoning used for assigning the selected value.")
-    most_important_note: int | str | None = Field(description="ID of note containing the most evidence for the value extracted. `None` if no value could be determined.")
+    most_important_note: int | str | None = Field(description="Exact note_id of the supplied note containing the strongest evidence for the extracted value. Return the identifier, never quoted text, a note title, or an explanation. Preserve string IDs and leading zeroes. Return null if no value could be determined.")
     spans: list[TextSpan] = Field(description="List of text span(s) in the clinical note that provide evidence for this claim. A span containing newline characters should be split into multiple spans at the newlines.")
     presence_confidence: ConfidenceLevel = confidence_field()
 

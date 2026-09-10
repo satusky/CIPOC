@@ -97,17 +97,49 @@ dependencies. Install it with standard `pip`:
 python -m pip install ./packages/cipoc-workbench
 ```
 
-Then serve a canonical `OrchestratorRunResult` JSON artifact:
+Start empty, then choose a canonical `OrchestratorRunResult` JSON artifact with
+**Load Run...** at `http://127.0.0.1:8000/`:
+
+```bash
+cipoc-workbench serve --feedback-dir reviews
+```
+
+Or auto-load an explicit startup artifact, optionally with ground truth:
 
 ```bash
 cipoc-workbench serve \
     --state tests/test_outputs/case_state.json \
     --ground-truth ground_truth.json \
-    --feedback feedback.json
+    --feedback-dir reviews
 ```
 
-All three paths are optional. Without arguments, the workbench serves its
-bundled example at `http://127.0.0.1:8000/`.
+`cipoc-workbench serve` without arguments starts empty with read-only annotations.
+`--state` is optional; `--ground-truth` and legacy `--feedback FILE` require it.
+The bundled `1.0` compatibility example is unchanged and only loaded by explicit
+choice: select `packages/cipoc-workbench/src/cipoc_workbench/example/case_state.json`
+with **Load Run...** or pass that path to `--state`.
+
+**Load Run...** opens completed artifacts in tab-local memory, never uploading
+or persisting their contents. Refresh returns to empty without `--state`, or
+reloads the explicitly configured startup artifact. Switching
+clears ground truth and case-specific UI state, asks before discarding feedback
+drafts, and blocks switching during saves. Automatic ground truth uses a run-scoped
+API bound to the server's original startup UUID, with no unbound fallback.
+`--feedback-dir` saves one feedback document per run UUID even without `--state`;
+legacy `--feedback FILE` is mutually exclusive and startup-run-only. Local loading
+never establishes a server-global active run or binds the unscoped APIs. Without
+a startup artifact, legacy feedback is read-only with an unknown run ID and
+automatic ground truth cannot bind.
+Without a destination, annotations are read-only. Feedback may contain PHI; use a
+trusted interface and a single server process.
+
+The **Observability** view shows recorded usage, collection health, validation
+attempts, timing coverage, and optional cost estimates. Pricing requires an exact
+recorded model-name match in the local `endpoint_catalog.json` or **Load Pricing...**
+catalog; no prices are supplied by default and uncertain zero counts are not
+priced. See the [Workbench README](packages/cipoc-workbench/README.md) for the
+catalog format, feedback APIs, and coverage limits. These metrics do not establish
+actual endpoint headroom or quota saturation.
 
 ## Configuration
 
@@ -211,8 +243,9 @@ PYTHONPATH=src python -m scripts.run_case_state \
     --max-content-chars 20000
 ```
 
-New artifacts use `schema_version: "1.1"`; updated runtime and Workbench readers
-continue accepting saved `1.0` artifacts without recoding historical results.
+New result and failure artifacts use `schema_version: "1.2"`; runtime readers
+accept `1.0`, `1.1`, and `1.2`, as does the Workbench for completed results,
+without recoding historical results.
 The artifact has five domains:
 
 - `run` - run identity, timing, completion status, configuration fingerprint,
@@ -236,10 +269,11 @@ omitted. Prompt capture is unbounded by default. `max_content_chars` or
 both per-message truncation metadata and the run-level `content_truncated` flag;
 parsed responses are not truncated.
 
-Version 1.1 records observability `collection_status` (`complete`, `partial`, or
-`unavailable`), typed `collection_issues`, and `unattributed_exchanges` when a
-callback cannot be bound to an exact entity/attempt. Unavailable usage is `null`,
-never fabricated zero totals. A missing collection status in a legacy artifact
+Versions 1.1 and 1.2 require explicit observability `collection_status` (`complete`,
+`partial`, or `unavailable`). They also support typed `collection_issues` and
+`unattributed_exchanges` when a callback cannot be bound to an exact entity/attempt.
+Unavailable usage is `null`, never fabricated zero totals. A missing collection
+status in a legacy artifact
 means it was not recorded. Collection health is separate from provider usage
 coverage. In usage buckets, `logical_calls` counts starts in that bucket; a model
 bucket may have retries but zero starts when a deployment alias resolves to a
@@ -263,6 +297,42 @@ output tokens, are breakdowns of the corresponding totals, not additional
 tokens. The artifact does not estimate monetary cost, retain hidden reasoning,
 or contain a raw graph-event timeline.
 
+Schema 1.2 adds optional invocation fields to both attributed and diagnostic
+exchanges; availability is determined by field presence, not version alone:
+
+- `started_at` / `finished_at` are UTC model callback boundaries, after local
+  permit acquisition, not pre-queue request timestamps.
+- `service_seconds` is monotonic callback duration, including network time and
+  SDK-internal retries/backoff, not pure provider compute or total permit occupancy.
+  Structured calls hold the permit through parsing after the callback ends.
+- `queue_seconds` measures only the local synchronous permit wait, excluding
+  graph scheduling and LangGraph retry backoff. Instrumented unbounded calls can
+  report zero; uninstrumented async/direct paths remain `null`.
+- `usage_reported_fields` lists retained `input_tokens`, `output_tokens`, and/or
+  `total_tokens` verified against provider JSON before SDK coercion or adapter
+  defaulting. Neither callback `token_usage` nor LangChain `usage_metadata` alone
+  proves provenance: the SDK can coerce booleans, strings, and floats, and adapters
+  can fill missing counts or derive totals. `null` means verification unavailable
+  or unrecorded; `[]` means no scalar verified. Verification never replaces normalized
+  counts, and an explicit list missing a required count is authoritative.
+
+`src/cipoc/llm/openai.py` installs narrowly scoped request/response hooks on its
+wrapper-owned default synchronous OpenAI HTTP client. `llm/usage_evidence.py`
+keeps only immutable scalar evidence in a per-call `ContextVar` scope, bound to
+the invocation and request. Non-streaming Chat Completions and Responses support
+verification, including genuine zero counts, without new configuration or
+dependencies. External clients, LangChain's proxy path, async/direct calls, and
+streaming remain unverified (`null`); callback metadata is not a fallback.
+
+The run-result CLI reports derived timing sums, means, maxima, and coverage,
+including diagnostic invocations. Summed invocation time and summed queue wait
+are not run wall time: concurrent sums can exceed it. The Workbench's interval
+union estimates time with an observed model call active, excludes invalid or
+inconsistent wall-clock intervals, and does not measure exclusive model delay.
+Envelope duration can include initialization, cleanup, and the interactive
+summary pause. Collection, provider-usage, scalar-provenance, timing, and cost
+coverage are separate; missing measurements are never assumed zero.
+
 ### Run individual agents
 
 ```bash
@@ -285,6 +355,11 @@ observability/failure handling, and export boundaries:
 
 ```bash
 PYTHONPATH=src python -m unittest discover -s tests -t .
+
+# Standalone Workbench tests, from the repository root
+node --test packages/cipoc-workbench/tests/*.test.js
+PYTHONPATH=packages/cipoc-workbench/src python -m unittest discover \
+    -s packages/cipoc-workbench/tests -p 'test_*.py'
 ```
 
 This does not replace native Databricks and live-endpoint smoke checks. A quick
@@ -347,6 +422,7 @@ src/cipoc/
 ├── llm/
 │   ├── base.py            # LLMConfig / BaseAgentModel abstractions
 │   ├── openai.py          # OpenAI-compatible ChatOpenAI wrapper
+│   ├── usage_evidence.py  # Invocation-local pre-SDK scalar evidence
 │   └── retry.py           # RetryPolicy for LLM-backed graph nodes
 ├── models/                # Pydantic contracts (see below)
 ├── prompts/               # Per-agent prompt strings

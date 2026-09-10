@@ -1,4 +1,5 @@
 import ast
+from datetime import datetime, timedelta, timezone
 import inspect
 import threading
 import textwrap
@@ -7,23 +8,26 @@ from typing import TypedDict
 from unittest.mock import patch
 from uuid import uuid4
 
+import httpx
 from langchain_core.callbacks import BaseCallbackHandler, CallbackManager
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.outputs import ChatGeneration, ChatResult, LLMResult
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import RetryPolicy
+from langchain_openai import ChatOpenAI
 
 from cipoc.agents.extractor import ExtractorAgent
 from cipoc.agents.note_retriever import NoteRetrieverAgent
 from cipoc.agents.note_scanner import NoteScannerAgent
-from cipoc.models import LLMUsageSummary, RunObservability
+from cipoc.models import LLMUsageSummary, NormalizedTokenUsage, RunObservability
 from cipoc.utils.observability import (
     LLMCaptureHandler,
     ObservabilityCollector,
     aggregate_llm_usage,
     merge_callback_config,
     normalize_token_usage,
+    _read_llm_result,
 )
 from cipoc.utils.progress.events import ProgressEvent, normalize
 from cipoc.utils.progress.model import ProgressModel
@@ -415,6 +419,158 @@ class LLMCaptureTests(unittest.TestCase):
         self.collector.observe(branch)
         self.collector.observe(model)
         return model
+
+    def test_callback_clocks_precede_serialization_and_ignore_wall_clock_steps(self):
+        epoch = datetime(2026, 9, 9, 12, tzinfo=timezone.utc)
+        for chat in (False, True):
+            for captured in (False, True):
+                for failed in (False, True):
+                    with self.subTest(chat=chat, captured=captured, failed=failed):
+                        collector = ObservabilityCollector(capture_llm_content=captured)
+                        event = start((), "summarize_note", "clock", {"note_id": "clock"})
+                        collector.observe(event)
+                        callback = collector.llm_callback
+                        clocks = {"wall": epoch, "mono": 100.0}
+
+                        def prompt(message, limit):
+                            clocks.update(wall=epoch + timedelta(seconds=5), mono=101.0)
+                            return {"role": "human", "content": "prompt"}
+
+                        def read_response(*args, **kwargs):
+                            clocks.update(wall=epoch + timedelta(seconds=50), mono=120.0)
+                            return None, {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0}, None, ["input_tokens", "output_tokens"]
+
+                        class ErrorWithSlowString(Exception):
+                            def __str__(self):
+                                clocks["mono"] = 120.0
+                                return "failure"
+
+                        run_id = uuid4()
+                        with (
+                            patch("cipoc.utils.observability.datetime") as wall,
+                            patch("cipoc.utils.observability.monotonic", side_effect=lambda: clocks["mono"]),
+                            patch("cipoc.utils.observability._prompt_message", side_effect=prompt) as serialize,
+                            patch("cipoc.utils.observability._read_llm_result", side_effect=read_response),
+                        ):
+                            wall.now.side_effect = lambda tz: clocks["wall"]
+                            if chat:
+                                callback.on_chat_model_start({}, [[HumanMessage(content="prompt")]], run_id=run_id,
+                                                             metadata={**metadata(event), "cipoc_queue_seconds": 0.25})
+                            else:
+                                callback.on_llm_start({}, ["prompt"], run_id=run_id,
+                                                      metadata={**metadata(event), "cipoc_queue_seconds": 0.25})
+                            self.assertEqual(serialize.call_count, int(captured))
+                            clocks.update(wall=epoch - timedelta(seconds=10), mono=102.5)
+                            if failed:
+                                callback.on_llm_error(ErrorWithSlowString(), run_id=run_id)
+                            else:
+                                callback.on_llm_end({}, run_id=run_id)
+
+                        snapshot = collector.snapshot()
+                        exchange = RunObservability.model_validate(snapshot).llm_exchanges["note:clock"][0]
+                        self.assertEqual(exchange.started_at, epoch)
+                        self.assertEqual(exchange.finished_at, epoch - timedelta(seconds=10))
+                        self.assertEqual(exchange.service_seconds, 2.5)
+                        self.assertEqual(exchange.queue_seconds, 0.25)
+                        self.assertEqual(exchange.usage_reported_fields, None if failed else ["input_tokens", "output_tokens"])
+                        self.assertEqual(collector.snapshot(), snapshot)
+
+    def test_callback_clock_errors_preserve_lifecycles_usage_and_original_errors(self):
+        for clock in ("datetime", "monotonic"):
+            for boundary in ("start", "end", "both"):
+                for failed in (False, True):
+                    with self.subTest(clock=clock, boundary=boundary, failed=failed):
+                        collector = ObservabilityCollector(capture_llm_content=False)
+                        event = start((), "summarize_note", "clock", {"note_id": "clock"})
+                        collector.observe(event)
+                        callback = collector.llm_callback
+                        run_id = uuid4()
+                        target = f"cipoc.utils.observability.{clock}"
+                        with patch(target) as patched:
+                            mocked = patched.now if clock == "datetime" else patched
+                            value = datetime(2026, 9, 9, tzinfo=timezone.utc) if clock == "datetime" else 100.0
+                            mocked.side_effect = [
+                                OSError("optional clock failed") if boundary in ("start", "both") else value,
+                                OSError("optional clock failed") if boundary in ("end", "both") else value,
+                            ]
+                            callback.on_chat_model_start({}, [[]], run_id=run_id, metadata=metadata(event))
+                            if failed:
+                                callback.on_llm_error(ValueError("original model failure"), run_id=run_id)
+                            else:
+                                callback.on_llm_end(llm_result(AIMessage(content="", usage_metadata={
+                                    "input_tokens": 8, "output_tokens": 2, "total_tokens": 10,
+                                })), run_id=run_id)
+                        snapshot = RunObservability.model_validate(collector.snapshot())
+                        self.assertEqual(snapshot.collection_status, "partial")
+                        self.assertEqual(snapshot.llm_usage_summary.model_invocations, 1)
+                        self.assertEqual(snapshot.llm_usage_summary.total_tokens, 0 if failed else 10)
+                        self.assertEqual(snapshot.llm_usage_summary.failed_invocations, int(failed))
+                        call = snapshot.llm_exchanges["note:clock"][0]
+                        self.assertEqual(call.invocation_id, str(run_id))
+                        self.assertEqual(call.error, "ValueError: original model failure" if failed else None)
+                        if clock == "monotonic":
+                            self.assertIsNone(call.service_seconds)
+                        else:
+                            self.assertGreaterEqual(call.service_seconds, 0)
+                            self.assertEqual(call.started_at is None, boundary in ("start", "both"))
+                            self.assertEqual(call.finished_at is None, boundary in ("end", "both"))
+                        self.assertEqual({issue.code for issue in snapshot.collection_issues}, {"invocation_timing_error"})
+
+    def test_real_model_callbacks_do_not_report_complete_zero_when_all_clocks_fail(self):
+        for failed in (False, True):
+            with self.subTest(failed=failed):
+                collector = ObservabilityCollector(capture_llm_content=False)
+                event = start((), "summarize_note", "clock", {"note_id": "clock"})
+                collector.observe(event)
+                model = _FlakyChatModel(model_name="offline", fail_times=int(failed))
+                with (
+                    patch("cipoc.utils.observability.datetime") as wall,
+                    patch("cipoc.utils.observability.monotonic", side_effect=OSError("clock failure")),
+                ):
+                    wall.now.side_effect = OSError("clock failure")
+                    config = collector.graph_config({"metadata": metadata(event)})
+                    if failed:
+                        with self.assertRaisesRegex(TimeoutError, "transient"):
+                            model.invoke("offline", config=config)
+                    else:
+                        model.invoke("offline", config=config)
+                snapshot = RunObservability.model_validate(collector.snapshot())
+                self.assertEqual(snapshot.collection_status, "partial")
+                self.assertEqual(snapshot.llm_usage_summary.model_invocations, 1)
+                self.assertEqual(snapshot.llm_usage_summary.failed_invocations, int(failed))
+                call = snapshot.llm_exchanges["note:clock"][0]
+                self.assertIsNone(call.started_at)
+                self.assertIsNone(call.finished_at)
+                self.assertIsNone(call.service_seconds)
+                self.assertEqual({issue.code for issue in snapshot.collection_issues}, {"invocation_timing_error"})
+
+    def test_unmatched_lifecycles_and_uninstrumented_or_invalid_queue_are_unknown(self):
+        collector = ObservabilityCollector(capture_llm_content=False)
+        callback = collector.llm_callback
+        epoch = datetime(2026, 9, 9, tzinfo=timezone.utc)
+        with patch("cipoc.utils.observability.datetime") as wall:
+            wall.now.return_value = epoch
+            callback.on_llm_end(llm_result(AIMessage(content="")), run_id=uuid4())
+            callback.on_llm_error(ValueError("unmatched"), run_id=uuid4())
+            callback.on_llm_start({}, ["unfinished"], run_id=uuid4())
+        snapshot = collector.snapshot()
+        self.assertIn("incomplete_invocations", {issue["code"] for issue in snapshot["collection_issues"]})
+        records = RunObservability.model_validate(snapshot).unattributed_exchanges
+        self.assertEqual(len(records), 2)
+        for record in records:
+            self.assertEqual(record.finished_at, epoch)
+            self.assertIsNone(record.started_at)
+            self.assertIsNone(record.service_seconds)
+            self.assertIsNone(record.queue_seconds)
+        for queue in (None, True, -1, "2", float("inf"), float("nan"), 0, 1.5):
+            with self.subTest(queue=queue):
+                callback = LLMCaptureHandler(capture_llm_content=False)
+                run_id = uuid4()
+                callback.on_llm_start({}, [], run_id=run_id, metadata={"cipoc_queue_seconds": queue})
+                callback.on_llm_error(ValueError("failed"), run_id=run_id)
+                record = callback._snapshot()[0]
+                self.assertEqual(record.queue_seconds, queue if type(queue) in (int, float) and queue in (0, 1.5) else None)
+                self.assertGreaterEqual(record.service_seconds, 0)
 
     def test_success_captures_prompt_parsed_response_model_and_normalized_usage(self):
         model = self.scanner_call()
@@ -823,6 +979,119 @@ class LLMCaptureTests(unittest.TestCase):
 
 
 class LLMUsageTests(unittest.TestCase):
+    def test_unknown_scalar_provenance_does_not_change_normalized_source_precedence(self):
+        zero = {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0}
+        cases = [
+            (None, {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}),
+            (None, {"prompt_tokens": 7}),
+            (None, {"total_tokens": 7}),
+            (None, {"prompt_tokens_details": {"cached_tokens": 2}}),
+            (zero, {}),
+            (zero, {"prompt_tokens": 9, "completion_tokens": 4, "total_tokens": 13}),
+            ({"input_tokens": 7, "output_tokens": 0, "total_tokens": 7}, {"prompt_tokens": 7}),
+            # A later source never fills a scalar missing from the first source.
+            ({"total_tokens": 7}, {"prompt_tokens": 7, "completion_tokens": 0}),
+        ]
+        for normalized, raw in cases:
+            with self.subTest(normalized=normalized, raw=raw):
+                response = {"generations": [[{"message": {
+                    "usage_metadata": normalized,
+                    "response_metadata": {"token_usage": raw},
+                }}]]}
+                _, usage, _, fields = _read_llm_result(response)
+                self.assertIsNone(fields)
+                self.assertEqual(NormalizedTokenUsage.model_validate(usage), normalize_token_usage(normalized, raw))
+
+    def test_provenance_requires_pre_sdk_evidence_not_callback_container_names(self):
+        zero = {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0}
+        for metadata in ({}, {"usage": zero}):
+            response = llm_result(AIMessage(content="", usage_metadata=zero, response_metadata=metadata))
+            self.assertIsNone(_read_llm_result(response)[3])
+        # Generation/API-specific `usage` may itself be adapter-normalized.
+        self.assertIsNone(_read_llm_result({"generations": [[{
+            "message": {"usage_metadata": zero}, "generation_info": {"usage": zero},
+        }]], "llm_output": {"usage": zero}})[3])
+        # Aggregate llm_output from several input prompts is not corroboration.
+        response = {"generations": [[{"message": {"usage_metadata": zero}}]] * 2,
+                    "llm_output": {"token_usage": zero}}
+        self.assertIsNone(_read_llm_result(response)[3])
+        for invalid in (True, -1, 0.5, "0", None, float("nan"), float("inf")):
+            with self.subTest(invalid=invalid):
+                response = llm_result(AIMessage(content="", usage_metadata=zero), llm_output={
+                    "token_usage": {"prompt_tokens": invalid, "completion_tokens": 0},
+                })
+                self.assertIsNone(_read_llm_result(response)[3])
+        # Conflicting aliases or secondary raw views cannot certify a scalar.
+        for raw in ({"prompt_tokens": 1}, {"input_tokens": 0, "prompt_tokens": 1}):
+            response = llm_result(AIMessage(content="", usage_metadata=zero, response_metadata={
+                "token_usage": {"prompt_tokens": 0, "completion_tokens": 0},
+            }), llm_output={"token_usage": raw})
+            self.assertIsNone(_read_llm_result(response)[3])
+        self.assertIsNone(_read_llm_result(llm_result(AIMessage(content=""), llm_output={
+            "token_usage": {},
+        }))[3])
+
+    def test_real_pinned_adapter_partial_usage_does_not_certify_synthetic_zero(self):
+        for raw in (
+            {"prompt_tokens": 8},
+            {"completion_tokens": 8},
+            {"total_tokens": 8},
+            {"prompt_tokens_details": {"cached_tokens": 2}},
+            {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+        ):
+            with self.subTest(raw=raw):
+                collector = ObservabilityCollector(capture_llm_content=False)
+
+                def respond(request):
+                    return httpx.Response(200, json={
+                        "id": "offline", "object": "chat.completion", "created": 1,
+                        "model": "offline", "usage": raw,
+                        "choices": [{"index": 0, "message": {"role": "assistant", "content": "ok"}, "finish_reason": "stop"}],
+                    })
+
+                with httpx.Client(transport=httpx.MockTransport(respond)) as transport:
+                    adapter = ChatOpenAI(
+                        model="offline", api_key="synthetic", base_url="https://example.invalid/v1",
+                        http_client=transport, max_retries=0, use_responses_api=False,
+                    )
+                    message = adapter.invoke("offline prompt", config=collector.graph_config())
+                if "completion_tokens" not in raw:
+                    self.assertEqual(message.usage_metadata["output_tokens"], 0)
+                parsed = RunObservability.model_validate(collector.snapshot())
+                self.assertIsNone(parsed.unattributed_exchanges[0].usage_reported_fields)
+                self.assertEqual(parsed.unattributed_exchanges[0].usage.input_tokens, message.usage_metadata["input_tokens"])
+                # Neither post-SDK token_usage nor usage_metadata proves validity.
+                message.response_metadata = {}
+                self.assertIsNone(_read_llm_result(llm_result(message))[3])
+
+    def test_real_sdk_coercion_cannot_certify_valid_provider_scalars(self):
+        # Each wire value becomes the same integer before callback token_usage.
+        for wire_value in (0, False, "0", 0.0):
+            with self.subTest(wire_value=wire_value, type=type(wire_value)):
+                def respond(request):
+                    return httpx.Response(200, json={
+                        "id": "offline", "object": "chat.completion", "created": 1,
+                        "model": "offline", "usage": {
+                            "prompt_tokens": 8, "completion_tokens": wire_value, "total_tokens": 8,
+                        },
+                        "choices": [{"index": 0, "message": {"role": "assistant", "content": "ok"}, "finish_reason": "stop"}],
+                    })
+
+                collector = ObservabilityCollector(capture_llm_content=False)
+                with httpx.Client(transport=httpx.MockTransport(respond)) as transport:
+                    adapter = ChatOpenAI(
+                        model="offline", api_key="synthetic", base_url="https://example.invalid/v1",
+                        http_client=transport, max_retries=0, use_responses_api=False,
+                    )
+                    message = adapter.invoke("offline", config=collector.graph_config())
+                retained = message.response_metadata["token_usage"]["completion_tokens"]
+                self.assertIs(type(retained), int)
+                self.assertEqual(retained, 0)
+                self.assertEqual(message.usage_metadata["output_tokens"], 0)
+                call = collector.llm_callback._snapshot()[0]
+                self.assertEqual(call.usage["output_tokens"], 0)
+                self.assertIsNone(call.usage_reported_fields)
+
     def test_normalizes_scalar_provider_shapes(self):
         cases = [
             (

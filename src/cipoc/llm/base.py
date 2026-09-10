@@ -1,15 +1,21 @@
 from abc import ABC, abstractmethod
+from contextlib import contextmanager
 from ipaddress import IPv4Address, IPv6Address
+import math
 import re
 from threading import BoundedSemaphore, Lock
+from time import monotonic
 from urllib.parse import urlsplit
 from weakref import WeakValueDictionary
 
 from typing import Annotated, ClassVar, Literal
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field, SecretStr, StringConstraints, TypeAdapter
+from langchain_core.callbacks import CallbackManager
 from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.runnables.config import ensure_config
 from langchain_core.tools import StructuredTool
 
+from .usage_evidence import usage_evidence_scope
 
 def _validate_endpoint_url(value: str) -> str:
     try:
@@ -125,6 +131,7 @@ class BaseAgentModel(ABC):
     _model: BaseChatModel
     _config: LLMConfig
     _tools: list[StructuredTool] | None
+    _usage_evidence_owner: object | None = None
     _non_model_fields: ClassVar[set[str]] = {
         "tools",
         "provider",
@@ -168,31 +175,63 @@ class BaseAgentModel(ABC):
     def _initialize_model(self, **kwargs) -> BaseChatModel:
         ...
 
-    def invoke(self, messages, *, config=None, stop=None, **kwargs):
-        if self._semaphore is None:
-            return self.model.invoke(
-                messages,
-                config,
-                stop=stop,
-                **kwargs
-            )
+    @contextmanager
+    def _queued_config(self, config):
+        queue_seconds = 0.0
+        timing_error = None
+        started = None
+        if self._semaphore is not None:
+            try:
+                started = monotonic()
+            except Exception as error:
+                timing_error = type(error).__name__
+            self._semaphore.acquire()
+        try:
+            if self._semaphore is not None:
+                queue_seconds = None
+                if started is not None:
+                    try:
+                        measured = monotonic() - started
+                        if not math.isfinite(measured) or measured < 0:
+                            raise ValueError("Invalid queue duration")
+                        queue_seconds = measured
+                    except Exception as error:
+                        timing_error = type(error).__name__
+            # Resolve inherited graph callbacks/metadata before adding our field.
+            # ensure_config copies the mutable config containers.
+            merged = ensure_config(config)
+            if isinstance(callbacks := merged.get("callbacks"), list):
+                # RunnableBinding also inherits context. Unlike lists, managers
+                # deduplicate handlers when it merges that context with config.
+                merged["callbacks"] = CallbackManager(
+                    handlers=callbacks.copy(), inheritable_handlers=callbacks.copy(),
+                )
+            # Explicit nulls mask stale inherited measurements/errors in bindings.
+            merged["metadata"]["cipoc_queue_seconds"] = queue_seconds
+            merged["metadata"]["cipoc_queue_timing_error"] = timing_error
+            yield merged
+        finally:
+            if self._semaphore is not None:
+                self._semaphore.release()
 
-        with self._semaphore:
+    def invoke(self, messages, *, config=None, stop=None, **kwargs):
+        with self._queued_config(config) as queued_config, usage_evidence_scope(self._usage_evidence_owner):
             return self.model.invoke(
                 messages,
-                config,
+                queued_config,
                 stop=stop,
                 **kwargs
             )
 
     async def ainvoke(self, messages, *, config=None, stop=None, **kwargs):
         """Async passthrough; does not acquire the synchronous per-model budget."""
-        return await self.model.ainvoke(
-            messages,
-            config,
-            stop=stop,
-            **kwargs
-        )
+        with usage_evidence_scope(None):
+            return await self.model.ainvoke(
+                messages,
+                config,
+                stop=stop,
+                **kwargs
+            )
 
     def structured(self, schema, messages, **kwargs):
         """Invoke the model with structured output under the concurrency guard.
@@ -204,11 +243,8 @@ class BaseAgentModel(ABC):
         which bypasses the semaphore.
         """
         runnable = self._structured_runnable(schema)
-        if self._semaphore is None:
-            result = runnable.invoke(messages, **kwargs)
-            return self._parse_structured_result(schema, result)
-        with self._semaphore:
-            result = runnable.invoke(messages, **kwargs)
+        with self._queued_config(kwargs.pop("config", None)) as config, usage_evidence_scope(self._usage_evidence_owner):
+            result = runnable.invoke(messages, config=config, **kwargs)
             return self._parse_structured_result(schema, result)
 
     async def astructured(self, schema, messages, **kwargs):
@@ -221,8 +257,9 @@ class BaseAgentModel(ABC):
         limiter is implemented, only the sync path is bounded.
         """
         runnable = self._structured_runnable(schema)
-        result = await runnable.ainvoke(messages, **kwargs)
-        return self._parse_structured_result(schema, result)
+        with usage_evidence_scope(None):
+            result = await runnable.ainvoke(messages, **kwargs)
+            return self._parse_structured_result(schema, result)
 
     def _structured_runnable(self, schema):
         return self.model.with_structured_output(

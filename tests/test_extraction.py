@@ -1,7 +1,48 @@
 import unittest
 
 from cipoc.models import ConfidenceLevel, VariableInfo, VariableOutput
-from cipoc.tools import VariableValueValidator
+from cipoc.tools import VariableValueValidator, resolve_evidence_text
+
+
+class EvidenceTextMatchingTests(unittest.TestCase):
+    def test_typographic_punctuation_is_restored_from_source_in_both_directions(self):
+        for variants in ("-\u2010\u2011", "'\u2018\u2019", '\"\u201c\u201d'):
+            for source_character in variants:
+                for returned_character in variants:
+                    with self.subTest(source=source_character, returned=returned_character):
+                        source = f"word{source_character}word"
+                        returned = f"word{returned_character}word"
+                        self.assertEqual(resolve_evidence_text(returned, f"Pr\u00e9fix: {source}."), source)
+
+    def test_existing_exact_matches_take_precedence_even_when_repeated(self):
+        for text, content in (("a-b", "a-b a\u2011b a-b"), ("--", "---")):
+            with self.subTest(text=text):
+                self.assertEqual(resolve_evidence_text(text, content), text)
+
+    def test_equivalent_matches_must_be_unique_including_overlaps(self):
+        for text, content in (
+            ("a\u2010b", "a-b / a\u2011b"),
+            ("a\u2011b", "a-b / a-b"),
+            ("\u2011\u2011", "---"),
+        ):
+            with self.subTest(text=text, content=content):
+                self.assertIsNone(resolve_evidence_text(text, content))
+
+    def test_other_differences_are_not_normalized(self):
+        for text, content in (
+            ("ER-positive", "ER-negative"), ("ER+", "ER-"),
+            ("Node 2", "Node 3"), ("Node \uff12", "Node 2"),
+            ("no evidence", "No evidence"), ("no  evidence", "no evidence"),
+            ("no\u00a0evidence", "no evidence"), ("no\tevidence", "no evidence"),
+            ("no evidence", "no\nevidence"), ("caf\u00e9", "cafe\u0301"),
+            ("value\u22122", "value-2"), ("value\u20132", "value-2"),
+            ("value\u20142", "value-2"), ("quote\u2026", "quote..."),
+            ("5\u2032", "5'"), ("5\u2033", '5"'),
+            ("no\nevidence", "no\nevidence"), ("no\revidence", "no\revidence"),
+            ("", "text"), (" \t", " \t"),
+        ):
+            with self.subTest(text=text, content=content):
+                self.assertIsNone(resolve_evidence_text(text, content))
 
 
 class VariableValueValidatorTests(unittest.TestCase):

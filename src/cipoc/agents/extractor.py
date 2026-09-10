@@ -29,7 +29,7 @@ from cipoc.prompts import (
     EXTRACT_VARIABLE_VALUE_PROMPT,
     REPAIR_VARIABLE_VALUE_PROMPT,
 )
-from cipoc.tools import VariableValueValidator, build_variable_group
+from cipoc.tools import VariableValueValidator, build_variable_group, resolve_evidence_text
 from cipoc.utils import CipocConfig, run_with_progress
 
 from .base import BaseAgent
@@ -234,25 +234,29 @@ class ExtractorAgent(BaseAgent):
 
     def validate_extraction(self, state: VariableBranchState) -> dict:
         errors = list(state.task.validation_errors)
-        if state.task.candidate is None:
+        candidate = state.task.candidate
+        if candidate is None:
             errors.append("No extraction candidate was returned.")
         else:
+            citation = candidate.most_important_note
+            if isinstance(citation, str) and not citation.strip():
+                # Treat a blank optional citation as absent without mutating the raw/group response.
+                candidate = candidate.model_copy(update={"most_important_note": None})
             errors.extend(
                 self._value_validator.validate(
                     state.task.variable,
-                    state.task.candidate,
+                    candidate,
                 )
             )
-            if state.task.candidate.value is None and state.task.candidate.spans:
+            if candidate.value is None and candidate.spans:
                 errors.append("Supporting text spans must be empty when no value is returned.")
-            elif state.task.candidate.value is not None and not state.task.candidate.spans:
+            elif candidate.value is not None and not candidate.spans:
                 errors.append("No supporting text spans were returned.")
-            citation = state.task.candidate.most_important_note
-            if state.task.candidate.value is None and citation is not None:
+            citation = candidate.most_important_note
+            if candidate.value is None and citation is not None:
                 errors.append("Primary citation must be null when no value is returned.")
-            if citation is not None and not any(str(note.note_id) == str(citation) for note in state.notes):
-                errors.append(f"Primary citation cites note id '{citation}', which is not one of the provided notes.")
-            for index, span in enumerate(state.task.candidate.spans, start=1):
+            spans = list(candidate.spans)
+            for index, span in enumerate(spans, start=1):
                 if not span.text.strip():
                     errors.append(f"Supporting text span {index} is empty.")
                     continue
@@ -273,14 +277,37 @@ class ExtractorAgent(BaseAgent):
                         "text was copied from."
                     )
                 elif not any(span.text in note.content for note in cited_notes):
-                    errors.append(
-                        f"Supporting text span {index} is not verbatim text from note "
-                        f"{span.note_id}."
+                    source_text = (
+                        resolve_evidence_text(span.text, cited_notes[0].content)
+                        if len(cited_notes) == 1 else None
                     )
+                    if source_text is None:
+                        errors.append(
+                            f"Supporting text span {index} is not verbatim text from note "
+                            f"{span.note_id}."
+                        )
+                    else:
+                        spans[index - 1] = span.model_copy(update={"text": source_text})
+            if spans != candidate.spans:
+                candidate = candidate.model_copy(update={"spans": spans})
+
+            if citation is not None and not any(str(note.note_id) == str(citation) for note in state.notes):
+                matching_notes = []
+                if isinstance(citation, str) and not errors:
+                    # Keep quote-as-ID recovery paired with its validated span after punctuation restoration.
+                    matching_notes = [
+                        note for note in state.notes
+                        if any(citation in (original.text, span.text) and str(span.note_id) == str(note.note_id)
+                               for original, span in zip(state.task.candidate.spans, candidate.spans))
+                    ]
+                if len(matching_notes) == 1:
+                    candidate = candidate.model_copy(update={"most_important_note": matching_notes[0].note_id})
+                else:
+                    errors.append(f"Primary citation cites note id '{citation}', which is not one of the provided notes.")
 
         return {
             "task": state.task.model_copy(
-                update={"validation_errors": errors, "is_valid": not errors}
+                update={"candidate": candidate, "validation_errors": errors, "is_valid": not errors}
             )
         }
 

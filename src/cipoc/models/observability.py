@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from datetime import timezone
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, JsonValue, RootModel, model_validator
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, JsonValue, RootModel, field_validator, model_validator
 
 
 AttemptMode = Literal["group", "individual", "repair"]
@@ -15,6 +16,7 @@ LLMAgent = Literal[
 
 _NonNegativeInt = Annotated[int, Field(ge=0, strict=True)]
 _PositiveInt = Annotated[int, Field(gt=0, strict=True)]
+_NonNegativeFloat = Annotated[float, Field(ge=0)]
 
 
 class _ObservabilityModel(BaseModel):
@@ -150,10 +152,42 @@ class _LLMInvocation(_ObservabilityModel):
         description="Transport retry ordinal; absent for the first invocation.",
     )
     model: str | None = None
+    started_at: AwareDatetime | None = Field(
+        default=None, description="UTC model callback start, after local permit acquisition."
+    )
+    finished_at: AwareDatetime | None = Field(
+        default=None, description="UTC model end/error callback entry; wall clocks may step."
+    )
+    service_seconds: _NonNegativeFloat | None = Field(
+        default=None,
+        description="Monotonic callback duration including network and SDK retries, not pure provider compute or total permit occupancy.",
+    )
+    queue_seconds: _NonNegativeFloat | None = Field(
+        default=None,
+        description="Monotonic local synchronous permit wait; excludes graph scheduling and LangGraph retry backoff. Uninstrumented paths are null.",
+    )
     prompt_messages: list[LLMPromptMessage] | None = None
     response: JsonValue | None = None
     usage: NormalizedTokenUsage | None = None
+    usage_reported_fields: list[Literal["input_tokens", "output_tokens", "total_tokens"]] | None = Field(
+        default=None,
+        description="Retained scalars verified against same-invocation provider usage before SDK/adapter coercion or defaulting. Null is unverified/unrecorded; [] verifies no scalars. Instrumented synchronous non-streaming calls can supply this proof.",
+    )
     error: str | None = None
+
+    @field_validator("started_at", "finished_at")
+    @classmethod
+    def normalize_utc(cls, value):
+        return value.astimezone(timezone.utc) if value is not None else None
+
+    @model_validator(mode="after")
+    def validate_reported_fields(self):
+        if self.usage_reported_fields is not None:
+            if len(set(self.usage_reported_fields)) != len(self.usage_reported_fields):
+                raise ValueError("Reported usage fields cannot repeat.")
+            if self.usage_reported_fields and self.usage is None:
+                raise ValueError("Verified scalar fields require retained usage.")
+        return self
 
 
 class LLMExchange(_LLMInvocation):

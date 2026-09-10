@@ -11,8 +11,16 @@ from unittest.mock import Mock, patch
 from uuid import uuid4
 
 import httpx
+from langchain_core.callbacks import BaseCallbackHandler, CallbackManager
+from langchain_core.runnables.config import set_config_context
+from langchain_core.tools import StructuredTool
+from langchain_openai import ChatOpenAI
+from langgraph.graph import END, START, StateGraph
+from langgraph.types import RetryPolicy
 
 from cipoc.llm import BaseAgentModel, LLMConfig, OpenAIAgentModel
+from cipoc.utils.observability import ObservabilityCollector
+from tests.test_observability import _DeterministicChatModel, _FlakyChatModel
 
 
 class _Model:
@@ -57,6 +65,264 @@ class EndpointConcurrencyTests(unittest.TestCase):
         for cap in (None, 1, 2):
             agent = self.agent(cap, endpoint=f"{self.endpoint}/{cap}")
             self.assertEqual(agent._endpoint_limiter.capacity, cap)
+
+    def test_queue_measurement_covers_contention_without_mutating_caller_config(self):
+        for structured in (False, True):
+            with self.subTest(structured=structured):
+                agent = self.agent()
+                entered = threading.Event()
+                reached_clock = threading.Event()
+                clock = [10.0]
+                received = []
+                callback = BaseCallbackHandler()
+                config = {
+                    "metadata": {"caller": "keep", "cipoc_queue_seconds": 999},
+                    "callbacks": [callback], "tags": ["caller"],
+                    "configurable": {"custom": "keep"}, "max_concurrency": 4,
+                }
+
+                def monotonic():
+                    value = clock[0]
+                    reached_clock.set()
+                    return value
+
+                def invoke(messages, config=None, **kwargs):
+                    received.append(config)
+                    entered.set()
+                    return messages
+
+                agent._model.invoke = invoke
+                with patch("cipoc.llm.base.monotonic", side_effect=monotonic):
+                    with ThreadPoolExecutor(max_workers=1) as pool:
+                        agent._semaphore.acquire()
+                        try:
+                            if structured:
+                                pending = pool.submit(agent.structured, dict, "ok", config=config)
+                            else:
+                                pending = pool.submit(agent.invoke, "ok", config=config)
+                            self.assertTrue(reached_clock.wait(3))
+                            self.assertFalse(entered.is_set())
+                            clock[0] = 12.5
+                        finally:
+                            agent._semaphore.release()
+                        self.assertEqual(pending.result(timeout=3), "ok")
+                self.assertEqual(received[0]["metadata"]["cipoc_queue_seconds"], 2.5)
+                for key, value in config.items():
+                    if key == "callbacks":
+                        self.assertEqual(received[0][key].handlers, value)
+                    elif key != "metadata":
+                        self.assertEqual(received[0][key], value)
+                self.assertEqual(received[0]["metadata"]["caller"], "keep")
+                self.assertEqual(config["metadata"], {"caller": "keep", "cipoc_queue_seconds": 999})
+                self.assertIsNot(received[0], config)
+                self.assertIsNot(received[0]["metadata"], config["metadata"])
+
+    def test_queue_metadata_preserves_context_callbacks_and_config(self):
+        for callbacks in ([BaseCallbackHandler()], CallbackManager([BaseCallbackHandler()])):
+            for explicit in (None, {"tags": ["explicit"]}):
+                for structured in (False, True):
+                    with self.subTest(callbacks=type(callbacks), explicit=explicit, structured=structured):
+                        agent = self.agent(None)
+                        parent_id = uuid4()
+                        if isinstance(callbacks, CallbackManager):
+                            callbacks.parent_run_id = parent_id
+                        inherited = {
+                            "callbacks": callbacks,
+                            "metadata": {"langgraph_node": "summarize_note", "cipoc_queue_seconds": 999},
+                            "configurable": {"thread_id": "synthetic"},
+                            "recursion_limit": 42,
+                        }
+                        agent._model.invoke = Mock(return_value="ok")
+                        with set_config_context(inherited) as context:
+                            if structured:
+                                context.run(agent.structured, dict, "ok", config=explicit)
+                            else:
+                                context.run(agent.invoke, "ok", config=explicit)
+                        call = agent._model.invoke.call_args
+                        config = call.kwargs["config"] if structured else call.args[1]
+                        self.assertEqual(config["metadata"]["cipoc_queue_seconds"], 0.0)
+                        self.assertEqual(config["metadata"]["langgraph_node"], "summarize_note")
+                        self.assertEqual(config["configurable"], inherited["configurable"])
+                        self.assertEqual(config["recursion_limit"], 42)
+                        if isinstance(callbacks, list):
+                            self.assertEqual(config["callbacks"].handlers, callbacks)
+                        else:
+                            self.assertEqual(config["callbacks"].handlers, callbacks.handlers)
+                            self.assertEqual(config["callbacks"].parent_run_id, parent_id)
+                        self.assertEqual(inherited["metadata"]["cipoc_queue_seconds"], 999)
+
+    def test_real_tool_binding_does_not_duplicate_inherited_callbacks(self):
+        def tool(value: str) -> str:
+            """Return a synthetic value."""
+            return value
+
+        class Handler(BaseCallbackHandler):
+            def __init__(self):
+                self.starts = []
+                self.ends = []
+
+            def on_chat_model_start(self, serialized, messages, *, run_id, parent_run_id=None, **kwargs):
+                self.starts.append((run_id, parent_run_id))
+
+            def on_llm_end(self, response, *, run_id, **kwargs):
+                self.ends.append(run_id)
+
+        def respond(request):
+            self.assertTrue(json.loads(request.content)["tools"])
+            return httpx.Response(200, json={
+                "id": "offline", "object": "chat.completion", "created": 1,
+                "model": "offline", "choices": [{
+                    "index": 0, "finish_reason": "stop",
+                    "message": {"role": "assistant", "content": "ok"},
+                }],
+            })
+
+        for manager in (False, True):
+            for explicit in (None, {"tags": ["explicit"]}):
+                with self.subTest(manager=manager, explicit=explicit):
+                    handler = Handler()
+                    collector = ObservabilityCollector(capture_llm_content=False)
+                    handlers = [handler, collector.llm_callback]
+                    parent_id = uuid4() if manager else None
+                    callbacks = CallbackManager(
+                        handlers=handlers.copy(), inheritable_handlers=handlers.copy(), parent_run_id=parent_id,
+                    ) if manager else handlers
+                    with httpx.Client(transport=httpx.MockTransport(respond)) as transport:
+                        agent = self.agent(model=ChatOpenAI(
+                            model="offline", api_key="synthetic", base_url=self.endpoint,
+                            http_client=transport, max_retries=0, use_responses_api=False,
+                        ), tools=[StructuredTool.from_function(tool)])
+                        with set_config_context({"callbacks": callbacks}) as context:
+                            self.assertEqual(context.run(agent.invoke, "offline", config=explicit).content, "ok")
+                    self.assertEqual(len(handler.starts), 1)
+                    self.assertEqual(handler.starts[0][1], parent_id)
+                    self.assertEqual(handler.ends, [handler.starts[0][0]])
+                    self.assertEqual(len(collector.llm_callback._snapshot()), 1)
+                    self.assertEqual(collector.llm_callback.collection_issues(), [])
+                    self.assertEqual(callbacks.handlers if manager else callbacks, handlers)
+                    if manager:
+                        self.assertEqual(callbacks.parent_run_id, parent_id)
+
+    def test_queue_clock_errors_do_not_prevent_model_calls_or_release_permits_early(self):
+        for structured in (False, True):
+            for failure_at in (0, 1):
+                with self.subTest(structured=structured, failure_at=failure_at):
+                    agent = self.agent(model=_DeterministicChatModel(model_name="offline"))
+                    collector = ObservabilityCollector(capture_llm_content=False)
+
+                    def parse(schema, result):
+                        self.assertFalse(agent._semaphore.acquire(blocking=False))
+                        return result
+
+                    clocks = [100, 101]
+                    clocks[failure_at] = OSError("clock unavailable")
+                    with (
+                        patch("cipoc.llm.base.monotonic", side_effect=clocks),
+                        patch.object(agent, "_structured_runnable", return_value=agent.model),
+                        patch.object(agent, "_parse_structured_result", side_effect=parse),
+                    ):
+                        if structured:
+                            agent.structured(dict, "offline", config=collector.graph_config())
+                        else:
+                            agent.invoke("offline", config=collector.graph_config())
+                    self.assertTrue(agent._semaphore.acquire(blocking=False))
+                    agent._semaphore.release()
+                    snapshot = collector.snapshot()
+                    self.assertEqual(len(snapshot["unattributed_exchanges"]), 1)
+                    self.assertIsNone(snapshot["unattributed_exchanges"][0]["queue_seconds"])
+                    self.assertIn("queue_timing_error", {issue["code"] for issue in snapshot["collection_issues"]})
+
+    def test_real_structured_binding_with_inherited_callbacks_is_captured_once(self):
+        def respond(request):
+            return httpx.Response(200, json={
+                "id": "offline", "object": "chat.completion", "created": 1,
+                "model": "offline", "choices": [{
+                    "index": 0, "finish_reason": "stop",
+                    "message": {"role": "assistant", "content": '{"ok":true}'},
+                }],
+            })
+
+        collector = ObservabilityCollector(capture_llm_content=False)
+        with httpx.Client(transport=httpx.MockTransport(respond)) as transport:
+            agent = OpenAIAgentModel({
+                "model": "offline", "api_key": "synthetic", "base_url": self.endpoint,
+                "reasoning": None, "use_responses_api": False, "max_retries": 0,
+                "structured_output_method": "json_mode", "max_concurrency": 1,
+            }, http_client=transport)
+            with set_config_context({"callbacks": [collector.llm_callback]}) as context:
+                self.assertEqual(context.run(agent.structured, dict, "offline"), {"ok": True})
+        self.assertEqual(len(collector.llm_callback._snapshot()), 1)
+        self.assertEqual(collector.llm_callback.collection_issues(), [])
+
+    def test_queue_clock_failure_keeps_model_error_and_masks_inherited_timing(self):
+        agent = self.agent(model=_FlakyChatModel(model_name="offline", fail_times=1))
+        collector = ObservabilityCollector(capture_llm_content=False)
+        inherited = collector.graph_config({"metadata": {"cipoc_queue_seconds": 999}})
+        with (
+            set_config_context(inherited) as context,
+            patch("cipoc.llm.base.monotonic", side_effect=OSError("optional clock failure")),
+        ):
+            with self.assertRaisesRegex(TimeoutError, "transient"):
+                context.run(agent.invoke, "offline")
+        self.assertTrue(agent._semaphore.acquire(blocking=False))
+        agent._semaphore.release()
+        snapshot = collector.snapshot()
+        call = snapshot["unattributed_exchanges"][0]
+        self.assertEqual(call["error"], "TimeoutError: transient")
+        self.assertIsNone(call["queue_seconds"])
+        self.assertEqual(snapshot["llm_usage_summary"]["failed_invocations"], 1)
+        self.assertIn("queue_timing_error", {issue["code"] for issue in snapshot["collection_issues"]})
+        self.assertEqual(inherited["metadata"], {"cipoc_queue_seconds": 999})
+
+    def test_sync_unbounded_reports_zero_but_async_and_direct_capture_queue_is_null(self):
+        collector = ObservabilityCollector(capture_llm_content=False)
+        agent = self.agent(None, model=_DeterministicChatModel(model_name="offline"))
+        config = collector.graph_config()
+
+        async def async_calls():
+            await agent.ainvoke("async", config=config)
+            await agent.astructured(dict, "async structured", config=config)
+
+        with patch.object(agent, "_structured_runnable", return_value=agent.model):
+            agent.invoke("sync", config=config)
+            agent.structured(dict, "sync structured", config=config)
+            asyncio.run(async_calls())
+            agent.model.invoke("direct", config=config)
+        calls = collector.snapshot()["unattributed_exchanges"]
+        self.assertEqual([call["queue_seconds"] for call in calls], [0.0, 0.0, None, None, None])
+        self.assertTrue(all(call["service_seconds"] >= 0 for call in calls))
+
+    def test_langgraph_retries_release_permits_and_have_separate_service_and_queue_times(self):
+        model = _FlakyChatModel(model_name="flaky", fail_times=1)
+        agent = self.agent(model=model)
+        collector = ObservabilityCollector(capture_llm_content=False)
+
+        def retry_on(error):
+            self.assertTrue(agent._semaphore.acquire(blocking=False))
+            agent._semaphore.release()
+            return isinstance(error, TimeoutError)
+
+        def invoke(state):
+            agent.invoke("offline")
+            return state
+
+        builder = StateGraph(dict)
+        builder.add_node("summarize_note", invoke, retry_policy=RetryPolicy(
+            initial_interval=0, max_interval=0, jitter=False, max_attempts=2, retry_on=retry_on,
+        ))
+        builder.add_edge(START, "summarize_note")
+        builder.add_edge("summarize_note", END)
+        with (
+            patch("cipoc.llm.base.monotonic", side_effect=[10, 10.25, 20, 20.5]),
+            patch("cipoc.utils.observability.monotonic", side_effect=[100, 102, 200, 203]),
+        ):
+            builder.compile().invoke({"note_id": "offline"}, config=collector.graph_config())
+        calls = collector.snapshot()["llm_exchanges"]["note:offline"]
+        self.assertEqual([call["queue_seconds"] for call in calls], [0.25, 0.5])
+        self.assertEqual([call["service_seconds"] for call in calls], [2, 3])
+        self.assertEqual([call.get("retry_ordinal") for call in calls], [None, 1])
+        self.assertEqual([call["attempt"] for call in calls], [1, 1])
+        self.assertNotEqual(calls[0]["invocation_id"], calls[1]["invocation_id"])
 
     def test_same_model_and_endpoint_share_budget_across_wrappers_and_credentials(self):
         with patch("cipoc.llm.openai.ChatOpenAI"):
@@ -334,8 +600,31 @@ class EndpointConcurrencyTests(unittest.TestCase):
         self.assertTrue(peer._semaphore.acquire(blocking=False))
         peer._semaphore.release()
 
+    def test_structured_parser_holds_permit_after_callback_service_time_finishes(self):
+        agent = self.agent(model=_DeterministicChatModel(model_name="offline"))
+        collector = ObservabilityCollector(capture_llm_content=False)
+
+        def parse(schema, result):
+            self.assertFalse(agent._semaphore.acquire(blocking=False))
+            calls = collector.snapshot()["unattributed_exchanges"]
+            self.assertEqual(len(calls), 1)
+            self.assertEqual(calls[0]["service_seconds"], 2)
+            self.assertEqual(calls[0]["queue_seconds"], 0.25)
+            return result
+
+        with (
+            patch.object(agent, "_structured_runnable", return_value=agent.model),
+            patch.object(agent, "_parse_structured_result", side_effect=parse),
+            patch("cipoc.llm.base.monotonic", side_effect=[10, 10.25]),
+            patch("cipoc.utils.observability.monotonic", side_effect=[100, 102]),
+        ):
+            agent.structured(dict, "offline", config=collector.graph_config())
+        self.assertTrue(agent._semaphore.acquire(blocking=False))
+        agent._semaphore.release()
+
     def test_sdk_retry_and_backoff_retain_the_shared_permit(self):
         peer = self.agent()
+        collector = ObservabilityCollector(capture_llm_content=False)
         requests = []
 
         def respond(request):
@@ -361,9 +650,18 @@ class EndpointConcurrencyTests(unittest.TestCase):
                 "max_concurrency": 1, "max_retries": 1,
                 "reasoning": None, "use_responses_api": False,
             }, model_name="test-model", http_client=transport)
-            with patch("openai._base_client.time.sleep", side_effect=backoff) as sleep:
-                self.assertEqual(agent.invoke("synthetic prompt").content, "ok")
+            with (
+                patch("openai._base_client.time.sleep", side_effect=backoff) as sleep,
+                patch("cipoc.llm.base.monotonic", side_effect=[10, 10.25]),
+                patch("cipoc.utils.observability.monotonic", side_effect=[100, 105]),
+            ):
+                self.assertEqual(agent.invoke("synthetic prompt", config=collector.graph_config()).content, "ok")
                 sleep.assert_called_once()
+        calls = collector.snapshot()["unattributed_exchanges"]
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(calls[0]["queue_seconds"], 0.25)
+        self.assertEqual(calls[0]["service_seconds"], 5)
+        self.assertNotIn("retry_ordinal", calls[0])
         self.assertEqual(len(requests), 2)
         self.assertIs(peer._semaphore, agent._semaphore)
         self.assertTrue(peer._semaphore.acquire(blocking=False))

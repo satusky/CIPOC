@@ -23,6 +23,7 @@ from cipoc.models import (
     OrchestratorRunError,
     OrchestratorRunFailure,
     OrchestratorRunResult,
+    RunObservability,
 )
 
 
@@ -147,38 +148,76 @@ def run_case_state(
     )
 
 
-def usage_lines(summary: LLMUsageSummary | None) -> list[str]:
-    """Render concise provider-reported usage totals for terminal output."""
+def usage_lines(
+    summary: LLMUsageSummary | None, *, observability: RunObservability | None = None
+) -> list[str]:
+    """Render recorded usage and optional derived, coverage-qualified timing."""
     if summary is None:
-        return ["Usage: unavailable; telemetry did not produce a valid summary."]
-    lines = [
-        (
-            f"Tokens: input={summary.input_tokens:,} "
-            f"output={summary.output_tokens:,} total={summary.total_tokens:,}"
-        ),
-        (
-            f"Calls: logical={summary.logical_calls:,} "
-            f"invocations={summary.model_invocations:,} "
-            f"retries={summary.retry_invocations:,}"
-        ),
-        (
-            "Usage coverage: "
-            f"reported={summary.usage_reported_invocations:,} "
-            f"missing={summary.missing_usage_invocations:,}"
-        ),
-    ]
-    details = [
-        f"input.{name}={count:,}"
-        for name, count in sorted(summary.input_token_details.root.items())
-        if count
-    ]
-    details.extend(
-        f"output.{name}={count:,}"
-        for name, count in sorted(summary.output_token_details.root.items())
-        if count
+        lines = ["Usage: unavailable; telemetry did not produce a valid summary."]
+    else:
+        lines = [
+            (
+                f"Tokens: input={summary.input_tokens:,} "
+                f"output={summary.output_tokens:,} total={summary.total_tokens:,}"
+            ),
+            (
+                f"Calls: logical={summary.logical_calls:,} "
+                f"invocations={summary.model_invocations:,} "
+                f"retries={summary.retry_invocations:,}"
+            ),
+            (
+                "Usage coverage: "
+                f"reported={summary.usage_reported_invocations:,} "
+                f"missing={summary.missing_usage_invocations:,}"
+            ),
+        ]
+        details = [
+            f"input.{name}={count:,}"
+            for name, count in sorted(summary.input_token_details.root.items())
+            if count
+        ]
+        details.extend(
+            f"output.{name}={count:,}"
+            for name, count in sorted(summary.output_token_details.root.items())
+            if count
+        )
+        if details:
+            lines.append("Token details: " + ", ".join(details))
+    if observability is None:
+        return lines
+
+    calls = [call for values in observability.llm_exchanges.values() for call in values]
+    calls.extend(observability.unattributed_exchanges)
+    lines.append(
+        f"Timing records: retained={len(calls):,} "
+        f"diagnostic={len(observability.unattributed_exchanges):,} "
+        f"summary_invocations={summary.model_invocations if summary is not None else 'unavailable'}; "
+        f"collection={observability.collection_status or 'unknown'}"
     )
-    if details:
-        lines.append("Token details: " + ", ".join(details))
+    if any(issue.code == "invalid_invocation_sequence" for issue in observability.collection_issues):
+        lines.append("Timing/provenance aggregates: unavailable; invalid invocation identity or sequence.")
+        return lines
+
+    for field, label in (
+        ("service_seconds", "Summed invocation time"),
+        ("queue_seconds", "Summed queue wait"),
+    ):
+        values = [value for call in calls if (value := getattr(call, field)) is not None]
+        measured = (
+            f"{sum(values):.3f}s mean={sum(values) / len(values):.3f}s max={max(values):.3f}s"
+            if values else "unavailable"
+        )
+        lines.append(f"{label}: {measured}; recorded={len(values):,} missing={len(calls) - len(values):,}")
+    verified = sum(
+        call.usage_reported_fields is not None
+        and {"input_tokens", "output_tokens"}.issubset(call.usage_reported_fields)
+        for call in calls
+    )
+    unknown = sum(call.usage_reported_fields is None for call in calls)
+    lines.append(
+        f"Scalar provenance (input/output): verified={verified:,} "
+        f"incomplete={len(calls) - verified - unknown:,} unknown={unknown:,}"
+    )
     return lines
 
 
@@ -197,7 +236,9 @@ def _print_outcome(path: Path, artifact: RunArtifact) -> None:
         print(f"Telemetry collection: {artifact.observability.collection_status}")
         for issue in artifact.observability.collection_issues:
             print(f"  {issue.code}: {issue.message}")
-    for line in usage_lines(artifact.observability.llm_usage_summary):
+    for line in usage_lines(
+        artifact.observability.llm_usage_summary, observability=artifact.observability
+    ):
         print(line)
 
 

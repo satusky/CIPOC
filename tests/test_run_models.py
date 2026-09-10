@@ -139,7 +139,7 @@ class OrchestratorRunModelTests(unittest.TestCase):
         restored = OrchestratorRunResult.model_validate_json(result.model_dump_json())
 
         self.assertEqual(restored, result)
-        self.assertEqual(restored.schema_version, "1.1")
+        self.assertEqual(restored.schema_version, "1.2")
         self.assertEqual(restored.run.started_at.tzinfo, timezone.utc)
         self.assertNotIn(
             "api_key",
@@ -188,6 +188,26 @@ class OrchestratorRunModelTests(unittest.TestCase):
         values["agent_llm_config"]["extractor"] = {"custom": object()}
         with self.assertRaises(ValidationError):
             OrchestratorConfigFingerprint.model_validate(values)
+
+    def test_completed_and_failed_versions_preserve_legacy_and_require_modern_status(self):
+        for model, extra in (
+            (OrchestratorRunResult, {"run": run_info(), "case": Case(), "corpus": corpus()}),
+            (OrchestratorRunFailure, {"run": run_info("failed"), "error": "failure"}),
+        ):
+            artifact = model(inputs=inputs(), observability=observability(), **extra)
+            self.assertEqual(artifact.schema_version, "1.2")
+            for version in ("1.0", "1.1", "1.2"):
+                with self.subTest(model=model.__name__, version=version):
+                    payload = {**artifact.model_dump(mode="json"), "schema_version": version}
+                    restored = model.model_validate(payload)
+                    self.assertEqual(restored.schema_version, version)
+                    self.assertEqual(model.model_validate_json(restored.model_dump_json()), restored)
+                    payload["observability"].pop("collection_status")
+                    if version == "1.0":
+                        self.assertIsNone(model.model_validate(payload).observability.collection_status)
+                    else:
+                        with self.assertRaisesRegex(ValidationError, "explicit observability collection status"):
+                            model.model_validate(payload)
 
     def test_processed_note_scan_fields_survive_json_round_trip(self):
         restored = OrchestratorRunCorpus.model_validate_json(corpus().model_dump_json())

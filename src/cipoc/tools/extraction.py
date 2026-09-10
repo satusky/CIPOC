@@ -25,6 +25,31 @@ _CODE_COLUMN_NAMES = ("code",)
 _DESCRIPTION_COLUMN_NAMES = ("description",)
 _MISSING = object()
 
+# One-to-one typographic substitutions keep offsets into the original note valid.
+_EVIDENCE_PUNCTUATION = str.maketrans({
+    "\u2010": "-", "\u2011": "-",  # Hyphen and non-breaking hyphen, not mathematical minus.
+    "\u2018": "'", "\u2019": "'",
+    "\u201c": '"', "\u201d": '"',
+})
+
+
+def resolve_evidence_text(text: str, note_content: str) -> str | None:
+    """Return exact source text, allowing only an unambiguous punctuation equivalent.
+
+    Existing literal matches take precedence. Otherwise only typographic hyphens
+    and curly quotes are equivalent; do not fold whitespace, case, or other Unicode.
+    """
+    if not text.strip() or "\n" in text or "\r" in text:
+        return None
+    if text in note_content:
+        return text
+    normalized_text = text.translate(_EVIDENCE_PUNCTUATION)
+    normalized_note = note_content.translate(_EVIDENCE_PUNCTUATION)
+    start = normalized_note.find(normalized_text)
+    if start < 0 or normalized_note.find(normalized_text, start + 1) >= 0:
+        return None
+    return note_content[start:start + len(text)]
+
 
 def _parse_code_domain(tokens: list[str]) -> tuple[set[str], list[tuple[str, str, str]]]:
     """Parse only literal codes and equal-width, equal-prefix numeric intervals."""

@@ -90,7 +90,7 @@ class OrchestratorRunCorpus(_RunModel):
 class OrchestratorRunResult(_RunModel):
     """Canonical completed-run artifact consumed across the JSON boundary."""
 
-    schema_version: Literal["1.0", "1.1"] = "1.1"
+    schema_version: Literal["1.0", "1.1", "1.2"] = "1.2"
     run: OrchestratorRunInfo
     case: Case
     inputs: OrchestratorRunInputs
@@ -101,15 +101,15 @@ class OrchestratorRunResult(_RunModel):
     def validate_completed_status(self):
         if self.run.status != "completed":
             raise ValueError("A completed run result requires status 'completed'.")
-        if self.schema_version == "1.1" and self.observability.collection_status is None:
-            raise ValueError("Schema 1.1 requires an explicit observability collection status.")
+        if self.schema_version in {"1.1", "1.2"} and self.observability.collection_status is None:
+            raise ValueError(f"Schema {self.schema_version} requires an explicit observability collection status.")
         return self
 
 
 class OrchestratorRunFailure(_RunModel):
     """Partial artifact retained when orchestration raises before finalization."""
 
-    schema_version: Literal["1.0", "1.1"] = "1.1"
+    schema_version: Literal["1.0", "1.1", "1.2"] = "1.2"
     run: OrchestratorRunInfo
     inputs: OrchestratorRunInputs
     corpus: OrchestratorRunCorpus | None = None
@@ -120,8 +120,8 @@ class OrchestratorRunFailure(_RunModel):
     def validate_failed_status(self):
         if self.run.status != "failed":
             raise ValueError("A run failure requires status 'failed'.")
-        if self.schema_version == "1.1" and self.observability.collection_status is None:
-            raise ValueError("Schema 1.1 requires an explicit observability collection status.")
+        if self.schema_version in {"1.1", "1.2"} and self.observability.collection_status is None:
+            raise ValueError(f"Schema {self.schema_version} requires an explicit observability collection status.")
         return self
 
 

@@ -475,7 +475,7 @@ class OrchestratorRemediationTests(unittest.TestCase):
 
     def test_actual_result_is_1_1_and_legacy_1_0_remains_readable(self):
         result = _agent().run([_note().model_dump()], {400: "C349"}, progress=False)
-        self.assertEqual(result.schema_version, "1.1")
+        self.assertEqual(result.schema_version, "1.2")
         restored = OrchestratorRunResult.model_validate_json(result.model_dump_json())
         self.assertEqual(restored, result)
         legacy = result.model_dump(mode="json")
@@ -599,7 +599,7 @@ class OrchestratorRemediationTests(unittest.TestCase):
         self.assertIs(error.__cause__, original)
         self.assertIn("synchronized_scan", [frame.name for frame in traceback.extract_tb(original.__traceback__)])
         failure = error.failure
-        self.assertEqual(failure.schema_version, "1.1")
+        self.assertEqual(failure.schema_version, "1.2")
         self.assertEqual(failure.error, "RuntimeError: original fanout scanner failure")
         self.assertEqual(failure.run.status, "failed")
         self.assertNotIn("case", failure.model_dump())

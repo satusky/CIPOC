@@ -6,8 +6,12 @@ from threading import Event, Lock
 import unittest
 from unittest.mock import patch
 
-from cipoc.agents.extractor import ExtractorAgent, ExtractorInput, ExtractorOutput
-from cipoc.models import ClinicalNote, VariableGroupInfo, VariableInfo, VariableStatus
+from cipoc.agents.extractor import (
+    ExtractorAgent, ExtractorInput, ExtractorOutput, VariableBranchState, VariableExtractionTask,
+)
+from cipoc.models import (
+    ClinicalNote, VariableGroupInfo, VariableGroupOutput, VariableInfo, VariableStatus,
+)
 from cipoc.tools import to_case_results
 from cipoc.utils import CipocConfig
 
@@ -146,12 +150,292 @@ class ExtractorRegressionTests(unittest.TestCase):
 
     def test_malformed_null_answers_enter_repair(self):
         variable = VariableInfo(item_id=410, valid_codes={"1": "Right"})
-        for updates in ({"item_id": 400}, {"most_important_note": 1}, {"spans": [{"note_id": 1, "text": "Evidence"}]}):
+        for updates in (
+            {"item_id": 400}, {"most_important_note": 1}, {"most_important_note": 0},
+            {"spans": [{"note_id": 1, "text": "Evidence"}]},
+            {"most_important_note": "", "spans": [{"note_id": 1, "text": "Evidence"}]},
+        ):
             with self.subTest(updates=updates):
                 model = FakeModel({410: [{**candidate(410, None), **updates}, candidate(410, None)]})
                 result = self.agent(model).run(self.input([variable]), progress=False)
                 self.assertTrue(result.extracted_values.variables[0].is_valid)
                 self.assertEqual(model.calls, {410: 2})
+
+    def test_blank_primary_citation_is_not_found_without_repair(self):
+        variable = VariableInfo(item_id=3843, valid_codes={"1": "Well differentiated"})
+        for citation in ("", " \t\r\n"):
+            with self.subTest(citation=citation):
+                model = FakeModel({3843: [candidate(3843, None, most_important_note=citation)]})
+                result = self.agent(model).run(self.input([variable]), progress=False)
+                extracted = result.extracted_values.variables[0]
+                self.assertTrue(extracted.is_valid, extracted.validation_errors)
+                self.assertIsNone(extracted.most_important_note)
+                self.assertEqual(extracted.validation_errors, [])
+                self.assertEqual(extracted.extraction_attempts, 1)
+                self.assertEqual(model.calls, {3843: 1})
+                case_result = to_case_results(VariableGroupInfo(variables=[variable]), result.extracted_values)
+                self.assertEqual(case_result[3843].status, VariableStatus.NOT_FOUND)
+
+    def test_blank_citation_normalization_preserves_raw_candidate_and_group_context(self):
+        variable = VariableInfo(item_id=3843, valid_codes={"1": "Well differentiated"})
+        group = VariableGroupOutput(variables=[candidate(3843, None, most_important_note="")])
+        original = group.variables[0]
+        state = VariableBranchState(
+            task=VariableExtractionTask(variable=variable, extraction_mode="group", candidate=original,
+                                        extraction_attempts=1),
+            notes=self.input([variable]).notes, messages=[], group_context=group,
+        )
+        task = self.agent(FakeModel({})).validate_extraction(state)["task"]
+        self.assertTrue(task.is_valid)
+        self.assertIsNone(task.candidate.most_important_note)
+        self.assertIsNot(task.candidate, original)
+        self.assertEqual(task.candidate.model_dump(), {**original.model_dump(), "most_important_note": None})
+        self.assertEqual(state.task.candidate.most_important_note, "")
+        self.assertEqual(group.variables[0].most_important_note, "")
+        self.assertEqual(VariableGroupOutput.model_validate_json(group.model_dump_json()).variables[0].most_important_note, "")
+
+    def test_blank_citations_normalize_for_group_and_repair_outputs(self):
+        variables = [VariableInfo(item_id=item_id, valid_codes={"2": "Moderately differentiated"})
+                     for item_id in (3843, 3844)]
+        for missing in (False, True):
+            with self.subTest(repaired=missing):
+                blank = candidate(3843, None, most_important_note=" \t")
+                group = [candidate(3844, "2")]
+                if not missing:
+                    group.append(blank)
+                model = FakeModel({3843: [blank]}, group_response=group)
+                result = self.agent(model).run(self.input(variables, grouped=True), progress=False)
+                self.assertTrue(all(output.is_valid for output in result.extracted_values.variables))
+                extracted = result.extracted_values.variables[0]
+                self.assertIsNone(extracted.most_important_note)
+                self.assertEqual(extracted.extraction_attempts, 2 if missing else 1)
+                self.assertEqual(model.calls, {"group": 1, 3843: 1} if missing else {"group": 1})
+
+    def test_blank_optional_citations_do_not_bypass_evidence_validation(self):
+        variable = VariableInfo(item_id=410, valid_codes={"1": "Right"})
+        for spans, valid in (
+            ([{"note_id": 1, "text": "Evidence"}], True),
+            ([], False),
+            ([{"note_id": 1, "text": " \t"}], False),
+            ([{"note_id": 1, "text": "Evidence\n"}], False),
+            ([{"note_id": 1, "text": "Invented evidence"}], False),
+            ([{"note_id": 999, "text": "Evidence"}], False),
+        ):
+            with self.subTest(spans=spans):
+                model = FakeModel({410: [candidate(410, "1", most_important_note="", spans=spans)]})
+                result = self.agent(model).run(self.input([variable]), progress=False)
+                extracted = result.extracted_values.variables[0]
+                self.assertIsNone(extracted.most_important_note)
+                self.assertEqual(extracted.is_valid, valid, extracted.validation_errors)
+                self.assertEqual(model.calls[410], 1 if valid else 3)
+
+    def test_span_substituted_for_primary_citation_is_resolved_without_repair(self):
+        variable = VariableInfo(item_id=832, data_type="date", length=8, format="YYYYMMDD")
+        quote = "Procedure performed 2025-03-18: left breast lumpectomy with sentinel lymph node biopsy."
+        for note_id in (53, "53", "note-A", "053", 0):
+            with self.subTest(note_id=note_id):
+                response = candidate(832, "20250318", most_important_note=quote,
+                                     spans=[{"note_id": str(note_id), "text": quote}] * 2)
+                model = FakeModel({832: [response]})
+                inputs = self.input([variable], note_id=note_id)
+                inputs.notes[0].content = quote
+                result = self.agent(model).run(inputs, progress=False)
+                extracted = result.extracted_values.variables[0]
+                self.assertTrue(extracted.is_valid, extracted.validation_errors)
+                self.assertEqual(extracted.value, "20250318")
+                self.assertEqual(extracted.most_important_note, note_id)
+                self.assertIs(type(extracted.most_important_note), type(note_id))
+                self.assertEqual(extracted.extraction_attempts, 1)
+                self.assertEqual(model.calls, {832: 1})
+                self.assertEqual(response["most_important_note"], quote)
+                self.assertEqual(to_case_results(inputs.requested_variables, result.extracted_values)[832].status,
+                                 VariableStatus.EXTRACTED)
+
+    def test_span_citation_recovery_requires_exact_unambiguous_valid_evidence(self):
+        variable = VariableInfo(item_id=410, valid_codes={"1": "Right"})
+        notes = self.input([variable]).notes
+        span = {"note_id": 1, "text": "Evidence"}
+        agent = self.agent(FakeModel({}))
+        for label, updates, offered in (
+            ("partial quote", {"most_important_note": "Evidence in"}, notes),
+            ("different case", {"most_important_note": "evidence"}, notes),
+            ("padded quote", {"most_important_note": " Evidence "}, notes),
+            ("no spans", {"spans": []}, notes),
+            ("unknown span note", {"spans": [{**span, "note_id": 999}]}, notes),
+            ("non-verbatim span", {}, [notes[0].model_copy(update={"content": "Other text"})]),
+            ("newline span", {"most_important_note": "Evidence\nin", "spans": [{**span, "text": "Evidence\nin"}]},
+             [notes[0].model_copy(update={"content": "Evidence\nin a note"})]),
+            ("additional invalid span", {"spans": [span, {**span, "text": "Invented"}]}, notes),
+            ("invalid code", {"value": "9"}, notes),
+            ("wrong item", {"item_id": 999}, notes),
+            ("null with evidence", {"value": None}, notes),
+            ("ambiguous source", {"spans": [span, {**span, "note_id": 2}]},
+             notes + [notes[0].model_copy(update={"note_id": 2})]),
+            ("colliding source IDs", {}, notes + [notes[0].model_copy(update={"note_id": "1"})]),
+        ):
+            with self.subTest(label=label):
+                original = VariableGroupOutput(variables=[{
+                    **candidate(410, "1", most_important_note="Evidence"), **updates,
+                }]).variables[0]
+                state = VariableBranchState(
+                    task=VariableExtractionTask(variable=variable, extraction_mode="individual",
+                                                candidate=original, extraction_attempts=1),
+                    notes=offered, messages=[],
+                )
+                validated = state.model_copy(update=agent.validate_extraction(state))
+                self.assertFalse(validated.task.is_valid)
+                self.assertEqual(validated.task.candidate.most_important_note, original.most_important_note)
+                self.assertTrue(any("Primary citation" in error for error in validated.task.validation_errors))
+                self.assertEqual(agent.route_after_validation(validated), "repair_invalid_extraction")
+
+    def test_valid_primary_id_takes_precedence_over_matching_span_text(self):
+        variable = VariableInfo(item_id=410, valid_codes={"1": "Right"})
+        model = FakeModel({410: [candidate(410, "1", most_important_note="Evidence")]})
+        inputs = self.input([variable])
+        inputs.notes.append(inputs.notes[0].model_copy(update={"note_id": "Evidence"}))
+        result = self.agent(model).run(inputs, progress=False)
+        extracted = result.extracted_values.variables[0]
+        self.assertTrue(extracted.is_valid)
+        self.assertEqual(extracted.most_important_note, "Evidence")
+        self.assertEqual(model.calls, {410: 1})
+
+    def test_span_citation_recovery_applies_to_group_and_repair_outputs(self):
+        variables = [VariableInfo(item_id=item_id, valid_codes={"1": "Present"}) for item_id in (400, 410)]
+        substituted = candidate(400, "1", most_important_note="Evidence")
+        for repair in (False, True):
+            with self.subTest(repair=repair):
+                group = [candidate(410, "1")]
+                if not repair:
+                    group.append(substituted)
+                model = FakeModel({400: [substituted]}, group_response=group)
+                result = self.agent(model).run(self.input(variables, grouped=True), progress=False)
+                self.assertTrue(all(output.is_valid for output in result.extracted_values.variables))
+                extracted = result.extracted_values.variables[0]
+                self.assertEqual(extracted.most_important_note, 1)
+                self.assertEqual(extracted.extraction_attempts, 2 if repair else 1)
+                self.assertEqual(model.calls, {"group": 1, 400: 1} if repair else {"group": 1})
+
+    def test_span_citation_recovery_preserves_raw_group_and_validation_errors(self):
+        variable = VariableInfo(item_id=410, valid_codes={"1": "Right"})
+        group = VariableGroupOutput(variables=[candidate(410, "1", most_important_note="Evidence")])
+        original = group.variables[0]
+        state = VariableBranchState(
+            task=VariableExtractionTask(variable=variable, extraction_mode="group", candidate=original,
+                                        extraction_attempts=1),
+            notes=self.input([variable]).notes, messages=[], group_context=group,
+        )
+        agent = self.agent(FakeModel({}))
+        task = agent.validate_extraction(state)["task"]
+        self.assertTrue(task.is_valid)
+        self.assertIsNot(task.candidate, original)
+        self.assertEqual(task.candidate.model_dump(), {**original.model_dump(), "most_important_note": 1})
+        self.assertEqual(state.task.candidate.most_important_note, "Evidence")
+        self.assertEqual(VariableGroupOutput.model_validate_json(group.model_dump_json()).variables[0].most_important_note,
+                         "Evidence")
+        state.task.validation_errors = ["Group extraction returned this variable more than once."]
+        task = agent.validate_extraction(state)["task"]
+        self.assertFalse(task.is_valid)
+        self.assertIn(state.task.validation_errors[0], task.validation_errors)
+        self.assertEqual(task.candidate.most_important_note, "Evidence")
+
+    def test_punctuation_only_span_is_corrected_without_repair(self):
+        variable = VariableInfo(item_id=1280, data_type="date", length=8, format="YYYYMMDD")
+        source = "Ultrasound-guided core biopsy was recommended and completed on 2025-02-20."
+        returned = source.replace("Ultrasound-", "Ultrasound\u2011")
+        for note_id in (50, "050", 0):
+            with self.subTest(note_id=note_id):
+                response = candidate(1280, "20250220", note_id=note_id,
+                                     spans=[{"note_id": str(note_id), "text": returned}])
+                model = FakeModel({1280: [response]})
+                inputs = self.input([variable], note_id=note_id)
+                inputs.notes[0].content = source
+                result = self.agent(model).run(inputs, progress=False)
+                extracted = result.extracted_values.variables[0]
+                self.assertTrue(extracted.is_valid, extracted.validation_errors)
+                self.assertEqual(extracted.value, "20250220")
+                self.assertEqual(extracted.most_important_note, note_id)
+                self.assertEqual(extracted.spans[0].note_id, str(note_id))
+                self.assertEqual(extracted.spans[0].text, source)
+                self.assertEqual(extracted.extraction_attempts, 1)
+                self.assertEqual(model.calls, {1280: 1})
+                self.assertEqual(response["spans"][0]["text"], returned)
+
+    def test_punctuation_correction_composes_with_primary_citation_without_mutation(self):
+        variable = VariableInfo(item_id=410, valid_codes={"1": "Right"})
+        source, returned = "Right-sided evidence", "Right\u2011sided evidence"
+        notes = self.input([variable]).notes
+        notes[0].content = source
+        for citation in (1, returned, source):
+            with self.subTest(citation=citation):
+                group = VariableGroupOutput(variables=[candidate(410, "1", most_important_note=citation,
+                    spans=[{"note_id": 1, "text": returned}])])
+                before = group.model_dump_json()
+                original = group.variables[0]
+                state = VariableBranchState(
+                    task=VariableExtractionTask(variable=variable, extraction_mode="group",
+                                                candidate=original, extraction_attempts=1),
+                    notes=notes, messages=[], group_context=group,
+                )
+                task = self.agent(FakeModel({})).validate_extraction(state)["task"]
+                self.assertTrue(task.is_valid, task.validation_errors)
+                self.assertEqual(task.candidate.most_important_note, 1)
+                self.assertEqual(task.candidate.spans[0].text, source)
+                self.assertIsNot(task.candidate.spans[0], original.spans[0])
+                self.assertEqual(group.model_dump_json(), before)
+                self.assertEqual(state.task.candidate.model_dump(), original.model_dump())
+                self.assertEqual(notes[0].content, source)
+
+    def test_punctuation_correction_is_local_and_does_not_bypass_other_validation(self):
+        variable = VariableInfo(item_id=410, valid_codes={"1": "Right"})
+        source, returned = "Right-sided evidence", "Right\u2011sided evidence"
+        notes = self.input([variable]).notes
+        notes[0].content = source
+        agent = self.agent(FakeModel({}))
+        for label, updates, offered in (
+            ("unknown span ID", {"spans": [{"note_id": 999, "text": returned}]}, notes),
+            ("punctuation in span ID", {"spans": [{"note_id": "note\u2011A", "text": returned}]},
+             [notes[0].model_copy(update={"note_id": "note-A"})]),
+            ("other source only", {}, [notes[0].model_copy(update={"content": "Other evidence"}),
+                                      notes[0].model_copy(update={"note_id": 2})]),
+            ("colliding source IDs", {}, notes + [notes[0].model_copy(update={"note_id": "1"})]),
+            ("ambiguous source offsets", {}, [notes[0].model_copy(update={"content": source + " " + source})]),
+            ("invalid value", {"value": "9"}, notes),
+            ("wrong item", {"item_id": 999}, notes),
+            ("null with evidence", {"value": None}, notes),
+        ):
+            with self.subTest(label=label):
+                response = {**candidate(410, "1", spans=[{"note_id": 1, "text": returned}]), **updates}
+                original = VariableGroupOutput(variables=[response]).variables[0]
+                state = VariableBranchState(
+                    task=VariableExtractionTask(variable=variable, extraction_mode="individual",
+                                                candidate=original, extraction_attempts=1),
+                    notes=offered, messages=[],
+                )
+                validated = state.model_copy(update=agent.validate_extraction(state))
+                self.assertFalse(validated.task.is_valid)
+                self.assertEqual(agent.route_after_validation(validated), "repair_invalid_extraction")
+                self.assertEqual(original.spans[0].text, returned)
+                if label not in {"invalid value", "wrong item", "null with evidence"}:
+                    self.assertEqual(validated.task.candidate.spans[0].text, returned)
+
+    def test_punctuation_correction_applies_to_group_and_repair_outputs(self):
+        variables = [VariableInfo(item_id=item_id, valid_codes={"1": "Present"}) for item_id in (400, 410)]
+        source, returned = "Right-sided evidence", "Right\u2011sided evidence"
+        for repair in (False, True):
+            with self.subTest(repair=repair):
+                response = candidate(400, "1", spans=[{"note_id": 1, "text": returned}])
+                group = [candidate(410, None)]
+                if not repair:
+                    group.append(response)
+                model = FakeModel({400: [response]}, group_response=group)
+                inputs = self.input(variables, grouped=True)
+                inputs.notes[0].content = source
+                result = self.agent(model).run(inputs, progress=False)
+                self.assertTrue(all(value.is_valid for value in result.extracted_values.variables))
+                extracted = result.extracted_values.variables[0]
+                self.assertEqual(extracted.spans[0].text, source)
+                self.assertEqual(extracted.extraction_attempts, 2 if repair else 1)
+                self.assertEqual(model.calls, {"group": 1, 400: 1} if repair else {"group": 1})
 
     def test_missing_duplicate_and_unexpected_group_candidates_require_repair(self):
         variables = [VariableInfo(item_id=item_id, valid_codes={"1": "Present"}) for item_id in (400, 410)]
@@ -187,7 +471,7 @@ class ExtractorRegressionTests(unittest.TestCase):
 
     def test_string_primary_citations_round_trip_without_scalar_conversion(self):
         variable = VariableInfo(item_id=400, valid_codes={"C509": "Breast"})
-        for note_id in (1, "note-A", "001", "1"):
+        for note_id in (1, "note-A", "001", "1", 0, "0", "000"):
             with self.subTest(note_id=note_id):
                 model = FakeModel({400: [candidate(400, "C509", note_id=note_id)]})
                 result = self.agent(model).run(self.input([variable], note_id=note_id), progress=False)
@@ -201,6 +485,7 @@ class ExtractorRegressionTests(unittest.TestCase):
     def test_primary_citations_use_canonical_equality_without_normalizing_strings(self):
         variable = VariableInfo(item_id=400, valid_codes={"C509": "Breast"})
         for offered, citation, valid in ((1, "1", True), ("1", 1, True), ("001", 1, False),
+                                         (0, "0", True), ("0", 0, True), ("000", 0, False),
                                          ("note-A", "note-a", False), ("note-A", " note-A", False), (1, 999, False)):
             with self.subTest(offered=offered, citation=citation):
                 model = FakeModel({400: [candidate(400, "C509", note_id=offered, most_important_note=citation)]})

@@ -199,6 +199,56 @@ class RunCaseStateCliTests(unittest.TestCase):
             self.assertIn("missing=1", stdout.getvalue())
             self.assertIn("endpoint unavailable", stderr.getvalue())
 
+    def test_derived_timing_and_scalar_coverage_include_diagnostic_invocations_once(self):
+        obs = RunObservability(
+            llm_content_captured=False, collection_status="partial",
+            collection_issues=[{"code": "missing_task_binding", "message": "Diagnostic call."}],
+            llm_usage_summary=usage_summary(partial=True),
+            llm_exchanges={"note:1": [{
+                "agent": "note_scanner", "node": "summarize_note", "attempt": 1,
+                "service_seconds": 0, "queue_seconds": 0,
+                "usage": {}, "usage_reported_fields": ["input_tokens", "output_tokens"],
+            }, {
+                "agent": "note_scanner", "node": "detect_concepts", "attempt": 1,
+                "usage_reported_fields": [],
+            }]},
+            unattributed_exchanges=[{
+                "invocation_id": "diagnostic", "agent": "unknown", "node": "unknown",
+                "service_seconds": 3.5, "queue_seconds": 1.25,
+            }],
+        )
+        before = obs.model_dump_json()
+        lines = cli.usage_lines(obs.llm_usage_summary, observability=obs)
+        self.assertIn("Timing records: retained=3 diagnostic=1 summary_invocations=3; collection=partial", lines)
+        self.assertIn("Summed invocation time: 3.500s mean=1.750s max=3.500s; recorded=2 missing=1", lines)
+        self.assertIn("Summed queue wait: 1.250s mean=0.625s max=1.250s; recorded=2 missing=1", lines)
+        self.assertIn("Scalar provenance (input/output): verified=1 incomplete=1 unknown=1", lines)
+        self.assertEqual(obs.model_dump_json(), before)
+
+        payload = obs.model_dump()
+        payload["collection_issues"].append({"code": "invalid_invocation_sequence", "message": "Duplicate identity."})
+        obs = RunObservability.model_validate(payload)
+        lines = cli.usage_lines(None, observability=obs)
+        self.assertIn("Usage: unavailable; telemetry did not produce a valid summary.", lines)
+        self.assertIn("Timing/provenance aggregates: unavailable; invalid invocation identity or sequence.", lines)
+        self.assertFalse(any("Summed invocation time:" in line for line in lines))
+
+    def test_legacy_missing_and_measured_zero_timing_remain_distinct(self):
+        obs = RunObservability(
+            llm_content_captured=False,
+            llm_exchanges={"note:1": [{
+                "agent": "note_scanner", "node": "summarize_note", "attempt": 1,
+            }]},
+        )
+        lines = cli.usage_lines(None, observability=obs)
+        self.assertIn("Summed invocation time: unavailable; recorded=0 missing=1", lines)
+        self.assertIn("Summed queue wait: unavailable; recorded=0 missing=1", lines)
+        self.assertIn("Scalar provenance (input/output): verified=0 incomplete=0 unknown=1", lines)
+        self.assertIn("summary_invocations=unavailable; collection=unknown", "\n".join(lines))
+        obs.llm_exchanges["note:1"][0].service_seconds = 0
+        lines = cli.usage_lines(None, observability=obs)
+        self.assertIn("Summed invocation time: 0.000s mean=0.000s max=0.000s; recorded=1 missing=0", lines)
+
     def test_script_has_no_parallel_graph_or_observability_driver(self):
         source = Path(cli.__file__).read_text(encoding="utf-8")
 

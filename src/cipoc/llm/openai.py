@@ -1,10 +1,15 @@
 import json
+import os
+from functools import partial
+from weakref import finalize
 
 from langchain_openai import ChatOpenAI
+from openai import DefaultHttpxClient
 from pydantic import AliasChoices, BaseModel, Field, ConfigDict
 from typing import ClassVar, Literal
 
 from .base import BaseAgentModel, EndpointURL, LLMConfig
+from .usage_evidence import capture_usage_request, capture_usage_response
 
 
 class OpenAIReasoning(BaseModel):
@@ -55,7 +60,31 @@ class OpenAIAgentModel(BaseAgentModel):
             if reasoning is not None:
                 effort = reasoning.get("effort") if isinstance(reasoning, dict) else reasoning.effort
                 model_kwargs.setdefault("reasoning_effort", effort)
-        return ChatOpenAI(**model_kwargs)
+        # Never mutate caller clients or interfere with LangChain's proxy path.
+        if (
+            any(model_kwargs.get(key) is not None for key in ("http_client", "client", "root_client"))
+            or model_kwargs.get("openai_proxy", os.getenv("OPENAI_PROXY"))
+        ):
+            return ChatOpenAI(**model_kwargs)
+        owner = object()
+        client = DefaultHttpxClient(
+            base_url=model_kwargs["base_url"],
+            timeout=model_kwargs.get("timeout", model_kwargs.get("request_timeout")),
+            event_hooks={
+                "request": [partial(capture_usage_request, owner)],
+                "response": [partial(capture_usage_response, owner)],
+            },
+        )
+        try:
+            model = ChatOpenAI(**{**model_kwargs, "http_client": client})
+        except BaseException:
+            client.close()
+            raise
+        self._usage_evidence_owner = owner
+        # Match the default clients' cleanup without tying an escaped model's
+        # lifetime to its wrapper, or retaining the model in a finalizer closure.
+        finalize(model.root_client if model.root_client is not None else model, client.close)
+        return model
 
     def _structured_runnable(self, schema):
         if not (
