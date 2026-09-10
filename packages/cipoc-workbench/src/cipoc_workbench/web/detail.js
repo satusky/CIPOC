@@ -112,7 +112,8 @@ function usageDetails(usage) {
       .map((key) => [key.replace(/_/g, " "), usage[key] ?? "not recorded"])),
     ["input_token_details", "output_token_details"].map((key) =>
       Object.keys(usage[key] || {}).length
-        ? rawBlock(key.replace(/_/g, " ") + " (breakdown, not additional tokens)", usage[key]) : null));
+        ? rawBlock(key.replace(/_/g, " ") + " (breakdown, not additional tokens)", usage[key])
+        : h("p", { class: "faint", text: "No " + key.replace(/_/g, " ") + " reported." })));
 }
 
 function exchangeCard(exchange, index, { unattributed = false } = {}) {
@@ -145,6 +146,7 @@ function exchangeCard(exchange, index, { unattributed = false } = {}) {
       ["namespace", exchange.namespace == null ? null : JSON.stringify(exchange.namespace)],
     ]),
     usageDetails(exchange.usage),
+    exchangeMetrics(exchange),
     promptMessages == null
       ? h("p", { class: "faint", text: exchange.response == null
           ? "Prompt and response bodies were not captured." : "Prompt messages were not captured." })

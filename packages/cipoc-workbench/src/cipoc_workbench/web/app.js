@@ -53,6 +53,10 @@ const DEFAULT_LENS = "confidence";
 
 const App = {
   schemaVersion: null,
+  runSource: "",
+  activation: 0,
+  loadGeneration: 0,
+  truthGeneration: 0,
   run: {},
   case: {},
   inputs: {},
@@ -75,6 +79,11 @@ const App = {
   feedback: { variable: {}, group: {}, note: {} },
   feedbackDraft: new Map(),  // kind:id -> unsaved edits, kept across re-renders
   feedbackWritable: false,   // false under a plain static server
+  feedbackStatus: "unavailable",
+  feedbackReason: "No run loaded.",
+  feedbackGeneration: 0,
+  feedbackPending: new Map(),
+  feedbackErrors: new Map(),
 
   notes: new Map(),         // note_id (string) -> ProcessedClinicalNote
   noteDigests: new Map(),
@@ -232,13 +241,17 @@ function passesLens(entry) {
 
 /* ------------------------------------------------------------------ index */
 
+const isRecord = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
+const canonicalRunId = (value) => typeof value === "string" && value.length === 36 &&
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(value);
+
 function normalizeRunResult(result) {
   if (!result || typeof result !== "object" || Array.isArray(result)) {
     throw new Error("Expected an OrchestratorRunResult JSON object.");
   }
-  if (!["1.0", "1.1"].includes(result.schema_version)) {
+  if (!["1.0", "1.1", "1.2"].includes(result.schema_version)) {
     const version = result.schema_version == null ? "missing" : String(result.schema_version);
-    throw new Error("Unsupported schema_version " + version + "; expected 1.0 or 1.1.");
+    throw new Error("Unsupported schema_version " + version + "; expected 1.0, 1.1 or 1.2.");
   }
 
   for (const domain of ["run", "case", "inputs", "corpus", "observability"]) {
@@ -246,48 +259,170 @@ function normalizeRunResult(result) {
       throw new Error("OrchestratorRunResult is missing the " + domain + " object.");
     }
   }
+  if (result.run.status !== "completed") throw new Error("Only completed run artifacts can be loaded.");
+  if (!canonicalRunId(result.run.run_id)) throw new Error("Expected run.run_id to be a canonical lowercase UUID.");
+
+  // Check containers consumed by indexing and renderers, not clinical decisions.
+  const object = (value, name) => {
+    if (!isRecord(value)) throw new Error(name + " must be an object.");
+    return value;
+  };
+  const array = (value, name) => {
+    if (!Array.isArray(value)) throw new Error(name + " must be an array.");
+    return value;
+  };
+  const records = (value, name) => Object.values(object(value, name)).map((v) => object(v, name + " entry"));
+  const list = (value, name) => array(value, name).map((v) => object(v, name + " entry"));
+  const text = (value, name) => {
+    if (typeof value !== "string") throw new Error(name + " must be text.");
+  };
+  const texts = (value, keys, name) => {
+    for (const key of keys) if (value[key] != null) text(value[key], name + "." + key);
+  };
+  const identifier = (value, name) => {
+    if (typeof value !== "string" && !Number.isSafeInteger(value)) throw new Error(name + " must be a string or integer ID.");
+  };
+  const textList = (value, name) => array(value, name).forEach((v) => text(v, name + " entry"));
+  const optionalArrays = (value, keys, name) => {
+    for (const key of keys) if (value[key] != null) textList(value[key], name + "." + key);
+  };
+  const idArrays = (value, keys, name) => {
+    for (const key of keys) if (value[key] != null) {
+      array(value[key], name + "." + key).forEach((v) => identifier(v, name + "." + key));
+    }
+  };
+  const evidence = (value, name) => {
+    texts(value, ["value", "explanation", "presence_confidence", "confidence", "affected_tissue", "status"], name);
+    if (value.most_important_note != null) identifier(value.most_important_note, name + ".most_important_note");
+    for (const key of ["spans", "evidence"]) if (value[key] != null) {
+      for (const span of list(value[key], name + "." + key)) {
+        identifier(span.note_id, "span.note_id");
+        texts(span, ["text"], "span");
+      }
+    }
+    optionalArrays(value, ["validation_errors"], name);
+  };
+  texts(result.run, ["started_at", "finished_at"], "run");
+  for (const group of list(result.inputs.target_variables, "inputs.target_variables")) {
+    if (typeof group.group_id !== "string" || !group.group_id) throw new Error("A target group needs a group_id.");
+    text(group.name, "group.name");
+    texts(group, ["stage"], "group");
+    for (const variable of list(group.variables, "group.variables")) {
+      if (!Number.isSafeInteger(variable.item_id)) throw new Error("A variable needs an integer item_id.");
+      text(variable.name, "variable.name");
+    }
+    optionalArrays(group, ["gate", "depends_on"], "group");
+    if (group.note_filter != null) optionalArrays(object(group.note_filter, "note_filter"),
+      ["note_types", "keywords", "cancer_status"], "note_filter");
+    if (group.applies_to != null) object(group.applies_to, "applies_to");
+  }
+  for (const value of records(result.case.variable_results, "case.variable_results")) {
+    text(value.status, "variable result.status");
+    texts(value, ["value", "reason"], "variable result");
+    idArrays(value, ["blocking_item_ids"], "variable result");
+    if (value.extraction != null) evidence(object(value.extraction, "extraction"), "extraction");
+  }
+  for (const note of records(result.corpus.note_corpus, "corpus.note_corpus")) {
+    identifier(note.note_id, "note.note_id");
+    texts(note, ["content", "date", "note_type", "summary"], "note");
+    optionalArrays(note, ["cancer_status", "flags"], "note");
+    if (note.concepts != null) for (const c of records(note.concepts, "note.concepts")) evidence(c, "concept");
+    if (note.cancer_mentions != null) for (const m of list(note.cancer_mentions, "cancer_mentions")) evidence(m, "mention");
+  }
+  if (result.corpus.note_digests != null) for (const digest of records(result.corpus.note_digests, "note_digests")) {
+    identifier(digest.note_id, "digest.note_id");
+    texts(digest, ["date", "note_type", "summary"], "digest");
+  }
+  if (result.corpus.note_corpus_descriptors != null) {
+    const descriptors = object(result.corpus.note_corpus_descriptors, "note_corpus_descriptors");
+    if (descriptors.concepts != null) records(descriptors.concepts, "descriptor concepts");
+  }
+  if (result.case.case_facts != null) texts(object(result.case.case_facts, "case_facts"),
+    ["primary_site", "gross_primary_site", "histology", "behavior", "sex", "date_of_diagnosis"], "case_facts");
+  texts(result.case, ["fatal_blocker"], "case");
+  if (result.case.report != null) {
+    const report = object(result.case.report, "report");
+    if (report.flags != null) for (const flag of list(report.flags, "report.flags")) texts(flag, ["flag_type", "detail"], "report flag");
+  }
+  if (result.case.note_selection != null) for (const selection of records(result.case.note_selection, "note_selection")) {
+    idArrays(selection, ["requested_item_ids", "candidate_note_ids", "selected_note_ids", "discarded_note_ids"], "note_selection");
+    optionalArrays(selection, ["unevaluated_checks"], "note_selection");
+    if (selection.rejected_note_ids != null) for (const codes of Object.values(object(selection.rejected_note_ids, "rejected_note_ids"))) {
+      textList(codes, "rejected_note_ids codes");
+    }
+  }
+  const telemetry = result.observability;
+  texts(telemetry, ["collection_status"], "observability");
+  const invocation = (entry) => {
+    texts(entry, ["entity_key", "invocation_id", "agent", "node", "model", "error", "mode", "started_at", "finished_at"], "invocation");
+    optionalArrays(entry, ["namespace", "usage_reported_fields", "validation_errors"], "invocation");
+    if (entry.prompt_messages != null) for (const message of list(entry.prompt_messages, "prompt_messages")) {
+      texts(message, ["role", "content"], "prompt message");
+    }
+    if (entry.usage != null) object(entry.usage, "usage");
+    if (entry.candidate != null) evidence(object(entry.candidate, "candidate"), "candidate");
+  };
+  for (const key of ["llm_exchanges", "variable_attempts"]) {
+    if (telemetry[key] == null) continue;
+    for (const entries of Object.values(object(telemetry[key], key))) {
+      for (const entry of list(entries, key)) {
+        invocation(entry);
+      }
+    }
+  }
+  for (const key of ["collection_issues", "unattributed_exchanges"]) {
+    if (telemetry[key] != null) for (const entry of list(telemetry[key], key)) {
+      invocation(entry);
+      texts(entry, ["code", "message"], key);
+    }
+  }
+  if (telemetry.llm_usage_summary != null) {
+    const summary = object(telemetry.llm_usage_summary, "llm_usage_summary");
+    for (const key of ["by_agent", "by_node", "by_model"]) if (summary[key] != null) records(summary[key], key);
+  }
   return result;
 }
 
-function indexState(raw) {
+function buildRunState(raw) {
   const result = normalizeRunResult(raw);
-  App.schemaVersion = result.schema_version;
-  App.run = result.run;
-  App.case = result.case;
-  App.inputs = result.inputs;
-  App.corpus = result.corpus;
-  App.observability = result.observability;
+  const next = {
+    schemaVersion: result.schema_version, run: result.run, case: result.case,
+    inputs: result.inputs, corpus: result.corpus, observability: result.observability,
+  };
 
-  App.notes = new Map(Object.entries(App.corpus.note_corpus || {}));
-  App.noteDigests = new Map(Object.entries(App.corpus.note_digests || {}));
-  App.descriptors = App.corpus.note_corpus_descriptors || {};
+  next.notes = new Map(Object.entries(next.corpus.note_corpus));
+  next.noteDigests = new Map(Object.entries(next.corpus.note_digests || {}));
+  next.descriptors = next.corpus.note_corpus_descriptors || {};
 
-  App.groups = App.inputs.target_variables || [];
-  App.groupById = new Map(App.groups.map((g) => [g.group_id, g]));
+  next.groups = next.inputs.target_variables;
+  next.groupById = new Map(next.groups.map((g) => [g.group_id, g]));
 
-  App.results = new Map(
-    Object.entries(App.case.variable_results || {}).map(([k, v]) => [Number(k), v])
+  next.results = new Map(
+    Object.entries(next.case.variable_results).map(([k, v]) => [Number(k), v])
   );
 
-  App.variables = [];
-  App.groupOfItem = new Map();
-  for (const group of App.groups) {
-    for (const variable of group.variables || []) {
-      App.groupOfItem.set(variable.item_id, group.group_id);
-      App.variables.push({
+  next.variables = [];
+  next.groupOfItem = new Map();
+  for (const group of next.groups) {
+    for (const variable of group.variables) {
+      next.groupOfItem.set(variable.item_id, group.group_id);
+      next.variables.push({
         item_id: variable.item_id,
         name: variable.name,
         group_id: group.group_id,
         group_name: group.name,
-        result: App.results.get(variable.item_id) || { item_id: variable.item_id, status: "pending" },
+        result: next.results.get(variable.item_id) || { item_id: variable.item_id, status: "pending" },
       });
     }
   }
 
-  App.exchanges = App.observability.llm_exchanges || {};
-  App.noteSelections = App.case.note_selection || {};
-  App.attempts = App.observability.variable_attempts || {};
+  next.exchanges = next.observability.llm_exchanges || {};
+  next.noteSelections = next.case.note_selection || {};
+  next.attempts = next.observability.variable_attempts || {};
+  return next;
 }
+
+function indexState(raw) { Object.assign(App, buildRunState(raw)); }
 
 /* Lookups over the recorded observability channels. */
 const exchangesFor = (key) => App.exchanges[key] || [];
@@ -514,6 +649,7 @@ function select(kind, id) {
 }
 
 function show(kind, id) {
+  if (!App.run.run_id) return;
   App.selection = { kind, id: String(id) };
   renderDetail();
   markSelection();
@@ -540,12 +676,14 @@ function markSelection() {
 }
 
 function setView(view) {
+  if (!App.run.run_id) return;
   App.view = view;
   for (const tab of document.querySelectorAll(".view-tab")) {
     tab.setAttribute("aria-selected", String(tab.dataset.view === view));
   }
   $("#view-notes").hidden = view !== "notes";
   $("#view-variables").hidden = view !== "variables";
+  $("#view-run").hidden = view !== "run";
   render();
 }
 
@@ -610,7 +748,9 @@ function syncLensTabs() {
 }
 
 function render() {
+  if (!App.run.run_id) return;
   if (App.view === "notes") renderNotes();
+  else if (App.view === "run") renderRun();
   else if (App.mode === "control") renderControlRoom();
   else renderTable();
   markSelection();
@@ -619,6 +759,19 @@ function render() {
 /* --------------------------------------------------------------- chrome */
 
 function renderChrome() {
+  const loaded = !!App.run.run_id;
+  for (const tab of document.querySelectorAll(".view-tab")) {
+    tab.disabled = !loaded;
+    if (!loaded) tab.setAttribute("aria-selected", "false");
+  }
+  $("#facts").hidden = !loaded;
+  if (!loaded) {
+    clear($("#case-summary"));
+    clear($("#facts"));
+    $("#run-source").textContent = "No run loaded";
+    $("#run-source").removeAttribute("title");
+    return;
+  }
   const flags = ((App.case.report || {}).flags || []).length;
   const acc = hasTruth() ? caseAccuracy() : null;
 
@@ -636,6 +789,8 @@ function renderChrome() {
       flags ? flags + " review flag" + (flags === 1 ? "" : "s") : "no review flags")
   );
   if (App.run.run_id) {
+    $("#run-source").textContent = App.runSource + " | " + App.run.run_id;
+    $("#run-source").title = $("#run-source").textContent;
     const duration = Number.isFinite(App.run.duration_seconds)
       ? " · " + App.run.duration_seconds.toFixed(1) + "s" : "";
     $("#case-summary").append(h("span", {
@@ -643,6 +798,12 @@ function renderChrome() {
       text: "run " + String(App.run.run_id).slice(0, 8) + duration,
     }));
   }
+  $("#case-summary").append(...runSummaryChips());
+  if (App.run.run_id) $("#case-summary").append(h("span", {
+    class: "chip" + (App.feedbackWritable ? "" : " warn"),
+    text: "feedback " + App.feedbackStatus,
+    title: App.feedbackReason,
+  }));
   /* Appended separately rather than as a conditional argument above:
      Element.append() renders a null argument as the literal text "null",
      unlike h(), which skips falsy children. */
@@ -668,10 +829,9 @@ function renderChrome() {
   rail.append(h("button", {
     type: "button",
     class: "chip telemetry-link" + (status === "complete" && !issues.length ? "" : " warn"),
-    dataset: { entity: "telemetry:run" },
     title: "Inspect collection issues, provider usage and unattributed invocations",
     text: "telemetry " + status + (issues.length ? " (" + issues.length + " issue" + (issues.length === 1 ? "" : "s") + ")" : ""),
-    onclick: () => select("telemetry", "run"),
+    onclick: () => { clearSelection(); setView("run"); },
   }));
   for (const key of order) {
     const value = facts[key];
@@ -719,18 +879,163 @@ function wire() {
     tab.addEventListener("click", () => setLens(tab.dataset.lens));
   }
   $("#truth-file").addEventListener("change", onTruthFile);
+  $("#run-file").addEventListener("change", onRunFile);
+  $("#run-file").addEventListener("cancel", () => loadRunFile(null));
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") clearSelection();
+    if (e.key === "Escape" && !$("#run-confirm").open) clearSelection();
   });
   window.addEventListener("scroll", () => Tooltip.hide(), true);
 }
 
+function runLoadStatus(message, error = false) {
+  const status = $("#run-load-status");
+  status.textContent = message;
+  status.className = "run-load-status" + (error ? " bad" : "");
+}
+
+function readLocalText(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("Could not read the file. Select it again or check file access."));
+    reader.onabort = () => reject(new Error("File read cancelled. Select a file to try again."));
+    reader.readAsText(file);
+  });
+}
+
+let cancelRunConfirmation = null;
+function confirmRunReplacement() {
+  return new Promise((resolve) => {
+    const dialog = $("#run-confirm");
+    const finish = (discard) => {
+      dialog.close();
+      cancelRunConfirmation = null;
+      $("#run-confirm-cancel").onclick = null;
+      $("#run-confirm-discard").onclick = null;
+      dialog.oncancel = null;
+      resolve(discard);
+    };
+    cancelRunConfirmation = () => finish(false);
+    $("#run-confirm-cancel").onclick = () => finish(false);
+    $("#run-confirm-discard").onclick = () => finish(true);
+    dialog.oncancel = (event) => { event.preventDefault(); finish(false); };
+    dialog.showModal();
+  });
+}
+
+async function activateRun(raw, source, generation, startup = false) {
+  const next = buildRunState(raw);
+  if (generation !== App.loadGeneration) return false;
+  if (App.feedbackPending.size) throw new Error("Wait for the pending feedback save before loading another run.");
+  if (App.feedbackDraft.size && !await confirmRunReplacement()) {
+    if (generation === App.loadGeneration) runLoadStatus("Load cancelled. Current run and drafts kept.");
+    return false;
+  }
+  if (generation !== App.loadGeneration) return false;
+  if (App.feedbackPending.size) throw new Error("Wait for the pending feedback save before loading another run.");
+
+  // Rendering is synchronous: restore the same nodes (and their listeners/form
+  // values) before the browser can paint if any view rejects the replacement.
+  const previous = { ...App };
+  const snapshot = (node) => ({
+    node, children: Array.from(node.childNodes),
+    attributes: node.getAttributeNames ? node.getAttributeNames().map((name) => [name, node.getAttribute(name)]) : null,
+    value: node.value, checked: node.checked, display: node.style?.display,
+    scrollTop: node.scrollTop, scrollLeft: node.scrollLeft,
+  });
+  const dom = [snapshot(document.documentElement), ...Array.from(document.querySelectorAll("body, body *"), snapshot)];
+  const focused = document.activeElement;
+  const selection = focused && [focused.selectionStart, focused.selectionEnd];
+  try {
+    Object.assign(App, next, {
+      runSource: source, activation: App.activation + 1, truthGeneration: App.truthGeneration + 1,
+      truth: new Map(), truthSource: null, selection: null,
+      noteFilter: "", varFilter: "", sort: { key: "item_id", dir: 1 },
+      lens: DEFAULT_LENS, classFilter: new Set(),
+      feedback: { variable: {}, group: {}, note: {} }, feedbackDraft: new Map(),
+      feedbackPending: new Map(), feedbackErrors: new Map(),
+      feedbackWritable: false, feedbackStatus: "loading", feedbackReason: "Loading this run's feedback...",
+    });
+    $("#note-filter").value = "";
+    $("#var-filter").value = "";
+    $("#group-toggle").checked = App.grouped;
+    clearSelection();
+    clear($("#detail-body"));
+    clear($("#tooltip"));
+    $("#tooltip").hidden = true;
+    renderChrome();
+    renderNotes();
+    renderControlRoom();
+    renderTable();
+    renderRun();
+    setMode(App.mode);
+    setView(App.view);
+  } catch (error) {
+    for (const key of Object.keys(App)) if (!Object.hasOwn(previous, key)) delete App[key];
+    Object.assign(App, previous);
+    for (const saved of dom) {
+      const node = saved.node;
+      if (saved.attributes) {
+        for (const name of node.getAttributeNames()) node.removeAttribute(name);
+        for (const [name, value] of saved.attributes) node.setAttribute(name, value);
+        if (node !== document.documentElement) node.replaceChildren(...saved.children);
+      }
+      // File input values cannot be restored programmatically; clear them only
+      // after a successful render, never inside the rollback boundary.
+      if (saved.value !== undefined && node.getAttribute("type") !== "file") node.value = saved.value;
+      if (saved.checked !== undefined) node.checked = saved.checked;
+      if (node.style) node.style.display = saved.display;
+      node.scrollTop = saved.scrollTop;
+      node.scrollLeft = saved.scrollLeft;
+    }
+    focused?.focus({ preventScroll: true });
+    if (selection?.[0] != null) focused.setSelectionRange(...selection);
+    throw error;
+  }
+  $("#truth-file").value = "";
+  $("#boot").hidden = true;
+  runLoadStatus(startup ? "Startup run loaded. Use Load Run to choose another artifact."
+    : "Loaded locally. Artifact contents are not uploaded.");
+  void loadFeedback(App.activation);
+  if (startup) void loadTruth(App.activation);
+  return true;
+}
+
+async function loadRunFile(file) {
+  const generation = ++App.loadGeneration;
+  if (cancelRunConfirmation) cancelRunConfirmation();
+  if (!file) {
+    runLoadStatus(App.run.run_id ? "No file selected. Current run kept." : "No file selected. Use Load Run to open a completed JSON artifact.");
+    return false;
+  }
+  try {
+    if (App.feedbackPending.size) throw new Error("Wait for the pending feedback save before loading another run.");
+    runLoadStatus("Reading " + file.name + "...");
+    const text = await readLocalText(file);
+    if (generation !== App.loadGeneration) return false;
+    return await activateRun(JSON.parse(text), file.name, generation);
+  } catch (err) {
+    if (generation === App.loadGeneration) runLoadStatus("Could not load " + file.name + ": " + err.message, true);
+    return false;
+  }
+}
+
+async function onRunFile(event) {
+  const input = event.target;
+  const file = input.files && input.files[0];
+  // Reset immediately: selecting the same regenerated file must fire change again.
+  input.value = "";
+  return loadRunFile(file);
+}
+
 function bootError(err) {
+  runLoadStatus("Startup load failed: " + err.message + ". Use Load Run to select a completed JSON artifact.", true);
   const boot = $("#boot");
   boot.className = "boot error";
   clear(boot).append(
     h("div", {},
-      h("p", { text: "Could not load " + STATE_URL + " — " + err.message }),
+      h("p", { text: "Could not load " + STATE_URL + ": " + err.message }),
+      h("p", { text: "Use Load Run above to open a completed run JSON file locally." }),
       h("p", { class: "muted" },
         "Browsers block file:// fetches. Start the installed server with ",
         h("code", { text: "cipoc-workbench serve" }),
@@ -742,24 +1047,24 @@ function bootError(err) {
 
 async function boot() {
   wire();
+  renderChrome();
+  const generation = ++App.loadGeneration;
+  runLoadStatus("Checking for a configured startup run...");
+  if (typeof loadEndpointCatalog === "function") void loadEndpointCatalog();
   try {
     const response = await fetch(STATE_URL, { cache: "no-store" });
+    if (generation !== App.loadGeneration) return;
+    if (response.status === 204) {
+      runLoadStatus("No startup run configured.");
+      return;
+    }
     if (!response.ok) throw new Error("HTTP " + response.status);
-    indexState(await response.json());
+    const raw = await response.json();
+    if (generation !== App.loadGeneration) return;
+    await activateRun(raw, STATE_URL, generation, true);
   } catch (err) {
-    bootError(err);
-    return;
+    if (generation === App.loadGeneration) bootError(err);
   }
-  /* A reference file is optional and independent of the run: absence is the
-     normal case and leaves every view exactly as it was. loadTruth() is in
-     truth.js and never throws — it returns false when nothing is served. */
-  await loadTruth();
-  await loadFeedback();
-  renderChrome();
-  setLens(storedLens() || App.lens, false);
-  setMode(App.mode);
-  setView(App.view);
-  $("#boot").hidden = true;
 }
 
 document.addEventListener("DOMContentLoaded", boot);

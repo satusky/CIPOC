@@ -150,20 +150,26 @@ function indexTruth(raw, source) {
   App.truthSource = App.truth.size ? source : null;
 }
 
-/* Server first, then a sibling static file, then nothing. Absence is not an
- * error: with no reference file the workbench is exactly the report it was. */
-async function loadTruth() {
-  for (const [url, source] of [["api/ground-truth", "server"], ["ground_truth.json", "ground_truth.json"]]) {
-    try {
-      const response = await fetch(url, { cache: "no-store" });
-      if (!response.ok) continue;
-      const raw = await response.json();
-      if (raw && typeof raw === "object" && Object.keys(raw).length) {
-        indexTruth(raw, source);
-        return true;
-      }
-    } catch (err) { /* not served, or not JSON — try the next */ }
-  }
+/* Only the server's explicit run binding may supply an automatic reference.
+ * Static/unbound references remain available through the local file picker. */
+async function loadTruth(activation = App.activation) {
+  if (activation !== App.activation) return false;
+  const runId = App.run.run_id;
+  const generation = ++App.truthGeneration;
+  const current = () => activation === App.activation && generation === App.truthGeneration;
+  try {
+    if (!canonicalRunId(runId)) return false;
+    const response = await fetch("/api/runs/" + runId + "/ground-truth", { cache: "no-store" });
+    if (!response.ok) return false;
+    const document = await response.json();
+    if (!current() || !isRecord(document) || document.run_id !== runId || !isRecord(document.values)) return false;
+    if (!Object.keys(document.values).length) return false;
+    indexTruth(document.values, "server");
+    renderChrome();
+    setLens(storedLens() || App.lens, false);
+    if (App.selection) renderDetail();
+    return true;
+  } catch (err) { /* Optional service unavailable; never use an unbound fallback. */ }
   return false;
 }
 
@@ -172,30 +178,28 @@ async function loadTruth() {
  * it into place). Re-renders the chrome as well as the views: renderChrome()
  * runs once at boot, so the accuracy chip and the compare control would
  * otherwise never appear. */
-function onTruthFile(event) {
+async function onTruthFile(event) {
   const file = event.target.files && event.target.files[0];
+  event.target.value = "";
+  const generation = ++App.truthGeneration;
+  const activation = App.activation;
+  const current = () => activation === App.activation && generation === App.truthGeneration;
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    let raw;
-    try {
-      raw = JSON.parse(reader.result);
-    } catch (err) {
-      alert("That file is not valid JSON: " + err.message);
-      return;
-    }
-    if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
-      alert("Expected a JSON object of {item_id: value}.");
-      return;
-    }
+  if (!App.run.run_id) { alert("Load a run before selecting ground truth."); return; }
+  try {
+    const text = await readLocalText(file);
+    if (!current()) return;
+    const raw = JSON.parse(text);
+    if (!isRecord(raw)) throw new Error("Expected a JSON object of {item_id: value}.");
     indexTruth(raw, file.name);
     renderChrome();
     /* setLens re-renders, and switches to the lens the file just enabled —
        picking a reference file is only ever a prelude to reading against it. */
     setLens(hasTruth() ? "accuracy" : App.lens);
     if (App.selection) renderDetail();
-  };
-  reader.readAsText(file);
+  } catch (err) {
+    if (current()) alert("Could not load ground truth: " + err.message);
+  }
 }
 
 function accuracyTooltip() {
