@@ -84,6 +84,7 @@
         {
           "group_id": "histologic_type_and_behavior",
           "name": "Histologic Type and Behavior Code",
+          "stage": "initial",
           "extract_as_group": true,
           "variables": [
             { "item_id": 522, "name": "Histologic Type ICD-O-3" },
@@ -118,8 +119,20 @@
           "name": "Breast/Melanoma Only",
           "extract_as_group": true,
           "applies_to": {
-            "gross_primary_sites": ["breast"],
-            "histology_families": ["melanoma"]
+            "any_of": [
+              { "gross_primary_sites": ["breast"] },
+              {
+                "all_of": [
+                  {
+                    "primary_sites": [
+                      "C000-C002", "C006", "C440-C449", "C500",
+                      "C510-C512", "C518-C519", "C600-C602", "C608-C609", "C632"
+                    ]
+                  },
+                  { "histology_families": ["melanoma"] }
+                ]
+              }
+            ]
           },
           "variables": [
             { "item_id": 832, "name": "Date of Sentinel Lymph Node Biopsy" }

@@ -18,6 +18,10 @@ from .notes import (
     CancerMention,
     NoteDigest,
     NoteCorpusDescriptors,
+    NoteSelectionRejectionCode,
+    NoteSelectionUnevaluatedCode,
+    NoteFilterEvaluation,
+    NoteSelectionProvenance,
 )
 
 from .variables import (
@@ -51,6 +55,31 @@ from .case import (
     ReviewFlag,
     CaseReport,
     Case,
+)
+
+from .observability import (
+    AttemptMode,
+    LLMAgent,
+    TokenDetails,
+    NormalizedTokenUsage,
+    LLMUsageBucket,
+    LLMUsageSummary,
+    LLMPromptMessage,
+    LLMExchange,
+    UnattributedLLMExchange,
+    ObservabilityIssue,
+    VariableAttempt,
+    RunObservability,
+)
+
+from .run import (
+    OrchestratorConfigFingerprint,
+    OrchestratorRunCorpus,
+    OrchestratorRunError,
+    OrchestratorRunFailure,
+    OrchestratorRunInfo,
+    OrchestratorRunInputs,
+    OrchestratorRunResult,
 )
 
 
@@ -88,9 +117,32 @@ __all__ = [
     "ManualSource",
     "RuleStoreManifest",
     "VariableStatus",
+    "NoteSelectionRejectionCode",
+    "NoteSelectionUnevaluatedCode",
+    "NoteFilterEvaluation",
+    "NoteSelectionProvenance",
     "CaseVariableResult",
     "ReviewFlagType",
     "ReviewFlag",
     "CaseReport",
     "Case",
+    "AttemptMode",
+    "LLMAgent",
+    "TokenDetails",
+    "NormalizedTokenUsage",
+    "LLMUsageBucket",
+    "LLMUsageSummary",
+    "LLMPromptMessage",
+    "LLMExchange",
+    "UnattributedLLMExchange",
+    "ObservabilityIssue",
+    "VariableAttempt",
+    "RunObservability",
+    "OrchestratorConfigFingerprint",
+    "OrchestratorRunCorpus",
+    "OrchestratorRunError",
+    "OrchestratorRunFailure",
+    "OrchestratorRunInfo",
+    "OrchestratorRunInputs",
+    "OrchestratorRunResult",
 ]

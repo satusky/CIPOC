@@ -4,6 +4,7 @@ Pure functions used to set up and drive orchestrator state. Keep these free of
 LLM calls; bounded model usage belongs in the scanner/extractor subagents.
 """
 import json
+import re
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -19,6 +20,9 @@ from cipoc.models import (
     NoteCorpusDescriptors,
     NoteDigest,
     NoteFilter,
+    NoteFilterEvaluation,
+    NoteSelectionRejectionCode,
+    NoteSelectionUnevaluatedCode,
     ProcessedClinicalNote,
     ReviewFlag,
     ReviewFlagType,
@@ -32,7 +36,7 @@ from cipoc.models import (
     ConceptWithEvidence,
 )
 from cipoc.models.case import TERMINAL_VARIABLE_STATUSES
-from .coding_context import resolve_gross_site, site_in_ranges
+from .coding_context import ranges_overlap, resolve_gross_site, site_in_ranges
 
 
 def _concept_present(corpus: NoteCorpusDescriptors, concept: str) -> bool:
@@ -42,7 +46,9 @@ def _concept_present(corpus: NoteCorpusDescriptors, concept: str) -> bool:
 
 # Treatment is modeled as granular modalities rather than an aggregate concept,
 # so the treatment gate is derived by OR-ing those modality concepts.
-TREATMENT_CONCEPTS = ("surgery", "chemotherapy", "radiation")
+TREATMENT_CONCEPTS = (
+    "surgery", "chemotherapy", "radiation", "hormonal_therapy", "immunotherapy"
+)
 
 
 CORPUS_GATE_PREDICATES: dict[CorpusGate, Callable[[NoteCorpusDescriptors], bool]] = {
@@ -82,7 +88,7 @@ def load_variable_groups(path: str | Path) -> list[TargetGroup]:
         config = json.load(f)
 
     def _to_group(node: dict, *, gate=None, stage=None, note_filter=None) -> TargetGroup:
-        return TargetGroup(
+        group = TargetGroup(
             group_id=node.get("group_id"),
             name=node.get("name"),
             extract_as_group=node.get("extract_as_group", False),
@@ -95,6 +101,8 @@ def load_variable_groups(path: str | Path) -> list[TargetGroup]:
                 for variable in node.get("variables", [])
             ],
         )
+        site_applies(group.applies_to, None)
+        return group
 
     groups: list[TargetGroup] = []
     for group in config.get("groups", []):
@@ -173,50 +181,77 @@ def _parse_note_date(value: str | None) -> date | None:
         return None
 
 
+def evaluate_note_filter(
+    note: ProcessedClinicalNote,
+    note_filter: NoteFilter | None,
+    *,
+    anchor: date | None = None,
+) -> NoteFilterEvaluation:
+    """Evaluate every configured note-filter dimension and explain the result.
+
+    Each dimension is evaluated independently and combined with AND; a dimension
+    left empty/``None`` imposes no restriction. A ``None`` filter passes every
+    note. Configured checks that are currently disabled or lack required context
+    are reported as unevaluated and do not reject the note.
+    """
+    if note_filter is None:
+        return NoteFilterEvaluation(passes=True)
+
+    rejection_reasons: list[NoteSelectionRejectionCode] = []
+    unevaluated_checks: list[NoteSelectionUnevaluatedCode] = []
+
+    # Note type: case-insensitive exact match against the allowed set.
+    if note_filter.note_types:
+        allowed = {t.strip().casefold() for t in note_filter.note_types}
+        if (note.note_type or "").strip().casefold() not in allowed:
+            rejection_reasons.append(NoteSelectionRejectionCode.NOTE_TYPE_MISMATCH)
+
+    # Keyword filtering remains disabled because these values are LLM-generated.
+    if note_filter.keywords:
+        unevaluated_checks.append(
+            NoteSelectionUnevaluatedCode.KEYWORD_FILTER_DISABLED
+        )
+
+    # Cancer status: note's temporality set must intersect the allowed statuses.
+    if note_filter.cancer_status:
+        if not (note.cancer_status or set()).intersection(note_filter.cancer_status):
+            rejection_reasons.append(
+                NoteSelectionRejectionCode.CANCER_STATUS_MISMATCH
+            )
+
+    # Date window: note within `within_days` of the anchor (skipped without one).
+    if note_filter.within_days is not None:
+        if anchor is None:
+            unevaluated_checks.append(
+                NoteSelectionUnevaluatedCode.TEMPORAL_ANCHOR_UNAVAILABLE
+            )
+        else:
+            note_date = _parse_note_date(note.date)
+            if note_date is None:
+                rejection_reasons.append(
+                    NoteSelectionRejectionCode.MISSING_OR_INVALID_DATE
+                )
+            elif abs((note_date - anchor).days) > note_filter.within_days:
+                rejection_reasons.append(
+                    NoteSelectionRejectionCode.OUTSIDE_DATE_WINDOW
+                )
+
+    return NoteFilterEvaluation(
+        passes=not rejection_reasons,
+        rejection_reasons=rejection_reasons,
+        unevaluated_checks=unevaluated_checks,
+    )
+
+
 def note_matches_filter(
     note: ProcessedClinicalNote,
     note_filter: NoteFilter | None,
     *,
     anchor: date | None = None,
 ) -> bool:
-    """Return True when a note satisfies every constraint set on the filter.
+    """Return whether a note passes its deterministic filter."""
 
-    Each dimension is evaluated independently and combined with AND; a dimension
-    left empty/``None`` imposes no restriction. A ``None`` filter passes every
-    note. The ``within_days`` date dimension is skipped when no ``anchor`` is
-    supplied, since it cannot be evaluated without one.
-    """
-    if note_filter is None:
-        return True
-
-    # Note type: case-insensitive exact match against the allowed set.
-    if note_filter.note_types:
-        allowed = {t.strip().casefold() for t in note_filter.note_types}
-        if (note.note_type or "").strip().casefold() not in allowed:
-            return False
-
-    ##### Commented out for now because the keywords are LLM generated and will usually not pass
-    # Keywords: any stem is a case-insensitive substring of a flag or the summary.
-    # if note_filter.keywords:
-    #     haystack = [f.casefold() for f in (note.flags or [])]
-    #     if note.summary:
-    #         haystack.append(note.summary.casefold())
-    #     stems = [k.strip().casefold() for k in note_filter.keywords if k.strip()]
-    #     if not any(stem in hay for stem in stems for hay in haystack):
-    #         return False
-
-    # Cancer status: note's temporality set must intersect the allowed statuses.
-    if note_filter.cancer_status:
-        if not (note.cancer_status or set()).intersection(note_filter.cancer_status):
-            return False
-
-    # Date window: note within `within_days` of the anchor (skipped without one).
-    if note_filter.within_days is not None and anchor is not None:
-        note_date = _parse_note_date(note.date)
-        if note_date is None or abs((note_date - anchor).days) > note_filter.within_days:
-            return False
-
-    return True
+    return evaluate_note_filter(note, note_filter, anchor=anchor).passes
 
 
 def prefilter_notes(
@@ -309,35 +344,66 @@ DEPENDENT_STAGE = "dependent"
 
 
 def site_applies(applies_to: SiteApplicability | None, facts: CaseFacts | None) -> bool:
-    """Whether a site-limited group applies to the case.
+    """Exclude only definitively false restrictions, evaluating relevant facts.
 
-    Follows the ``CaseFacts`` principle that *unknown facts widen scope, never
-    narrow it*: a group with no restriction, or a case whose site/histology is
-    still unknown, passes. A group is ruled out only when a site/histology is
-    positively known and none of them match the restriction.
+    Internally None means unknown. OR excludes only when all alternatives are
+    false; AND is false when even one condition is false. An informative coded
+    primary outranks gross-site inference, including when they conflict. An
+    explicit unknown/malformed primary also suppresses gross-site fallback.
+    Unsupported family labels raise here, not during historical artifact parsing.
     """
     if applies_to is None:
-        return True  # not site-limited
+        return True
 
-    gross_site = facts.gross_primary_site if facts else None
-    primary_site = facts.primary_site if facts else None
-    histology = facts.histology if facts else None
-    if not gross_site and not primary_site and not histology:
-        return True  # nothing known that could exclude it
-
-    if gross_site and any(
-        s.casefold() in gross_site.casefold() or gross_site.casefold() in s.casefold()
-        for s in applies_to.gross_primary_sites
+    gross_site = facts.gross_primary_site if facts and not facts.primary_site else None
+    gross_ranges = resolve_gross_site(gross_site)
+    primary_site = (facts.primary_site or "").strip().upper() if facts else ""
+    # C809 is unknown primary; malformed/out-of-range codes cannot exclude sites.
+    if (
+        not re.fullmatch(r"C[0-9]{2}\.?[0-9]", primary_site)
+        or primary_site.replace(".", "") >= "C809"
     ):
-        return True
-    if primary_site:
-        for site in applies_to.gross_primary_sites:
-            ranges = resolve_gross_site(site)
-            if ranges is not None and site_in_ranges(primary_site, ranges):
-                return True
-    if histology and histology in applies_to.histology_families:
-        return True
-    return False
+        primary_site = ""
+    histology = (facts.histology or "").strip() if facts else ""
+
+    def matches_sites(ranges: list[str] | None) -> bool | None:
+        if ranges is None:
+            return None
+        if primary_site:
+            return site_in_ranges(primary_site, ranges)
+        if gross_ranges:
+            return ranges_overlap(gross_ranges, ranges)
+        return None
+
+    def evaluate(restriction: SiteApplicability) -> bool | None:
+        for family in restriction.histology_families:
+            if family.casefold() != "melanoma":
+                raise ValueError(f"Unsupported histology family: {family!r}. Supported: melanoma.")
+        if restriction.all_of:
+            conditions = [evaluate(child) for child in restriction.all_of]
+            return False if False in conditions else None if None in conditions else True
+        if restriction.any_of:
+            alternatives = [evaluate(child) for child in restriction.any_of]
+        else:
+            alternatives: list[bool | None] = []
+            for site in restriction.gross_primary_sites:
+                match = matches_sites(resolve_gross_site(site))
+                if not primary_site and gross_site and site.casefold() == gross_site.casefold():
+                    match = True
+                alternatives.append(match)
+            if restriction.primary_sites:
+                alternatives.append(matches_sites(restriction.primary_sites))
+            if restriction.histology_families:
+                # The validated live family vocabulary currently contains melanoma only.
+                alternatives.append(
+                    8720 <= int(histology) <= 8790
+                    if re.fullmatch(r"[0-9]{4}", histology) else None
+                )
+        if not alternatives:
+            return True
+        return True if True in alternatives else None if None in alternatives else False
+
+    return evaluate(applies_to) is not False
 
 
 def group_item_ids(group: TargetGroup) -> list[int]:
@@ -434,16 +500,16 @@ def resolve_leftovers(
     descriptors: NoteCorpusDescriptors,
     facts: CaseFacts | None,
 ) -> dict[int, CaseVariableResult]:
-    """At the fixed point (nothing eligible), attribute why each group with
-    pending work cannot run and turn its PENDING variables terminal so the loop
-    ends. Already-terminal variables (e.g. structured-data seeds) are left alone.
+    """When nothing is eligible, close pending work ruled out by site or gate.
+
+    Resolve only initials while any remain pending: making them terminal can
+    release dependent work on the next planner pass. Already-terminal variables
+    (e.g. structured-data seeds) are left alone.
 
     Reason precedence is deliberate — site, then gate, then deps:
       * site does not match  -> NOT_APPLICABLE (a definitive exclusion)
       * corpus gate unmet    -> NOT_APPLICABLE (a definitive exclusion)
-      * otherwise            -> BLOCKED, citing the still-pending initial item IDs
-        (the only "dependency" the models express is the initial->dependent stage
-        ordering, so a would-be-eligible group left unrun was blocked on it).
+      * otherwise            -> BLOCKED (defensive fallback for unexplained work)
     """
     pending_initials = [
         item_id
@@ -454,6 +520,8 @@ def resolve_leftovers(
 
     updates: dict[int, CaseVariableResult] = {}
     for group in groups:
+        if pending_initials and group.stage != INITIAL_STAGE:
+            continue
         pending = pending_item_ids(group, results)
         if not pending:
             continue

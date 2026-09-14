@@ -1,10 +1,17 @@
 import csv
 import json
+import os
 import tempfile
 import unittest
+from datetime import date, datetime
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
+from scripts import export_omop
 from cipoc.export import OmopExporter
+from cipoc.export import omop as omop_module
+from cipoc.export.models import OmopNoteNlpRow, OmopNoteRow
 from cipoc.models import (
     Case,
     CaseVariableResult,
@@ -241,6 +248,285 @@ class OmopExporterTests(unittest.TestCase):
 
         self.assertEqual(result.note_nlp_count, 1)
         self.assertEqual(nlp_rows[0]["offset"], "")
+
+    def evidence_case(self):
+        return Case(
+            variable_results={
+                400: CaseVariableResult(
+                    item_id=400,
+                    status=VariableStatus.EXTRACTED,
+                    value="C504",
+                    extraction=extraction(
+                        400, "C504", [TextSpan(note_id="note-A", text="left breast")]
+                    ),
+                )
+            }
+        )
+
+    def test_invalid_note_dates_are_row_errors_and_invalidate_references(self):
+        for value in (
+            "2025-02-29", "2024-02-30", "2025-13-01", "20250224", "2025-2-24",
+            "", "private-date",
+        ):
+            with self.subTest(value=value), tempfile.TemporaryDirectory() as directory:
+                note = self.note.model_copy(update={"date": value})
+                result = OmopExporter(person_id=7).export(
+                    notes=[note], case=self.evidence_case(), output_directory=directory
+                )
+                self.assertEqual(
+                    (result.note_count, result.note_nlp_count, result.error_count),
+                    (0, 0, 2),
+                )
+                errors = read_json(result.error_path)["errors"]
+                self.assertEqual(errors[0]["row_data"]["note_date"], value)
+                self.assertEqual(errors[0]["issues"][0]["field"], "note_date")
+                if value:
+                    self.assertNotIn(value, errors[0]["issues"][0]["message"])
+                self.assertEqual(errors[1]["issues"][0]["type"], "invalid_reference")
+
+    def test_invalid_explicit_nlp_dates_and_timestamps_are_row_errors(self):
+        for options, field, invalid in (
+            ({"nlp_date": ""}, "nlp_date", ""),
+            ({"nlp_date": "2025-02-29"}, "nlp_date", "2025-02-29"),
+            ({"nlp_date": "20250412"}, "nlp_date", "20250412"),
+            ({"nlp_date": "", "nlp_datetime": "2024-02-29T12:00:00"}, "nlp_date", ""),
+            ({"nlp_datetime": "private-timestamp"}, "nlp_datetime", "private-timestamp"),
+            ({"nlp_datetime": "2025-02-29T12:00:00"}, "nlp_datetime", "2025-02-29T12:00:00"),
+            ({"nlp_datetime": "2024-02-29T25:00:00"}, "nlp_datetime", "2024-02-29T25:00:00"),
+            (
+                {"nlp_date": "2024-02-29", "nlp_datetime": "2024-02-29T12:60:00"},
+                "nlp_datetime", "2024-02-29T12:60:00",
+            ),
+        ):
+            with self.subTest(options=options), tempfile.TemporaryDirectory() as directory:
+                exporter = OmopExporter(person_id=7, **options)
+                result = exporter.export(
+                    notes=[self.note], case=self.evidence_case(), output_directory=directory
+                )
+                self.assertEqual(
+                    (result.note_count, result.note_nlp_count, result.error_count),
+                    (1, 0, 1),
+                )
+                error = read_json(result.error_path)["errors"][0]
+                self.assertEqual(error["row_data"][field], invalid)
+                self.assertIn(field, {issue["field"] for issue in error["issues"]})
+                self.assertEqual(read_csv(result.note_nlp_path), [])
+                if "nlp_date" not in options:
+                    self.assertEqual(error["row_data"]["nlp_date"], "")
+
+    def test_dates_derive_from_parsed_iso_timestamps_and_omitted_defaults(self):
+        for options, expected_date in (
+            ({"nlp_datetime": "2024-02-29T23:59:59Z"}, "2024-02-29"),
+            ({"nlp_datetime": "2024-02-29 23:59:59.123456+05:30"}, "2024-02-29"),
+            ({"nlp_datetime": "20240229T235959"}, "2024-02-29"),
+            ({"nlp_datetime": "2024-W09-4T23:59:59"}, "2024-02-29"),
+            ({"nlp_datetime": datetime(2024, 2, 29, 23, 59, 59)}, "2024-02-29"),
+            ({"nlp_date": date(2024, 2, 29)}, "2024-02-29"),
+            ({"nlp_date": "2024-02-29", "nlp_datetime": "2025-01-01T12:00:00"}, "2024-02-29"),
+            ({"nlp_datetime": ""}, date.today().isoformat()),
+            ({}, date.today().isoformat()),
+        ):
+            with self.subTest(options=options), tempfile.TemporaryDirectory() as directory:
+                note = self.note.model_copy(update={"date": "2024-02-29"})
+                result = OmopExporter(person_id=7, **options).export(
+                    notes=[note], case=self.evidence_case(), output_directory=directory
+                )
+                self.assertEqual(result.error_count, 0)
+                self.assertEqual(read_csv(result.note_path)[0]["note_date"], "2024-02-29")
+                self.assertEqual(read_csv(result.note_nlp_path)[0]["nlp_date"], expected_date)
+
+    def test_duplicate_notes_are_rejected_before_publishing_referenced_rows(self):
+        notes = [self.note, self.note.model_copy()]
+        with tempfile.TemporaryDirectory() as directory:
+            result = OmopExporter(person_id=7).export(
+                notes=notes, case=self.evidence_case(), output_directory=directory
+            )
+            self.assertEqual(
+                (result.note_count, result.note_nlp_count, result.error_count), (0, 0, 3)
+            )
+            errors = read_json(result.error_path)["errors"]
+            self.assertEqual(
+                [error["issues"][0]["type"] for error in errors],
+                ["duplicate", "duplicate", "invalid_reference"],
+            )
+
+    def test_staging_failures_preserve_all_three_existing_files(self):
+        for failed_file in ("note.csv", "note_nlp.csv", "omop_errors.json"):
+            with self.subTest(failed_file=failed_file), tempfile.TemporaryDirectory() as directory:
+                output = Path(directory)
+                exporter = OmopExporter(person_id=7)
+                exporter.export(notes=[], case=Case(), output_directory=output)
+                before = {path.name: path.read_bytes() for path in output.iterdir()}
+                write_csv_file, write_text = omop_module._write_csv, Path.write_text
+                invalid_note = self.note.model_copy(
+                    update={"note_id": "invalid", "date": "2025-02-29"}
+                )
+
+                def fail_csv(path, fields, rows):
+                    write_csv_file(path, fields, rows)
+                    if path.name == failed_file:
+                        raise OSError("injected staging failure")
+
+                def fail_text(path, *args, **kwargs):
+                    count = write_text(path, *args, **kwargs)
+                    if path.name == failed_file:
+                        raise OSError("injected staging failure")
+                    return count
+
+                with (
+                    patch.object(omop_module, "_write_csv", side_effect=fail_csv),
+                    patch.object(Path, "write_text", new=fail_text),
+                ):
+                    with self.assertRaisesRegex(OSError, "injected"):
+                        exporter.export(
+                            notes=[self.note, invalid_note],
+                            case=self.evidence_case(),
+                            output_directory=output,
+                        )
+                self.assertEqual(
+                    {path.name: path.read_bytes() for path in output.iterdir()}, before
+                )
+
+    def test_error_serialization_failure_preserves_existing_files(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            exporter = OmopExporter(person_id=7)
+            exporter.export(notes=[], case=Case(), output_directory=output)
+            before = {path.name: path.read_bytes() for path in output.iterdir()}
+            with patch.object(
+                omop_module.OmopErrorReport, "model_dump_json",
+                side_effect=TypeError("injected serialization failure"),
+            ):
+                with self.assertRaisesRegex(TypeError, "injected"):
+                    exporter.export(
+                        notes=[self.note], case=self.evidence_case(), output_directory=output
+                    )
+            self.assertEqual(
+                {path.name: path.read_bytes() for path in output.iterdir()}, before
+            )
+
+    def test_all_three_files_close_before_replace_and_replacements_are_not_a_transaction(self):
+        for fail_at in (1, 2, 3):
+            with self.subTest(fail_at=fail_at), tempfile.TemporaryDirectory() as directory:
+                output = Path(directory)
+                exporter = OmopExporter(person_id=7)
+                exporter.export(notes=[], case=Case(), output_directory=output)
+                before = {path.name: path.read_bytes() for path in output.iterdir()}
+                streams, published = [], []
+                open_path, replace = Path.open, os.replace
+
+                def track_open(path, *args, **kwargs):
+                    stream = open_path(path, *args, **kwargs)
+                    if (args[0] if args else kwargs.get("mode")) == "w":
+                        streams.append(stream)
+                    return stream
+
+                def fail_replace(src, dst):
+                    self.assertEqual(len(streams), 3)
+                    self.assertTrue(all(stream.closed for stream in streams))
+                    self.assertEqual(Path(src).parent.parent, output)
+                    self.assertTrue(Path(src).is_file())
+                    if len(published) + 1 == fail_at:
+                        raise OSError("injected replacement failure")
+                    replace(src, dst)
+                    published.append(Path(dst).name)
+
+                with (
+                    patch.object(Path, "open", new=track_open),
+                    patch("os.replace", side_effect=fail_replace),
+                ):
+                    with self.assertRaisesRegex(OSError, "injected"):
+                        exporter.export(
+                            notes=[self.note], case=self.evidence_case(),
+                            output_directory=output,
+                        )
+                self.assertEqual(len(published), fail_at - 1)
+                self.assertEqual({path.name for path in output.iterdir()}, set(before))
+                for name, data in before.items():
+                    if name in published:
+                        self.assertNotEqual((output / name).read_bytes(), data)
+                    else:
+                        self.assertEqual((output / name).read_bytes(), data)
+
+
+class OmopDateSchemaTests(unittest.TestCase):
+    def test_both_row_schemas_validate_dates_and_optional_datetimes(self):
+        rows = (
+            (OmopNoteRow, "note_date", "note_datetime", {
+                "note_id": "1", "person_id": "1", "note_type_concept_id": "EHR",
+                "note_class_concept_id": "Test", "note_text": "Synthetic",
+                "encoding_concept_id": "UTF-8", "language_concept_id": "English",
+            }),
+            (OmopNoteNlpRow, "nlp_date", "nlp_datetime", {
+                "note_nlp_id": "1", "note_id": "1", "lexical_variant": "Synthetic",
+            }),
+        )
+        for model, date_field, datetime_field, row in rows:
+            for invalid in (
+                "2025-02-29", "2024-04-31", "20240229", "2024-2-29",
+                "2024-02-29T12:00:00", "",
+            ):
+                with self.subTest(model=model.__name__, invalid=invalid):
+                    with self.assertRaises(ValueError):
+                        model.model_validate({**row, date_field: invalid})
+            for timestamp in (None, "", "2024-02-29T12:00:00Z", "20240229T120000"):
+                with self.subTest(model=model.__name__, timestamp=timestamp):
+                    result = model.model_validate(
+                        {**row, date_field: "2024-02-29", datetime_field: timestamp}
+                    )
+                    self.assertEqual(getattr(result, datetime_field), timestamp)
+                    self.assertIsInstance(getattr(result, date_field), str)
+            for invalid in ("2024-02-30T12:00:00", "2024-02-29T24:00:00", "not-a-time", " "):
+                with self.subTest(model=model.__name__, invalid=invalid):
+                    with self.assertRaises(ValueError):
+                        model.model_validate(
+                            {**row, date_field: "2024-02-29", datetime_field: invalid}
+                        )
+
+
+class OmopExportScriptTests(unittest.TestCase):
+    def test_main_passes_run_result_case_to_exporter(self):
+        case = Case()
+        run_result = SimpleNamespace(case=case)
+        exported = SimpleNamespace(
+            note_count=1,
+            note_path=Path("note.csv"),
+            note_nlp_count=0,
+            note_nlp_path=Path("note_nlp.csv"),
+            error_count=0,
+            error_path=Path("omop_errors.json"),
+        )
+        args = SimpleNamespace(
+            notes=Path("notes.json"),
+            person_id="person-1",
+            output_directory=Path("output"),
+            nlp_date=None,
+            nlp_system="CIPOC",
+            structured_data=None,
+            max_concurrency=None,
+            no_progress=True,
+        )
+        note = ClinicalNote(
+            note_id=1,
+            date="2025-02-24",
+            note_type="Pathology Report",
+            content="No reportable finding.",
+        )
+        parser = SimpleNamespace(parse_args=lambda: args)
+        agent = SimpleNamespace(run=lambda *args, **kwargs: run_result)
+        exporter = SimpleNamespace(export=lambda **kwargs: exported)
+
+        with (
+            patch.object(export_omop, "build_parser", return_value=parser),
+            patch.object(export_omop, "_load_notes", return_value=[note]),
+            patch.object(export_omop, "_load_structured_data", return_value=None),
+            patch.object(export_omop, "OrchestratorAgent", return_value=agent),
+            patch.object(export_omop, "OmopExporter", return_value=exporter),
+            patch.object(exporter, "export", wraps=exporter.export) as export,
+        ):
+            export_omop.main()
+
+        self.assertIs(export.call_args.kwargs["case"], case)
 
 
 if __name__ == "__main__":

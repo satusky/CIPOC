@@ -2,6 +2,7 @@ import unittest
 from dataclasses import replace
 from pathlib import Path
 
+from cipoc.models import TargetGroup
 from cipoc.tools import load_group_hierarchy, load_variable_groups
 from cipoc.utils.progress.layout import build_rows, render_lines
 from cipoc.utils.progress.events import ProgressEvent
@@ -145,6 +146,42 @@ class ProgressLayoutTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.snapshot = dashboard_snapshot()
+
+    def test_typed_and_mapping_composites_have_conditional_annotations(self):
+        conjunction = {"all_of": [
+            {"primary_sites": ["C440-C449"]},
+            {"histology_families": ["melanoma"]},
+        ]}
+        for applies_to in (
+            conjunction,
+            {"any_of": [{"gross_primary_sites": ["breast"]}, conjunction]},
+        ):
+            typed = TargetGroup(
+                group_id="conditional", variables=[{"item_id": 832}],
+                applies_to=applies_to,
+            )
+            for group in (typed, typed.model_dump(mode="json")):
+                with self.subTest(applies_to=applies_to, representation=type(group).__name__):
+                    model = ProgressModel("Orchestrator", 0.0, target_groups=[group])
+                    self.assertEqual(model.snapshot().groups[0].annotation, "site:conditional")
+
+    def test_typed_and_mapping_leaf_annotations_remain_specific(self):
+        for applies_to, expected in (
+            ({"gross_primary_sites": ["ovary"]}, "site:ovary"),
+            ({"primary_sites": ["C440-C449"]}, "site:C440-C449"),
+            ({"primary_sites": ["C500", "C504"]}, "site:C500/C504"),
+            ({"histology_families": ["melanoma"]}, "site:melanoma"),
+            ({"gross_primary_sites": ["breast"], "histology_families": ["melanoma"]}, "site:breast/melanoma"),
+            ({"any_of": [], "all_of": []}, "gate:treatment"),
+        ):
+            typed = TargetGroup(
+                group_id="leaf", variables=[{"item_id": 832}],
+                applies_to=applies_to, gate=["treatment_present"],
+            )
+            for group in (typed, typed.model_dump(mode="json")):
+                with self.subTest(applies_to=applies_to, representation=type(group).__name__):
+                    model = ProgressModel("Orchestrator", 0.0, target_groups=[group])
+                    self.assertEqual(model.snapshot().groups[0].annotation, expected)
 
     def test_viewport_goldens(self):
         sections = []

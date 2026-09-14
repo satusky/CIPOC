@@ -12,8 +12,11 @@ from cipoc.models import (
     CancerMention,
     ClinicalNote,
     CONCEPT_DESCRIPTIONS,
+    CorpusGate,
+    ProcessedClinicalNote,
     TextSpan,
 )
+from cipoc.tools.orchestration import build_corpus_descriptors, corpus_gate_passes
 
 
 class FakeLLM:
@@ -64,7 +67,7 @@ def _state():
 
 class ConceptDetectionTests(unittest.TestCase):
     def test_schema_requires_every_configured_concept(self):
-        descriptions = {**CONCEPT_DESCRIPTIONS, "immunotherapy": "Cancer immunotherapy."}
+        descriptions = {**CONCEPT_DESCRIPTIONS, "targeted_therapy": "Cancer targeted therapy."}
         schema = concept_findings_model(descriptions).model_json_schema()
 
         self.assertEqual(set(schema["required"]), set(descriptions))
@@ -91,12 +94,12 @@ class ConceptDetectionTests(unittest.TestCase):
         self.assertEqual(concepts["surgery"].evidence[0].note_id, 1)
 
     def test_cancer_is_implied_by_cancer_directed_treatment(self):
-        scanner = _scanner_with(_findings(chemotherapy=True))
-
-        result = scanner.detect_concepts(_state())
-
-        self.assertTrue(result["concepts"]["cancer"].presence)
-        self.assertEqual(result["concepts"]["cancer"].evidence[0].text, "chemotherapy")
+        for concept in ("chemotherapy", "hormonal_therapy", "immunotherapy"):
+            with self.subTest(concept=concept):
+                scanner = _scanner_with(_findings(**{concept: True}))
+                result = scanner.detect_concepts(_state())
+                self.assertTrue(result["concepts"]["cancer"].presence)
+                self.assertEqual(result["concepts"]["cancer"].evidence[0].text, concept)
 
     def test_detect_concepts_passes_template_and_returns_findings(self):
         scanner = _scanner_with(_findings(cancer=True))
@@ -109,6 +112,55 @@ class ConceptDetectionTests(unittest.TestCase):
         for name, description in CONCEPT_DESCRIPTIONS.items():
             self.assertIn(f'"{name}":', prompt)
             self.assertIn(description, prompt)
+
+    def test_treatment_definitions_are_cancer_directed_and_not_cytotoxic_chemo(self):
+        self.assertEqual(
+            CONCEPT_DESCRIPTIONS["chemotherapy"],
+            "Any systemic cytotoxic chemotherapy that was administered or planned.",
+        )
+        for concept in ("hormonal_therapy", "immunotherapy"):
+            with self.subTest(concept=concept):
+                self.assertIn("cancer-directed", CONCEPT_DESCRIPTIONS[concept])
+                self.assertIn("administered or planned", CONCEPT_DESCRIPTIONS[concept])
+                self.assertIn("non-cancer", CONCEPT_DESCRIPTIONS[concept])
+
+    def test_real_scanner_graph_preserves_treatment_provenance_and_negative_findings(self):
+        for concept, note_id, content, present in (
+            ("hormonal_therapy", "001", "Anastrozole planned for breast cancer.", True),
+            ("immunotherapy", "note-A", "Pembrolizumab administered for melanoma.", True),
+            ("hormonal_therapy", "001", "Hormone replacement for menopause; no cancer.", False),
+            ("immunotherapy", "note-A", "Allergen immunotherapy for rhinitis; no cancer.", False),
+        ):
+            with self.subTest(concept=concept, present=present):
+                class ScriptedLLM:
+                    def structured(self, schema, messages, **kwargs):
+                        if schema.__name__ == "NoteSummary":
+                            return schema(summary=content, keywords=[concept])
+                        if schema.__name__ == "CancerMentions":
+                            return schema(mentions=[])
+                        return schema(**{
+                            name: _finding(present and name == concept, evidence=content)
+                            for name in CONCEPT_DESCRIPTIONS
+                        })
+
+                scanner = _scanner_with(None)
+                scanner.agent = ScriptedLLM()
+                scanner._retry_policy = None
+                scanner._graph = scanner._build_graph()
+                note = scanner.run(ClinicalNote(
+                    note_id=note_id, date="2025-01-01", note_type="Oncology", content=content
+                ), progress=False)
+                restored = ProcessedClinicalNote.model_validate_json(note.model_dump_json())
+                self.assertEqual(restored.concepts[concept].presence, present)
+                self.assertEqual(restored.concepts["cancer"].presence, present)
+                self.assertFalse(restored.concepts["chemotherapy"].presence)
+                if present:
+                    self.assertEqual(restored.concepts[concept].evidence, [TextSpan(note_id=note_id, text=content)])
+                    self.assertEqual(restored.concepts[concept].confidence, "max")
+                else:
+                    self.assertEqual(restored.concepts[concept].evidence, [])
+                corpus = build_corpus_descriptors({note_id: restored})
+                self.assertEqual(corpus_gate_passes([CorpusGate.TREATMENT_PRESENT], corpus), present)
 
 
 class CancerMentionSchemaTests(unittest.TestCase):

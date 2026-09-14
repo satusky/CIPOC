@@ -5,7 +5,14 @@ explicitly from ``cipoc.utils.databricks_utils`` when running in Databricks.
 """
 
 from .utils import CipocConfig, DocumentsConfig, DEFAULT_CONFIG_PATH, load_config
-from .progress import run_with_progress
+from .observability import (
+    LLMCaptureHandler,
+    ObservabilityCollector,
+    aggregate_llm_usage,
+    merge_callback_config,
+    normalize_token_usage,
+)
+from .progress import run_graph_stream, run_with_progress
 
 
 __all__ = [
@@ -13,5 +20,11 @@ __all__ = [
     "DocumentsConfig",
     "DEFAULT_CONFIG_PATH",
     "load_config",
+    "LLMCaptureHandler",
+    "aggregate_llm_usage",
+    "merge_callback_config",
+    "normalize_token_usage",
+    "ObservabilityCollector",
+    "run_graph_stream",
     "run_with_progress",
 ]

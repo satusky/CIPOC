@@ -16,18 +16,22 @@ llm:
   base_url: ${AZURE_OPENAI_URL}
   api_key: ${RENCI_AZURE_API_KEY}
 
-  # Standard endpoints use the Responses API. Databricks gpt-oss uses Chat
-  # Completions and returns structured output beside its reasoning blocks.
+  # Databricks gpt-oss uses Chat Completions and returns native structured output
+  # in a text content block alongside its reasoning blocks. Compatibility defaults
+  # to "standard" when omitted; opt into "databricks" only for affected endpoints.
   use_responses_api: true
   endpoint_compatibility: standard
   # use_responses_api: false
   # endpoint_compatibility: databricks
   structured_output_method: json_schema
 
-  # Endpoint-wide concurrency cap. Bounds in-flight requests via a semaphore on
-  # the shared model wrapper. This is a property of the endpoint, not the agent:
-  # to make it a global cap, build one model from these defaults and inject it
-  # into every subagent (llm=). Omit or set null for unbounded.
+  # Process-wide synchronous per-model cap, shared by live wrappers using the
+  # same model and base URL (scheme/host case, default ports, and SDK-appended
+  # slash normalized), regardless of API key. Paths and queries remain distinct.
+  # Different models at the same URL have independent limits; there is no URL-wide
+  # aggregate cap. Wrappers for the same endpoint/model pair must agree, including
+  # null (unbounded). Positive integers only; 1 is allowed here, unlike graph concurrency.
+  # Async/direct model calls and other processes/Databricks workers are not capped.
   max_concurrency: 8
 
   # Reasoning settings (OpenAI-style). Set to null to disable.
@@ -59,7 +63,6 @@ agents:
 documents:
   documents_path: documents/
   data_dictionary_path: documents/manuals/naaccr_data_dictionary_v25.json
-  rules_path: documents/rules/
   site_data_dictionary_path: documents/cipoc_data_dictionary.json
-  # variable_groups_path: config/variable_groups.json
-  variable_groups_path: config/initial_extraction_test.json
+  variable_groups_path: config/variable_groups.json
+  # variable_groups_path: config/initial_extraction_test.json

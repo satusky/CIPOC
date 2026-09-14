@@ -29,7 +29,7 @@ from cipoc.prompts import (
     EXTRACT_VARIABLE_VALUE_PROMPT,
     REPAIR_VARIABLE_VALUE_PROMPT,
 )
-from cipoc.tools import VariableValueValidator, build_variable_group, load_rule_store
+from cipoc.tools import VariableValueValidator, build_variable_group, resolve_evidence_text
 from cipoc.utils import CipocConfig, run_with_progress
 
 from .base import BaseAgent
@@ -88,6 +88,11 @@ class ExtractorAgent(BaseAgent):
     # Initial nodes
     def initialize(self, state: ExtractorState) -> dict:
         """Seed the conversation with the shared persona and the variables to extract."""
+        variables = state.requested_variables.variables
+        if not variables or len({variable.item_id for variable in variables}) != len(variables):
+            raise ValueError("Extraction requires a nonempty group of unique requested item IDs.")
+        for variable in variables:
+            self._value_validator.preflight(variable)
         return {"messages": [SystemMessage(EXTRACTOR_SYSTEM_PROMPT)]}
 
     def load_notes(self, state: ExtractorState) -> dict:
@@ -133,6 +138,9 @@ class ExtractorAgent(BaseAgent):
         )
 
         output_counts = Counter(output.item_id for output in group_output.variables)
+        unexpected_ids = sorted(set(output_counts) - {
+            variable.item_id for variable in state.requested_variables.variables
+        })
         outputs_by_id = {
             output.item_id: output
             for output in group_output.variables
@@ -152,7 +160,7 @@ class ExtractorAgent(BaseAgent):
                             else ["Group extraction returned this variable more than once."]
                             if output_counts[variable.item_id] > 1
                             else []
-                        ),
+                        ) + ([f"Group extraction returned unexpected item IDs: {unexpected_ids}."] if unexpected_ids else []),
                         extraction_attempts=1,
                     ),
                     notes=state.notes or [],
@@ -167,6 +175,14 @@ class ExtractorAgent(BaseAgent):
         return Command(goto=sends)
 
     def merge_variable_results(self, state: ExtractorState) -> dict:
+        requested_ids = {variable.item_id for variable in state.requested_variables.variables}
+        counts = Counter(result.item_id for result in state.variable_results)
+        duplicates = sorted(item_id for item_id, count in counts.items() if count > 1)
+        unexpected = sorted(set(counts) - requested_ids)
+        if duplicates or unexpected:
+            raise ValueError(
+                f"Invalid completed branch IDs: duplicates={duplicates}, unexpected={unexpected}."
+            )
         results_by_id = {result.item_id: result for result in state.variable_results}
 
         ordered_results = [
@@ -218,20 +234,29 @@ class ExtractorAgent(BaseAgent):
 
     def validate_extraction(self, state: VariableBranchState) -> dict:
         errors = list(state.task.validation_errors)
-        if state.task.candidate is None:
+        candidate = state.task.candidate
+        if candidate is None:
             errors.append("No extraction candidate was returned.")
         else:
+            citation = candidate.most_important_note
+            if isinstance(citation, str) and not citation.strip():
+                # Treat a blank optional citation as absent without mutating the raw/group response.
+                candidate = candidate.model_copy(update={"most_important_note": None})
             errors.extend(
                 self._value_validator.validate(
                     state.task.variable,
-                    state.task.candidate,
+                    candidate,
                 )
             )
-            if state.task.candidate.value is None and state.task.candidate.spans:
+            if candidate.value is None and candidate.spans:
                 errors.append("Supporting text spans must be empty when no value is returned.")
-            elif state.task.candidate.value is not None and not state.task.candidate.spans:
+            elif candidate.value is not None and not candidate.spans:
                 errors.append("No supporting text spans were returned.")
-            for index, span in enumerate(state.task.candidate.spans, start=1):
+            citation = candidate.most_important_note
+            if candidate.value is None and citation is not None:
+                errors.append("Primary citation must be null when no value is returned.")
+            spans = list(candidate.spans)
+            for index, span in enumerate(spans, start=1):
                 if not span.text.strip():
                     errors.append(f"Supporting text span {index} is empty.")
                     continue
@@ -252,14 +277,37 @@ class ExtractorAgent(BaseAgent):
                         "text was copied from."
                     )
                 elif not any(span.text in note.content for note in cited_notes):
-                    errors.append(
-                        f"Supporting text span {index} is not verbatim text from note "
-                        f"{span.note_id}."
+                    source_text = (
+                        resolve_evidence_text(span.text, cited_notes[0].content)
+                        if len(cited_notes) == 1 else None
                     )
+                    if source_text is None:
+                        errors.append(
+                            f"Supporting text span {index} is not verbatim text from note "
+                            f"{span.note_id}."
+                        )
+                    else:
+                        spans[index - 1] = span.model_copy(update={"text": source_text})
+            if spans != candidate.spans:
+                candidate = candidate.model_copy(update={"spans": spans})
+
+            if citation is not None and not any(str(note.note_id) == str(citation) for note in state.notes):
+                matching_notes = []
+                if isinstance(citation, str) and not errors:
+                    # Keep quote-as-ID recovery paired with its validated span after punctuation restoration.
+                    matching_notes = [
+                        note for note in state.notes
+                        if any(citation in (original.text, span.text) and str(span.note_id) == str(note.note_id)
+                               for original, span in zip(state.task.candidate.spans, candidate.spans))
+                    ]
+                if len(matching_notes) == 1:
+                    candidate = candidate.model_copy(update={"most_important_note": matching_notes[0].note_id})
+                else:
+                    errors.append(f"Primary citation cites note id '{citation}', which is not one of the provided notes.")
 
         return {
             "task": state.task.model_copy(
-                update={"validation_errors": errors, "is_valid": not errors}
+                update={"candidate": candidate, "validation_errors": errors, "is_valid": not errors}
             )
         }
 
@@ -315,7 +363,7 @@ class ExtractorAgent(BaseAgent):
             presence_confidence=ConfidenceLevel.LOW,
         )
         validated = ValidatedVariableOutput(
-            **candidate.model_dump(),
+            **{**candidate.model_dump(), "item_id": state.task.variable.item_id},
             is_valid=state.task.is_valid,
             validation_errors=list(state.task.validation_errors),
             extraction_attempts=state.task.extraction_attempts,
@@ -404,18 +452,15 @@ if __name__ == "__main__":
     # agent.draw(path="src/cipoc/agents/visualization/extractor.png")
 
     # Case facts matching tests/fixtures/note_bundle.json (left breast, dx 2025);
-    # scopes valid codes and coding instructions from the tissue-keyed dictionary
-    # and compiled rule store. The gross site is what note characterization yields;
-    # primary_site stays unset because item 400 is being extracted here.
+    # scopes valid codes from the tissue-keyed data dictionary. The gross site is
+    # what note characterization yields; primary_site stays unset because item
+    # 400 is one of the variables being extracted here.
     facts = CaseFacts(gross_primary_site="breast", date_of_diagnosis="2025-02-24", sex="female")
-    rules_path = getattr(agent._config.documents(), "rules_path", None)
-    rule_store = load_rule_store(rules_path) if rules_path is not None else None
     variable_group = build_variable_group(
         [400, 410, 522],  # Primary Site, Laterality, Histology
         data_dictionary_path=agent._config.documents().data_dictionary_path,
         case_facts=facts,
         site_data_dictionary_path=agent._config.documents().site_data_dictionary_path,
-        rule_store=rule_store,
     )
 
     note_path = Path(__file__).resolve().parents[3] / "tests" / "fixtures" / "note_bundle.json"

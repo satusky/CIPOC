@@ -229,7 +229,11 @@ def _annotation(group: Any) -> str:
         return ""
     applies_to = field(group, "applies_to")
     if applies_to is not None:
+        # Flattening a composite would misrepresent its conjunctions as alternatives.
+        if field(applies_to, "any_of") or field(applies_to, "all_of"):
+            return "site:conditional"
         sites = list(field(applies_to, "gross_primary_sites", []) or [])
+        sites += list(field(applies_to, "primary_sites", []) or [])
         sites += list(field(applies_to, "histology_families", []) or [])
         if sites:
             return "site:" + "/".join(sites[:2])

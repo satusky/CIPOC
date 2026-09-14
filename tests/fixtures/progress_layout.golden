@@ -93,7 +93,7 @@
    671  RX Hosp--Surg Prim Site 2023      ▱▱▱                 7n  · pending    —
   3843  Grade Clinical                    ▰▰▰                 7n  ✖ error      Invalid grade cod… !▒
   3844  Grade Pathological                ▰◈▱ extract         7n  · coding     —
-▾   Histologic Type and Behavior Code                                     2/2  ✔2
+▾   Histologic Type and Behavior Code     initial                         2/2  ✔2
    522    Histologic Type ICD-O-3         ▰▰▰                 7n  ✔ extracted  8500                █
    523    Behavior Code ICD-O-3           ▰▰▰                 7n  ✔ extracted  3                   █
 ▾ Other                                                                   6/6  ∅6
@@ -104,7 +104,7 @@
   3280  RX Hosp--Palliative Proc          ▰▰▰                 4n  ∅ not found  —                   ░
    756  Tumor Size Summary                ▰▰▰                 4n  ∅ not found  —                   ░
 ▾ Limited By Primary Site                                                 7/7  ⊗7
-▾   Breast/Melanoma Only                  site:breast/melanoma            1/1  ⊗1
+▾   Breast/Melanoma Only                  site:conditional                1/1  ⊗1
    832    Date of Sentinel Lymph Node B…  ▱▱▱                     ⊗ n/a        Primary site does…
 ▾   Ovary Only                            site:ovary                      1/1  ⊗1
   3836    FIGO Stage                      ▱▱▱                     ⊗ n/a        Primary site does…
@@ -143,7 +143,7 @@
    671  RX Hosp--Surg Prim Site 2023    ▱▱▱              · pending    —
   3843  Grade Clinical                  ▰▰▰              ✖ error      Invali… !▒
   3844  Grade Pathological              ▰◈▱ extract      · coding     —
-▾   Histologic Type and Behavior Code                            2/2  ✔2
+▾   Histologic Type and Behavior Code   initial                  2/2  ✔2
    522    Histologic Type ICD-O-3       ▰▰▰              ✔ extracted  8500     █
    523    Behavior Code ICD-O-3         ▰▰▰              ✔ extracted  3        █
 ▾ Other                                                          6/6  ∅6
@@ -154,7 +154,7 @@
   3280  RX Hosp--Palliative Proc        ▰▰▰              ∅ not found  —        ░
    756  Tumor Size Summary              ▰▰▰              ∅ not found  —        ░
 ▾ Limited By Primary Site                                        7/7  ⊗7
-▾   Breast/Melanoma Only                site:breast/mela…        1/1  ⊗1
+▾   Breast/Melanoma Only                site:conditional         1/1  ⊗1
    832    Date of Sentinel Lymph Node…  ▱▱▱              ⊗ n/a        Primar…
 ▾   Ovary Only                          site:ovary               1/1  ⊗1
   3836    FIGO Stage                    ▱▱▱              ⊗ n/a        Primar…
@@ -193,7 +193,7 @@
    671  RX Hosp--Surg Prim Si…  ▱▱▱  · pending    —
   3843  Grade Clinical          ▰▰▰  ✖ error      Invali… !▒
   3844  Grade Pathological      ▰◈▱  · coding     —
-▾   Histologic Type and Behavio…             2/2  ✔2
+▾   Histologic Type and Behavio…init…        2/2  ✔2
    522    Histologic Type ICD…  ▰▰▰  ✔ extracted  8500     █
    523    Behavior Code ICD-O…  ▰▰▰  ✔ extracted  3        █
 ▾ Other                                      6/6  ∅6

@@ -1,10 +1,16 @@
 import json
+import hashlib
+import time
 from collections import Counter
+from datetime import datetime, timezone
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
+from uuid import uuid4
 
 from operator import add
+from typing import Any, Callable, Mapping
 from typing_extensions import Annotated, Literal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.state import CompiledStateGraph
@@ -13,8 +19,10 @@ from langgraph.graph.message import add_messages
 from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
-from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_rule_store, load_variable_groups, prefilter_notes, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key
-from cipoc.utils import CipocConfig, run_with_progress
+from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key
+from cipoc.utils import CipocConfig, ObservabilityCollector, run_graph_stream
+from cipoc.utils.progress.events import ProgressEvent
+from cipoc.utils.progress.runner import validate_graph_concurrency
 from cipoc.models import (
     Case,
     CaseFacts,
@@ -24,6 +32,16 @@ from cipoc.models import (
     ConfidenceLevel,
     NoteDigest,
     NoteCorpusDescriptors,
+    NoteSelectionProvenance,
+    NoteSelectionUnevaluatedCode,
+    OrchestratorConfigFingerprint,
+    OrchestratorRunCorpus,
+    OrchestratorRunError,
+    OrchestratorRunFailure,
+    OrchestratorRunInfo,
+    OrchestratorRunInputs,
+    OrchestratorRunResult,
+    RunObservability,
     TargetGroup,
     VariableGroupOutput,
     VariableInfo,
@@ -36,7 +54,7 @@ from cipoc.models import (
 )
 
 from .base import BaseAgent
-from .extractor import ExtractorAgent, ExtractorInput
+from .extractor import ExtractorAgent, ExtractorInput, ExtractorState
 from .note_scanner import NoteScannerAgent, ScannerState
 from .note_retriever import NoteRetrieverAgent, RetrieverInput
 
@@ -65,6 +83,10 @@ class CaseState(BaseModel):
     variable_results: Annotated[dict[int, CaseVariableResult], dict_merge_reducer] = Field(
         default_factory=dict,
         description="Per-variable orchestration results keyed by item ID; written concurrently by extraction branches.",
+    )
+    note_selection: Annotated[dict[str, NoteSelectionProvenance], dict_merge_reducer] = Field(
+        default_factory=dict,
+        description="Per-group note-selection provenance merged from extraction branches.",
     )
     fatal_blocker: str | None = Field(
         default=None,
@@ -104,6 +126,7 @@ class CaseState(BaseModel):
         return Case(
             case_facts=self.case_facts,
             variable_results=dict(self.variable_results),
+            note_selection=dict(self.note_selection),
             fatal_blocker=self.fatal_blocker,
             report=self.report,
         )
@@ -121,13 +144,15 @@ class ExtractorBranchInput(BaseModel):
 class ExtractBranchState(ExtractorBranchInput):
     """Per-group state for the extract subgraph (retrieve_notes -> extract).
 
-    ``variable_results`` shares the parent ``CaseState`` key and reducer, so each
-    branch's results merge back into the case as the fan-out joins. The note
-    inputs deliberately do not share parent channel names, so nothing but
-    ``variable_results`` is written back.
+    ``variable_results`` and ``note_selection`` share parent ``CaseState`` keys
+    and reducers, so each branch's outputs merge back into the case as the fan-out
+    joins. The note inputs deliberately do not share parent channel names.
     """
     retrieved_note_ids: list[int | str] = Field(default_factory=list)
     variable_results: Annotated[dict[int, CaseVariableResult], dict_merge_reducer] = Field(
+        default_factory=dict,
+    )
+    note_selection: Annotated[dict[str, NoteSelectionProvenance], dict_merge_reducer] = Field(
         default_factory=dict,
     )
 
@@ -145,12 +170,27 @@ class OrchestratorInput(BaseModel):
         description="Optional known coded values keyed by NAACCR item ID; seeded as structured-data results, skipping extraction.",
     )
 
+    @model_validator(mode="after")
+    def validate_note_identity(self):
+        if not self.note_corpus:
+            raise ValueError("At least one clinical note is required; structured-only runs are not supported.")
+        seen: set[str] = set()
+        for key, note in self.note_corpus.items():
+            canonical = str(key)
+            if canonical in seen:
+                raise ValueError("Note corpus contains duplicate canonical note IDs.")
+            if canonical != str(note.note_id):
+                raise ValueError("Note corpus key does not match its note ID.")
+            seen.add(canonical)
+        return self
+
 
 class OrchestratorOutput(BaseModel):
     """Exactly the channels ``CaseState.to_case()`` consumes to build the snapshot."""
     case_facts: CaseFacts | None = None
     target_variables: list[TargetGroup] = Field(default_factory=list)
     variable_results: dict[int, CaseVariableResult] = Field(default_factory=dict)
+    note_selection: dict[str, NoteSelectionProvenance] = Field(default_factory=dict)
     fatal_blocker: str | None = None
     report: CaseReport | None = None
 
@@ -168,14 +208,13 @@ class OrchestratorAgent(BaseAgent):
         self._retriever = NoteRetrieverAgent(config=self._config)
         self._extractor = ExtractorAgent(config=self._config)
         variable_groups_path = self._config.documents().variable_groups_path
+        self._variable_groups_path = variable_groups_path
         self._target_variables = load_variable_groups(variable_groups_path)
         self._target_group_hierarchy = load_group_hierarchy(variable_groups_path)
-        # Config groups carry only item_id/name; dictionaries and the rule store
-        # supply metadata, site-specific codes, and coding instructions.
+        # Config groups carry only item_id/name; the NAACCR dictionary supplies
+        # metadata and the tissue-keyed dictionary supplies case-scoped codes.
         self._data_dictionary_path = self._config.documents().data_dictionary_path
         self._site_data_dictionary_path = self._config.documents().site_data_dictionary_path
-        rules_path = getattr(self._config.documents(), "rules_path", None)
-        self._rule_store = load_rule_store(rules_path) if rules_path is not None else None
 
     # --- Graph wiring (compiled once per instance) ---
     def _wire_graph(self, workflow: StateGraph) -> None:
@@ -228,6 +267,8 @@ class OrchestratorAgent(BaseAgent):
         case_facts up front so it can scope dependent groups even when no
         extraction ever runs for that group.
         """
+        # Direct graph callers must obey the same input invariants as run().
+        OrchestratorInput(note_corpus=state.note_corpus, structured_data=state.structured_data)
         structured = state.structured_data or {}
         results: dict[int, CaseVariableResult] = {}
         for group in self._target_variables:
@@ -256,13 +297,18 @@ class OrchestratorAgent(BaseAgent):
     
     def note_branch(self, note: ClinicalNote):
         processed_note = self._scanner.run(note, progress=False)
-        return {"note_corpus": {processed_note.note_id: processed_note}}
+        if not isinstance(processed_note, ProcessedClinicalNote):
+            raise TypeError("Scanner must return a completed ProcessedClinicalNote.")
+        if str(processed_note.note_id) != str(note.note_id):
+            raise ValueError("Scanner changed the input note identity.")
+        processed_note = processed_note.model_copy(update={"note_id": note.note_id})
+        return {"note_corpus": {note.note_id: processed_note}}
     
     def characterize_corpus(self, state: CaseState) -> dict:
         descriptors = build_corpus_descriptors(state.note_corpus)
         digests = build_corpus_digests(state.note_corpus)
         case_facts = state.case_facts
-        if case_facts is None or case_facts.gross_primary_site is None:
+        if case_facts is None or (not case_facts.primary_site and not case_facts.gross_primary_site):
             site_dictionary = {}
             site_dictionary_path = getattr(self, "_site_data_dictionary_path", None)
             if site_dictionary_path is not None:
@@ -288,10 +334,9 @@ class OrchestratorAgent(BaseAgent):
                         )
                         for tissue in tissues
                     }
-                    resolved_sites.discard(None)
                 else:
                     resolved_sites = tissues
-                if len(resolved_sites) == 1:
+                if len(resolved_sites) == 1 and None not in resolved_sites:
                     case_facts = (case_facts or CaseFacts()).model_copy(
                         update={"gross_primary_site": resolved_sites.pop()}
                     )
@@ -323,26 +368,25 @@ class OrchestratorAgent(BaseAgent):
         return "plan_extraction"
 
     def _scope_group(self, group: TargetGroup, case_facts: CaseFacts | None) -> TargetGroup:
-        """Fill data-dictionary metadata and case-scoped coding context while
+        """Fill each variable's data-dictionary metadata and site-scoped codes,
         preserving the group's gating/filter fields.
 
         ``build_variable_group`` returns a plain ``VariableGroupInfo`` (no gating),
         so its enriched variables are merged back onto the pending ``TargetGroup``
-        by item ID; the original ordering is kept and any variable the dictionary
-        does not know is left as-is rather than dropped.
+        by item ID; the original ordering is kept. Missing or unusable dictionary
+        metadata fails explicitly before the group makes model calls.
         """
         enriched = build_variable_group(
             [variable.item_id for variable in group.variables],
             self._data_dictionary_path,
             case_facts=case_facts,
             site_data_dictionary_path=self._site_data_dictionary_path,
-            rule_store=self._rule_store,
         )
         enriched_by_id = {variable.item_id: variable for variable in enriched.variables}
         return group.model_copy(
             update={
                 "variables": [
-                    enriched_by_id.get(variable.item_id, variable)
+                    enriched_by_id[variable.item_id]
                     for variable in group.variables
                 ]
             }
@@ -388,32 +432,102 @@ class OrchestratorAgent(BaseAgent):
         )
 
     # --- Extract subgraph nodes ---
+    @staticmethod
+    def _retrieve_prep(
+        state: ExtractBranchState,
+    ) -> tuple[RetrieverInput | None, NoteSelectionProvenance]:
+        """Build the retriever request and durable deterministic funnel record."""
+        group = state.requested_variables
+        if group.group_id is None:
+            raise ValueError("A group reaching note retrieval must have a group_id.")
+
+        candidate_note_ids: list[int | str] = []
+        rejected_note_ids = {}
+        unevaluated_checks: list[NoteSelectionUnevaluatedCode] = []
+
+        for note in state.branch_note_corpus.values():
+            evaluation = evaluate_note_filter(note, group.note_filter, anchor=None)
+            if evaluation.passes:
+                candidate_note_ids.append(note.note_id)
+            else:
+                rejected_note_ids[note.note_id] = evaluation.rejection_reasons
+            for check in evaluation.unevaluated_checks:
+                if check not in unevaluated_checks:
+                    unevaluated_checks.append(check)
+
+        # Unevaluated checks are properties of the configured funnel, so retain
+        # them even when the incoming corpus itself is empty.
+        if not state.branch_note_corpus and group.note_filter is not None:
+            if group.note_filter.keywords:
+                unevaluated_checks.append(
+                    NoteSelectionUnevaluatedCode.KEYWORD_FILTER_DISABLED
+                )
+            if group.note_filter.within_days is not None:
+                unevaluated_checks.append(
+                    NoteSelectionUnevaluatedCode.TEMPORAL_ANCHOR_UNAVAILABLE
+                )
+
+        selection = NoteSelectionProvenance(
+            group_id=group.group_id,
+            requested_item_ids=[variable.item_id for variable in group.variables],
+            candidate_note_ids=candidate_note_ids,
+            rejected_note_ids=rejected_note_ids,
+            unevaluated_checks=unevaluated_checks,
+        )
+        if not candidate_note_ids:
+            return None, selection
+
+        candidate_ids = set(candidate_note_ids)
+        return RetrieverInput(
+            requested_variables=group.to_variable_group(),
+            available_digests={
+                note_id: digest
+                for note_id, digest in state.branch_note_digests.items()
+                if note_id in candidate_ids
+            },
+        ), selection
+
+    @staticmethod
+    def _retrieve_result(
+        request: RetrieverInput | None,
+        selection: NoteSelectionProvenance,
+        relevant_ids: list[int | str] | None,
+    ) -> dict:
+        """Restrict model output to offered IDs and finish the durable record."""
+        offered_ids = {
+            str(note_id): note_id for note_id in request.available_digests
+        } if request is not None else {}
+        selected_ids: list[int | str] = []
+        discarded_ids: list[int | str] = []
+        for proposal in relevant_ids or []:
+            if str(proposal) not in offered_ids:
+                discarded_ids.append(proposal)
+            else:
+                original_id = offered_ids[str(proposal)]
+                if original_id not in selected_ids:
+                    selected_ids.append(original_id)
+        completed = selection.model_copy(
+            update={
+                "selected_note_ids": selected_ids,
+                "discarded_note_ids": discarded_ids,
+            }
+        )
+        return {
+            "retrieved_note_ids": selected_ids,
+            "note_selection": {f"group:{selection.group_id}": completed},
+        }
+
     def retrieve_notes(self, state: ExtractBranchState) -> dict:
         """Narrow the corpus for one group through the two-stage selection funnel:
         the deterministic hard filter on the group's own NoteFilter, then the
         retriever soft filter judging relevance to the group's variables."""
-        group = state.requested_variables
-        # Hard filter reuses prefilter_notes with the group's NoteFilter. anchor=None
-        # for now, so the within_days dimension is skipped until a temporal anchor
-        # is derived.
-        kept = prefilter_notes(state.branch_note_corpus.values(), group.note_filter, anchor=None)
-        kept_ids = [note.note_id for note in kept]
-        if not kept_ids:
-            return {"retrieved_note_ids": []}
+        request, selection = self._retrieve_prep(state)
+        if request is None:
+            return self._retrieve_result(request, selection, None)
         # Soft filter: the retriever ranks the surviving digests for this group's
         # variables and returns None when nothing is plausibly relevant.
-        relevant_ids = self._retriever.run(
-            RetrieverInput(
-                requested_variables=group.to_variable_group(),
-                available_digests={
-                    note_id: digest
-                    for note_id, digest in state.branch_note_digests.items()
-                    if note_id in kept_ids
-                },
-            ),
-            progress=False,
-        )
-        return {"retrieved_note_ids": relevant_ids or []}
+        relevant_ids = self._retriever.run(request, progress=False)
+        return self._retrieve_result(request, selection, relevant_ids)
 
     def extract(self, state: ExtractBranchState) -> dict:
         """Extract the group's variables from the retrieved notes and fold the
@@ -453,6 +567,142 @@ class OrchestratorAgent(BaseAgent):
 
 
     # --- Public API ---
+    @staticmethod
+    def _sha256_digest(path: Path | str | None) -> str | None:
+        if path is None:
+            return None
+        digest = hashlib.sha256()
+        with open(path, "rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(chunk)
+        return f"sha256:{digest.hexdigest()}"
+
+    @staticmethod
+    def _retry_fingerprint(policy: Any) -> dict[str, Any]:
+        values = policy._asdict() if hasattr(policy, "_asdict") else vars(policy)
+        result = {}
+        for name, value in values.items():
+            if callable(value):
+                module = getattr(value, "__module__", "")
+                qualified_name = getattr(value, "__qualname__", repr(value))
+                value = f"{module}.{qualified_name}" if module else qualified_name
+            result[name] = value
+        return result
+
+    def _config_fingerprint(self) -> OrchestratorConfigFingerprint:
+        components = {
+            "orchestrator": self,
+            "note_scanner": self._scanner,
+            "note_retriever": self._retriever,
+            "extractor": self._extractor,
+        }
+        safe_fields = {
+            "provider": (str,), "model": (str,),
+            "structured_output_method": (str,), "endpoint_compatibility": (str,),
+            "max_concurrency": (int,), "use_responses_api": (bool,),
+            "reasoning_effort": (str,), "temperature": (int, float),
+            "top_p": (int, float), "frequency_penalty": (int, float),
+            "presence_penalty": (int, float), "max_tokens": (int,),
+            "max_completion_tokens": (int,), "seed": (int,),
+        }
+        agent_llm_config = {}
+        for name, component in components.items():
+            settings = component._llm_config
+            safe = {}
+            # Project before serialization: arbitrary extras can contain both
+            # credentials and unserializable SDK objects. URLs can contain secrets too.
+            for key, allowed_types in safe_fields.items():
+                if not hasattr(settings, key):
+                    continue
+                value = getattr(settings, key)
+                if value is not None and type(value) not in allowed_types:
+                    raise ValueError(f"Invalid type for fingerprint setting {key}.")
+                safe[key] = value
+            if hasattr(settings, "reasoning"):
+                reasoning = settings.reasoning
+                safe["reasoning"] = None
+                if reasoning is not None:
+                    safe_reasoning = {}
+                    for key, choices in {
+                        "effort": {"low", "medium", "high"},
+                        "summary": {"detailed", "auto"},
+                    }.items():
+                        value = reasoning.get(key) if isinstance(reasoning, Mapping) else getattr(reasoning, key, None)
+                        if value is not None and (type(value) is not str or value not in choices):
+                            raise ValueError(f"Invalid reasoning fingerprint setting {key}.")
+                        safe_reasoning[key] = value
+                    safe["reasoning"] = safe_reasoning
+            agent_llm_config[name] = safe
+        retry = {
+            name: self._retry_fingerprint(component._retry_policy)
+            for name, component in components.items()
+        }
+
+        prompt_dir = Path(__file__).resolve().parents[1] / "prompts"
+        prompt_digests = {
+            prompt_path.name: self._sha256_digest(prompt_path)
+            for prompt_path in sorted(prompt_dir.glob("*.py"))
+        }
+        try:
+            cipoc_version = version("cipoc")
+        except PackageNotFoundError:
+            cipoc_version = None
+
+        return OrchestratorConfigFingerprint(
+            agent_llm_config=agent_llm_config,
+            retry=retry,
+            max_extraction_attempts=ExtractorState.model_fields[
+                "max_extraction_attempts"
+            ].default,
+            variable_groups_digest=self._sha256_digest(self._variable_groups_path),
+            data_dictionary_digest=self._sha256_digest(self._data_dictionary_path),
+            site_data_dictionary_digest=self._sha256_digest(
+                self._site_data_dictionary_path
+            ),
+            prompt_digests=prompt_digests,
+            cipoc_version=cipoc_version,
+        )
+
+    @staticmethod
+    def _corpus_from_state(
+        state: Mapping[str, Any] | None,
+    ) -> OrchestratorRunCorpus | None:
+        if state is None:
+            return None
+        return OrchestratorRunCorpus(
+            note_corpus=state.get("note_corpus", {}),
+            note_digests=state.get("note_digests", {}),
+            note_corpus_descriptors=state.get("note_corpus_descriptors"),
+        )
+
+    @staticmethod
+    def _failure_corpus(
+        state: Mapping[str, Any] | None,
+        completed: Mapping[int | str, ProcessedClinicalNote],
+        original_notes: list[ClinicalNote],
+    ) -> OrchestratorRunCorpus | None:
+        state = state or {}
+        available = {
+            str(key): note for key, note in state.get("note_corpus", {}).items()
+            if isinstance(note, ProcessedClinicalNote)
+        }
+        available.update({str(key): note for key, note in completed.items()})
+        notes = {
+            original.note_id: available[str(original.note_id)]
+            for original in original_notes if str(original.note_id) in available
+        }
+        if not notes:
+            return None
+        characterized = (
+            len(notes) == len(original_notes)
+            and state.get("note_corpus_descriptors") is not None
+        )
+        return OrchestratorRunCorpus(
+            note_corpus=notes,
+            note_digests=state.get("note_digests", {}) if characterized else {},
+            note_corpus_descriptors=state.get("note_corpus_descriptors") if characterized else None,
+        )
+
     def run(
         self,
         raw_notes: list[dict],
@@ -460,42 +710,198 @@ class OrchestratorAgent(BaseAgent):
         *,
         progress: bool = True,
         max_concurrency: int | None = None,
-    ) -> Case:
+        capture_llm_content: bool = True,
+        max_content_chars: int | None = None,
+        pause_before_summary: bool = True,
+        config: Mapping[str, Any] | None = None,
+        event_observer: Callable[[ProgressEvent], None] | None = None,
+    ) -> OrchestratorRunResult:
         """Extract the configured variable groups from ``raw_notes``.
 
         ``structured_data`` optionally supplies already-known coded values keyed
         by NAACCR item ID; those variables are seeded as structured-data results
-        and skip extraction. Set ``progress`` to false to run without rendering
+        and skip extraction. Empty note lists are rejected, even when structured
+        values are supplied. Set ``progress`` to false to run without rendering
         the live progress display. ``max_concurrency`` controls LangGraph's
-        parallel task limit. Returns the durable ``Case`` snapshot.
+        parallel task limit. Prompt/response capture can be disabled independently
+        from model metadata and usage collection. Returns the complete versioned
+        run artifact; graph failures raise ``OrchestratorRunError`` with a partial
+        failure artifact.
         """
+        if not isinstance(raw_notes, list):
+            raise TypeError("raw_notes must be a list.")
+        if structured_data is not None and not isinstance(structured_data, Mapping):
+            raise TypeError("structured_data must be a mapping or None.")
+        if not isinstance(progress, bool):
+            raise TypeError("progress must be a boolean.")
+        if not isinstance(capture_llm_content, bool):
+            raise TypeError("capture_llm_content must be a boolean.")
+        if not isinstance(pause_before_summary, bool):
+            raise TypeError("pause_before_summary must be a boolean.")
+        if config is not None and not isinstance(config, Mapping):
+            raise TypeError("config must be a mapping or None.")
+        if event_observer is not None and not callable(event_observer):
+            raise TypeError("event_observer must be callable or None.")
+        if max_concurrency is not None and (
+            isinstance(max_concurrency, bool)
+            or not isinstance(max_concurrency, int)
+        ):
+            raise TypeError("max_concurrency must be an integer or None.")
         if max_concurrency is not None and max_concurrency < 1:
             raise ValueError("max_concurrency must be at least 1.")
+        if max_content_chars is not None and (
+            isinstance(max_content_chars, bool)
+            or not isinstance(max_content_chars, int)
+        ):
+            raise TypeError("max_content_chars must be an integer or None.")
+        if max_content_chars is not None and max_content_chars < 0:
+            raise ValueError("max_content_chars must be non-negative.")
 
-        graph_input = {
-            "note_corpus": {note["note_id"]: ClinicalNote(**note) for note in raw_notes},
-            "structured_data": structured_data or {},
-        }
-        graph_config = (
-            {"max_concurrency": max_concurrency}
-            if max_concurrency is not None
-            else None
+        if not raw_notes:
+            raise ValueError("At least one clinical note is required; structured-only runs are not supported.")
+        notes = [ClinicalNote.model_validate(note) for note in raw_notes]
+        seen_ids: dict[str, int] = {}
+        for position, note in enumerate(notes):
+            canonical = str(note.note_id)
+            if canonical in seen_ids:
+                raise ValueError(
+                    f"Duplicate canonical note ID at input positions {seen_ids[canonical]} and {position}."
+                )
+            seen_ids[canonical] = position
+        validated_input = OrchestratorInput(
+            note_corpus={note.note_id: note for note in notes},
+            structured_data={} if structured_data is None else structured_data,
         )
-        if progress:
-            final_state = run_with_progress(
+        graph_input = {
+            "note_corpus": validated_input.note_corpus,
+            "structured_data": validated_input.structured_data,
+        }
+        run_inputs = OrchestratorRunInputs(
+            target_variables=self._target_variables,
+            structured_data=validated_input.structured_data,
+        )
+        graph_config = dict(config or {})
+        configured_concurrency = graph_config.get("max_concurrency")
+        if max_concurrency is not None:
+            graph_config["max_concurrency"] = max_concurrency
+        elif configured_concurrency is not None and (
+            isinstance(configured_concurrency, bool)
+            or not isinstance(configured_concurrency, int)
+            or configured_concurrency < 1
+        ):
+            raise ValueError("config max_concurrency must be a positive integer.")
+        validate_graph_concurrency(self._graph, graph_config, subgraphs=True)
+
+        run_id = uuid4()
+        started_at = datetime.now(timezone.utc)
+        started_monotonic = time.monotonic()
+        fingerprint = self._config_fingerprint()
+        collector = ObservabilityCollector(
+            capture_llm_content=capture_llm_content,
+            max_content_chars=max_content_chars,
+        )
+        observed_config = collector.graph_config(graph_config)
+        last_root_state: Mapping[str, Any] | None = None
+
+        def observe(event: ProgressEvent) -> None:
+            nonlocal last_root_state
+            collector.observe(event)
+            if event.kind == "values" and event.is_root:
+                last_root_state = event.payload
+            if event_observer is not None:
+                event_observer(event)
+
+        run_error: Exception | None = None
+        full_state: CaseState | None = None
+        corpus: OrchestratorRunCorpus | None = None
+        try:
+            final_state = run_graph_stream(
                 self._graph,
                 graph_input,
-                config=graph_config,
+                config=observed_config,
                 subgraphs=True,
+                progress=progress,
                 description="Orchestrator",
                 target_groups=self._target_variables,
                 group_hierarchy=self._target_group_hierarchy,
-                pause_before_summary=True,
+                pause_before_summary=pause_before_summary,
+                event_observer=observe,
             )
-        else:
-            final_state = self._graph.invoke(graph_input, config=graph_config)
+            full_state = CaseState.model_validate(final_state)
+            expected_items = {
+                variable.item_id for group in self._target_variables for variable in group.variables
+            }
+            if (
+                expected_items - full_state.variable_results.keys()
+                or full_state.outstanding_item_ids or full_state.report is None
+            ):
+                raise RuntimeError("Graph terminated before all requested variables were finalized.")
+            if (
+                {str(key) for key in full_state.note_corpus} != set(seen_ids)
+                or any(not isinstance(note, ProcessedClinicalNote) for note in full_state.note_corpus.values())
+            ):
+                raise RuntimeError("Completed graph did not retain every processed input note.")
+            corpus = self._corpus_from_state(final_state)
+            if corpus is None:
+                raise RuntimeError("Completed graph produced no corpus state.")
+        except Exception as error:
+            run_error = error
 
-        return CaseState(**final_state).to_case()
+        # Finalize only after graph cleanup has joined its running workers.
+        # Never repeat a failing snapshot while building the failure envelope.
+        try:
+            observability = RunObservability.model_validate(collector.snapshot())
+        except Exception as error:
+            observability = RunObservability(
+                llm_content_captured=capture_llm_content,
+                max_content_chars=max_content_chars,
+                collection_status="unavailable",
+                collection_issues=[{
+                    "code": "telemetry_finalization_error",
+                    "message": f"Telemetry finalization failed ({type(error).__name__}); usage is unavailable.",
+                }],
+                llm_usage_summary=None,
+            )
+            if run_error is None:
+                run_error = error
+
+        run_info = OrchestratorRunInfo(
+            run_id=run_id,
+            started_at=started_at,
+            finished_at=datetime.now(timezone.utc),
+            duration_seconds=time.monotonic() - started_monotonic,
+            status="failed" if run_error is not None else "completed",
+            config_fingerprint=fingerprint,
+        )
+        if run_error is None:
+            try:
+                return OrchestratorRunResult(
+                    run=run_info, case=full_state.to_case(), inputs=run_inputs,
+                    corpus=corpus, observability=observability,
+                )
+            except Exception as error:
+                run_error = error
+                run_info = run_info.model_copy(update={"status": "failed"})
+
+        try:
+            partial_corpus = self._failure_corpus(last_root_state, collector.completed_notes(), notes)
+        except Exception as error:
+            partial_corpus = None
+            values = observability.model_dump()
+            values["collection_status"] = (
+                "unavailable" if observability.collection_status == "unavailable" else "partial"
+            )
+            values["collection_issues"].append({
+                "code": "failure_corpus_error",
+                "message": f"Partial corpus assembly failed ({type(error).__name__}).",
+            })
+            observability = RunObservability.model_validate(values)
+        failure = OrchestratorRunFailure(
+            run=run_info, inputs=run_inputs, corpus=partial_corpus,
+            observability=observability,
+            error=f"{type(run_error).__name__}: {run_error}",
+        )
+        raise OrchestratorRunError(failure) from run_error
 
 
 if __name__ == "__main__":
@@ -530,9 +936,9 @@ if __name__ == "__main__":
     with open(note_path, "r") as f:
         raw_notes = json.load(f)
 
-    case = agent.run(raw_notes, structured_data=structured_data)
+    run_result = agent.run(raw_notes, structured_data=structured_data)
     result_path = Path(__file__).resolve().parents[3] / "tests" / "test_outputs" / "orchestrator_test.json"
     result_path.parent.mkdir(parents=True, exist_ok=True)
     with open(result_path, "w") as f:
-        json.dump(case.model_dump(), f, indent=2, default=str)
-    # print(json.dumps(case.model_dump(), indent=2, default=str))
+        json.dump(run_result.model_dump(mode="json"), f, indent=2)
+    # print(run_result.model_dump_json(indent=2))

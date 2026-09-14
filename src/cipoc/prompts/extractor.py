@@ -6,14 +6,15 @@ Coding rules:
 - When `valid_codes` is a non-empty dictionary, its keys are the complete set of allowable outputs.
 - When `valid_codes` is a list of JSON objects, the complete set of allowable outputs will be a single field from each object (typically `Code` or the name of the variable; never labeled `description`).
 - Return a code exactly as written, never its description.
-- When encountering two numbers separated by a hyphen (e.g., `01-90` or `01 - 90`), treat those as inclusive ranges.
+- When encountering two numbers separated by a hyphen (e.g., `01-90` or `01 - 90`), treat those as inclusive ranges. 
 - Follow the supplied format, length, allowable-value, and coding-instruction constraints. Preserve leading zeroes and do not add whitespace.
 - Do not invent clinical facts or codes. If the evidence and coding rules do not support a defensible value, return null.
 - Review all supplied notes before selecting a value. When compatible evidence provides different levels of specificity, choose the most specific allowable value directly supported by the evidence unless the coding instructions specify a different priority. Treat valid codes as categorical choices: never use the first code, shortest code, or a shared code prefix as a default.
 - `NOS` in code values stands for `not otherwise specified` and should be considered the least specific option. Only select a code with `NOS` when insufficient evidence exists for increased specificity.
 - Return the requested item ID exactly.
-- Keep the explanation concise and identify the note evidence and coding rule that support the selected value. Do not include hidden reasoning or unsupported claims.
+- Keep the explanation concise. Provide reasoning to support the selected value, including references to evidence from the text and any applicable coding rules. Do not include unsupported claims.
 - For a non-null value, return one or more supporting spans copied verbatim from the clinical-note content. Each span must be an exact substring of a note, must directly support the selected value, and must not contain newline characters. Set each span's note_id to the note_id of the note the text was copied from — never a field name or an invented label. Split evidence across lines into separate spans. Return an empty spans list when the value is null.
+- Set `most_important_note` to the exact `note_id` of the supplied note containing the strongest evidence for the selected value. This field is an identifier, never a quotation, note title, note content, or explanation. For example, evidence from a supplied note with `note_id: 53` uses `most_important_note: 53`; the quotation belongs in `spans[].text`, not in `most_important_note`. Preserve string IDs and leading zeroes exactly. Return null when the value is null.
 - Set presence_confidence to confidence that the evidence supports the selected value, not confidence that the output satisfies its formatting rules.
 
 Return only the requested structured output. Do not add prose outside it.
@@ -40,6 +41,6 @@ REPAIR_VARIABLE_VALUE_PROMPT = """Repair the invalid extraction for the single t
 - Treat validation_errors as authoritative descriptions of what must change.
 - Return exactly one corrected result with the target variable's item ID.
 - Correct only the target variable. The group context is read-only context for consistency; do not return or revise sibling variables.
-- Reconsider the clinical evidence, supporting spans, and coding constraints rather than making a superficial formatting change.
+- If only `most_important_note` is invalid, correct that identifier without changing a supported value or valid spans. For value or evidence errors, reconsider the clinical evidence and coding constraints.
 - Do not repeat a value identified as invalid and do not invent a code. Return null if no defensible valid value can be determined.
 """

@@ -2,7 +2,7 @@
 
 Retries live on the graph node, not inside the model wrapper. LangGraph reruns
 only the node that raised, so a throttled call replays one LLM request rather
-than a whole branch, and the endpoint concurrency permit held by
+than a whole branch, and the per-model concurrency permit held by
 :meth:`BaseAgentModel.structured` is released for the duration of the backoff
 instead of idling while it sleeps.
 

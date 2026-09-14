@@ -1,0 +1,334 @@
+"""JSON serialization contracts for run observability."""
+
+from __future__ import annotations
+
+from collections.abc import Mapping
+from datetime import timezone
+from typing import Annotated, Any, Literal
+
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, JsonValue, RootModel, field_validator, model_validator
+
+
+AttemptMode = Literal["group", "individual", "repair"]
+LLMAgent = Literal[
+    "note_scanner", "note_retriever", "extractor", "orchestrator", "unknown"
+]
+
+_NonNegativeInt = Annotated[int, Field(ge=0, strict=True)]
+_PositiveInt = Annotated[int, Field(gt=0, strict=True)]
+_NonNegativeFloat = Annotated[float, Field(ge=0)]
+
+
+class _ObservabilityModel(BaseModel):
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+
+
+class TokenDetails(RootModel[dict[str, _NonNegativeInt]]):
+    """Provider token-detail counts, including unknown provider-specific keys.
+
+    Detail counts are breakdowns of the corresponding input or output total,
+    not additional tokens to add to that total.
+    """
+
+    root: dict[str, _NonNegativeInt] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_keys(self):
+        if any(not key for key in self.root):
+            raise ValueError("Token detail names cannot be empty.")
+        return self
+
+
+class NormalizedTokenUsage(_ObservabilityModel):
+    """Provider-reported usage normalized to one JSON-safe shape."""
+
+    input_tokens: _NonNegativeInt = 0
+    output_tokens: _NonNegativeInt = 0
+    total_tokens: _NonNegativeInt = 0
+    input_token_details: TokenDetails = Field(default_factory=TokenDetails)
+    output_token_details: TokenDetails = Field(default_factory=TokenDetails)
+
+
+class LLMUsageBucket(NormalizedTokenUsage):
+    """Invocation counts and token usage for one aggregate grouping."""
+
+    logical_calls: _NonNegativeInt = Field(
+        default=0,
+        description="Logical calls whose initial invocation belongs to this bucket; retries may report a different model.",
+    )
+    model_invocations: _NonNegativeInt = 0
+    successful_invocations: _NonNegativeInt = 0
+    failed_invocations: _NonNegativeInt = 0
+    retry_invocations: _NonNegativeInt = 0
+    usage_reported_invocations: _NonNegativeInt = 0
+    missing_usage_invocations: _NonNegativeInt = 0
+
+    @model_validator(mode="after")
+    def validate_invocation_counts(self):
+        if (
+            self.successful_invocations + self.failed_invocations
+            != self.model_invocations
+        ):
+            raise ValueError(
+                "Successful and failed invocations must equal model invocations."
+            )
+        if (
+            self.usage_reported_invocations + self.missing_usage_invocations
+            != self.model_invocations
+        ):
+            raise ValueError(
+                "Usage-reported and missing-usage invocations must equal model "
+                "invocations."
+            )
+        if self.logical_calls + self.retry_invocations != self.model_invocations:
+            raise ValueError(
+                "Logical calls plus retry invocations must equal model invocations."
+            )
+        if self.usage_reported_invocations == 0 and (
+            self.input_tokens
+            or self.output_tokens
+            or self.total_tokens
+            or self.input_token_details.root
+            or self.output_token_details.root
+        ):
+            raise ValueError(
+                "Token usage requires at least one usage-reporting invocation."
+            )
+        return self
+
+
+class LLMUsageSummary(LLMUsageBucket):
+    """Complete run usage totals and the same metrics by stable dimensions."""
+
+    by_agent: dict[str, LLMUsageBucket] = Field(default_factory=dict)
+    by_node: dict[str, LLMUsageBucket] = Field(default_factory=dict)
+    by_model: dict[str, LLMUsageBucket] = Field(default_factory=dict)
+
+
+class LLMPromptMessage(_ObservabilityModel):
+    """One retained visible prompt message and any truncation metadata."""
+
+    role: str = Field(min_length=1)
+    content: str
+    truncated: bool = False
+    original_char_count: _NonNegativeInt | None = None
+
+    @model_validator(mode="after")
+    def validate_truncation(self):
+        retained_count = len(self.content)
+        if (
+            self.original_char_count is not None
+            and self.original_char_count < retained_count
+        ):
+            raise ValueError(
+                "Original character count cannot be shorter than retained content."
+            )
+        if self.truncated and (
+            self.original_char_count is None
+            or self.original_char_count <= retained_count
+        ):
+            raise ValueError(
+                "Truncated content requires an original character count greater "
+                "than the retained length."
+            )
+        if (
+            not self.truncated
+            and self.original_char_count is not None
+            and self.original_char_count != retained_count
+        ):
+            raise ValueError(
+                "Untruncated content must retain its full original character count."
+            )
+        return self
+
+
+class _LLMInvocation(_ObservabilityModel):
+    invocation_id: str | None = Field(default=None, min_length=1)
+    namespace: list[str] = Field(default_factory=list)
+    agent: LLMAgent
+    node: str = Field(min_length=1)
+    retry_ordinal: _PositiveInt | None = Field(
+        default=None,
+        description="Transport retry ordinal; absent for the first invocation.",
+    )
+    model: str | None = None
+    started_at: AwareDatetime | None = Field(
+        default=None, description="UTC model callback start, after local permit acquisition."
+    )
+    finished_at: AwareDatetime | None = Field(
+        default=None, description="UTC model end/error callback entry; wall clocks may step."
+    )
+    service_seconds: _NonNegativeFloat | None = Field(
+        default=None,
+        description="Monotonic callback duration including network and SDK retries, not pure provider compute or total permit occupancy.",
+    )
+    queue_seconds: _NonNegativeFloat | None = Field(
+        default=None,
+        description="Monotonic local synchronous permit wait; excludes graph scheduling and LangGraph retry backoff. Uninstrumented paths are null.",
+    )
+    prompt_messages: list[LLMPromptMessage] | None = None
+    response: JsonValue | None = None
+    usage: NormalizedTokenUsage | None = None
+    usage_reported_fields: list[Literal["input_tokens", "output_tokens", "total_tokens"]] | None = Field(
+        default=None,
+        description="Retained scalars verified against same-invocation provider usage before SDK/adapter coercion or defaulting. Null is unverified/unrecorded; [] verifies no scalars. Instrumented synchronous non-streaming calls can supply this proof.",
+    )
+    error: str | None = None
+
+    @field_validator("started_at", "finished_at")
+    @classmethod
+    def normalize_utc(cls, value):
+        return value.astimezone(timezone.utc) if value is not None else None
+
+    @model_validator(mode="after")
+    def validate_reported_fields(self):
+        if self.usage_reported_fields is not None:
+            if len(set(self.usage_reported_fields)) != len(self.usage_reported_fields):
+                raise ValueError("Reported usage fields cannot repeat.")
+            if self.usage_reported_fields and self.usage is None:
+                raise ValueError("Verified scalar fields require retained usage.")
+        return self
+
+
+class LLMExchange(_LLMInvocation):
+    """One completed model callback lifecycle correlated to a graph entity."""
+
+    entity_key: str = Field(min_length=1)
+    attempt: _PositiveInt = Field(description="Semantic extraction attempt number.")
+
+
+class UnattributedLLMExchange(_LLMInvocation):
+    """A retained invocation whose clinical entity/attempt could not be established."""
+
+    invocation_id: str = Field(min_length=1)
+
+
+class ObservabilityIssue(_ObservabilityModel):
+    code: str = Field(min_length=1)
+    message: str = Field(min_length=1)
+
+
+class VariableAttempt(_ObservabilityModel):
+    """Candidate and validation verdict emitted by one validation task."""
+
+    attempt: _PositiveInt
+    mode: AttemptMode
+    candidate: JsonValue | None = None
+    validation_errors: list[str] = Field(default_factory=list)
+    is_valid: bool
+
+
+class RunObservability(_ObservabilityModel):
+    """All execution telemetry retained for one orchestrator run."""
+
+    llm_content_captured: bool
+    max_content_chars: _NonNegativeInt | None = None
+    content_truncated: bool = False
+    collection_status: Literal["complete", "partial", "unavailable"] | None = Field(
+        default=None,
+        description="Callback collection health, not provider usage completeness; absent in legacy 1.0 artifacts.",
+    )
+    collection_issues: list[ObservabilityIssue] = Field(default_factory=list)
+    variable_attempts: dict[str, list[VariableAttempt]] = Field(default_factory=dict)
+    llm_exchanges: dict[str, list[LLMExchange]] = Field(default_factory=dict)
+    unattributed_exchanges: list[UnattributedLLMExchange] = Field(default_factory=list)
+    llm_usage_summary: LLMUsageSummary | None = Field(default_factory=LLMUsageSummary)
+
+    @model_validator(mode="before")
+    @classmethod
+    def populate_exchange_entity_keys(cls, value: Any):
+        """Accept the current keyed artifact shape while making keys explicit."""
+        if not isinstance(value, Mapping):
+            return value
+        raw_exchanges = value.get("llm_exchanges")
+        if not isinstance(raw_exchanges, Mapping):
+            return value
+
+        changed = False
+        exchanges: dict[Any, Any] = {}
+        for entity_key, raw_items in raw_exchanges.items():
+            if not isinstance(raw_items, list):
+                exchanges[entity_key] = raw_items
+                continue
+            items = []
+            for raw_item in raw_items:
+                if isinstance(raw_item, Mapping) and "entity_key" not in raw_item:
+                    raw_item = {"entity_key": str(entity_key), **raw_item}
+                    changed = True
+                items.append(raw_item)
+            exchanges[entity_key] = items
+
+        if not changed:
+            return value
+        normalized = dict(value)
+        normalized["llm_exchanges"] = exchanges
+        return normalized
+
+    @model_validator(mode="after")
+    def validate_content_capture(self):
+        any_truncated = False
+        all_exchanges: list[_LLMInvocation] = list(self.unattributed_exchanges)
+        for entity_key, exchanges in self.llm_exchanges.items():
+            if not entity_key:
+                raise ValueError("LLM exchange map keys cannot be empty.")
+            for exchange in exchanges:
+                if exchange.entity_key != entity_key:
+                    raise ValueError(
+                        f"LLM exchange entity key {exchange.entity_key!r} does not "
+                        f"match map key {entity_key!r}."
+                    )
+            all_exchanges.extend(exchanges)
+        for exchange in all_exchanges:
+            if not self.llm_content_captured and (
+                exchange.prompt_messages is not None or exchange.response is not None
+            ):
+                raise ValueError(
+                    "Prompt and response content must be absent when LLM content "
+                    "capture is disabled."
+                )
+            if self.llm_content_captured and exchange.prompt_messages is None:
+                raise ValueError(
+                    "Prompt messages must be present when LLM content capture "
+                    "is enabled."
+                )
+            for message in exchange.prompt_messages or ():
+                if self.max_content_chars is not None and (
+                    len(message.content) > self.max_content_chars
+                ):
+                    raise ValueError("Retained prompt content exceeds max_content_chars.")
+                if message.truncated:
+                    if self.max_content_chars is None:
+                        raise ValueError(
+                            "Truncated prompt content requires max_content_chars."
+                        )
+                    any_truncated = True
+
+        if self.content_truncated != any_truncated:
+            raise ValueError(
+                "content_truncated must report whether any prompt message was truncated."
+            )
+        if self.collection_status == "complete" and (
+            self.collection_issues or self.unattributed_exchanges or self.llm_usage_summary is None
+        ):
+            raise ValueError("Complete collection requires an available summary and no collection issues.")
+        if self.collection_status in {"partial", "unavailable"} and not self.collection_issues:
+            raise ValueError("Incomplete collection requires an explicit diagnostic issue.")
+        if self.collection_status == "unavailable" and self.llm_usage_summary is not None:
+            raise ValueError("Unavailable collection cannot claim a usage summary.")
+        return self
+
+
+__all__ = [
+    "AttemptMode",
+    "LLMAgent",
+    "LLMExchange",
+    "LLMPromptMessage",
+    "LLMUsageBucket",
+    "LLMUsageSummary",
+    "NormalizedTokenUsage",
+    "ObservabilityIssue",
+    "RunObservability",
+    "TokenDetails",
+    "UnattributedLLMExchange",
+    "VariableAttempt",
+]

@@ -2,6 +2,7 @@ from enum import Enum
 
 from pydantic import BaseModel, Field, model_validator
 
+from .notes import NoteSelectionProvenance
 from .rules import CaseFacts
 from .variables import ValidatedVariableOutput
 
@@ -167,6 +168,10 @@ class Case(BaseModel):
         description="Coding-rule scoping facts, if any were derived for the case.",
     )
     variable_results: dict[int, CaseVariableResult] = Field(default_factory=dict)
+    note_selection: dict[str, NoteSelectionProvenance] = Field(
+        default_factory=dict,
+        description="Per-group note-selection provenance keyed as group:<group_id>.",
+    )
     fatal_blocker: str | None = Field(
         default=None,
         description="Reason no further extraction could be attempted for this case.",
@@ -185,5 +190,12 @@ class Case(BaseModel):
                 raise ValueError(
                     f"Variable result key {item_id} does not match item ID "
                     f"{result.item_id}."
+                )
+        for key, selection in self.note_selection.items():
+            expected_key = f"group:{selection.group_id}"
+            if key != expected_key:
+                raise ValueError(
+                    f"Note selection key {key!r} does not match group ID "
+                    f"{selection.group_id!r}; expected {expected_key!r}."
                 )
         return self
