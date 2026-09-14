@@ -167,7 +167,7 @@ class ProgressLayoutTests(unittest.TestCase):
     def test_unbounded_layout_expands_every_variable(self):
         rows = build_rows(self.snapshot, 100, None, now=172.0)
         variable_rows = [row for row in rows if row.kind == "variable"]
-        self.assertEqual(len(variable_rows), 52)
+        self.assertEqual(len(variable_rows), len(self.snapshot.variables))
         self.assertEqual(
             [int(row.text[2:6]) for row in variable_rows],
             list(self.snapshot.variables),

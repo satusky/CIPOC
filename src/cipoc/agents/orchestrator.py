@@ -13,7 +13,7 @@ from langgraph.graph.message import add_messages
 from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
-from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_rule_store, load_variable_groups, prefilter_notes, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report
+from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_rule_store, load_variable_groups, prefilter_notes, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key
 from cipoc.utils import CipocConfig, run_with_progress
 from cipoc.models import (
     Case,
@@ -52,7 +52,7 @@ def dict_merge_reducer(left: dict, right: dict) -> dict:
 class CaseState(BaseModel):
     case_facts: CaseFacts | None = Field(
         default=None,
-        description="Coding-rule scoping facts; derived during the run, absent until then.",
+        description="Data-dictionary scoping facts; derived during the run, absent until then.",
     )
     target_variables: list[TargetGroup] = Field(
         default_factory=list,
@@ -170,11 +170,10 @@ class OrchestratorAgent(BaseAgent):
         variable_groups_path = self._config.documents().variable_groups_path
         self._target_variables = load_variable_groups(variable_groups_path)
         self._target_group_hierarchy = load_group_hierarchy(variable_groups_path)
-        # Config groups carry only item_id/name; the data dictionary and rule
-        # store supply the valid codes, format, and case-scoped coding
-        # instructions the extractor needs, filled in per dispatch (see
-        # plan_extraction) once case facts are known.
+        # Config groups carry only item_id/name; dictionaries and the rule store
+        # supply metadata, site-specific codes, and coding instructions.
         self._data_dictionary_path = self._config.documents().data_dictionary_path
+        self._site_data_dictionary_path = self._config.documents().site_data_dictionary_path
         rules_path = getattr(self._config.documents(), "rules_path", None)
         self._rule_store = load_rule_store(rules_path) if rules_path is not None else None
 
@@ -182,12 +181,6 @@ class OrchestratorAgent(BaseAgent):
     def _wire_graph(self, workflow: StateGraph) -> None:
         extract_branch = self._build_extract_branch()
 
-        # No node here carries a retry policy. Every LLM call the orchestrator is
-        # responsible for happens inside a subagent's own graph, whose nodes
-        # already retry transient endpoint failures; retrying here as well would
-        # replay a whole scan or extraction — and multiply the attempt count —
-        # for one throttled request. The remaining nodes are deterministic, so a
-        # failure in them is a bug that should surface on the first attempt.
         workflow.add_node("initialize", self.initialize)
         workflow.add_node("scan_notes", self.scan_notes, destinations=("note_branch",))
         workflow.add_node("note_branch", self.note_branch)
@@ -268,7 +261,46 @@ class OrchestratorAgent(BaseAgent):
     def characterize_corpus(self, state: CaseState) -> dict:
         descriptors = build_corpus_descriptors(state.note_corpus)
         digests = build_corpus_digests(state.note_corpus)
-        return {"note_corpus_descriptors": descriptors, "note_digests": digests}
+        case_facts = state.case_facts
+        if case_facts is None or case_facts.gross_primary_site is None:
+            site_dictionary = {}
+            site_dictionary_path = getattr(self, "_site_data_dictionary_path", None)
+            if site_dictionary_path is not None:
+                with open(site_dictionary_path, "r") as file:
+                    site_dictionary = json.load(file)
+            for status in ("current", "recent", "historical"):
+                affected_tissues = (descriptors.affected_tissues or {}).get(
+                    status, set()
+                )
+                if isinstance(affected_tissues, str):
+                    affected_tissues = [affected_tissues]
+                tissues = {
+                    tissue.strip()
+                    for tissue in affected_tissues
+                    if tissue.strip()
+                }
+                if not tissues:
+                    continue
+                if site_dictionary:
+                    resolved_sites = {
+                        resolve_site_key(
+                            CaseFacts(gross_primary_site=tissue), site_dictionary
+                        )
+                        for tissue in tissues
+                    }
+                    resolved_sites.discard(None)
+                else:
+                    resolved_sites = tissues
+                if len(resolved_sites) == 1:
+                    case_facts = (case_facts or CaseFacts()).model_copy(
+                        update={"gross_primary_site": resolved_sites.pop()}
+                    )
+                break
+        return {
+            "note_corpus_descriptors": descriptors,
+            "note_digests": digests,
+            "case_facts": case_facts,
+        }
 
     def check_state(self, state: CaseState) -> dict:
         """Loop hub (flow Step 4). Pure pass-through: the branch decision lives
@@ -291,8 +323,8 @@ class OrchestratorAgent(BaseAgent):
         return "plan_extraction"
 
     def _scope_group(self, group: TargetGroup, case_facts: CaseFacts | None) -> TargetGroup:
-        """Fill each variable's data-dictionary metadata and case-scoped coding
-        context, preserving the group's gating/filter fields.
+        """Fill data-dictionary metadata and case-scoped coding context while
+        preserving the group's gating/filter fields.
 
         ``build_variable_group`` returns a plain ``VariableGroupInfo`` (no gating),
         so its enriched variables are merged back onto the pending ``TargetGroup``
@@ -303,6 +335,7 @@ class OrchestratorAgent(BaseAgent):
             [variable.item_id for variable in group.variables],
             self._data_dictionary_path,
             case_facts=case_facts,
+            site_data_dictionary_path=self._site_data_dictionary_path,
             rule_store=self._rule_store,
         )
         enriched_by_id = {variable.item_id: variable for variable in enriched.variables}
@@ -425,36 +458,42 @@ class OrchestratorAgent(BaseAgent):
         raw_notes: list[dict],
         structured_data: dict[int, str] | None = None,
         *,
+        progress: bool = True,
         max_concurrency: int | None = None,
     ) -> Case:
         """Extract the configured variable groups from ``raw_notes``.
 
         ``structured_data`` optionally supplies already-known coded values keyed
         by NAACCR item ID; those variables are seeded as structured-data results
-        and skip extraction. ``max_concurrency`` controls LangGraph's parallel
-        task limit. Returns the durable ``Case`` snapshot.
+        and skip extraction. Set ``progress`` to false to run without rendering
+        the live progress display. ``max_concurrency`` controls LangGraph's
+        parallel task limit. Returns the durable ``Case`` snapshot.
         """
         if max_concurrency is not None and max_concurrency < 1:
             raise ValueError("max_concurrency must be at least 1.")
 
+        graph_input = {
+            "note_corpus": {note["note_id"]: ClinicalNote(**note) for note in raw_notes},
+            "structured_data": structured_data or {},
+        }
         graph_config = (
             {"max_concurrency": max_concurrency}
             if max_concurrency is not None
             else None
         )
-        final_state = run_with_progress(
-            self._graph,
-            {
-                "note_corpus": {note["note_id"]: ClinicalNote(**note) for note in raw_notes},
-                "structured_data": structured_data or {},
-            },
-            config=graph_config,
-            subgraphs=True,
-            description="Orchestrator",
-            target_groups=self._target_variables,
-            group_hierarchy=self._target_group_hierarchy,
-            pause_before_summary=True,
-        )
+        if progress:
+            final_state = run_with_progress(
+                self._graph,
+                graph_input,
+                config=graph_config,
+                subgraphs=True,
+                description="Orchestrator",
+                target_groups=self._target_variables,
+                group_hierarchy=self._target_group_hierarchy,
+                pause_before_summary=True,
+            )
+        else:
+            final_state = self._graph.invoke(graph_input, config=graph_config)
 
         return CaseState(**final_state).to_case()
 

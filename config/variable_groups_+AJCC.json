@@ -93,6 +93,22 @@
       ]
     },
     {
+      "group_id": "tnm_staging",
+      "name": "TNM Staging",
+      "stage": "dependent",
+      "extract_as_group": true,
+      "variables": [
+        { "item_id": 1001, "name": "AJCC TNM Clin T" },
+        { "item_id": 1002, "name": "AJCC TNM Clin N" },
+        { "item_id": 1003, "name": "AJCC TNM Clin M" },
+        { "item_id": 1004, "name": "AJCC TNM Clin Stage Group" },
+        { "item_id": 1011, "name": "AJCC TNM Path T" },
+        { "item_id": 1012, "name": "AJCC TNM Path N" },
+        { "item_id": 1013, "name": "AJCC TNM Path M" },
+        { "item_id": 1014, "name": "AJCC TNM Path Stage Group" }
+      ]
+    },
+    {
       "group_id": "other",
       "name": "Other",
       "stage": "dependent",

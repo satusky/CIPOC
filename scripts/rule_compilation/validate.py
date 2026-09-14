@@ -140,15 +140,19 @@ def validate_unit(
             result.errors.append("code_table unit carries no codes.")
         for item_id in unit.item_ids:
             entry = data_dictionary.get(str(item_id), {})
-            if str(entry.get("Data Type", "")).casefold() == "date":
+            if str(entry.get("item_data_type", "")).casefold() == "date":
                 result.errors.append(
                     f"code_table unit targets date item {item_id}; date format templates "
                     "are not enumerated codes."
                 )
                 continue
-            valid = entry.get("Code Descriptions")
-            if not isinstance(valid, dict) or not valid:
+            allowed_codes = entry.get("allowed_codes")
+            if not isinstance(allowed_codes, list) or not allowed_codes:
                 continue  # item has no enumerated set to check against
+            valid = {
+                str(code["code"]): str(code["description"])
+                for code in allowed_codes
+            }
             missing = [code for code in (unit.codes or {}) if not _code_in_item_set(code, valid)]
             if missing:
                 result.errors.append(

@@ -398,9 +398,13 @@ class FakeOrchestratorStreamTests(unittest.TestCase):
 
         model.finish()
         snapshot = model.snapshot()
-        self.assertEqual(snapshot.total_variables, 52)
-        self.assertEqual(snapshot.terminal_variables, 52)
-        self.assertEqual((snapshot.done_groups, snapshot.total_groups), (11, 11))
+        expected_variables = sum(len(group.variables) for group in target_groups)
+        self.assertEqual(snapshot.total_variables, expected_variables)
+        self.assertEqual(snapshot.terminal_variables, expected_variables)
+        self.assertEqual(
+            (snapshot.done_groups, snapshot.total_groups),
+            (len(target_groups), len(target_groups)),
+        )
         self.assertEqual(snapshot.notes_done, len(input_state["note_corpus"]))
         self.assertEqual(snapshot.branches, ())
         self.assertEqual(snapshot.counts.get("pending", 0), 0)

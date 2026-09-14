@@ -404,9 +404,9 @@ if __name__ == "__main__":
     # agent.draw(path="src/cipoc/agents/visualization/extractor.png")
 
     # Case facts matching tests/fixtures/note_bundle.json (left breast, dx 2025);
-    # scopes coding instructions and valid codes from documents/rules. The gross
-    # site is what note characterization yields; primary_site stays unset because
-    # item 400 is one of the variables being extracted here.
+    # scopes valid codes and coding instructions from the tissue-keyed dictionary
+    # and compiled rule store. The gross site is what note characterization yields;
+    # primary_site stays unset because item 400 is being extracted here.
     facts = CaseFacts(gross_primary_site="breast", date_of_diagnosis="2025-02-24", sex="female")
     rules_path = getattr(agent._config.documents(), "rules_path", None)
     rule_store = load_rule_store(rules_path) if rules_path is not None else None
@@ -414,6 +414,7 @@ if __name__ == "__main__":
         [400, 410, 522],  # Primary Site, Laterality, Histology
         data_dictionary_path=agent._config.documents().data_dictionary_path,
         case_facts=facts,
+        site_data_dictionary_path=agent._config.documents().site_data_dictionary_path,
         rule_store=rule_store,
     )
 

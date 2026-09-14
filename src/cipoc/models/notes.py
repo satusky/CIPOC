@@ -42,7 +42,6 @@ class CancerMention(BaseModel):
     metastasis: bool = Field(description="Metastases mentioned in the note.")
     model_config = ConfigDict(protected_namespaces=())
 
-
 class ClinicalNote(BaseModel):
     note_id: int | str = Field(description="ID value for note.")
     date: str = Field(description="Date note was written in 'YYYY-MM-DD' format.")
