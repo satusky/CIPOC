@@ -21,6 +21,7 @@
         "keywords": ["chemo", "radiation", "hormone", "immunother", "therapy", "treatment", "surgery", "infusion", "biologic"]
       },
       "variables": [
+        { "item_id": 690, "name": "RX Hosp--Radiation" },
         { "item_id": 700, "name": "RX Hosp--Chemo" },
         { "item_id": 710, "name": "RX Hosp--Hormone" },
         { "item_id": 720, "name": "RX Hosp--BRM" },
@@ -31,8 +32,7 @@
         { "item_id": 1230, "name": "RX Date Hormone" },
         { "item_id": 1240, "name": "RX Date BRM" },
         { "item_id": 1270, "name": "Date 1st Crs RX CoC" },
-        { "item_id": 1280, "name": "RX Date DX/Stg Proc" },
-        { "item_id": 1350, "name": "RX Summ--DX/Stg Proc" }
+        { "item_id": 1280, "name": "RX Date DX/Stg Proc" }
       ]
     },
     {
@@ -75,7 +75,8 @@
       "stage": "dependent",
       "extract_as_group": false,
       "variables": [
-        { "item_id": 1290, "name": "RX Summ--Surg Prim Site 03-2022" },
+        { "item_id": 670, "name": "RX Hosp--Surg Prim Site 03-2022" },
+        { "item_id": 671, "name": "RX Hosp--Surg Prim Site 2023" },
         { "item_id": 3843, "name": "Grade Clinical" },
         { "item_id": 3844, "name": "Grade Pathological" }
       ],

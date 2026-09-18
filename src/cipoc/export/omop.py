@@ -21,6 +21,7 @@ from .models import (
     OmopNoteNlpRow,
     OmopNoteRow,
     OmopRowError,
+    OmopTables,
     OmopValidationIssue,
 )
 
@@ -56,6 +57,35 @@ class OmopExporter:
         self.encoding = encoding
         self.language = language
 
+    def build(
+        self,
+        *,
+        notes: Iterable[ClinicalNote],
+        case: Case,
+        item_ids: Iterable[int] | None = None,
+    ) -> OmopTables:
+        """Build staging rows without I/O, optionally selecting variable items.
+
+        The complete supplied corpus still participates in reference validation.
+        The caller's case and notes are never modified.
+        """
+        source_notes = list(notes)
+        if item_ids is not None:
+            wanted = set(item_ids)
+            case = case.model_copy(update={
+                "variable_results": {
+                    key: value for key, value in case.variable_results.items() if key in wanted
+                },
+            })
+        note_rows, note_errors = self._build_note_rows(source_notes)
+        note_nlp_rows, note_nlp_errors = self._build_note_nlp_rows(
+            source_notes, {str(row.note_id) for row in note_rows}, case,
+        )
+        return OmopTables(
+            note_rows=note_rows, note_nlp_rows=note_nlp_rows,
+            errors=note_errors + note_nlp_errors,
+        )
+
     def export(
         self,
         *,
@@ -72,20 +102,14 @@ class OmopExporter:
         """
         output_directory = Path(output_directory)
 
-        source_notes = list(notes)
-        note_rows, note_errors = self._build_note_rows(source_notes)
-        valid_note_ids = {str(row.note_id) for row in note_rows}
-        note_nlp_rows, note_nlp_errors = self._build_note_nlp_rows(
-            source_notes,
-            valid_note_ids,
-            case,
-        )
+        tables = self.build(notes=notes, case=case)
+        note_rows, note_nlp_rows = tables.note_rows, tables.note_nlp_rows
 
         note_path = output_directory / "note.csv"
         note_nlp_path = output_directory / "note_nlp.csv"
         error_path = output_directory / "omop_errors.json"
 
-        errors = note_errors + note_nlp_errors
+        errors = tables.errors
         error_json = OmopErrorReport(errors=errors).model_dump_json(indent=2)
         with staged_output_paths(
             output_directory, ("note.csv", "note_nlp.csv", "omop_errors.json")

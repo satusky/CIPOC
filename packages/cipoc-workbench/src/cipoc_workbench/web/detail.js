@@ -150,7 +150,7 @@ function exchangeCard(exchange, index, { unattributed = false } = {}) {
     promptMessages == null
       ? h("p", { class: "faint", text: exchange.response == null
           ? "Prompt and response bodies were not captured." : "Prompt messages were not captured." })
-      : h("details", { open: index === 0 ? true : null },
+      : h("details", {},
           h("summary", { text: "Prompt (" + promptMessages.length + " messages)" }),
           messages),
     exchange.error ? h("p", { class: "errors", text: exchange.error }) : null,

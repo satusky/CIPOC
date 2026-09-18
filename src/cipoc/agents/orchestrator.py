@@ -22,6 +22,7 @@ from cipoc.llm import BaseAgentModel
 from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key
 from cipoc.utils import CipocConfig, ObservabilityCollector, run_graph_stream
 from cipoc.utils.progress.events import ProgressEvent
+from cipoc.utils.observability import InvocationObserver
 from cipoc.utils.progress.runner import validate_graph_concurrency
 from cipoc.models import (
     Case,
@@ -715,6 +716,7 @@ class OrchestratorAgent(BaseAgent):
         pause_before_summary: bool = True,
         config: Mapping[str, Any] | None = None,
         event_observer: Callable[[ProgressEvent], None] | None = None,
+        invocation_observer: InvocationObserver | None = None,
     ) -> OrchestratorRunResult:
         """Extract the configured variable groups from ``raw_notes``.
 
@@ -727,6 +729,10 @@ class OrchestratorAgent(BaseAgent):
         from model metadata and usage collection. Returns the complete versioned
         run artifact; graph failures raise ``OrchestratorRunError`` with a partial
         failure artifact.
+        ``invocation_observer(phase, call)`` optionally receives detached runtime
+        ``CapturedLLMCall`` records at model start/finish. It runs synchronously,
+        must return promptly, and cannot change telemetry or fail extraction.
+        Content follows the same capture settings as the final artifact.
         """
         if not isinstance(raw_notes, list):
             raise TypeError("raw_notes must be a list.")
@@ -742,6 +748,8 @@ class OrchestratorAgent(BaseAgent):
             raise TypeError("config must be a mapping or None.")
         if event_observer is not None and not callable(event_observer):
             raise TypeError("event_observer must be callable or None.")
+        if invocation_observer is not None and not callable(invocation_observer):
+            raise TypeError("invocation_observer must be callable or None.")
         if max_concurrency is not None and (
             isinstance(max_concurrency, bool)
             or not isinstance(max_concurrency, int)
@@ -799,6 +807,7 @@ class OrchestratorAgent(BaseAgent):
         collector = ObservabilityCollector(
             capture_llm_content=capture_llm_content,
             max_content_chars=max_content_chars,
+            invocation_observer=invocation_observer,
         )
         observed_config = collector.graph_config(graph_config)
         last_root_state: Mapping[str, Any] | None = None

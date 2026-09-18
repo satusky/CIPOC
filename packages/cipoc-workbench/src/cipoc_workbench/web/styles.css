@@ -7,54 +7,13 @@
    swap needs no change below this block. The theme itself is resolved before
    first paint by the head script in index.html.
 
-   ---- Palette -------------------------------------------------------------
+   Surfaces are near-neutral: graphite in dark, cool gray and off-white in light.
+   Navy remains the light theme's ink. Blue marks interaction; status, confidence
+   and verdict colours carry their own meanings independently of the UI accent.
 
-   NEITHER THEME IS ON THE BRAND HUE. Both surface ramps started there — the
-   UNC Chapel Hill palette carried over from the demo UI, every surface, line
-   and text colour Navy #13294B mixed with black or white at a stated percentage
-   — and both left, for different reasons found in this UI rather than in the
-   brand. What survives the departure is the DISCIPLINE, not the hue: one stated
-   axis per theme, every surface derived from a lightness and checked against the
-   surface below it, no eyeballed greys. And the brand survives where it reads —
-   Navy is the light theme's ink, Carolina Blue is the accent in both.
-
-   Dark left first, for fatigue. Its ramp had to widen: the three surfaces sat at
-   Navy x0.50 / x0.68 / x0.88, which is 1.079:1 from the page ground to a card
-   and 1.101:1 from a card to the thing inside it, both under the ~1.2:1 where a
-   surface step is visible at all. Nothing had an edge. Widening it to x0.35 /
-   x0.88 / x1.24 fixed the edges and made a second problem acute: the card went
-   to chroma 0.062 at hue 259, which is a great deal of blue for the largest
-   surface on screen, repeated across ten cards. It read as fatiguing rather than
-   as branded. Dark surfaces are now a near-neutral graphite with a slight cool
-   bias — chroma 0.005 to 0.012, about 85% below where the card was.
-
-   Light left second, for GLARE. It carried the same 1.101:1 flatness, and worse:
-   `--bg-raised` — under cards, rows, the table and the topbar, so most of the
-   screen — was literally #ffffff, the display's peak output, with the page
-   ground beside it at Y 0.904. The whole UI sat at 90–100% of white and had no
-   edges either. Light is now warm paper, OKLCH hue 78 at chroma 0.005–0.011,
-   with area-weighted screen luminance down 15% (0.953 → 0.779) and #ffffff kept
-   only for form fields. A warm ground was chosen over a neutral or a cooler one
-   because at equal luminance it reads softer, which is the whole point here.
-
-   Going neutral in dark also gave two colours their jobs back: Carolina Blue
-   reads as an accent again instead of as a brighter piece of the ground, and the
-   confidence ramp's quiet end (steel blue, below) has room it did not have when
-   the ground was itself blue.
-
-   Carolina Blue is the one value that differs by role rather than by ramp. Dark
-   uses the brand hex itself (#4B9CD3, 5.9:1 on the dark ground). On paper it
-   cannot carry text, so light uses the brand's own digital-link blue darkened to
-   #005F83 — #007FAE cleared 4.6:1 on white but only 3.6:1 once the paper came
-   off peak white, which is the kind of thing a surface change quietly breaks.
-
-   The data colours were never on the Navy axis in either theme, so they are
-   unaffected by both departures. Status and confidence hues are not brand
-   colours and are not tinted toward one: they encode data, and re-tinting them
-   for tidiness would trade legibility for it. `--structured` is the exception
-   that proves the rule — a royal blue 20° of hue from Carolina, indistinguishable
-   from the accent it sits beside, so it moved to the brand's Tile Teal, far
-   enough from both Carolina and `--extracted` green to read at dot size. */
+   Light gives interaction and table surfaces dedicated tokens: a selected row
+   needs a blue cue, a group band needs structure, and an expanded detail pane
+   needs a quiet reading surface. They should not all share --bg-panel. */
 
 :root {
   /* Surfaces — graphite, OKLCH hue 255 at chroma 0.003–0.012. Stated as L
@@ -67,6 +26,17 @@
   --bg-input: #070809;      /* L 0.133 — recessed, so below the ground */
   --line: #43474b;          /* L 0.395 — 1.643 on --bg-raised */
   --line-soft: #25282b;     /* L 0.205 — the receded edge only; 1.305 on --bg */
+
+  --bg-hover: var(--bg-panel);
+  --bg-selected: var(--bg-panel);
+  --selection-line: var(--line);
+
+  --table-bg: var(--bg);
+  --table-stripe: var(--bg);
+  --table-head-bg: var(--bg-raised);
+  --table-group-bg: var(--bg);
+  --table-group-text: var(--text-faint);
+  --table-hover: var(--bg-raised);
 
   /* Text. Each value is the DARKEST that clears its floor (7 / 4.5 / 4.5) on
      every surface above and — for --text and --text-dim — on every washed
@@ -128,19 +98,7 @@
 
      Lightness runs up here and down under [data-theme="light"] — same four hues,
      same semantics, opposite direction, because the grounds are opposite and
-     "prominent" means brighter on one, darker on the other.
-
-     THE TRILEMMA INVERTS WITH THE DIRECTION, and light resolves it by refusing
-     the optimum rather than by escaping it. Descending lightness lands gold on
-     the SECOND step, below green, which is the position ascending lightness
-     would not let it hold. Maximising adjacent ΔE from there drives it to L 0.48
-     — dot #7b5600, composited #a0874c, the light-side olive, and precisely the
-     khaki an earlier pass produced and was told to remove. Light pins it at
-     L 0.60 (composited #b38d3a, chroma 0.110) and pays about 1 ΔE for it. That
-     is a deliberate trade, not a search result: the gates are floors, and a
-     ramp that clears them by less but is not khaki is the better ramp. Anything
-     that re-derives these four values by maximising separation will re-introduce
-     the olive and look like an improvement. */
+     "prominent" means brighter on one, darker on the other. */
   --conf-max: #1d6b91;      /* steel blue */
   --conf-high: #238343;     /* green */
   --conf-medium: #c89430;   /* gold */
@@ -178,14 +136,10 @@
      step it points at rather than by editing a component rule — and so light can
      redefine the numbers in one place, which it does, for all eight.
 
-     ITS RIMS ARE MUCH STRONGER: 69–88% against 48–74%, and that is structural
-     rather than taste. Mixing a rim toward a DARK ground drains lightness;
-     mixing it toward a LIGHT one drains chroma, so paper needs a rim much nearer
-     full strength to arrive at the same place. Run light's ramp at dark's
-     percentages and its minimum composited chroma falls 0.110 → 0.096, its
-     worst-vision ΔE 11.7 → 10.7, and `max`'s rim lands on 1.30:1 against its own
-     ground — the floor exactly, with nothing left for the legend swatch, which
-     mixes against the darker --bg and is the tightest case in either theme.
+     Light's rims are stronger: mixing toward a light ground drains chroma,
+     so the rim needs more of its own hue. Check both channels against their
+     actual surfaces whenever changing the palette, including the legend and
+     excluded cards, which mix against --bg.
 
      Both rims and washes mix against --surface, NOT the one against the other:
      a bubble's rim is `--dot` at --rim into the card, not into the washed ground
@@ -204,8 +158,8 @@
      the card ground at wash 0. A literal 0% on `max` would put a valued class
      and an unvalued one on the identical ground and break that invariant. 6% is
      1.055:1, invisible at a glance, and keeps it exact. Light reads 8% for the
-     same reason and lands at 1.053 on its own card — the invariant is
-     theme-independent, because the pairs it protects collapse under CVD in both. */
+     same reason — the invariant is theme-independent, because the pairs it
+     protects collapse under CVD in both. */
   --wash-0: 6%;   --rim-0: 48%;   /* max, match */
   --wash-1: 13%;  --rim-1: 58%;   /* high, extracted, structured_data, near */
   --wash-2: 18%;  --rim-2: 66%;   /* medium, spurious */
@@ -230,65 +184,47 @@
 }
 
 :root[data-theme="light"] {
-  /* Surfaces — warm paper, OKLCH hue 78 at chroma 0.005–0.011. Stated here as
-     the luminance and the ratio against the surface BELOW, which is the step the
-     eye has to see; the hex is derived from the lightness. The order is an exact
-     mirror of dark's — there, input < bg < raised < panel; here it runs the other
-     way, and --bg-input is the one white left rather than the deepest recess,
-     because a white well is what reads as "you can type here" and a field is too
-     small to buy the glare back. */
-  --bg: #d9d3c8;            /* Y 0.655 — the page ground */
-  --bg-raised: #e9e6e0;     /* Y 0.793 — cards, rows, topbar; 1.196 on --bg */
-  --bg-panel: #fbfbf9;      /* Y 0.963 — hover/selected, detail cards; 1.202 */
-  --bg-input: #ffffff;      /* fields only; 1.246 on --bg-raised */
+  /* Neutral workspace, off-white reading panes, and a light gray inset for
+     detail cards. Edges separate surfaces without tinting the whole page. */
+  --bg: #edf0f3;
+  --bg-raised: #fafbfc;
+  --bg-panel: #f1f4f7;
+  --bg-input: #ffffff;
+  --line: #bcc6d0;
+  --line-soft: #d4dbe2;
 
-  /* Both edges must be darker than every surface here, where dark hides
-     --line-soft INSIDE its stack (just above --bg-raised: 1.305 on the ground,
-     1.038 on a card, invisible exactly where it should not matter). That trick
-     is unavailable when the ground is only 1.20 below the card, so light's two
-     edge weights are necessarily closer than dark's. This is the widest split
-     the ramp allows; the 1.491 is not a bug. */
-  --line: #bcb09f;          /* 1.712 on --bg-raised */
-  --line-soft: #c7bdad;     /* the receded edge; 1.247 on --bg, 1.491 on a card */
+  /* Hover, selection, and table structure have different jobs from detail cards. */
+  --bg-hover: #e9eef3;
+  --bg-selected: #deebf6;
+  --selection-line: var(--accent);
+  --table-bg: var(--bg-raised);
+  --table-stripe: #f0f3f6;
+  --table-head-bg: #dce3eb;
+  --table-group-bg: #e4e9ef;
+  --table-group-text: var(--text-dim);
+  --table-hover: #e5edf5;
 
-  /* Navy ink on warm paper — the brand survives here rather than in the surfaces.
-     Each value is the LIGHTEST that clears its floor (7 / 4.5 / 4.5) on every
-     surface above and, for --text and --text-dim, on every washed bubble ground.
-     --text-faint is excluded from that second set by construction: inside a
-     bubble it only ever paints `.val.none`, which renders only on an unwashed
-     one.
+  /* Navy ink; secondary text must also clear the tinted confidence grounds,
+     including bubbles in excluded cards and pills in selected table rows. */
+  --text: #13294b;
+  --text-dim: #2b3e5d;
+  --text-faint: #4a5a73;
 
-     --text-dim's BINDING CASE IS NOT THE ONE IT IS IN DARK, and it is easy to
-     miss. An excluded card sets --surface to --bg, so its bubbles wash against
-     the page ground rather than against the card. In dark that ground is darker,
-     which moves it AWAY from light ink and helps; here it is darker too, which
-     moves it TOWARD dark ink and hurts — the excluded card and the wash compound
-     instead of cancelling. At Navy 87% this read 4.14:1 on a `low` bubble in an
-     excluded card. Navy 90% clears it at 4.63 and is still 6.8 ΔE from --text,
-     so the three ink tiers stay distinguishable. */
-  --text: #13294b;          /* Navy, PMS 2767 — 9.75 on --bg, 7.28 on the `low` wash */
-  --text-dim: #2b3e5d;      /* Navy at 90% — 7.23 on --bg, 5.44 on the `low` wash */
-  --text-faint: #4a5a73;    /* 4.70 on --bg */
-
-  --accent: #005f83;        /* brand digital-link blue, darkened — 5.69 on a card */
+  --accent: #176b99;
 
   --extracted: #1a7f37;
-  --structured: #00707a;    /* Tile Teal darkened — 4.68 on a card */
+  --structured: #00707a;    /* Tile Teal */
   --not-found: #6b7480;
-  --not-applicable: #98a1af;/* 2.09 on a card, against dark's 1.96 — the mute rung */
+  --not-applicable: #98a1af;/* muted, hollow indicator */
   --blocked: #7a41d6;
   --error: #cf222e;
   --pending: #9a6700;
 
-  --warn: #6d5100;          /* Sunburst darkened — 4.99 on --bg */
-  /* A highlight on cream cannot win on luminance: the whole range above the card
-     is 1.246:1. It wins on hue instead — 26.2 ΔE from the paper, with --text at
-     9.3:1 on top of it. Judge this one by ΔE, not by contrast ratio. */
+  --warn: #6d5100;
+  /* Evidence highlights use hue to stand out on the reading surface. */
   --mark: #f5cb3a;
 
-  /* The same four hues as dark, walked DOWN: on this ground `max` is the palest,
-     least separated step and `low` the darkest. See the ramp block above for why
-     descending lightness puts gold on the second step and why it survives there. */
+  /* Same four hues as dark, descending in lightness toward low confidence. */
   --conf-max: #38b8f6;
   --conf-high: #2aa654;
   --conf-medium: #a57710;
@@ -304,12 +240,7 @@
   --v-spurious: var(--blocked);
   --v-untested: var(--not-applicable);
 
-  /* Light's own ladder — the override the :root block was written to allow. The
-     rims are far stronger than dark's for the structural reason stated there;
-     the washes are shallower in effect than their percentages suggest, because
-     mixing a dark ink INTO a light card moves contrast faster than mixing a
-     bright one into a dark card. Each ground step is >= 1.09 from its neighbour,
-     and --text-dim clears 4.5 on all four (worst: 4.82 on `low`). */
+  /* Preserve the confidence/verdict ladder and the filled-vs-hollow encoding. */
   --wash-0: 8%;   --rim-0: 69%;   /* max, match */
   --wash-1: 16%;  --rim-1: 73%;   /* high, extracted, structured_data, near */
   --wash-2: 23%;  --rim-2: 80%;   /* medium, spurious */
@@ -321,7 +252,7 @@
   --rim-fault: 72%;               /* error */
 
   --tooltip-bg: #ffffff;
-  --shadow: 0 8px 24px rgba(58, 47, 30, 0.22);
+  --shadow: 0 8px 24px rgba(19, 41, 75, 0.14);
 }
 
 /* The one place a theme changes more than a token: the browser's own widgets
@@ -383,14 +314,14 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
   font: inherit;
   cursor: pointer;
 }
-.view-tab:hover, .mode-tab:hover, .lens-tab:hover { color: var(--text); background: var(--bg-panel); }
+.view-tab:hover, .mode-tab:hover, .lens-tab:hover { color: var(--text); background: var(--bg-hover); }
 .view-tab:disabled { opacity: 0.45; cursor: not-allowed; }
 .view-tab:disabled:hover { color: var(--text-dim); background: transparent; }
 .view-tab[aria-selected="true"], .mode-tab[aria-selected="true"],
 .lens-tab[aria-selected="true"] {
   color: var(--text);
-  background: var(--bg-panel);
-  border-color: var(--line);
+  background: var(--bg-selected);
+  border-color: var(--selection-line);
 }
 .view-tab:focus-visible, .mode-tab:focus-visible, .lens-tab:focus-visible,
 .icon-btn:focus-visible, .bubble:focus-visible, .note-row:focus-visible,
@@ -444,7 +375,8 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 .fact .v { font-family: var(--mono); }
 .fact.unset .v { color: var(--text-faint); font-style: italic; }
 .telemetry-link { flex: 0 0 auto; cursor: pointer; background: transparent; }
-.telemetry-link:hover, .telemetry-link[aria-current="true"] { background: var(--bg-panel); }
+.telemetry-link:hover { background: var(--bg-hover); }
+.telemetry-link[aria-current="true"] { background: var(--bg-selected); }
 
 .topbar { flex-wrap: wrap; gap: 10px 16px; }
 .run-loader { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; min-width: 0; }
@@ -478,10 +410,11 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 .run-content .chip { white-space: normal; }
 .metrics-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); }
 .metrics-table-wrap:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.metrics-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; }
+.metrics-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; background: var(--table-bg); }
 .metrics-table th, .metrics-table td { padding: 9px 12px; border-bottom: 1px solid var(--line-soft); min-width: 90px; }
 .metrics-table th:first-child { text-align: left; min-width: 180px; }
-.metrics-table thead th { background: var(--bg-panel); color: var(--text-dim); font-size: 11px; font-weight: 500; }
+.metrics-table thead th { background: var(--table-head-bg); color: var(--text-dim); font-size: 11px; font-weight: 600; }
+.metrics-table tbody tr:nth-child(even) { background: var(--table-stripe); }
 .metrics-table tbody th { font-weight: 500; font-family: var(--mono); }
 .metrics-table tbody tr:last-child > * { border-bottom: 0; }
 
@@ -561,8 +494,8 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
   margin-bottom: 8px;
   cursor: pointer;
 }
-.note-row:hover { border-color: color-mix(in srgb, var(--text) 28%, var(--line)); background: var(--bg-panel); }
-.note-row[aria-current="true"] { border-left-color: var(--accent); background: var(--bg-panel); }
+.note-row:hover { border-color: color-mix(in srgb, var(--text) 28%, var(--line)); background: var(--bg-hover); }
+.note-row[aria-current="true"] { border-left-color: var(--accent); background: var(--bg-selected); }
 .note-row.current { border-left-color: var(--extracted); }
 .note-row.historical { border-left-color: var(--not-found); }
 
@@ -872,40 +805,40 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 
 .table-wrap { overflow: auto; padding: 0 0 30px; }
 
-/* --surface is the ground a .pill mixes its wash and rim against, exactly as it
-   is inside a .group-card. The difference is that here it MOVES: a table row
-   repaints on hover and on selection, and a wash mixed against a stale ground
-   reads stale. So the two rules below restate it alongside their `background`,
-   and the two declarations must always change together.
-
-   The control room deliberately does the opposite — a card's ground is frozen
-   because --text-dim on the `low` wash clears AA by 0.11 there. That constraint
-   does not bind here: a pill's label is full --text, and the worst cell in the
-   app is `low` confidence on a selected row at 5.86 (dark; light's worst is
-   `low` on the page ground at 6.24). Every other combination is higher. */
-.vtable { width: 100%; border-collapse: collapse; font-size: 12.5px; --surface: var(--bg); }
+/* Rows and their pills share --surface so striping, hover and selection cannot
+   leave a pill mixed against an old ground. Selection follows hover and wins;
+   group bands paint their own cells and never look like selectable data rows. */
+.vtable { width: 100%; border-collapse: collapse; font-size: 12.5px; --surface: var(--table-bg); }
 .vtable th, .vtable td { padding: 6px 12px; text-align: left; border-bottom: 1px solid var(--line-soft); }
 .vtable thead th {
   position: sticky; top: 0; z-index: 2;
-  background: var(--bg-raised);
+  background: var(--table-head-bg);
   color: var(--text-dim);
-  font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom-color: var(--line);
   cursor: pointer; white-space: nowrap;
 }
 .vtable thead th[aria-sort]::after { content: " \25B2"; color: var(--accent); }
 .vtable thead th[aria-sort="descending"]::after { content: " \25BC"; }
-.vtable tbody tr { cursor: pointer; }
-.vtable tbody tr:hover { background: var(--bg-raised); --surface: var(--bg-raised); }
+.vtable thead th[aria-sort] { box-shadow: inset 0 -2px var(--accent); }
+.vtable thead th:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.vtable tbody tr { cursor: pointer; background: var(--surface); }
+.vtable tbody tr:nth-child(even) { --surface: var(--table-stripe); }
+.vtable tbody tr:hover { --surface: var(--table-hover); }
 .vtable tbody tr[aria-current="true"] {
-  background: var(--bg-panel);
-  --surface: var(--bg-panel);
+  --surface: var(--bg-selected);
   box-shadow: inset 3px 0 0 var(--accent);
 }
-.vtable td.num, .vtable td.code { font-family: var(--mono); }
+.vtable td.num, .vtable td.code { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.vtable td.variable-name { font-weight: 500; }
+.vtable td.variable-meta { color: var(--text-faint); }
+.vtable td.code { font-weight: 600; }
 .vtable tr.group-sep td {
-  background: var(--bg);
-  color: var(--text-faint);
-  font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+  background: var(--table-group-bg);
+  color: var(--table-group-text);
+  padding: 9px 12px;
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+  border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
   cursor: default;
 }
@@ -1087,8 +1020,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 .kv dt { color: var(--text-faint); }
 .kv dd { margin: 0; word-break: break-word; }
 
-/* Sits on --bg-panel inside a --bg-raised pane, so its border reads against the
-   pane behind it (1.647) rather than against its own fill (1.336). */
+/* Inset detail cards sit on --bg-panel inside the --bg-raised reading pane. */
 .card {
   background: var(--bg-panel);
   border: 1px solid var(--line);

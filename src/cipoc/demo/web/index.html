@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CIPOC Extraction Demo</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="cytoscape.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="dot"></span>
+      <div>
+        <h1 id="run-title">CIPOC extraction</h1>
+        <p id="run-sub" class="muted">Loading…</p>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="btn-prev" class="ctl" title="Previous step (←)">‹ Prev</button>
+      <button id="btn-play" class="ctl ctl-primary" title="Play / Pause (space)">▶ Play</button>
+      <button id="btn-next" class="ctl" title="Next step (→)">Next ›</button>
+      <select id="step-select" class="step-select" title="Jump to step"></select>
+      <span id="step-counter" class="counter muted">–</span>
+      <span id="mode-badge" class="badge">replay</span>
+    </div>
+  </header>
+
+  <section class="runbar" aria-label="Run controls">
+    <button id="btn-start" hidden>Start Run</button>
+    <button id="btn-follow" hidden>Follow live / Jump to latest</button>
+    <span id="connection" role="status">Connecting…</span>
+    <span id="run-health" role="status"></span>
+    <a id="download-artifact" href="/api/artifact" hidden>Download run JSON</a>
+    <a id="download-trace" href="/api/recording" hidden>Download replay</a>
+    <button id="btn-export" hidden>Export OMOP…</button>
+    <details id="run-setup"><summary>Run details &amp; review</summary>
+      <pre id="setup-summary"></pre>
+      <p>Pause controls presentation; extraction continues. Closing or refreshing this tab does not restart the run.</p>
+      <p>Review a completed run in CIPOC Workbench: download the run JSON, open Workbench, and choose <b>Load Run…</b>.</p>
+      <p>Notes, recordings, and artifacts may contain PHI. OMOP previews use synthetic person ID 1; exports ask for a person ID.</p>
+    </details>
+    <span id="run-issues" role="alert"></span>
+  </section>
+
+  <main class="grid">
+    <!-- Panel 1: workflow map -->
+    <section class="panel panel-map" aria-label="RapCID-E Agentic Orchestration">
+      <div class="panel-head">
+        <h2>RapCID-E Agentic Orchestration</h2>
+        <div class="map-ctl">
+          <button id="btn-replay-step" class="map-btn" title="Replay this step on the map">▸</button>
+          <input id="map-scrub" class="map-scrub" type="range" min="0" max="1000" value="1000"
+                 title="Scrub through this step" aria-label="Scrub through this step" />
+        </div>
+      </div>
+      <div class="cy-wrap">
+        <div id="cy" class="cy"></div>
+        <div id="map-tip" class="map-tip" hidden></div>
+      </div>
+    </section>
+
+    <!-- Panel 2: current-step detail -->
+    <section class="panel panel-detail" aria-label="Current step detail">
+      <div class="panel-head">
+        <h2>Current step</h2>
+        <span id="detail-node" class="chip muted"></span>
+      </div>
+      <div id="detail" class="detail scroll"></div>
+    </section>
+
+    <!-- Panel 3: variable overview -->
+    <!-- Collapsed to its header by default and pulled up from the bottom edge
+         when wanted: the map is the thing being presented, and the variables
+         are a reference the presenter opens to answer a question. -->
+    <section class="panel panel-vars" aria-label="Variable overview">
+      <!-- Sits in the grid gap above this panel: drag the map/variables
+           boundary, double-click to reset (see wireSplitter in app.js). -->
+      <div id="row-split" class="row-split" role="separator" aria-orientation="horizontal"
+           title="Drag to resize · double-click to reset"></div>
+      <div id="vars-toggle" class="panel-head vars-head" role="button" tabindex="0"
+           aria-expanded="false" aria-controls="vars" title="Show variables (V)">
+        <h2>Variables</h2>
+        <div id="vars-summary" class="vars-summary muted"></div>
+        <span class="vars-caret" aria-hidden="true">⌃</span>
+      </div>
+      <div id="vars" class="vars scroll"></div>
+    </section>
+  </main>
+
+  <!-- OMOP row preview, raised from a variable's button in panel 3.
+       Declared here rather than built in JS because it must live outside #vars,
+       which renderVars replaces wholesale on every cursor message; the body is
+       the only part that is filled in. -->
+  <div id="omop-modal" class="modal" hidden>
+    <div id="omop-back" class="modal-back"></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="omop-title">
+      <div class="modal-head">
+        <h2 id="omop-title">OMOP export</h2>
+        <span id="omop-sub" class="chip muted"></span>
+        <button id="omop-close" class="modal-close" title="Close (Esc)" aria-label="Close">✕</button>
+      </div>
+      <div id="omop-body" class="modal-body scroll"></div>
+    </div>
+  </div>
+</body>
+</html>

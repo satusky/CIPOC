@@ -125,6 +125,14 @@ class OmopErrorReport(BaseModel):
     errors: list[OmopRowError] = Field(default_factory=list)
 
 
+class OmopTables(BaseModel):
+    """Validated in-memory staging rows shared by previews and file export."""
+
+    note_rows: list[OmopNoteRow]
+    note_nlp_rows: list[OmopNoteNlpRow]
+    errors: list[OmopRowError]
+
+
 class OmopExportResult(BaseModel):
     """Paths and row counts produced by one export."""
 
@@ -155,6 +163,7 @@ __all__ = [
     "NOTE_NLP_FIELDS",
     "OmopErrorReport",
     "OmopExportResult",
+    "OmopTables",
     "OmopMergeResult",
     "OmopNoteNlpRow",
     "OmopNoteRow",

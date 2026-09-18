@@ -1,7 +1,7 @@
 == 100x24 ==
 ╭─ CIPOC · Orchestrator ─────────────────────────────────────────────────────────────────── 01:12 ─╮
 │ notes  ▰▰▰▰▰▰▰▰▰▰▰▰▰▰  14/14 scanned      groups  ▰▰▰▰▰▱▱  8/10                                  │
-│ vars   ▰▰▰▰▰▰▰▰▰▰▰▰▱▱  39/44   ✔9 ▣1 ∅8 ⊗19 ✖2   1 branch active                                 │
+│ vars   ▰▰▰▰▰▰▰▰▰▰▰▰▱▱  39/43   ✔9 ▣1 ∅8 ⊗19 ✖2   1 branch active                                 │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
   ITEM  VARIABLE                          PIPELINE         NOTES  STATUS       VALUE
   ────  ────────────────────────────────  ───────────────  ─────  ───────────  ─────────────────────
@@ -15,7 +15,7 @@
   1116  Mets at DX-Lung                   ▰▰▰                 3n  ✔ extracted  1                   ▓
   1117  Mets at DX-Other                  ▰▰▰                 3n  ✔ extracted  0                  ?░
 ▸ Lymph Node Removal                      gate:nodes ✓                    4/4  ✔3 ✖1
-▸ Site Specific Codes                                                     3/6  ▰▰▰▱▱▱
+▸ Site Specific Codes                                                     3/5  ▰▰▰▱▱
 ▸ Other                                                                   6/6  ∅6
 ▸ Limited By Primary Site                                                 7/7  ⊗7
 ────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -24,7 +24,7 @@
 == 80x24 ==
 ╭─ CIPOC · Orchestrator ─────────────────────────────────────────────── 01:12 ─╮
 │ notes  ▰▰▰▰▰▰▰▰  14/14 scanned      groups  ▰▰▰▱  8/10                       │
-│ vars   ▰▰▰▰▰▰▰▱  39/44   ✔9 ▣1 ∅8 ⊗19 ✖2   1 branch active                   │
+│ vars   ▰▰▰▰▰▰▰▱  39/43   ✔9 ▣1 ∅8 ⊗19 ✖2   1 branch active                   │
 ╰──────────────────────────────────────────────────────────────────────────────╯
   ITEM  VARIABLE                        PIPELINE         STATUS       VALUE
   ────  ──────────────────────────────  ───────────────  ───────────  ──────────
@@ -38,7 +38,7 @@
   1116  Mets at DX-Lung                 ▰▰▰              ✔ extracted  1        ▓
   1117  Mets at DX-Other                ▰▰▰              ✔ extracted  0       ?░
 ▸ Lymph Node Removal                    gate:nodes ✓             4/4  ✔3 ✖1
-▸ Site Specific Codes                                            3/6  ▰▰▰▱▱▱
+▸ Site Specific Codes                                            3/5  ▰▰▰▱▱
 ▸ Other                                                          6/6  ∅6
 ▸ Limited By Primary Site                                        7/7  ⊗7
 ────────────────────────────────────────────────────────────────────────────────
@@ -47,7 +47,7 @@
 == 60x24 ==
 ╭─ CIPOC · Orchestrator ─────────────────────────── 01:12 ─╮
 │ notes  ▰▰▰▰▰▰▰▰  14/14 scanned                           │
-│ vars   ▰▰▰▰▰▰▰▱  39/44   ✔9 ▣1 ∅8 ⊗19 ✖2                 │
+│ vars   ▰▰▰▰▰▰▰▱  39/43   ✔9 ▣1 ∅8 ⊗19 ✖2                 │
 ╰──────────────────────────────────────────────────────────╯
   ITEM  VARIABLE                PI…  STATUS       VALUE
   ────  ──────────────────────  ───  ───────────  ──────────
@@ -61,7 +61,7 @@
   1116  Mets at DX-Lung         ▰▰▰  ✔ extracted  1        ▓
   1117  Mets at DX-Other        ▰▰▰  ✔ extracted  0       ?░
 ▸ Lymph Node Removal            gate…        4/4  ✔3 ✖1
-▸ Site Specific Codes                        3/6  ▰▰▰▱▱▱
+▸ Site Specific Codes                        3/5  ▰▰▰▱▱
 ▸ Other                                      6/6  ∅6
 ▸ Limited By Primary Site                    7/7  ⊗7
 ────────────────────────────────────────────────────────────
@@ -70,7 +70,7 @@
 == 100x50 ==
 ╭─ CIPOC · Orchestrator ─────────────────────────────────────────────────────────────────── 01:12 ─╮
 │ notes  ▰▰▰▰▰▰▰▰▰▰▰▰▰▰  14/14 scanned      groups  ▰▰▰▰▰▱▱  8/10                                  │
-│ vars   ▰▰▰▰▰▰▰▰▰▰▰▰▱▱  39/44   ✔9 ▣1 ∅8 ⊗19 ✖2   1 branch active                                 │
+│ vars   ▰▰▰▰▰▰▰▰▰▰▰▰▱▱  39/43   ✔9 ▣1 ∅8 ⊗19 ✖2   1 branch active                                 │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
   ITEM  VARIABLE                          PIPELINE         NOTES  STATUS       VALUE
   ────  ────────────────────────────────  ───────────────  ─────  ───────────  ─────────────────────
@@ -88,9 +88,8 @@
    674  RX Hosp--Surg Oth Reg/Dis         ▰▰▰                 2n  ✔ extracted  1                   ▓
    676  RX Hosp--Reg LN Removed           ▰▰▰                 2n  ✔ extracted  1                   ▓
    682  Date Regional Lymph Node Dissec…  ▰▰▰                 2n  ✔ extracted  1                   ▓
-▾ Site Specific Codes                                                     3/6  ▰▰▰▱▱▱
-   670  RX Hosp--Surg Prim Site 03-2022   ◈▱▱ retrieve        7n  · coding     —
-   671  RX Hosp--Surg Prim Site 2023      ▱▱▱                 7n  · pending    —
+▾ Site Specific Codes                                                     3/5  ▰▰▰▱▱
+  1290  RX Summ--Surg Prim Site 03-2022   ◈▱▱ retrieve        7n  · coding     —
   3843  Grade Clinical                    ▰▰▰                 7n  ✖ error      Invalid grade cod… !▒
   3844  Grade Pathological                ▰◈▱ extract         7n  · coding     —
 ▾   Histologic Type and Behavior Code     initial                         2/2  ✔2
@@ -120,7 +119,7 @@
 == 80x50 ==
 ╭─ CIPOC · Orchestrator ─────────────────────────────────────────────── 01:12 ─╮
 │ notes  ▰▰▰▰▰▰▰▰  14/14 scanned      groups  ▰▰▰▱  8/10                       │
-│ vars   ▰▰▰▰▰▰▰▱  39/44   ✔9 ▣1 ∅8 ⊗19 ✖2   1 branch active                   │
+│ vars   ▰▰▰▰▰▰▰▱  39/43   ✔9 ▣1 ∅8 ⊗19 ✖2   1 branch active                   │
 ╰──────────────────────────────────────────────────────────────────────────────╯
   ITEM  VARIABLE                        PIPELINE         STATUS       VALUE
   ────  ──────────────────────────────  ───────────────  ───────────  ──────────
@@ -138,9 +137,8 @@
    674  RX Hosp--Surg Oth Reg/Dis       ▰▰▰              ✔ extracted  1        ▓
    676  RX Hosp--Reg LN Removed         ▰▰▰              ✔ extracted  1        ▓
    682  Date Regional Lymph Node Diss…  ▰▰▰              ✔ extracted  1        ▓
-▾ Site Specific Codes                                            3/6  ▰▰▰▱▱▱
-   670  RX Hosp--Surg Prim Site 03-20…  ◈▱▱ retrieve     · coding     —
-   671  RX Hosp--Surg Prim Site 2023    ▱▱▱              · pending    —
+▾ Site Specific Codes                                            3/5  ▰▰▰▱▱
+  1290  RX Summ--Surg Prim Site 03-20…  ◈▱▱ retrieve     · coding     —
   3843  Grade Clinical                  ▰▰▰              ✖ error      Invali… !▒
   3844  Grade Pathological              ▰◈▱ extract      · coding     —
 ▾   Histologic Type and Behavior Code   initial                  2/2  ✔2
@@ -170,7 +168,7 @@
 == 60x50 ==
 ╭─ CIPOC · Orchestrator ─────────────────────────── 01:12 ─╮
 │ notes  ▰▰▰▰▰▰▰▰  14/14 scanned                           │
-│ vars   ▰▰▰▰▰▰▰▱  39/44   ✔9 ▣1 ∅8 ⊗19 ✖2                 │
+│ vars   ▰▰▰▰▰▰▰▱  39/43   ✔9 ▣1 ∅8 ⊗19 ✖2                 │
 ╰──────────────────────────────────────────────────────────╯
   ITEM  VARIABLE                PI…  STATUS       VALUE
   ────  ──────────────────────  ───  ───────────  ──────────
@@ -188,9 +186,8 @@
    674  RX Hosp--Surg Oth Reg…  ▰▰▰  ✔ extracted  1        ▓
    676  RX Hosp--Reg LN Remov…  ▰▰▰  ✔ extracted  1        ▓
    682  Date Regional Lymph N…  ▰▰▰  ✔ extracted  1        ▓
-▾ Site Specific Codes                        3/6  ▰▰▰▱▱▱
-   670  RX Hosp--Surg Prim Si…  ◈▱▱  · coding     —
-   671  RX Hosp--Surg Prim Si…  ▱▱▱  · pending    —
+▾ Site Specific Codes                        3/5  ▰▰▰▱▱
+  1290  RX Summ--Surg Prim Si…  ◈▱▱  · coding     —
   3843  Grade Clinical          ▰▰▰  ✖ error      Invali… !▒
   3844  Grade Pathological      ▰◈▱  · coding     —
 ▾   Histologic Type and Behavio…init…        2/2  ✔2

@@ -14,3 +14,6 @@ tests/test_outputs/
 documents/
 src/cipoc/agents/visualization/*.html
 .cache
+demo-runs/
+build/
+dist/

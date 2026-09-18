@@ -5,9 +5,9 @@
 
 const COLUMNS = [
   { key: "item_id",    label: "Item",       cls: "num",  get: (v) => v.item_id },
-  { key: "name",       label: "Variable",   get: (v) => v.name },
-  { key: "group_name", label: "Group",      get: (v) => v.group_name },
-  { key: "source",     label: "Source",     get: (v) => (v.result.status === "structured_data" ? "derived" : "extracted") },
+  { key: "name",       label: "Variable",   cls: "variable-name", get: (v) => v.name },
+  { key: "group_name", label: "Group",      cls: "variable-meta", get: (v) => v.group_name },
+  { key: "source",     label: "Source",     cls: "variable-meta", get: (v) => (v.result.status === "structured_data" ? "derived" : "extracted") },
   { key: "status",     label: "Status",     get: (v) => v.result.status },
   { key: "value",      label: "Value",      cls: "code", get: (v) => v.result.value || "" },
   { key: "confidence", label: "Confidence", get: (v) => (v.result.extraction || {}).presence_confidence || "" },

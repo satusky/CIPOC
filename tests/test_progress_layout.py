@@ -46,12 +46,12 @@ def dashboard_snapshot():
     update(410, stage=Stage.DONE, status="not_found", confidence="low")
 
     terminal(
-        (690, 700, 710, 720, 740),
+        (700, 710, 720, 740),
         "not_applicable",
         detail="Corpus gate not met: treatment.",
     )
     terminal(
-        (1200, 1210, 1220, 1230, 1240, 1270, 1280),
+        (1200, 1210, 1220, 1230, 1240, 1270, 1280, 1350),
         "not_applicable",
         detail="Corpus gate not met: treatment.",
     )
@@ -80,8 +80,7 @@ def dashboard_snapshot():
         flag="!",
     )
 
-    update(670, stage=Stage.RETRIEVE)
-    update(671, stage=Stage.IDLE)
+    update(1290, stage=Stage.RETRIEVE)
     update(
         3843,
         stage=Stage.DONE,

@@ -88,6 +88,24 @@ Requires Python ≥ 3.11 (see `.python-version`). Source lives under `src/`, so 
 commands with `PYTHONPATH=src` unless the package is installed into the
 environment.
 
+### Presenter demo
+
+The optional local demo supports animated replay and explicitly started live
+runs against your configured endpoint:
+
+```bash
+uv sync --extra demo
+uv run cipoc-demo serve --live --notes tests/fixtures/note_bundle.json
+```
+
+Open `http://127.0.0.1:8001/`, inspect **Run details**, and click **Start Run**.
+The presenter can follow live execution or pause presentation to review earlier
+steps. Each execution saves a canonical artifact under `demo-runs/<job-id>/`;
+download a replay or pass `--record NEW.jsonl` to record it incrementally.
+Completed JSON opens in the standalone Workbench through **Load Run…**.
+See the [demo guide](src/cipoc/demo/README.md) for recording, offline rehearsal,
+configuration, OMOP export, and lifecycle details.
+
 ### Workbench
 
 The review workbench is a separate package and does not install CIPOC's runtime

@@ -44,8 +44,12 @@ class TaskBinding:
 
 
 @dataclass(frozen=True)
-class _CapturedLLMCall:
-    """One completed callback lifecycle before graph-task correlation."""
+class CapturedLLMCall:
+    """Detached invocation observation before graph-task correlation.
+
+    Live observers receive start/finish records; only the final run artifact
+    supplies authoritative entity attribution and aggregate usage.
+    """
 
     namespace: tuple[str, ...]
     graph_node: str
@@ -61,6 +65,17 @@ class _CapturedLLMCall:
     queue_seconds: float | None = None
     error: str | None = None
     transport_retry_ordinal: int | None = None
+
+
+_CapturedLLMCall = CapturedLLMCall
+InvocationObserver = Callable[[str, CapturedLLMCall], None]
+
+
+def _copy_call(call: Mapping[str, Any]) -> CapturedLLMCall:
+    return CapturedLLMCall(**{
+        name: deepcopy(call.get(name))
+        for name in CapturedLLMCall.__dataclass_fields__
+    })
 
 
 _LLM_AGENT_BY_NODE = {
@@ -412,6 +427,7 @@ class LLMCaptureHandler(BaseCallbackHandler):
         capture_llm_content: bool = True,
         max_content_chars: int | None = None,
         task_observer: Callable[[ProgressEvent], None] | None = None,
+        invocation_observer: InvocationObserver | None = None,
     ) -> None:
         if max_content_chars is not None and (
             isinstance(max_content_chars, bool)
@@ -425,6 +441,7 @@ class LLMCaptureHandler(BaseCallbackHandler):
         self._pending: dict[str, int] = {}
         self._starts: dict[tuple[tuple[str, ...], str], int] = {}
         self._task_observer = task_observer
+        self._invocation_observer = invocation_observer
         self._task_runs: dict[str, ProgressEvent] = {}
         self._collection_issues: list[dict[str, str]] = []
         self.capture_llm_content = capture_llm_content
@@ -593,6 +610,17 @@ class LLMCaptureHandler(BaseCallbackHandler):
             if prompt_factory is not None:
                 call["prompt_messages"] = prompt_factory()
             self._calls.append(call)
+            observation = _copy_call(call) if self._invocation_observer else None
+        self._notify_invocation("started", observation)
+
+    def _notify_invocation(self, phase: str, call: CapturedLLMCall | None) -> None:
+        # Optional presentation is isolated from telemetry and inference. Never
+        # hold the callback lock while entering application code.
+        if self._invocation_observer is not None and call is not None:
+            try:
+                self._invocation_observer(phase, call)
+            except Exception:
+                pass
 
     def on_llm_end(
         self,
@@ -654,6 +682,8 @@ class LLMCaptureHandler(BaseCallbackHandler):
                 if value is not None or name != "model" or call.get("model") is None:
                     call[name] = value
             call["complete"] = True
+            observation = _copy_call(call) if self._invocation_observer else None
+        self._notify_invocation("finished", observation)
 
     def _snapshot(self) -> list[_CapturedLLMCall]:
         """Return completed calls in invocation-start order."""
@@ -869,6 +899,7 @@ class ObservabilityCollector:
         capture_llm_content: bool | None = None,
         max_content_chars: int | None = None,
         capture_llm: bool | None = None,
+        invocation_observer: InvocationObserver | None = None,
     ) -> None:
         if capture_llm_content is None:
             capture_llm_content = capture_llm if capture_llm is not None else False
@@ -889,6 +920,7 @@ class ObservabilityCollector:
             capture_llm_content=capture_llm_content,
             max_content_chars=max_content_chars,
             task_observer=self.observe,
+            invocation_observer=invocation_observer,
         )
 
     @property
@@ -1155,6 +1187,8 @@ class ObservabilityCollector:
 
 __all__ = [
     "AttemptMode",
+    "CapturedLLMCall",
+    "InvocationObserver",
     "LLMCaptureHandler",
     "ObservabilityCollector",
     "TaskBinding",

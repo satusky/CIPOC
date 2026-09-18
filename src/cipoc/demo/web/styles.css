@@ -1,0 +1,802 @@
+/* Vendored rather than linked, the same way cytoscape.min.js is: the deployment
+   target is airgapped, and a fonts.googleapis.com link would fall back there to
+   whatever the machine happens to have without ever saying so. Both families are
+   variable, so one file per style covers every weight this UI asks for. */
+@font-face {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url("fonts/open-sans-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Open Sans";
+  font-style: italic;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url("fonts/open-sans-latin-italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Libre Baskerville";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("fonts/libre-baskerville-latin.woff2") format("woff2");
+}
+
+/* ---- UNC Chapel Hill brand palette -------------------------------------
+ *
+ * Every value below is either a brand hex or a documented breakdown of one (a
+ * stated tint/shade), never an eyeballed colour. Primary palette carries the
+ * design; the secondary palette appears only as accents — agent identity, run
+ * status, and the two warm surfaces.
+ *
+ * Where a brand hex cannot meet WCAG 2.1 AA as text on white, it keeps its role
+ * in fills, rings and rules and a darkened `-ink` sibling carries the text.
+ * Carolina Blue is the clearest case: 3.0:1 on white as a fill, and #007FAE —
+ * the brand's own digital-link blue — at 4.6:1 for anything that has to be read.
+ */
+:root {
+  /* --- primary palette --- */
+  --carolina: #4B9CD3;       /* PMS 542 */
+  --carolina-ink: #007FAE;   /* brand digital-link blue, 4.6:1 on white */
+  --navy: #13294B;           /* PMS 2767 */
+  --black: #151515;          /* PMS Black 3 */
+  --brand-gray: #F8F8F8;     /* PMS Black 3 at 6% */
+
+  /* --- secondary palette (accents only) ---
+     Only the hues this design actually spends. The green comes from the second
+     branding secondary sheet — the one whose primary circle samples as Carolina
+     Blue — rather than from the Longleaf Pine / Davie Green sheet. */
+  --green: #3DAE2B;          /* secondary-palette green */
+  --pink: #ED40A9;           /* secondary-palette pink */
+  --tile-teal: #00A5AD;      /* Tile Teal */
+  --sunburst: #FFD100;       /* Sunburst Yellow */
+  --slate: #4F758B;          /* Basin Slate */
+
+  /* --- surfaces and text --- */
+  --bg: var(--brand-gray);
+  --panel: #ffffff;
+  --panel-sunk: #FAFAFB;     /* Navy at 3% */
+  --panel-card: #EFF1F4;     /* Navy at 6% — the fact cards */
+  --ink: var(--navy);        /* 14.7:1 on white */
+  --ink-max: var(--black);   /* dense running text only */
+  --muted: #5A6981;          /* Navy at 70%, 5.6:1 */
+  --line: #D5D8DF;           /* Navy at 18% */
+  --line-strong: #959FAE;    /* Navy at 45% */
+
+  /* --- accent: the Carolina Blue budget --- */
+  --accent: var(--carolina);
+  --accent-ink: var(--carolina-ink);
+  --accent-soft: #E4F1F9;    /* Carolina at 15% on white */
+  --accent-hover: color-mix(in srgb, var(--carolina) 80%, var(--navy));
+
+  /* --- agent identity (mirrors agent_flowcharts.json, overridden at runtime) ---
+     Four hues held as far apart as the brand allows. The gate disc runs
+     retrieve -> extract -> open/shut on one shape, so the retriever cannot be
+     pink (err) or amber (warn); Basin Slate is what is left, and it sits clear
+     of --miss because --miss is the light end of the Navy ramp. */
+  --orchestrator: var(--navy);
+  --orchestrator-ink: var(--navy);
+  --scanner: var(--tile-teal);
+  --scanner-ink: #00707A;    /* Tile Teal darkened to 5.8:1 */
+  --retriever: var(--slate);
+  --retriever-ink: var(--slate);   /* 5.0:1 as-is */
+  --extractor: var(--carolina);
+  --extractor-ink: var(--carolina-ink);
+
+  /* --- run status ---
+     Green and yellow come off different branding sheets on purpose: the green
+     and pink are the second sheet's, the yellow stays Sunburst from the first.
+     `--err` is a magenta-leaning pink rather than a brick red so that green and
+     pink stay apart under red-green colour blindness — that is the whole reason
+     the failure colour is not red, and both sheets' pinks hold it (3.4:1 from
+     the ✓ under deuteranopia either way). */
+
+  /* A true green, not Longleaf Pine and not Davie. On the gate row the ungated ↓
+     disc is the orchestrator's Navy and the open ✓ disc sits directly beside it,
+     and Longleaf Pine is dark and blue enough that the two read as one colour at
+     disc size. Davie fixed that but cost two other pairs: it is yellow-green, so
+     under deuteranopia it collapsed toward the pink ✗ (1.6:1), and its ink sat
+     right next to the Sunburst-derived --warn-ink. #3DAE2B clears all three —
+     far from Navy on hue, 3.4:1 from the pink ✗ under deuteranopia, and plainly
+     green against the warn brown.
+     At 2.9:1 on white the brand hex is a shade under the 3:1 a ring needs, so —
+     as with Sunburst below — it is shaded over Black: 90% for anything drawn
+     (rings, 3px rails, the ✓ glyph, which is large text), 65% for anything read
+     at body size. */
+  --ok: #399F29;             /* palette green 90% over Black — 3.4:1 */
+  --ok-ink: #2F7823;         /* palette green 65% over Black — 5.5:1 */
+  --ok-soft: #E8F5E6;        /* palette green at 12% on white */
+  /* Sunburst Yellow shaded 60/40 toward --warn-ink. The pure brand hex is 1.5:1
+     on white: as a 3px rail or a disc ring it disappears, and as the case's
+     in-progress halo it reads as a highlighter mark rather than as activity.
+     The pure hex still gets its two proper uses — the search highlight, and
+     numbers on the navy code surface, where it clears 10:1. */
+  --warn: #C9A200;
+  --warn-ink: #7A5B00;       /* Sunburst darkened to 6.1:1 */
+  --warn-soft: #FFF4CC;
+  --miss: #959FAE;           /* Navy at 45% */
+  --miss-ink: var(--muted);
+  --miss-soft: #EFF1F4;
+  --err: var(--pink);        /* 3.6:1 — rings, rails, the ✗ glyph */
+  --err-ink: #B73584;        /* palette pink 75% over Black — 5.5:1 */
+  --err-soft: #FDE8F5;       /* palette pink at 12% on white */
+
+  /* --- type --- */
+  --font-sans: "Open Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Libre Baskerville", Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --radius: 10px;
+  --shadow: 0 1px 2px rgba(19, 41, 75, .07), 0 4px 16px rgba(19, 41, 75, .06);
+  color-scheme: light;
+  font-family: var(--font-sans);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.muted { color: var(--muted); }
+
+.runbar { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem;
+  padding: .45rem 1rem; font-size: .75rem; border-bottom: 1px solid var(--line); flex: none; }
+.runbar button, .runbar a { font: inherit; color: var(--accent-ink); }
+.runbar button { background: white; border: 1px solid var(--line); border-radius: 4px; padding: .3rem .5rem; cursor: pointer; }
+.runbar button:disabled { opacity: .5; cursor: default; }
+.runbar [hidden] { display: none; }
+#run-setup[open] { width: 100%; max-height: 30vh; overflow: auto; }
+#setup-summary { white-space: pre-wrap; }
+#run-issues { color: var(--err-ink); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* ---- top bar ----
+   Navy field under a Carolina Blue rule: the one place on the page that is
+   unambiguously the university rather than the product, and where most of the
+   design's Carolina Blue is spent. Everything inside it is on navy, so the
+   control colours here are the inverse of the ones the panels use. */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .6rem 1rem;
+  background: var(--navy);
+  border-bottom: 3px solid var(--carolina);
+  box-shadow: var(--shadow);
+  z-index: 5;
+  flex: none;
+  color: #fff;
+}
+
+.brand { display: flex; align-items: center; gap: .7rem; min-width: 0; }
+.brand h1 {
+  font-family: var(--font-display);
+  font-size: .95rem; margin: 0; line-height: 1.25; letter-spacing: .01em;
+}
+/* On navy the generic .muted (a light-background grey) would sink; this is the
+   Carolina hue lightened until it clears AA against the bar. */
+.brand p {
+  margin: 0; font-size: .78rem; color: #B9C6D6;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 42vw;
+}
+.brand .dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--carolina);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--carolina) 28%, transparent);
+  flex: none;
+}
+
+.controls { display: flex; align-items: center; gap: .4rem; }
+
+.ctl {
+  font: inherit;
+  font-size: .85rem;
+  padding: .42rem .7rem;
+  border: 1px solid color-mix(in srgb, var(--carolina) 45%, transparent);
+  background: color-mix(in srgb, #fff 8%, transparent);
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .12s, border-color .12s, opacity .12s;
+}
+.ctl:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--carolina) 22%, transparent);
+  border-color: var(--carolina);
+}
+.ctl:disabled { opacity: .4; cursor: default; }
+/* Carolina fill with navy text — 4.9:1, and the only filled control in the bar. */
+.ctl-primary { background: var(--carolina); color: var(--navy); border-color: var(--carolina); font-weight: 700; }
+.ctl-primary:hover:not(:disabled) { background: var(--accent-hover); color: #fff; border-color: var(--accent-hover); }
+
+.step-select {
+  font: inherit; font-size: .82rem;
+  padding: .38rem .5rem;
+  border: 1px solid color-mix(in srgb, var(--carolina) 45%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, #fff 8%, transparent); color: #fff;
+  max-width: 15rem;
+}
+.step-select option { background: var(--panel); color: var(--ink); }
+.counter { font-variant-numeric: tabular-nums; font-size: .82rem; min-width: 4.5rem; text-align: right; }
+.topbar .muted { color: #B9C6D6; }
+
+.badge {
+  font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; font-weight: 700;
+  padding: .2rem .5rem; border-radius: 999px;
+  background: var(--accent-soft); color: var(--navy);
+}
+/* The pink hex itself is 3.6:1 behind white — loud but not readable at badge
+   size, so the live badge takes the darkened ink as its fill instead. */
+.badge.live { background: var(--err-ink); color: #fff; }
+
+/* ---- grid ---- */
+.grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  gap: .8rem;
+  padding: .8rem;
+  grid-template-columns: 1.55fr 1fr;
+  /* The map gets whatever the variables panel does not; --vars-h is written by
+     wireSplitter (and restored from localStorage), so a presenter can pull the
+     variables panel upward when a case has more variables than fit. */
+  grid-template-rows: minmax(0, 1fr) minmax(0, var(--vars-h, 32%));
+  grid-template-areas:
+    "map    detail"
+    "vars   detail";
+}
+.panel-map { grid-area: map; }
+.panel-detail { grid-area: detail; }
+.panel-vars { grid-area: vars; position: relative; }
+
+/* Collapsed, the variables row is exactly its own header — `auto` rather than a
+   height in the var, so the collapsed size can never disagree with what the
+   header actually measures, and the inline --vars-h left by the splitter is
+   simply not consulted until the panel opens again. */
+.grid.vars-collapsed { grid-template-rows: minmax(0, 1fr) auto; }
+.grid.vars-collapsed #vars { display: none; }
+.grid.vars-collapsed .row-split { display: none; }
+
+.vars-head { cursor: pointer; user-select: none; }
+.vars-head:hover h2 { color: var(--accent-ink); }
+.vars-head:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.vars-caret {
+  margin-left: auto; flex: none;
+  color: var(--muted); font-size: .8rem; line-height: 1;
+  transition: transform .14s;
+}
+/* Points up when there is something to pull up, down when it can be put away. */
+.grid:not(.vars-collapsed) .vars-caret { transform: rotate(180deg); }
+
+/* The drag handle lives in the grid gap above the variables panel, so it costs
+   no layout of its own. */
+.row-split {
+  position: absolute; left: 0; right: 0; top: -.85rem; height: .9rem;
+  cursor: row-resize; z-index: 4;
+  display: flex; align-items: center; justify-content: center;
+}
+.row-split::before {
+  content: ""; width: 3.5rem; height: 4px; border-radius: 999px;
+  background: var(--line-strong); opacity: 0; transition: opacity .12s, background .12s;
+}
+.row-split:hover::before, .row-split.dragging::before { opacity: 1; background: var(--accent); }
+body.row-resizing { cursor: row-resize; user-select: none; }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between; gap: .6rem;
+  padding: .6rem .85rem;
+  border-bottom: 1px solid var(--line);
+  flex: none;
+}
+.panel-head h2 { margin: 0; font-size: .82rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+/* The map's heading is a product name, so it keeps the case it is written in —
+   and, being a name, it is one of the three places the display serif appears.
+   The other panels are generic labels and stay in the uppercase house style. */
+.panel-map .panel-head h2 {
+  text-transform: none; letter-spacing: .01em;
+  font-family: var(--font-display); font-size: .8rem; color: var(--ink);
+}
+
+.scroll { overflow: auto; }
+
+/* ---- panel 1: map ---- */
+.cy-wrap { position: relative; flex: 1; min-height: 0; }
+.cy {
+  position: absolute; inset: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+  background:
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--navy) 12%, #fff) 1px, transparent 0) 0 0 / 22px 22px,
+    var(--panel);
+}
+
+/* Replay / scrub the current step's own span (see playStep in app.js). */
+.map-ctl { display: flex; align-items: center; gap: .4rem; flex: none; }
+.map-btn {
+  font: inherit; font-size: .8rem; line-height: 1;
+  width: 1.6rem; height: 1.6rem; padding: 0;
+  border: 1px solid var(--line-strong); border-radius: 999px;
+  background: var(--panel); color: var(--accent-ink); cursor: pointer;
+  transition: background .12s, border-color .12s;
+}
+.map-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
+.map-scrub { width: 6rem; accent-color: var(--accent); cursor: pointer; }
+
+/* Discs are deliberately unlabeled — this is how you find out which one. */
+.map-tip {
+  position: absolute; z-index: 6; pointer-events: none;
+  max-width: 15rem; padding: .2rem .45rem;
+  background: var(--navy); color: #fff; border-radius: 5px;
+  font-size: .7rem; font-weight: 600; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+  box-shadow: 0 2px 8px rgba(19, 41, 75, .28);
+}
+.map-tip[hidden] { display: none; }
+
+/* ---- panel 2: detail ---- */
+.detail { flex: 1; padding: .85rem; font-size: .85rem; }
+.detail-headline {
+  display: flex; flex-direction: column; gap: .35rem;
+  padding-bottom: .7rem; margin-bottom: .7rem; border-bottom: 1px dashed var(--line);
+}
+.detail-title { font-family: var(--font-display); font-size: .98rem; font-weight: 700; margin: 0; line-height: 1.3; }
+.detail-meta { display: flex; gap: .4rem; flex-wrap: wrap; align-items: center; }
+
+.chip {
+  font-size: .7rem; padding: .16rem .5rem; border-radius: 999px;
+  background: var(--miss-soft); color: var(--muted); font-weight: 600;
+  border: 1px solid var(--line);
+}
+/* Fill takes the agent's brand hue, text takes its `-ink` sibling: Tile Teal and
+   Carolina Blue are both under 4.5:1 as text on a pale tint of themselves. */
+.chip.agent-orchestrator { background: color-mix(in srgb, var(--orchestrator) 12%, #fff); color: var(--orchestrator-ink); border-color: color-mix(in srgb, var(--orchestrator) 30%, #fff); }
+.chip.agent-scanner { background: color-mix(in srgb, var(--scanner) 12%, #fff); color: var(--scanner-ink); border-color: color-mix(in srgb, var(--scanner) 30%, #fff); }
+.chip.agent-retriever { background: color-mix(in srgb, var(--retriever) 12%, #fff); color: var(--retriever-ink); border-color: color-mix(in srgb, var(--retriever) 30%, #fff); }
+.chip.agent-extractor { background: color-mix(in srgb, var(--extractor) 12%, #fff); color: var(--extractor-ink); border-color: color-mix(in srgb, var(--extractor) 30%, #fff); }
+
+/* ---- panel 2: section headers ----
+   A component header must read as a *separator*, not as one more pill in a row
+   of pills: an agent-colored rule carries the name, the fine node id trails
+   behind it in mono, and the status pill is the only pill left in the row. */
+.node-head {
+  display: flex; align-items: center; gap: .5rem;
+  margin: 1.1rem 0 .5rem; padding: .1rem 0 .35rem .55rem;
+  border-left: 3px solid var(--line-strong);
+  border-bottom: 1px solid var(--line);
+}
+/* Inside a card (a note or a variable) the header is already framed, so it does
+   not need the separating top margin that spaces bare sections apart. */
+.node-detail:first-of-type > .node-head,
+.node-detail.instance > .node-head,
+.node-detail.variable > .node-head { margin-top: .2rem; }
+.node-head-title {
+  font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--ink);
+}
+.node-head-id {
+  font-family: var(--font-mono);
+  /* The ink, not the light --miss ring colour: this is 10px mono and has to
+     clear AA on the panel. */
+  font-size: .66rem; color: var(--miss-ink); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.node-head .status-pill { margin-left: auto; flex: none; }
+.node-head .summary-tag { margin-left: 0; }
+.node-head.agent-orchestrator { border-left-color: var(--orchestrator); }
+.node-head.agent-scanner { border-left-color: var(--scanner); }
+.node-head.agent-retriever { border-left-color: var(--retriever); }
+.node-head.agent-extractor { border-left-color: var(--extractor); }
+.node-detail > :not(.node-head) { margin-left: .55rem; }
+
+/* ---- panel 2: container cards that open on demand ----
+   A scan step is seven notes and an extraction pass a dozen variables; all
+   expanded, the panel opens on the middle of somebody's summary and the shape of
+   the step is three scrolls away. The header is the toggle, so the collapsed
+   card still carries its name, its counts and its status. */
+details.node-detail > summary.node-head {
+  cursor: pointer;
+  list-style: none;
+}
+details.node-detail > summary.node-head::-webkit-details-marker { display: none; }
+details.node-detail > summary.node-head::after {
+  content: "▸";
+  display: inline-block;
+  color: var(--muted); font-size: .72rem;
+  transition: transform .12s;
+}
+details.node-detail[open] > summary.node-head::after { transform: rotate(90deg); }
+/* Without a pill to push it, the caret still belongs at the far right. */
+details.node-detail > summary.node-head:not(:has(.status-pill))::after { margin-left: auto; }
+details.node-detail > summary.node-head:hover .node-head-title { color: var(--accent-ink); }
+
+/* ---- panel 2: structural nodes, one quiet row in the step timeline ----
+   Same 3px left gutter as .node-head so the rows and the section headers stack
+   into one continuous rail down the step, read top-to-bottom in run order. */
+.minor-row {
+  display: flex; align-items: baseline; gap: .45rem;
+  margin: .1rem 0; padding: .18rem 0 .18rem .55rem;
+  border-left: 3px solid var(--line);
+  font-size: .74rem; color: var(--muted);
+}
+.minor-glyph { width: .8rem; flex: none; text-align: center; }
+.minor-name { font-weight: 600; }
+.minor-id {
+  font-family: var(--font-mono);
+  font-size: .64rem; color: var(--miss-ink);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.minor-row.st-active { border-left-color: var(--warn); color: var(--warn-ink); }
+.minor-row.st-error { border-left-color: var(--err); color: var(--err-ink); font-weight: 700; }
+
+/* ---- panel 2: one container per variable group in an extraction pass ---- */
+.node-detail.group {
+  border: 1px solid var(--line); border-radius: 10px;
+  padding: .25rem .7rem .5rem; margin: 0 0 .9rem;
+  background: color-mix(in srgb, var(--orchestrator) 3%, transparent);
+}
+.node-detail.group > .node-head { margin-top: .2rem; }
+
+/* ---- panel 2: one container per extracted variable ---- */
+.node-detail.variable {
+  border: 1px solid var(--line); border-radius: 10px;
+  padding: .25rem .7rem .6rem; margin: 0 0 .7rem;
+  background: color-mix(in srgb, var(--extractor) 3%, transparent);
+}
+.node-detail.variable.status-active { border-style: dashed; }
+.node-detail.variable.status-invalid { border-color: color-mix(in srgb, var(--err) 45%, #fff); }
+.status-pill.status-invalid { background: var(--err-soft); color: var(--err-ink); }
+
+.attempt { border-left: 3px solid var(--miss); padding: .2rem .5rem; margin: .35rem 0; }
+.attempt.ok { border-left-color: var(--ok); }
+.attempt.bad { border-left-color: var(--err); }
+.attempt-head { display: flex; align-items: center; gap: .4rem; font-size: .78rem; }
+.attempt-head .attempt-verdict { margin-left: auto; font-size: .72rem; font-weight: 700; }
+.attempt.ok .attempt-verdict { color: var(--ok-ink); }
+.attempt.bad .attempt-verdict { color: var(--err-ink); }
+ul.val-errors { margin: .2rem 0 0; padding-left: 1.1rem; }
+
+/* One card per parallel fan-out instance (e.g. each characterized note). */
+.node-detail.instance {
+  border: 1px solid var(--line); border-radius: 10px;
+  padding: .6rem .7rem; margin: 0 0 .7rem;
+  background: color-mix(in srgb, var(--scanner) 4%, transparent);
+}
+/* A note still being characterized (live): its filled slots sit next to
+   still-pending ones, so the card fills in place as results stream back. */
+.node-detail.instance.status-active { border-style: dashed; }
+/* A slot not filled in yet sits a step *below* a filled card rather than beside
+   it: --miss-soft is the same grey the card now uses, so the pending state would
+   have lost the one signal it had. Flatter and paler reads as emptier. */
+.headline-fact.pending {
+  background: var(--panel-sunk); border-color: var(--line);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.headline-fact.pending b { color: var(--muted); font-weight: 600; }
+.pending-dot {
+  font-size: .74rem; color: var(--muted); font-style: italic;
+  animation: pending-pulse 1.4s ease-in-out infinite;
+}
+@keyframes pending-pulse { 0%, 100% { opacity: .4; } 50% { opacity: .9; } }
+
+/* Scoped to the pill: cards also carry a status-* class (for their border), and
+   an unscoped `color` here would be inherited by everything inside them. */
+.status-pill { font-size: .7rem; padding: .16rem .5rem; border-radius: 999px; font-weight: 700; }
+.status-pill.status-active { background: var(--warn-soft); color: var(--warn-ink); }
+.status-pill.status-done { background: var(--ok-soft); color: var(--ok-ink); }
+.status-pill.status-error { background: var(--err-soft); color: var(--err-ink); }
+.status-pill.status-idle { background: var(--miss-soft); color: var(--miss-ink); }
+
+/* What the step concluded, as a light grey card set into the white panel. Grey
+   rather than a pale Carolina: these are the largest blocks in panel 2 and they
+   hold coloured content of their own — status words, gate chips, kept/dropped
+   counts — which a tinted ground was competing with. */
+.headline-fact {
+  background: var(--panel-card);
+  border: 1px solid var(--line);
+  border-radius: 8px; padding: .55rem .7rem; margin: .2rem 0 .6rem;
+  font-size: .85rem;
+}
+.headline-fact ul { margin: .3rem 0 0; padding-left: 1.1rem; }
+.headline-fact li { margin: .15rem 0; }
+.kept { color: var(--ok-ink); font-weight: 600; }
+.dropped { color: var(--miss-ink); }
+
+details.block { border: 1px solid var(--line); border-radius: 8px; margin: .5rem 0; background: var(--panel-sunk); }
+details.block > summary {
+  cursor: pointer; padding: .5rem .65rem; font-weight: 600; font-size: .8rem;
+  list-style: none; display: flex; align-items: center; gap: .5rem;
+}
+details.block > summary::-webkit-details-marker { display: none; }
+details.block > summary::before { content: "▸"; color: var(--muted); transition: transform .12s; }
+details.block[open] > summary::before { transform: rotate(90deg); }
+details.block .block-body { padding: 0 .65rem .6rem; }
+/* Same page the corpus marker on the map carries, drawn from the same paths, in
+   the same agent's hue — a note is marked the same way in both panels. The ink
+   rather than the raw Tile Teal: rules this fine need the weight. `color` is
+   what the paths' `currentColor` resolves to, so this one line still sets the
+   hue the way it did when this was a character. Sized like `.call-icon`, the
+   other inline icon here: an SVG with only a viewBox falls back to the 300×150
+   default of a replaced element, so the box has to be stated, and `flex: none`
+   keeps the flex summary from shrinking it. */
+.note-glyph { color: var(--scanner-ink); width: 14px; height: 14px; flex: none; }
+.summary-tag { margin-left: auto; font-size: .68rem; color: var(--muted); font-weight: 500; }
+
+.llm-call { border: 1px solid var(--line); border-radius: 8px; margin: .45rem 0; overflow: hidden; }
+.llm-call > summary { padding: 0; }
+.llm-call .llm-head {
+  display: flex; flex: 1; align-items: center; gap: .5rem; padding: .4rem .6rem;
+  background: color-mix(in srgb, var(--accent) 7%, #fff);
+  border-bottom: 1px solid var(--line); font-size: .78rem; color: var(--ink);
+}
+.llm-call[open] .llm-head { border-bottom-color: var(--line-strong); }
+.call-icon { width: 15px; height: 15px; flex: none; color: var(--accent-ink); }
+.llm-call .tok { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--muted); }
+
+/* Message bubbles, colored by who is speaking: the prompt scaffolding (system)
+   reads as background, the request (human) as input, and what came back
+   (response / reasoning / error) as output. */
+.msg {
+  padding: .35rem .55rem; margin: .45rem .5rem;
+  border-left: 3px solid var(--line-strong); border-radius: 0 6px 6px 0;
+  background: var(--panel-sunk);
+}
+.msg .role { font-size: .66rem; text-transform: uppercase; letter-spacing: .05em; font-weight: 700; color: var(--muted); }
+.msg.role-system { border-left-color: var(--miss); background: var(--miss-soft); }
+.msg.role-human, .msg.role-user { border-left-color: var(--orchestrator); background: color-mix(in srgb, var(--orchestrator) 6%, #fff); }
+.msg.role-human .role, .msg.role-user .role { color: var(--orchestrator-ink); }
+.msg.role-ai, .msg.role-assistant, .msg.role-response {
+  border-left-color: var(--ok); background: color-mix(in srgb, var(--ok) 6%, #fff);
+}
+.msg.role-ai .role, .msg.role-assistant .role, .msg.role-response .role { color: var(--ok-ink); }
+.msg.role-tool { border-left-color: var(--retriever); background: color-mix(in srgb, var(--retriever) 6%, #fff); }
+.msg.role-tool .role { color: var(--retriever-ink); }
+.msg.role-reasoning { border-left-color: var(--warn); background: var(--warn-soft); }
+.msg.role-reasoning .role { color: var(--warn-ink); }
+.msg.role-error { border-left-color: var(--err); background: var(--err-soft); }
+.msg.role-error .role { color: var(--err-ink); }
+
+/* The one dark surface in the app. It carries raw error text only — every
+   syntax-highlighted block below is `.plain`, i.e. on the pale message bubble
+   rather than on this. */
+pre.code {
+  margin: .3rem 0 0; padding: .5rem .6rem;
+  background: var(--navy); color: #E8EEF5;
+  border-radius: 6px; font-size: .74rem; line-height: 1.45;
+  overflow: auto; max-height: 22rem;
+  font-family: var(--font-mono);
+  white-space: pre-wrap; word-break: break-word;
+}
+pre.code.plain { background: transparent; color: var(--ink); border: none; padding: .25rem 0 0; }
+/* The compact serializer already keeps lines short, so wrapping is rare; a
+   shorter max-height keeps a prettified prompt from taking over the panel. */
+pre.code.json { max-height: 15rem; line-height: 1.4; word-break: normal; overflow-wrap: anywhere; }
+/* Four brand hues, held to AA against the *bubble* rather than against white —
+   the message background is #EFF1F4, which costs about half a point of ratio, so
+   the two that only just cleared on white are shaded 15% toward Navy to buy it
+   back. Contrasts below are measured on the bubble. */
+.j-key { color: #03729F; font-weight: 600; }  /* Carolina digital-link, 15% toward Navy — 4.7:1 */
+/* Now the same green as --ok. It was Longleaf Pine while --ok was the olive
+   Davie shade, because olive beside the brown --j-num was a poor pair for the
+   string/number split that shows up on every line of JSON; a true green beside
+   brown is not, so the design is down to one green. */
+.j-str { color: var(--ok-ink); }              /* 4.9:1 on the bubble */
+.j-num { color: var(--warn-ink); }            /* Sunburst shade — 5.6:1 */
+.j-lit { color: #466981; font-weight: 600; }  /* Basin Slate, 15% toward Navy — 5.2:1 */
+
+.empty { color: var(--muted); font-style: italic; padding: 1.5rem .5rem; text-align: center; }
+
+/* ---- panel 3: variables ---- */
+.vars { flex: 1; padding: .5rem .6rem .8rem; }
+.vars-summary { display: flex; gap: .8rem; font-size: .74rem; flex-wrap: wrap; }
+.vars-summary b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.vargroup { margin-bottom: .7rem; }
+.vargroup-head {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .35rem .5rem; border-radius: 7px;
+  background: var(--miss-soft);
+  font-weight: 700; font-size: .8rem;
+}
+.vargroup-head .gcount { margin-left: auto; font-weight: 500; color: var(--muted); font-size: .72rem; }
+.stage-badge { font-size: .62rem; text-transform: uppercase; letter-spacing: .04em; padding: .12rem .4rem; border-radius: 999px; font-weight: 700; }
+.stage-done { background: var(--ok-soft); color: var(--ok-ink); }
+.stage-active, .stage-running { background: var(--warn-soft); color: var(--warn-ink); }
+.stage-pending, .stage-idle, .stage-planned { background: var(--miss-soft); color: var(--muted); }
+.stage-blocked, .stage-skipped { background: var(--miss-soft); color: var(--muted); }
+
+table.vartable { width: 100%; border-collapse: collapse; margin-top: .2rem; font-size: .8rem; }
+table.vartable td { padding: .3rem .5rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.vartable tr:last-child td { border-bottom: none; }
+.vt-name { font-weight: 600; }
+.vt-value { font-variant-numeric: tabular-nums; }
+.vt-status { text-align: right; white-space: nowrap; }
+.st-extracted { color: var(--ok-ink); font-weight: 600; }
+.st-not_found, .st-not-found { color: var(--miss-ink); }
+.st-blocked, .st-skipped { color: var(--muted); }
+.st-error, .st-invalid { color: var(--err-ink); font-weight: 600; }
+.st-pending, .st-running, .st-active { color: var(--warn-ink); }
+.conf { font-size: .68rem; color: var(--muted); }
+.flag { color: var(--err-ink); font-weight: 700; }
+
+/* ---- panel 2: Phase-4 component views ---- */
+.headline-fact > b { display: block; margin-bottom: .35rem; }
+.summary-text { margin: .3rem 0; line-height: 1.45; }
+
+.chips { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .3rem; }
+.tag-chip {
+  font-size: .68rem; padding: .12rem .45rem; border-radius: 999px;
+  background: var(--panel); border: 1px solid var(--line-strong); color: var(--muted); font-weight: 600;
+}
+.tag-chip.warn { background: var(--warn-soft); color: var(--warn-ink); border-color: transparent; }
+
+.concept-chip {
+  font-size: .7rem; padding: .14rem .5rem; border-radius: 999px; font-weight: 600;
+  border: 1px solid var(--line);
+}
+.concept-chip.present { background: var(--ok-soft); color: var(--ok-ink); border-color: transparent; }
+.concept-chip.absent { background: var(--miss-soft); color: var(--miss-ink); }
+
+.mention-card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+  padding: .45rem .55rem; margin-top: .4rem;
+}
+
+.stat-grid { display: grid; grid-template-columns: auto 1fr; gap: .1rem .7rem; margin-top: .3rem; }
+.stat { display: contents; }
+.stat-k { font-size: .72rem; color: var(--muted); font-weight: 600; }
+.stat-v { font-size: .78rem; font-variant-numeric: tabular-nums; }
+.stat-sub { font-size: .68rem; text-transform: uppercase; letter-spacing: .04em; margin-top: .5rem; font-weight: 700; }
+
+/* ---- panel 2: the extraction plan, one row per verdict ----
+   Flat, every group wore a green ✓ and a plan that ruled three groups out read
+   as ten groups all passing. Each row takes the colour its verdict has on the
+   map, so the two panels say the same thing about the same group. */
+.plan-row { margin-top: .45rem; padding-left: .5rem; border-left: 3px solid var(--line-strong); }
+.plan-row.ungated { border-left-color: var(--orchestrator); }
+.plan-row.open { border-left-color: var(--ok); }
+.plan-row.shut { border-left-color: var(--err); }
+.plan-row-head {
+  display: flex; align-items: baseline; gap: .4rem;
+  font-size: .72rem;
+}
+.plan-row-head .muted { font-size: .68rem; }
+.plan-count {
+  font-variant-numeric: tabular-nums; font-weight: 700; font-size: .66rem;
+  padding: 0 .34rem; border-radius: 999px; background: var(--line); color: var(--muted);
+}
+.plan-row.ungated .plan-count { background: var(--accent-soft); color: var(--orchestrator-ink); }
+.plan-row.open .plan-count { background: var(--ok-soft); color: var(--ok-ink); }
+.plan-row.shut .plan-count { background: var(--err-soft); color: var(--err-ink); }
+
+.gate-chip {
+  font-size: .7rem; padding: .14rem .5rem; border-radius: 999px; font-weight: 600; border: 1px solid transparent;
+}
+.gate-chip.ungated { background: var(--accent-soft); color: var(--orchestrator-ink); }
+.gate-chip.open { background: var(--ok-soft); color: var(--ok-ink); }
+.gate-chip.shut { background: var(--err-soft); color: var(--err-ink); }
+
+.note-chip { font-size: .72rem; padding: .14rem .5rem; border-radius: 999px; font-weight: 600; }
+.note-chip.kept { background: var(--ok-soft); color: var(--ok-ink); }
+.note-chip.dropped { background: var(--miss-soft); color: var(--miss-ink); }
+
+.extraction {
+  background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--ok);
+  border-radius: 8px; padding: .45rem .55rem; margin-top: .45rem;
+}
+.extraction.invalid { border-left-color: var(--err); }
+.extraction-head { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
+.ext-ok { font-weight: 700; color: var(--ok-ink); }
+.extraction.invalid .ext-ok { color: var(--err-ink); }
+.ext-val { font-size: .82rem; }
+.expl { font-size: .8rem; color: var(--ink); margin: .3rem 0; line-height: 1.4; }
+.val-errors { font-size: .74rem; color: var(--err-ink); margin: .25rem 0; }
+
+.repair-badge { font-size: .64rem; padding: .1rem .45rem; border-radius: 999px; font-weight: 700; margin-left: auto; }
+.repair-badge.repaired { background: var(--warn-soft); color: var(--warn-ink); }
+.repair-badge.failed { background: var(--err-soft); color: var(--err-ink); }
+
+.evidence { margin-top: .4rem; }
+.evidence-label { font-size: .66rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 700; }
+.evidence-quotes { font-size: .78rem; color: var(--muted); font-style: italic; margin: .2rem 0; }
+.evidence-quote { display: inline; }
+details.block.evidence-note { margin: .35rem 0 0; }
+.note-text {
+  font-size: .76rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
+  max-height: 18rem; overflow: auto; padding: .5rem .6rem;
+  color: var(--ink-max);
+  background: var(--panel-sunk); border: 1px solid var(--line); border-radius: 6px;
+}
+.note-text mark {
+  background: color-mix(in srgb, var(--sunburst) 45%, #fff);
+  color: var(--ink-max); padding: 0 .1rem; border-radius: 2px; font-weight: 600;
+}
+
+/* --- OMOP row preview ----------------------------------------------------
+   Raised from a variable's button in panel 3. The overlay sits at body level,
+   outside `main`, because every `.panel` clips its own content — an absolutely
+   positioned card inside `.panel-vars` would be cut off at the panel edge. */
+.vt-omop { width: 1%; text-align: right; white-space: nowrap; }
+.omop-btn {
+  font: inherit; font-size: .66rem; font-weight: 700; letter-spacing: .04em;
+  padding: .12rem .42rem; border-radius: 999px; cursor: pointer;
+  background: var(--accent-soft); color: var(--accent-ink);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, #fff);
+}
+.omop-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.omop-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* Above every existing layer: the topbar is 5 and the map tooltip 6. */
+.modal { position: fixed; inset: 0; z-index: 7; display: flex; align-items: center; justify-content: center; }
+.modal[hidden] { display: none; }
+.modal-back { position: absolute; inset: 0; background: color-mix(in srgb, var(--navy) 45%, transparent); }
+.modal-card {
+  position: relative; display: flex; flex-direction: column;
+  width: min(1100px, 92vw); max-height: 85vh;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: 0 18px 48px color-mix(in srgb, var(--navy) 30%, transparent);
+}
+.modal-head {
+  display: flex; align-items: center; gap: .6rem;
+  padding: .6rem .85rem; border-bottom: 1px solid var(--line); flex: none;
+}
+.modal-head h2 { margin: 0; font-size: .82rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.modal-close {
+  font: inherit; font-size: .9rem; line-height: 1; margin-left: auto; cursor: pointer;
+  padding: .2rem .45rem; border-radius: 6px;
+  background: transparent; color: var(--muted); border: 1px solid var(--line);
+}
+.modal-close:hover { background: var(--err-soft); color: var(--err-ink); border-color: var(--err-ink); }
+.modal-body { padding: .7rem .85rem 1rem; overflow: auto; }
+
+.omop-block { margin-bottom: 1rem; }
+.omop-block h3 {
+  margin: 0 0 .3rem; font-size: .7rem; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--muted);
+}
+.omop-none { font-size: .78rem; margin: 0; }
+/* The tables are 14 columns wide and must scroll in their own box — the modal
+   body scrolls vertically only, so a wide table cannot push the card sideways. */
+.omop-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
+table.omop-table { border-collapse: collapse; font-size: .72rem; width: max-content; min-width: 100%; }
+.omop-table th {
+  text-align: left; white-space: nowrap; font-weight: 700; color: var(--muted);
+  padding: .35rem .5rem; background: var(--panel-sunk); border-bottom: 1px solid var(--line);
+  position: sticky; top: 0;
+}
+.omop-table td {
+  padding: .3rem .5rem; border-bottom: 1px solid var(--line);
+  vertical-align: top; white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.omop-table tr:last-child td { border-bottom: none; }
+.omop-wide { color: var(--ink-max); cursor: help; }
+
+.omop-error {
+  font-size: .76rem; padding: .4rem .55rem; margin-bottom: .35rem;
+  background: var(--err-soft); color: var(--err-ink);
+  border: 1px solid color-mix(in srgb, var(--err) 30%, #fff); border-radius: 6px;
+}
+.omop-error ul { margin: .25rem 0 0; padding-left: 1.1rem; }
