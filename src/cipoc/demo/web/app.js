@@ -5,14 +5,14 @@
  *   1. Workflow map   — this run's fan-out/fan-in graph: one node per note, per
  *                       variable group's gate, and per variable, animated
  *                       through each step's own span of the trace.
- *   2. Current step   — what the components decided during the presenter's
- *                       current step, per note / per group / per variable.
+ *   2. Details        — a selected note, group, or variable, resolved against
+ *                       the presenter's current step-end snapshot.
  *   3. Variables      — the reused ProgressModel variable table, grouped.
  *
  * The server is the single source of truth: every control (Prev/Next/goto/play)
- * POSTs to the server, which broadcasts the new cursor over SSE; the UI only
- * ever redraws in response to an SSE `cursor` message, so all viewers stay in
- * lockstep with the presenter.
+ * POSTs to the server, which broadcasts the new cursor over SSE to keep replay
+ * in lockstep with the presenter. Entity-card navigation is local
+ * to each browser and never moves the shared cursor.
  */
 
 "use strict";
@@ -146,7 +146,10 @@ let steps = [];          // static step list (GET /api/steps)
 let events = [];         // full event list (GET /api/events) for per-step nodes
 let numSteps = 0;
 let lastView = null;     // most recent SSE cursor view
-let focusBlock = null;   // manual Panel-2 focus (coarse block id) or null
+let detailSelection = null;
+let detailHistory = [];
+let detailOrigin = null; // accessible control that opened this navigation chain
+let detailCardsWired = false;
 let latestMeta = null;
 let refreshBusy = false;
 let refreshAgain = false;
@@ -164,6 +167,7 @@ document.addEventListener("DOMContentLoaded", () => init().catch((error) => {
 async function init() {
   cacheEls();
   wireControls();
+  wireDetailCards();
   wireSplitter();
   wireVarsPane();
   wireOmopModal();
@@ -221,8 +225,11 @@ function cacheEls() {
   els.mapScrub = document.getElementById("map-scrub");
   els.mapTip = document.getElementById("map-tip");
   els.detail = document.getElementById("detail");
+  els.detailWindow = document.getElementById("detail-window");
   els.detailNode = document.getElementById("detail-node");
-  watchCards(els.detail);
+  els.detailHeading = document.getElementById("detail-heading");
+  els.detailBack = document.getElementById("detail-back");
+  els.detailClose = document.getElementById("detail-close");
   els.vars = document.getElementById("vars");
   els.varsSummary = document.getElementById("vars-summary");
   els.omopModal = document.getElementById("omop-modal");
@@ -407,7 +414,7 @@ const BLOCK_TO_MAP = {
 /* Layout geometry, in Cytoscape model units.
  *
  * Model units, not pixels: everything here — including font sizes — is
- * multiplied by cy.zoom(), and zoom is whatever cy.fit() settles on. So the size
+ * multiplied by cy.zoom(), and zoom is whatever fitMap() settles on. So the size
  * text ends up on screen is `font-size × zoom`, and growing a node trades
  * directly against zoom. That is why the type here is large and the padding
  * mean: computeLayout picks the packing that maximises zoom, and the type scale
@@ -415,8 +422,10 @@ const BLOCK_TO_MAP = {
  */
 const GEO = {
   caseW: 264, caseH: 100,
-  noteD: 34, noteGapX: 46, noteGapY: 46,
-  gateD: 50, gateGap: 16, varD: 20, varGapX: 30, varGapY: 28,
+  // Each disc's row includes space for its ID underneath; four-digit item IDs
+  // also need more horizontal space than the variable circles themselves.
+  noteD: 34, noteGapX: 46, noteGapY: 58,
+  gateD: 50, gateGap: 16, varD: 20, varGapX: 40, varGapY: 44,
   clusterGap: 40,
   rowGap: 78,
   // The corpus box sits closer to the case than the band does. One line runs
@@ -564,7 +573,11 @@ function mapStyle(theme) {
       },
     },
     { selector: "node.disc.note", style: { width: GEO.noteD, height: GEO.noteD, "border-color": SCAN } },
-    { selector: "node.disc.var", style: { width: GEO.varD, height: GEO.varD, "border-color": EXTR, "font-size": 0 } },
+    { selector: "node.disc.var", style: { width: GEO.varD, height: GEO.varD, "border-color": EXTR } },
+    { selector: "node.disc.note, node.disc.var", style: {
+      "text-valign": "bottom", "text-margin-y": 4,
+      "font-size": 14, "text-events": "yes",
+    } },
     // The verdict glyph is the smallest thing on the map carrying the biggest
     // meaning, and ✓ / ✗ come from a fallback symbol font that ignores
     // font-weight — so each is outlined in its own colour to give it weight.
@@ -592,9 +605,8 @@ function mapStyle(theme) {
         // beside it; the page in the darker ink, because rules this fine need
         // the weight that #00A5AD at 2.7:1 does not give them.
         "border-color": SCAN,
-        // Drawn, not lettered, so the disc carries no label at all — `label: ""`
-        // rather than the `font-size: 0` a var disc uses, because this node has
-        // no label data to suppress. 48% of a 50px disc puts the page at 24px,
+        // Drawn, not lettered, so the marker carries no label. 48% of a 50px
+        // disc puts the page at 24px,
         // a size larger than the note discs it introduces, and well inside the
         // ~35px square the circle inscribes, so the ellipse never clips it.
         label: "",
@@ -892,7 +904,7 @@ function buildMapModel(snapshot) {
   add({ id: CORPUS_ID, label: "Scan & characterize notes", block: "characterize_corpus" }, "cluster corpus");
   add({ id: CORPUS_MARK_ID, parent: CORPUS_ID, title: "Clinical notes", block: "scanner_agent_block" }, "disc mark");
   for (const note of mapIndex.notes) {
-    add({ id: note.id, parent: CORPUS_ID, label: `#${note.noteId}`, title: `${note.type} #${note.noteId}`.trim(), block: "scanner_agent_block" }, "disc note");
+    add({ id: note.id, parent: CORPUS_ID, label: String(note.noteId), title: `${note.type} #${note.noteId}`.trim(), block: "scanner_agent_block" }, "disc note");
   }
 
   for (const group of planGroups(snapshot)) {
@@ -910,7 +922,7 @@ function buildMapModel(snapshot) {
     link(CASE_ID, gate, "fan gate-in", { group: group.id });
     for (const variable of group.variables) {
       const id = `var:${variable.itemId}`;
-      add({ id, parent: cluster, label: "", title: variable.name, group: group.id, block: "extractor_agent_block" }, "disc var");
+      add({ id, parent: cluster, label: String(variable.itemId), title: variable.name, group: group.id, block: "extractor_agent_block" }, "disc var");
     }
     link(gate, CASE_ID, "fan to-extractor grp-out", { group: group.id });
   }
@@ -924,7 +936,7 @@ function buildMapModel(snapshot) {
 function planGroups(snapshot) {
   const progress = snapshot && snapshot.progress;
   if (progress && progress.groups && progress.groups.length) {
-    const byGroup = {};
+    const byGroup = Object.create(null);
     for (const v of progress.variables || []) {
       (byGroup[v.group_id] = byGroup[v.group_id] || []).push({ itemId: v.item_id, name: v.name });
     }
@@ -940,7 +952,7 @@ function planGroups(snapshot) {
 
 /* --- layout ---------------------------------------------------------------
  *
- * The drawing's shape has to track the panel's, or cy.fit() throws half the
+ * The drawing's shape has to track the panel's, or fitting throws half the
  * panel away: a 1.4:1 drawing in a 2.3:1 panel scales to the height and leaves
  * the sides empty, which is what made every label too small to read.
  *
@@ -954,11 +966,21 @@ const FIT_PAD = 12;
 const CLUSTER_PAD = 10;   // node.cluster's `padding`, which Cytoscape adds around the children
 const BAND_ROW_GAP = 56;  // between band rows: a cluster's label hangs above its box
 
-// The container, or a sane guess: on first paint the flex panel has no size yet.
+// CSS owns the drawing rectangle beside the floating detail window. Its probe
+// stays put whether a card is open or closed; never measure the card itself.
+// Headless/first-paint callers retain the full-container initialization fallback.
 function viewportBox() {
+  const container = cy?.container?.();
+  const probe = document.getElementById?.("map-layout");
+  const outer = container?.getBoundingClientRect?.();
+  const rect = probe?.getBoundingClientRect?.();
+  if (outer && rect && outer.width > 0 && outer.height > 0 && rect.width > 0 && rect.height > 0) {
+    const box = { x: rect.left - outer.left, y: rect.top - outer.top, w: rect.width, h: rect.height };
+    if (Object.values(box).every(Number.isFinite)) return box;
+  }
   const w = cy ? cy.width() : 0;
   const h = cy ? cy.height() : 0;
-  return { w: w > 40 ? w : 1100, h: h > 40 ? h : 500 };
+  return { x: 0, y: 0, w: Number.isFinite(w) && w > 40 ? w : 1100, h: Number.isFinite(h) && h > 40 ? h : 500 };
 }
 
 // Group the model's variables under their cluster once, so the search below can
@@ -1134,30 +1156,38 @@ function buildMap(graph) {
   // Since the packing is *chosen against* the container, a resize may want a
   // different one — so re-pack, not just re-fit.
   const container = document.getElementById("cy");
-  if (window.ResizeObserver) new ResizeObserver(refitMap).observe(container);
+  if (window.ResizeObserver) {
+    new ResizeObserver(refitMap).observe(container);
+    // The drawer changes the drawing rectangle while the canvas itself stays
+    // full-size. Card visibility never changes either observed rectangle.
+    const drawing = document.getElementById("map-layout");
+    if (drawing) new ResizeObserver(refitMap).observe(drawing);
+  }
 
-  // Click a box or a disc to pin Panel 2 to the component behind it; click
-  // empty space to unpin. Discs resolve through their own `block`, so clicking
-  // a note pins the scanner and clicking a variable pins the extractor.
-  cy.on("tap", "node", (evt) => {
-    const block = evt.target.data("block");
-    if (!block) return;
-    focusBlock = block;
-    if (lastView) renderDetail(lastView);
-  });
-  cy.on("tap", (evt) => {
-    if (evt.target === cy) {
-      focusBlock = null;
-      if (lastView) renderDetail(lastView);
-    }
-  });
+  wireMapCards();
   wireMapTooltip();
 }
 
 function fitMap() {
   if (!cy) return;
   cy.resize();
-  cy.fit(undefined, FIT_PAD);
+  const elements = cy.elements();
+  if (elements.empty()) return;
+  // Retain labels and edges, but not selection overlays or activity halos: those
+  // are transient decoration and must not alter the fitted geometry.
+  const bounds = elements.boundingBox({ includeLabels: true, includeOverlays: false, includeUnderlays: false });
+  if (![bounds.x1, bounds.y1, bounds.x2, bounds.y2, bounds.w, bounds.h].every(Number.isFinite)
+      || bounds.w <= 0 || bounds.h <= 0) return;
+  const view = viewportBox();
+  const width = view.w - FIT_PAD * 2;
+  const height = view.h - FIT_PAD * 2;
+  if (width <= 0 || height <= 0) return;
+  const zoom = Math.max(cy.minZoom(), Math.min(cy.maxZoom(), width / bounds.w, height / bounds.h));
+  const pan = {
+    x: view.x + view.w / 2 - (bounds.x1 + bounds.w / 2) * zoom,
+    y: view.y + view.h / 2 - (bounds.y1 + bounds.h / 2) * zoom,
+  };
+  cy.viewport({ zoom, pan });
 }
 
 // The panel changed shape. Re-run the search; if it picks a different packing,
@@ -1336,11 +1366,16 @@ function stateStyles(theme) {
     // `edge.flowing`'s opacity on a specificity tie.
     //
     // Opacity, *not* `display: none`: display would drop the edge out of
-    // cy.fit()'s bounds, so the viewport would lurch every time one appeared
+    // fitMap()'s bounds, so the viewport would lurch every time one appeared
     // mid-animation. Opacity keeps the bounds fixed and picks up the 160ms
     // transition above, so edges fade in as the run reaches them. `events: no`
     // keeps an invisible edge from catching the hover tooltip.
     { selector: ".undrawn", style: { opacity: 0, events: "no" } },
+    // Selection is independent of playback state. An overlay adds no node
+    // width, border, or layout changes and survives every animation frame.
+    { selector: "node.entity-selected", style: {
+      "overlay-color": theme.navy, "overlay-opacity": 0.18, "overlay-padding": 4,
+    } },
   ];
 }
 
@@ -1512,7 +1547,7 @@ function renderMapAt(t, snapshot, step) {
       setState(node, state);
       // A settled variable with no value reads as reached-but-empty rather than
       // as another filled dot.
-      const result = byItem[Number(node.id().slice(4))];
+      const result = byItem[node.id().slice(4)];
       const empty = state === "done" && result?.terminal && (result.value == null || result.value === "");
       node.toggleClass("st-empty", Boolean(empty));
       node.toggleClass("st-flagged", Boolean(state === "done" && result && result.flag));
@@ -1552,8 +1587,8 @@ function setState(node, state) {
 
 function hasAnyVariableRun(groupId, t) {
   return cy
-    .nodes(`.var[group = "${groupId}"]`)
-    .some((node) => stateAt(node.id(), t) !== "idle");
+    .nodes(".var")
+    .some((node) => String(node.data("group")) === String(groupId) && stateAt(node.id(), t) !== "idle");
 }
 
 // An edge belongs to one phase of the run and is drawn only while that phase is
@@ -1702,9 +1737,7 @@ function setStepProgress(fraction) {
   }
 }
 
-// Hover a disc for the name behind it — the discs themselves are deliberately
-// unlabeled (43 labels would be unreadable), so this is how a presenter answers
-// "which variable is that one?".
+// IDs sit below the note and variable discs; hover supplies the descriptive name.
 function wireMapTooltip() {
   const tip = els.mapTip;
   if (!tip) return;
@@ -1723,7 +1756,170 @@ function wireMapTooltip() {
   cy.on("mouseout", "node.disc", () => { tip.hidden = true; });
 }
 
-// --- Panel 2: current-step detail ---------------------------------------
+// --- Panel 2: snapshot-bound entity navigation ---------------------------
+
+const ENTITY_CONTROL = "[data-entity-kind][data-entity-id]";
+const panelHTML = new WeakMap();
+
+function entitySelection(value) {
+  if (!value || !["note", "group", "variable"].includes(value.kind)
+      || value.id == null || String(value.id) === "") return null;
+  const selection = { kind: value.kind, id: String(value.id) };
+  if (value.groupId != null) selection.groupId = String(value.groupId);
+  if (value.instanceKey) selection.instanceKey = String(value.instanceKey);
+  return selection;
+}
+
+function controlSelection(control) {
+  const data = control?.dataset || {};
+  return entitySelection({ kind: data.entityKind, id: data.entityId,
+    groupId: data.groupId, instanceKey: data.instanceKey });
+}
+
+function sameSelection(a, b) {
+  return a?.kind === b?.kind && a?.id === b?.id
+    && a?.groupId === b?.groupId && a?.instanceKey === b?.instanceKey;
+}
+
+function mapSelection(node) {
+  const id = node.id();
+  // Strip only the known prefix: clinical IDs and group IDs may contain colons,
+  // quotes, slashes, or other characters meaningful to a CSS selector.
+  if (id.startsWith("note:")) return entitySelection({ kind: "note", id: id.slice(5) });
+  if (id.startsWith("grp:")) return entitySelection({ kind: "group", id: id.slice(4) });
+  if (id.startsWith("gate:")) return entitySelection({ kind: "group", id: id.slice(5) });
+  if (id.startsWith("var:")) return entitySelection({ kind: "variable", id: id.slice(4), groupId: node.data("group") });
+  return null;
+}
+
+function wireMapCards() {
+  cy.on("tap", "node", (event) => {
+    // The delegated core handler receives the original target even when the
+    // event bubbles through a compound parent. Resolve that disc, not its parent.
+    const selection = mapSelection(event.target);
+    if (selection) openEntityCard(selection);
+    else closeEntityCard(false);
+  });
+  cy.on("tap", (event) => { if (event.target === cy) closeEntityCard(false); });
+}
+
+function highlightEntity() {
+  if (!cy) return;
+  cy.batch(() => {
+    cy.nodes(".entity-selected").removeClass("entity-selected");
+    if (!detailSelection) return;
+    const { kind, id, groupId } = detailSelection;
+    const ids = kind === "note" ? [`note:${id}`]
+      : kind === "group" ? [`grp:${id}`, `gate:${id}`] : [`var:${id}`];
+    for (const key of ids) {
+      const node = cy.getElementById(key);
+      if (kind !== "variable" || groupId == null || String(node.data("group")) === groupId) {
+        node.addClass("entity-selected");
+      }
+    }
+  });
+}
+
+// Only identities may come from the full-run map index. In particular, neither
+// annotations nor future results/descriptions may hitch a ride in this catalog.
+function cardCatalog(snapshot) {
+  return {
+    notes: mapIndex.notes.map((note) => ({
+      id: String(note.id), noteId: String(note.noteId), type: String(note.type || ""),
+    })),
+    groups: planGroups(snapshot).map((group) => ({
+      id: String(group.id), name: String(group.name || group.id),
+      variables: group.variables.map((variable) => ({
+        itemId: String(variable.itemId), name: String(variable.name || variable.itemId),
+      })),
+    })),
+  };
+}
+
+function rememberFocus(element, root) {
+  if (!element) return null;
+  return { element, root, id: element.id, selection: controlSelection(element) };
+}
+
+function restoreFocus(reference) {
+  if (!reference) return;
+  let element = reference.element;
+  if (!element?.isConnected && reference.root) {
+    element = reference.id ? document.getElementById(reference.id) : null;
+    if (!element && reference.selection) {
+      element = [...reference.root.querySelectorAll(ENTITY_CONTROL)]
+        .find((control) => sameSelection(controlSelection(control), reference.selection));
+    }
+  }
+  if (element?.isConnected && !element.disabled && !element.closest("[hidden]")) {
+    element.focus?.({ preventScroll: true });
+  }
+}
+
+function replacePanelHTML(root, html) {
+  // Compare the rendered source, not the browser's normalized serialization of
+  // innerHTML (which can change entity escaping even for an identical card).
+  if (!root || panelHTML.get(root) === html) return;
+  const active = document.activeElement;
+  const focus = root.contains(active) ? rememberFocus(active, root) : null;
+  root.innerHTML = html;
+  panelHTML.set(root, html);
+  // Restore only the equivalent control that this replacement detached. An SSE
+  // refresh or a completed notes fetch must never move focus into a new card.
+  restoreFocus(focus);
+}
+
+function openEntityCard(value, origin = null, navigate = false) {
+  const selection = entitySelection(value);
+  if (!selection) return;
+  if (navigate && detailSelection) {
+    if (!sameSelection(selection, detailSelection)) detailHistory.push(detailSelection);
+  } else {
+    detailHistory = [];
+    detailOrigin = rememberFocus(origin, els.vars);
+  }
+  detailSelection = selection;
+  renderDetail(lastView || {});
+  // Explicit navigation may move focus; routine renderDetail calls never do.
+  els.detailClose?.focus({ preventScroll: true });
+}
+
+function backEntityCard() {
+  if (!detailHistory.length) return;
+  detailSelection = detailHistory.pop();
+  renderDetail(lastView || {});
+  const control = detailHistory.length ? els.detailBack : els.detailClose;
+  control?.focus({ preventScroll: true });
+}
+
+function closeEntityCard(restore = true) {
+  const origin = detailOrigin;
+  detailSelection = null;
+  detailHistory = [];
+  detailOrigin = null;
+  renderDetail(lastView || {});
+  if (restore) restoreFocus(origin);
+}
+
+function wireDetailCards() {
+  if (detailCardsWired) return;
+  detailCardsWired = true;
+  const delegate = (root, navigate) => {
+    root?.addEventListener("click", (event) => {
+      if (event.target.closest(".omop-btn")) return;
+      const control = event.target.closest(ENTITY_CONTROL);
+      if (!control || !root.contains(control)) return;
+      const selection = controlSelection(control);
+      if (!selection) return;
+      event.preventDefault();
+      openEntityCard(selection, control, navigate);
+    });
+  };
+  delegate(els.detail, true);
+  delegate(els.vars, false);
+  els.detailBack?.addEventListener("click", backEntityCard);
+  els.detailClose?.addEventListener("click", () => closeEntityCard());
+}
 
 // Ordered, de-duplicated fine map-node IDs touched within a step's seq range.
 function stepNodeIds(step) {
@@ -1755,73 +1951,20 @@ function detailHeadline(title, subtitle, agent, extra) {
 }
 
 function renderDetail(view) {
-  const snap = view.snapshot;
+  const snapshot = view.snapshot || {};
   const step = view.step;
-
-  if (!focusBlock && step) {
-    // An extraction pass is per-group and then per-variable, so it is checked
-    // before the generic fan-out path (it is also a collapsed fan-out step).
-    if (step.node === "extract_branch") {
-      renderExtractDetail(step, snap);
-      return;
-    }
-    // A collapsed fan-out step (e.g. "Characterize notes") shows one card per
-    // instance instead of one merged card per map node.
-    if (step.fanout) {
-      renderFanoutDetail(step, snap);
-      return;
-    }
-  }
-
-  let title, subtitle, agent, nodeIds;
-  // A pinned block is an explicit "show me everything about this component"
-  // request, so it keeps the full cards (raw payloads included).
-  const pinned = Boolean(focusBlock);
-  if (pinned) {
-    title = blockLabel(focusBlock);
-    subtitle = "pinned component";
-    agent = blockAgent(focusBlock);
-    nodeIds = (COARSE_MEMBERS[focusBlock] || []).filter((id) => snap.details[id]);
-  } else if (step) {
-    title = step.title;
-    subtitle = step.subtitle || "";
-    agent = step.agent;
-    // Primary node first, then any other fine nodes touched this step.
-    const touched = stepNodeIds(step);
-    const primary = step.map_node_id;
-    nodeIds = primary && !touched.includes(primary) ? [primary, ...touched] : touched;
-    const present = nodeIds.filter((id) => snap.details[id]);
-    nodeIds = present.filter(
-      (id) => !(SUBSUMED_BY[id] || []).some((by) => present.includes(by))
-    );
-  } else {
-    title = "Run start";
-    subtitle = "";
-    agent = null;
-    nodeIds = [];
-  }
-
-  els.detailNode.textContent = step && step.map_node_id ? step.map_node_id : "";
-
-  const parts = [
-    detailHeadline(
-      title,
-      subtitle,
-      agent,
-      pinned ? `<span class="chip">click background to unpin</span>` : ""
-    ),
-  ];
-
-  if (nodeIds.length === 0) {
-    parts.push(`<p class="empty">No model activity captured for this step.</p>`);
-  } else if (pinned) {
-    for (const id of nodeIds) parts.push(renderNodeDetail(id, snap.details[id], snap, true));
-  } else {
-    parts.push(
-      renderTimeline(nodeIds, snap, (id) => renderNodeDetail(id, snap.details[id], snap, false))
-    );
-  }
-  els.detail.innerHTML = parts.join("");
+  if (els.detailWindow) els.detailWindow.hidden = detailSelection === null;
+  if (els.detailHeading) els.detailHeading.textContent = "Details";
+  if (els.detailNode) els.detailNode.textContent = step
+    ? `Step ${(step.index ?? view.cursor ?? 0) + 1} · ${step.title || nodeTitle(step.map_node_id) || "Current step"}`
+    : "Run start";
+  if (els.detailBack) els.detailBack.hidden = detailHistory.length === 0;
+  if (els.detailClose) els.detailClose.hidden = detailSelection === null;
+  const html = typeof DemoCards !== "undefined" && typeof DemoCards.render === "function"
+    ? DemoCards.render(detailSelection, snapshot, notesById, cardCatalog(snapshot))
+    : detailSelection ? `<p class="empty">Entity details are unavailable.</p>` : "";
+  replacePanelHTML(els.detail, html);
+  highlightEntity();
 }
 
 function isMinor(id, detail) {
@@ -2833,7 +2976,7 @@ function renderVars(snapshot) {
   const prog = snapshot.progress;
   if (!prog) {
     els.varsSummary.textContent = "";
-    els.vars.innerHTML = `<p class="empty">The extraction plan has not been produced yet.</p>`;
+    replacePanelHTML(els.vars, `<p class="empty">The extraction plan has not been produced yet.</p>`);
     return;
   }
   const t = prog.totals;
@@ -2843,7 +2986,7 @@ function renderVars(snapshot) {
     `<span>Notes <b>${prog.notes_done}/${prog.notes_total}</b></span>` +
     (prog.review_flags ? `<span class="flag">⚑ ${prog.review_flags} flag(s)</span>` : "");
 
-  const byGroup = {};
+  const byGroup = Object.create(null);
   for (const v of prog.variables) (byGroup[v.group_id] = byGroup[v.group_id] || []).push(v);
 
   const groups = prog.groups.length
@@ -2856,18 +2999,20 @@ function renderVars(snapshot) {
       const rows = vars
         .map(
           (v) => `<tr>
-            <td class="vt-name">${esc(v.name)}${v.flag ? ` <span class="flag" title="${esc(v.flag)}">⚑</span>` : ""}</td>
+            <td class="vt-name"><button type="button" class="entity-link" data-entity-kind="variable"
+              data-entity-id="${esc(v.item_id)}" data-group-id="${esc(v.group_id)}">${esc(v.name)}</button>${v.flag ? ` <span class="flag" title="${esc(v.flag)}">⚑</span>` : ""}</td>
             <td class="vt-value">${v.value == null || v.value === "" ? "—" : esc(fmt(v.value))}
               ${v.confidence ? `<span class="conf"> · ${esc(v.confidence)}</span>` : ""}</td>
             <td class="vt-status st-${esc(v.status)}">${esc(v.status || v.stage)}</td>
-            <td class="vt-omop"><button class="omop-btn" data-item-id="${esc(v.item_id)}"
+            <td class="vt-omop"><button type="button" class="omop-btn" data-item-id="${esc(v.item_id)}"
               data-name="${esc(v.name)}" title="OMOP rows for this variable">OMOP</button></td>
           </tr>`
         )
         .join("");
       return `<div class="vargroup">
         <div class="vargroup-head">
-          <span>${esc(g.name || g.group_id)}</span>
+          <button type="button" class="entity-link" data-entity-kind="group"
+            data-entity-id="${esc(g.group_id)}">${esc(g.name || g.group_id)}</button>
           <span class="stage-badge stage-${esc(g.stage)}">${esc(g.stage)}</span>
           <span class="gcount">${vars.length} var${vars.length === 1 ? "" : "s"}</span>
         </div>
@@ -2875,7 +3020,7 @@ function renderVars(snapshot) {
       </div>`;
     })
     .join("");
-  els.vars.innerHTML = html || `<p class="empty">No variable groups planned.</p>`;
+  replacePanelHTML(els.vars, html || `<p class="empty">No variable groups planned.</p>`);
 }
 
 /* --- OMOP row preview ----------------------------------------------------
@@ -2989,12 +3134,15 @@ function wireOmopModal() {
   });
   els.omopClose.addEventListener("click", closeOmopModal);
   els.omopBack.addEventListener("click", closeOmopModal);
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && omopIsOpen()) closeOmopModal();
-  });
 }
 
 // --- controls ------------------------------------------------------------
+function interactiveTarget(target) {
+  return !!(target?.isContentEditable || target?.closest(
+    'button, input, textarea, select, a[href], summary, [role="button"], [role="link"], [contenteditable]:not([contenteditable="false"])'
+  ));
+}
+
 function wireControls() {
   els.prev.addEventListener("click", () => post("/api/prev"));
   els.next.addEventListener("click", () => post("/api/next"));
@@ -3006,10 +3154,19 @@ function wireControls() {
   els.mapScrub.addEventListener("input", (e) => seekStep(Number(e.target.value) / 1000));
 
   document.addEventListener("keydown", (e) => {
-    if (e.target.tagName === "SELECT") return;
+    if (e.defaultPrevented || e.isComposing) return;
+    if (e.key === "Escape") {
+      // One layer per Escape: a preview must close before the card behind it.
+      if (omopIsOpen()) closeOmopModal();
+      else if (detailSelection) closeEntityCard();
+      else return;
+      e.preventDefault();
+      return;
+    }
     // The modal owns the keyboard while it is up: stepping the run underneath an
     // open preview would leave it showing rows for a step no longer on screen.
-    if (omopIsOpen()) return;
+    if (omopIsOpen() || viewer || interactiveTarget(e.target)) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (e.key === "ArrowRight") { e.preventDefault(); post("/api/next"); }
     else if (e.key === "ArrowLeft") { e.preventDefault(); post("/api/prev"); }
     else if (e.key === " ") { e.preventDefault(); togglePlay(); }
@@ -3086,8 +3243,7 @@ function wireVarsPane() {
     if (e.key !== "v" && e.key !== "V") return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (omopIsOpen()) return;  // the pane behind the preview stays as it was
-    const tag = (e.target && e.target.tagName) || "";
-    if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
+    if (e.defaultPrevented || interactiveTarget(e.target)) return;
     toggleOpen();
   });
 }
@@ -3204,6 +3360,7 @@ async function refreshLive() {
     if (JSON.stringify(steps) !== oldSteps) buildStepSelect();
     const view = data.view;
     const changed = !lastView || view.cursor !== lastView.cursor || view.snapshot.seq !== lastView.snapshot.seq
+      || view.step?.start_seq !== lastView.step?.start_seq
       || view.follow_live !== lastView.follow_live;
     if (changed) applyView(view);
     else { lastView = view; updateControls(view); }
@@ -3217,9 +3374,19 @@ async function refreshLive() {
 }
 
 function applyView(view) {
-  const stepChanged = !lastView || lastView.cursor !== view.cursor;
+  const stepChanged = !lastView || lastView.cursor !== view.cursor
+    || lastView.step?.start_seq !== view.step?.start_seq;
+  const rewound = lastView && view.snapshot.seq < lastView.snapshot.seq;
+  if (stepChanged || rewound) {
+    // Retain the entity, not a binding to another extraction pass. The renderer
+    // now resolves it only from this snapshot; Back cannot resurrect old scope.
+    if (detailSelection) {
+      const { instanceKey, ...identity } = detailSelection;
+      detailSelection = identity;
+    }
+    detailHistory = [];
+  }
   lastView = view;
-  if (stepChanged) focusBlock = null; // new step clears any pinned component
   // The rows are a point-in-time view, pinned to the seq they were fetched at.
   // Left open across a step change they would quietly describe the wrong step.
   if (stepChanged) closeOmopModal();
@@ -3243,7 +3410,10 @@ async function getJSON(url) {
 }
 function post(url) {
   if (viewer) return Promise.resolve();
-  return fetch(url, { method: "POST" }).then((response) => {
+  return fetch(url, { method: "POST" }).then(async (response) => {
+    // Controls can return a full snapshot. Drain even error bodies to release
+    // the HTTP connection; only the refresh/SSE path supplies new viewer state.
+    await response.arrayBuffer();
     if (!response.ok) throw new Error(`Control request failed (${response.status}).`);
     scheduleRefresh();
   }).catch((error) => { document.getElementById("run-issues").textContent = error.message; });

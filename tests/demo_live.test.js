@@ -6,8 +6,12 @@ const path = require('node:path');
 
 function browser(search = '') {
   const timers = [];
+  const elements = new Map();
   const context = vm.createContext({
-    document: { addEventListener() {}, getElementById() { return {}; } },
+    document: { addEventListener() {}, getElementById(id) {
+      if (!elements.has(id)) elements.set(id, {textContent: ''});
+      return elements.get(id);
+    } },
     window: { location: { search } }, URLSearchParams,
     setTimeout(callback) { timers.push(callback); return timers.length; },
     clearTimeout() {}, console,
@@ -50,10 +54,97 @@ test('pause while following live pauses presentation through the server', () => 
 });
 
 test('viewer controls never post execution or playback requests', async () => {
-  const { context, run } = browser('?viewer=1');
-  context.fetch = () => { throw new Error('viewer sent a control request'); };
+  const { context, timers, run } = browser('?viewer=1');
+  const response = new Response('unused');
+  const requests = [];
+  context.fetch = async (url) => { requests.push(url); return response; };
   await run('post("/api/start")');
   await run('post("/api/next")');
+  await run('post("/api/goto/3")');
+  assert.deepEqual(requests, []);
+  assert.equal(response.bodyUsed, false);
+  assert.equal(timers.length, 0);
+  assert.equal(run('document.getElementById("run-issues").textContent'), '');
+});
+
+for (const status of [200, 409]) {
+  test(`control responses drain large HTTP ${status} bodies before refresh or error reporting`, async (t) => {
+    const { context, timers, run } = browser();
+    let body;
+    const response = new Response(new ReadableStream({start(controller) { body = controller; }}), {status});
+    t.after(() => { try { body.close(); } catch { /* already closed */ } });
+    response.json = () => { throw new Error('control responses must not be parsed'); };
+    context.fetch = async (url, options) => {
+      assert.equal(url, '/api/goto/3');
+      assert.equal(options.method, 'POST');
+      return response;
+    };
+    run('lastView = {cursor: 1, snapshot: {seq: 10}};');
+    const original = run('lastView');
+    const pending = run('post("/api/goto/3")');
+    // Let fetch deliver its headers; the body deliberately remains in flight.
+    await new Promise(setImmediate);
+    assert.equal(response.bodyUsed, true, 'the body reader must start on error responses too');
+    assert.equal(timers.length, 0, 'do not queue a refresh while this connection is still occupied');
+    assert.equal(run('document.getElementById("run-issues").textContent'), '');
+    // A ~2.2 MB body reproduces the response size that exhausted browser slots.
+    // It need not be valid JSON: these bytes must be discarded, not interpreted.
+    body.enqueue(new Uint8Array(2_200_000));
+    body.close();
+    await pending;
+    assert.equal(run('lastView'), original, 'control responses never replace the selected snapshot');
+    assert.equal(timers.length, status === 200 ? 1 : 0);
+    assert.equal(run('document.getElementById("run-issues").textContent'),
+      status === 200 ? '' : 'Control request failed (409).');
+  });
+}
+
+test('repeated controls release every body and coalesce successful refreshes', async () => {
+  const { context, timers, run } = browser();
+  const responses = [];
+  context.fetch = async () => {
+    const response = new Response('{"cursor":999,"snapshot":{"seq":999}}');
+    response.json = () => { throw new Error('control responses must not be parsed'); };
+    responses.push(response);
+    return response;
+  };
+  run('lastView = {cursor: 0, snapshot: {seq: 0}};');
+  const original = run('lastView');
+  // More than the five connections left after the browser opens the SSE stream.
+  for (let step = 1; step <= 8; step++) await run(`post("/api/goto/${step}")`);
+  assert.equal(responses.length, 8);
+  assert.ok(responses.every((response) => response.bodyUsed));
+  assert.equal(timers.length, 1);
+  assert.equal(run('lastView'), original);
+  assert.equal(run('document.getElementById("run-issues").textContent'), '');
+});
+
+test('bodyless successful controls still schedule refresh', async () => {
+  const { context, timers, run } = browser();
+  context.fetch = async () => new Response(null, {status: 204});
+  await run('post("/api/pause")');
+  assert.equal(timers.length, 1);
+  assert.equal(run('document.getElementById("run-issues").textContent'), '');
+});
+
+test('control fetch rejections are reported without scheduling refresh', async () => {
+  const { context, timers, run } = browser();
+  context.fetch = async () => { throw new Error('connection lost'); };
+  await run('post("/api/next")');
+  assert.equal(timers.length, 0);
+  assert.equal(run('document.getElementById("run-issues").textContent'), 'connection lost');
+});
+
+test('control body-read rejections are reported without scheduling refresh', async () => {
+  const { context, timers, run } = browser();
+  const response = new Response(new ReadableStream({
+    pull(controller) { controller.error(new Error('body interrupted')); },
+  }));
+  context.fetch = async () => response;
+  await run('post("/api/next")');
+  assert.equal(response.bodyUsed, true);
+  assert.equal(timers.length, 0);
+  assert.equal(run('document.getElementById("run-issues").textContent'), 'body interrupted');
 });
 
 test('retriever proposals do not invent a candidate pool from unrelated notes', () => {

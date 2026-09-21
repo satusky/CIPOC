@@ -9,6 +9,7 @@ real nodes), so the map can never silently drift from the pipeline.
 """
 
 import json
+import re
 import unittest
 import warnings
 from pathlib import Path
@@ -31,7 +32,7 @@ from cipoc.export import NOTE_FIELDS, NOTE_NLP_FIELDS  # noqa: E402
 from cipoc.utils.progress.model import DEFAULT_NODE_KINDS  # noqa: E402
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "demo_trace.jsonl"
-WEB_ASSETS = ("index.html", "app.js", "styles.css", "cytoscape.min.js")
+WEB_ASSETS = ("index.html", "app.js", "cards.js", "styles.css", "cytoscape.min.js")
 
 
 def _client():
@@ -67,8 +68,12 @@ class WebAssetTests(unittest.TestCase):
 
     def test_index_wires_up_assets(self):
         html = (WEB_DIR / "index.html").read_text()
-        for ref in ("app.js", "styles.css", "cytoscape.min.js"):
+        for ref in WEB_ASSETS[1:]:
             self.assertIn(ref, html)
+        scripts = re.findall(r'<script\b[^>]*\bsrc="([^"]+)"[^>]*>', html)
+        self.assertEqual(scripts, ["cytoscape.min.js", "cards.js", "app.js"])
+        for script in scripts:
+            self.assertIn(f'<script src="{script}" defer></script>', html)
 
     def test_app_js_fetches_the_backend_contract(self):
         app_js = (WEB_DIR / "app.js").read_text()
@@ -463,10 +468,14 @@ class WebAssetTests(unittest.TestCase):
         # The modal owns the keyboard while it is up. Without both guards the
         # arrows would move the presentation for every viewer, and space would
         # toggle play, while the presenter is reading a table.
-        self.assertEqual(app_js.count("if (omopIsOpen()) return;"), 2)
+        for function in ("wireControls", "wireVarsPane"):
+            scoped = app_js.split(f"function {function}", 1)[1].split("\n}", 1)[0]
+            keyboard = scoped.split('document.addEventListener("keydown"', 1)[1]
+            self.assertRegex(keyboard, r"if \(omopIsOpen\(\)(?: \|\| [^\n]+)?\) return;")
+            self.assertIn("interactiveTarget(e.target)", keyboard)
 
-        # The rows are pinned to a seq, so a step change closes them — the rule
-        # focusBlock already follows in the same place.
+        # OMOP rows are pinned to a seq, so a step change closes the preview
+        # while entity cards re-resolve against the newly selected snapshot.
         self.assertIn("closeOmopModal();", app_js.split("function applyView")[1])
 
         # Outside #vars, which is replaced on every render, and outside .panel,
@@ -548,8 +557,10 @@ class OverviewChartTests(unittest.TestCase):
     def test_static_assets_served_by_app(self):
         client = _client()
         self.assertEqual(client.get("/").status_code, 200)
-        for name in ("app.js", "styles.css", "cytoscape.min.js"):
-            self.assertEqual(client.get(f"/{name}").status_code, 200, name)
+        for name in WEB_ASSETS:
+            response = client.get(f"/{name}")
+            self.assertEqual(response.status_code, 200, name)
+            self.assertEqual(response.content, (WEB_DIR / name).read_bytes(), name)
 
 
 class OmopEndpointTests(unittest.TestCase):

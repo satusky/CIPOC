@@ -2,7 +2,8 @@
 
 The demo presents the same scanner → planner → retriever → extractor workflow
 as the historical `demo` branch: animated map, grouped presenter steps, evidence,
-validation repairs, model exchanges, variable table, and OMOP staging previews.
+validation repairs, standalone entity cards, variable table, and OMOP staging
+previews.
 Live runs use CIPOC 1.1.0's public orchestrator and emit canonical schema 1.2
 artifacts. The Workbench remains a separately installed completed-run reader.
 
@@ -50,10 +51,10 @@ per-request limits, not a whole-run deadline.
   interface, not authentication.
 - Elapsed time, active/completed model calls, transport retries, last-observation
   age, connection state, and distinct completion/failure states remain visible.
-- Model cards use the runtime observer, including available service/local-wait
-  timing and provider usage. Live observations are provisional and precede final
-  entity attribution; canonical observability is authoritative. Validation
-  repairs, transport retries, and model invocations are different measures.
+- Runtime observations include available service/local-wait timing and provider
+  usage. Live observations are provisional and precede final entity attribution;
+  canonical observability is authoritative. Validation checks/repairs, provider
+  transport retries, and model invocations are different measures.
 - Reconnects recover a consistent snapshot plus missing events. Refreshing or
   closing a browser tab does not rerun extraction. The local server must remain
   running. Graceful server shutdown waits for its owned worker; there is no
@@ -64,6 +65,52 @@ per-request limits, not a whole-run deadline.
 `llm.max_concurrency` in configuration is the separate process-wide synchronous
 capacity for a particular endpoint/model, and may be 1. The server runs one job
 per process; separate server processes have separate model budgets.
+
+## Replay entity cards
+
+The presentation target is **Full HD (1920 × 1080)**. The orchestration map spans
+the presentation board, with the Variables drawer over its lower-left corner.
+A content-sized floating window, capped at **896px wide**, appears over the
+clear right-hand portion of the map when an entity is selected. Workflow nodes
+are fitted to the available space beside it, keeping their layout stable when
+cards open or close. One note, group, or variable card is shown at a time,
+with all its sections together rather than behind tabs or accordions. Live mode
+uses the same frontend.
+
+- **Note:** ID, date/type, scan status, summary, concept presence/confidence,
+  cancer mentions and temporality, and evidence. Concepts occupy a uniform grid:
+  ✓ indicates present, − absent, and ? unrecorded; present concepts have a teal fill.
+- **Group:** summary and variable tiles with recorded status, value, and reasons.
+- **Variable:** item/name, value or candidate value, the first sentence of the
+  recorded definition where available, extraction explanation/confidence, evidence, and validation checks
+  with candidate values, outcomes, and recorded failure reasons. These checks
+  are distinct from provider retries. The value is emphasized in a full-width
+  result band. Confidence badges use dark teal for max, green for high, amber for
+  medium, and pink for low; missing or unrecognized levels remain neutral.
+
+Note IDs and numeric NAACCR item IDs appear below their map bubbles. Select a
+note/variable disc or its ID, a group container/gate on the map, or a group or
+variable name in the Variables table. Group tiles open variable cards; evidence
+note links open note cards. **Back** retraces this card navigation. **Close** or
+**Escape** clears the card (Escape closes an open OMOP preview first); clicking
+the map background also clears it. Card navigation is local to each browser and
+leaves the playback cursor and map geometry unchanged.
+
+Card results and the table reflect the **selected step-end snapshot**. The
+within-step scrubber and replay button animate only the map. Across step changes,
+the selected entity stays selected and is re-resolved against the new snapshot;
+instance-specific bindings and Back history are cleared, including on rewind.
+
+Evidence excerpts highlight exact source-note matches, preserving case,
+whitespace, and punctuation. Repeated matches disclose that the first occurrence
+is shown; long prose/citations use labeled deterministic excerpts. **Source note
+unavailable** and **Exact span not found in source note** show the recorded quote
+without highlighting. Read availability labels literally: **Pending**/**Active**
+describe scan progress, **Not recorded** means missing assessment data, and
+**No cancer mentions recorded** means a recorded empty mention list.
+
+Raw prompts/responses are omitted from the main cards. The canonical artifact
+retains captured model exchanges for review, subject to content-capture settings.
 
 ## Record, replay, and review
 
@@ -130,9 +177,10 @@ legacy traces without a recorded date use an explicit `1970-01-01` preview
 placeholder. Concept columns are staging values requiring downstream mapping.
 
 `--no-llm-content-capture` omits prompt/response bodies from both runtime exchange
-capture and live model cards. `--max-content-chars N` limits each captured prompt
-message. Raw graph message lists/group-response copies are excluded from the
-presentation channel; clinical candidates, evidence, notes, and errors remain.
+capture and recorded runtime observations. `--max-content-chars N` limits each
+captured prompt message. Raw graph message lists/group-response copies are
+excluded from the presentation channel; clinical candidates, evidence, notes,
+and errors remain.
 All artifacts and recordings can contain PHI even with model content disabled.
 Use the trusted local interface and handle downloaded files accordingly.
 
@@ -141,7 +189,8 @@ Use the trusted local interface and handle downloaded files accordingly.
 ```bash
 PYTHONPATH=src python -m unittest tests.test_demo_state tests.test_demo_steps \
     tests.test_demo_server tests.test_demo_web tests.test_demo_live
-node --test tests/demo_live.test.js
+node --test tests/demo_live.test.js tests/demo_cards.test.js \
+    tests/demo_card_navigation.test.js tests/demo_map_viewport.test.js
 ```
 
 Tests use stdlib unittest and deterministic graphs; they do not call endpoints.

@@ -147,7 +147,8 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow: hidden;
+  font-size: 1rem;
+  overflow: auto;
 }
 
 .muted { color: var(--muted); }
@@ -245,23 +246,34 @@ body {
 
 /* ---- grid ---- */
 .grid {
+  --detail-width: min(56rem, 48%);
+  --map-drawing-width: calc(100% - var(--detail-width) - 2rem);
   flex: 1;
   min-height: 0;
   display: grid;
   gap: .8rem;
   padding: .8rem;
-  grid-template-columns: 1.55fr 1fr;
-  /* The map gets whatever the variables panel does not; --vars-h is written by
+  grid-template-columns: minmax(0, 1fr);
+  /* The drawing gets whatever the variables panel does not; --vars-h is written by
      wireSplitter (and restored from localStorage), so a presenter can pull the
      variables panel upward when a case has more variables than fit. */
   grid-template-rows: minmax(0, 1fr) minmax(0, var(--vars-h, 32%));
   grid-template-areas:
-    "map    detail"
-    "vars   detail";
+    "map"
+    "vars";
 }
-.panel-map { grid-area: map; }
-.panel-detail { grid-area: detail; }
-.panel-vars { grid-area: vars; position: relative; }
+/* One canvas spans the whole presentation board. The variable drawer sits over
+   its lower-left corner; the fit rectangle follows the drawer's actual row. */
+.panel-map { grid-column: 1; grid-row: 1 / -1; position: relative; }
+.map-layout {
+  grid-area: map;
+  width: var(--map-drawing-width);
+  min-width: 0;
+  min-height: 0;
+  margin-top: 3rem;
+  pointer-events: none;
+}
+.panel-vars { grid-area: vars; position: relative; z-index: 3; width: var(--map-drawing-width); }
 
 /* Collapsed, the variables row is exactly its own header — `auto` rather than a
    height in the var, so the collapsed size can never disagree with what the
@@ -314,10 +326,19 @@ body.row-resizing { cursor: row-resize; user-select: none; }
   flex: none;
 }
 .panel-head h2 { margin: 0; font-size: .82rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.panel-map > .panel-head {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--map-drawing-width);
+  height: 3rem;
+  z-index: 2;
+  border: 0;
+}
 /* The map's heading is a product name, so it keeps the case it is written in —
    and, being a name, it is one of the three places the display serif appears.
    The other panels are generic labels and stay in the uppercase house style. */
-.panel-map .panel-head h2 {
+.panel-map > .panel-head h2 {
   text-transform: none; letter-spacing: .01em;
   font-family: var(--font-display); font-size: .8rem; color: var(--ink);
 }
@@ -325,10 +346,10 @@ body.row-resizing { cursor: row-resize; user-select: none; }
 .scroll { overflow: auto; }
 
 /* ---- panel 1: map ---- */
-.cy-wrap { position: relative; flex: 1; min-height: 0; }
+.cy-wrap { position: absolute; inset: 0; min-height: 0; }
 .cy {
   position: absolute; inset: 0;
-  border-radius: 0 0 var(--radius) var(--radius);
+  border-radius: var(--radius);
   background:
     radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--navy) 12%, #fff) 1px, transparent 0) 0 0 / 22px 22px,
     var(--panel);
@@ -346,7 +367,7 @@ body.row-resizing { cursor: row-resize; user-select: none; }
 .map-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
 .map-scrub { width: 6rem; accent-color: var(--accent); cursor: pointer; }
 
-/* Discs are deliberately unlabeled — this is how you find out which one. */
+/* Disc IDs are visible on the map; the hover tooltip adds their descriptive name. */
 .map-tip {
   position: absolute; z-index: 6; pointer-events: none;
   max-width: 15rem; padding: .2rem .45rem;
@@ -357,8 +378,356 @@ body.row-resizing { cursor: row-resize; user-select: none; }
 }
 .map-tip[hidden] { display: none; }
 
-/* ---- panel 2: detail ---- */
-.detail { flex: 1; padding: .85rem; font-size: .85rem; }
+/* ---- floating presentation card ----
+   The overlay floats above the canvas. The invisible fit rectangle keeps this
+   portion clear even when no card is selected; the empty area accepts map input. */
+.panel-detail {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  width: var(--detail-width);
+  z-index: 5;
+  min-width: 0;
+  min-height: 0;
+  pointer-events: none;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.detail-window {
+  width: min(100%, 56rem);
+  margin-inline: auto;
+  pointer-events: auto;
+  background: var(--panel);
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(19, 41, 75, .16), 0 2px 8px rgba(19, 41, 75, .07);
+  animation: card-appear 160ms ease-out;
+}
+.detail-window[hidden] { display: none; }
+@keyframes card-appear {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) { .detail-window { animation: none; } }
+.detail-window > .panel-head {
+  min-width: 0;
+  justify-content: flex-start;
+  padding: .4rem .85rem 0;
+  border: 0;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+#detail-node {
+  min-width: 0;
+  max-width: 50%;
+  overflow-wrap: anywhere;
+  font-size: .875rem;
+}
+#detail-node:empty { display: none; }
+.entity-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: .5rem;
+  margin-left: auto;
+  flex: none;
+}
+.entity-toolbar button {
+  font: inherit;
+  font-weight: 600;
+  min-height: 1.9rem;
+  padding: .2rem .6rem;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.entity-toolbar button:hover { background: var(--accent-soft); border-color: var(--accent-ink); }
+.entity-toolbar [hidden] { display: none; }
+.detail { min-width: 0; min-height: 0; font-size: 1rem; }
+
+/* ---- standalone note / group / variable cards ---- */
+.entity-card {
+  --entity-accent: var(--line-strong);
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: .4rem .85rem .85rem;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.entity-note { --entity-accent: var(--scanner-ink); }
+.entity-group { --entity-accent: var(--retriever-ink); }
+.entity-variable { --entity-accent: var(--extractor-ink); }
+.entity-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: .1rem .65rem;
+  padding-bottom: .45rem;
+  border-bottom: 1px solid var(--line);
+  flex: none;
+}
+.entity-header > :not(.entity-status) { grid-column: 1; min-width: 0; }
+.entity-header > .entity-status { grid-column: 2; grid-row: 1 / span 3; }
+.entity-eyebrow {
+  margin: 0;
+  font-size: .875rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--entity-accent);
+}
+.entity-title {
+  margin: .1rem 0 .3rem;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.entity-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .75rem; color: var(--muted); }
+.entity-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  align-items: start;
+  gap: .6rem .85rem;
+  min-width: 0;
+}
+.entity-section { display: grid; align-content: start; gap: .3rem; min-width: 0; margin: 0; }
+.entity-section-wide { grid-column: 1 / -1; }
+/* Evidence gets an uninterrupted reading column. The note's shorter summary,
+   concept assessment and mention facts stack beside it without row-height gaps. */
+.entity-note .entity-body { grid-template-areas: "summary evidence" "concepts evidence" "mentions evidence"; }
+.entity-note .entity-summary { grid-area: summary; }
+.entity-note .entity-concepts { grid-area: concepts; }
+.entity-note .entity-cancer { grid-area: mentions; }
+.entity-note .entity-evidence-section { grid-area: evidence; }
+/* Multiple cancer mentions share a full-width row rather than crowding the
+   summary column while the adjacent evidence column has already finished. */
+.entity-note .entity-body:has(.entity-mention + .entity-mention) {
+  grid-template-areas: "summary evidence" "concepts evidence" "mentions mentions";
+}
+.entity-mentions:has(.entity-mention + .entity-mention) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* Put source evidence beside the definition, with explanation and validation
+   below. Long definitions otherwise push evidence below the presentation frame
+   even when the neighbouring explanation leaves ample room. */
+.entity-variable .entity-body { grid-template-areas: "definition evidence" "explanation validation"; }
+.entity-variable .entity-definition { grid-area: definition; }
+.entity-variable .entity-explanation { grid-area: explanation; }
+.entity-variable .entity-evidence-section { grid-area: evidence; }
+.entity-variable .entity-validation { grid-area: validation; }
+.entity-section-title { margin: 0; color: var(--ink); font-size: 1rem; font-weight: 700; line-height: 1.3; }
+.entity-prose { margin: 0; color: var(--ink-max); line-height: 1.4; }
+.entity-empty, .entity-muted { color: var(--muted); }
+.entity-empty, .entity-muted { margin: 0; }
+.entity-prose p { margin: 0 0 .4rem; }
+.entity-prose p:last-child { margin-bottom: 0; }
+.entity-prose ul, .entity-prose ol { margin: .25rem 0; padding-left: 1.25rem; }
+.entity-header > .entity-result {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem 1rem;
+  margin-top: .5rem;
+  padding: .25rem .85rem;
+  border-radius: 9px;
+  background: var(--entity-state-soft, var(--accent-soft));
+  box-shadow: inset 4px 0 var(--entity-state-ink, var(--extractor-ink));
+}
+.entity-value { display: flex; flex-wrap: wrap; align-items: baseline; gap: .35rem 1rem; min-width: 0; }
+.entity-value > span { color: var(--muted); font-weight: 600; }
+.entity-value strong { font-size: 1.875rem; line-height: 1.4; font-variant-numeric: tabular-nums; color: var(--ink); }
+.entity-confidence {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  padding: .15rem .45rem;
+  border-radius: 5px;
+  font-size: .875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  background: var(--miss-soft);
+  color: var(--miss-ink);
+  text-transform: capitalize;
+}
+.confidence-max { background: var(--scanner-ink); color: #fff; }
+.confidence-high { background: var(--ok-soft); color: var(--ok-ink); }
+.confidence-medium { background: var(--warn-soft); color: var(--warn-ink); }
+.confidence-low { background: var(--err-soft); color: var(--err-ink); }
+.entity-result .entity-confidence { font-size: 1rem; padding: .35rem .65rem; }
+.entity-concept-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
+  gap: .4rem;
+}
+.entity-concept {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  align-content: center;
+  align-items: center;
+  gap: .15rem .5rem;
+  min-height: 3.3rem;
+  padding: .2rem .5rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  background: var(--panel-sunk);
+}
+.entity-concept.concept-present {
+  background: color-mix(in srgb, var(--scanner) 14%, #fff);
+  border-color: color-mix(in srgb, var(--scanner) 50%, #fff);
+  color: var(--scanner-ink);
+}
+.entity-concept-icon {
+  grid-column: 1;
+  grid-row: 2;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+}
+/* Give long names the full bubble width; presence and confidence share row two. */
+.entity-concept-name { grid-column: 1 / -1; grid-row: 1; font-size: 1rem; line-height: 1.2; }
+.entity-concept .entity-confidence { grid-column: 2; grid-row: 2; font-size: .8125rem; padding: .05rem .3rem; }
+.entity-reasons { margin: 0; padding-left: 1.25rem; }
+
+.entity-chips { display: flex; flex-wrap: wrap; align-items: flex-start; gap: .35rem; margin: 0; padding: 0; list-style: none; }
+.entity-chip, .entity-status, .entity-tile-status {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  gap: .25rem;
+  padding: .2rem .5rem;
+  border: 1px solid var(--entity-state-line, var(--line));
+  border-radius: 6px;
+  background: var(--entity-state-soft, var(--panel-sunk));
+  color: var(--entity-state-ink, var(--muted));
+  font-size: 1rem;
+  line-height: 1.3;
+  white-space: normal;
+}
+.entity-status, .entity-tile-status { font-weight: 600; }
+.entity-chip { display: block; }
+/* Status words are supplied by the renderer; colour is a redundant cue. Keep
+   the tone on badges/rails rather than tinting an entire clinical narrative. */
+.entity-card :is(.status-extracted, .status-done, .status-valid, .status-present) {
+  --entity-state-ink: var(--ok-ink); --entity-state-soft: var(--ok-soft); --entity-state-line: var(--ok);
+}
+.entity-card .status-structured-data {
+  --entity-state-ink: var(--ink); --entity-state-soft: var(--accent-soft); --entity-state-line: var(--accent);
+}
+.entity-card :is(.status-active, .status-running) {
+  --entity-state-ink: var(--warn-ink); --entity-state-soft: var(--warn-soft); --entity-state-line: var(--warn);
+}
+.entity-card :is(.status-invalid, .status-error) {
+  --entity-state-ink: var(--err-ink); --entity-state-soft: var(--err-soft); --entity-state-line: var(--err);
+}
+.entity-card :is(.status-not-found, .status-blocked, .status-not-applicable, .status-pending, .status-absent, .status-idle) {
+  --entity-state-ink: var(--miss-ink); --entity-state-soft: var(--miss-soft); --entity-state-line: var(--line-strong);
+}
+
+.entity-mentions, .entity-evidence, .entity-attempts { display: grid; gap: .5rem; margin: 0; padding: 0; list-style: none; }
+.entity-mention, .entity-evidence-item, .entity-attempt {
+  min-width: 0;
+  padding: .5rem .65rem;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--panel-sunk);
+}
+.entity-mention { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .25rem .6rem; }
+.entity-mention > strong { grid-column: 1 / -1; }
+.entity-evidence-item > .entity-muted { margin-bottom: .25rem; }
+.entity-source { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .5rem; margin: 0 0 .3rem; color: var(--muted); }
+.entity-note-text { margin: 0; white-space: pre-wrap; font: inherit; line-height: 1.4; color: var(--ink-max); }
+.entity-note-text mark {
+  background: color-mix(in srgb, var(--sunburst) 45%, #fff);
+  color: var(--ink-max);
+  border-radius: 2px;
+  font-weight: 600;
+}
+.entity-attempt { border-left: 3px solid var(--entity-state-line, var(--line-strong)); padding: .4rem .65rem; line-height: 1.3; }
+.entity-attempt-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .25rem .5rem; margin-bottom: .15rem; font-weight: 600; }
+.entity-errors { margin: .25rem 0 0; padding-left: 1.2rem; color: var(--err-ink); }
+.entity-errors > li + li { margin-top: .15rem; }
+
+/* A full-width group section holds 13 tiles in seven compact rows. IDs and
+   status remain readable alongside wrapping names; no hover is needed. */
+.entity-group .entity-body { row-gap: .5rem; }
+.entity-tiles { display: grid; grid-template-columns: minmax(0, 1fr); gap: .35rem .6rem; }
+.entity-section-wide .entity-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+button.entity-tile {
+  display: grid;
+  grid-template-columns: 3.25rem minmax(0, 1fr) auto;
+  grid-template-areas: "id name name" "id value status";
+  align-items: center;
+  gap: .2rem .5rem;
+  min-width: 0;
+  min-height: 3.75rem;
+  padding: .4rem .55rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--entity-state-line, var(--line-strong));
+  border-radius: 7px;
+  background: var(--panel-sunk);
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.3;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+.entity-tile:hover { background: var(--accent-soft); border-color: var(--accent-ink); }
+.entity-tile-id { grid-area: id; font-family: var(--font-mono); color: var(--muted); }
+.entity-tile-name { grid-area: name; min-width: 0; font-weight: 600; }
+.entity-tile-value { grid-area: value; min-width: 0; font-variant-numeric: tabular-nums; }
+.entity-tile-status { grid-area: status; justify-self: end; padding: .05rem .35rem; }
+.entity-tile-reason { grid-column: 1 / -1; color: var(--muted); }
+.entity-card :is(button, a)[data-entity-kind]:not(.entity-tile):not(.entity-chip),
+.panel-vars :is(button, a)[data-entity-kind] {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent-ink);
+  font: inherit;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-underline-offset: .15em;
+  cursor: pointer;
+}
+.entity-card :is(button, a)[data-entity-kind]:hover,
+.panel-vars :is(button, a)[data-entity-kind]:hover { color: var(--navy); }
+.entity-card :is(button, a, [tabindex]):focus-visible,
+.entity-card:focus-visible,
+.entity-toolbar button:focus-visible,
+.panel-vars [data-entity-kind]:focus-visible,
+#vars-toggle:focus-visible {
+  outline: 3px solid var(--accent-ink);
+  outline-offset: 3px;
+}
+
+/* Legacy shared detail utilities, also used by auxiliary views. The entity
+   renderer above has its own flat section and evidence vocabulary. */
 .detail-headline {
   display: flex; flex-direction: column; gap: .35rem;
   padding-bottom: .7rem; margin-bottom: .7rem; border-bottom: 1px dashed var(--line);
@@ -800,3 +1169,58 @@ table.omop-table { border-collapse: collapse; font-size: .72rem; width: max-cont
   border: 1px solid color-mix(in srgb, var(--err) 30%, #fff); border-radius: 6px;
 }
 .omop-error ul { margin: .25rem 0 0; padding-left: 1.1rem; }
+
+/* Stack the variable's reading columns independently so long source evidence
+   does not leave a matching gap between its definition and explanation. */
+@media (min-width: 1451px) and (min-height: 801px) {
+  .entity-variable .entity-body { display: block; columns: 2; column-gap: .85rem; }
+  .entity-variable .entity-section { break-inside: avoid; }
+  .entity-variable .entity-explanation, .entity-variable .entity-validation { margin-top: .6rem; }
+  .entity-variable .entity-evidence-section { break-before: column; }
+}
+
+/* Short presentation frames need less spacing around the same readable content,
+   particularly three validation checks and the seven-row variable roster. */
+@media (min-width: 1451px) and (min-height: 801px) and (max-height: 1000px) {
+  .detail-window > .panel-head { padding-top: .4rem; }
+  .entity-card { gap: .4rem; padding-top: .35rem; padding-bottom: .5rem; }
+  .entity-header { row-gap: 0; padding-bottom: .4rem; }
+  .entity-header > .entity-result { margin-top: .15rem; }
+  .entity-body { row-gap: .5rem; }
+  .entity-variable .entity-explanation, .entity-variable .entity-validation { margin-top: .5rem; }
+  .entity-attempts { gap: .35rem; }
+  .entity-attempt { padding-block: .2rem; }
+  .entity-errors { margin-top: .15rem; }
+  .entity-errors > li + li { margin-top: .1rem; }
+  .entity-evidence-item { padding-block: .4rem; }
+}
+
+/* Smaller windows retain readable type and allow local overflow. These rules
+   never run at the 1920 x 1080 presentation target, and selection state is not
+   a layout input at any viewport size. */
+@media (max-width: 1450px), (max-height: 800px) {
+  .detail-window { max-height: 100%; display: flex; flex-direction: column; }
+  .detail { overflow: auto; }
+  .entity-body { grid-template-columns: minmax(0, 1fr); }
+  .entity-note .entity-body, .entity-variable .entity-body { grid-template-areas: none; }
+  .entity-note .entity-body:has(.entity-mention + .entity-mention) { grid-template-areas: none; }
+  .entity-mentions:has(.entity-mention + .entity-mention) { grid-template-columns: minmax(0, 1fr); }
+  .entity-note .entity-body > .entity-section, .entity-variable .entity-body > .entity-section { grid-area: auto; }
+  .entity-header { grid-template-columns: minmax(0, 1fr); }
+  .entity-header > .entity-status { grid-column: 1; grid-row: auto; justify-self: start; }
+  .entity-variable .entity-header > .entity-status { grid-row: auto; }
+  .entity-section-wide .entity-tiles { grid-template-columns: minmax(0, 1fr); }
+  .topbar, .controls { flex-wrap: wrap; }
+}
+@media (max-width: 1000px) {
+  body { height: auto; min-height: 100vh; }
+  .grid {
+    flex: none;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: clamp(32rem, 80vh, 48rem) minmax(3rem, var(--vars-h, 18rem));
+  }
+  .grid.vars-collapsed { grid-template-rows: clamp(32rem, 80vh, 48rem) auto; }
+  .brand p { max-width: 85vw; }
+  .panel-map .panel-head { flex-wrap: wrap; }
+  #detail-node { max-width: 35%; }
+}
