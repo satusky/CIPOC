@@ -1,12 +1,17 @@
 """Phase 2 — DemoState folds the merged event stream into presentable state."""
 
 import json
+import tempfile
 import unittest
 from pathlib import Path
 
 from cipoc.demo.events import DemoEvent, LLMCall
-from cipoc.demo.state import DemoState, NodeDetail, replay
+from cipoc.demo.server import DemoSession, LiveDemoSession, load_replay_session
+from cipoc.demo.state import DemoSnapshot, DemoState, NodeDetail, replay
+from cipoc.demo.stream import DemoRun
 from cipoc.demo.trace import read_trace
+from cipoc.models import CaseFacts
+from tests.fake_orchestrator import Outcome, Script, build_fake_orchestrator, load_notes
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "demo_trace.jsonl"
 
@@ -364,6 +369,172 @@ class LazyModelTests(unittest.TestCase):
         self.assertEqual(progress.total_variables, 1)
 
 
+class CaseFactsSnapshotTests(unittest.TestCase):
+    """Facts are a detached read of root values, independent of task progress."""
+
+    UNKNOWN = {
+        "primary_site": None,
+        "gross_primary_site": None,
+        "histology": None,
+        "behavior": None,
+        "sex": None,
+        "date_of_diagnosis": None,
+    }
+
+    @staticmethod
+    def values(seq, payload, namespace=()):
+        return DemoEvent(seq=seq, t=seq * 0.1, type="values",
+                         namespace=namespace, payload=payload)
+
+    def test_direct_constructor_keeps_previous_positional_signature(self):
+        snap = DemoSnapshot(0, 0.0, False, None, None, (), (), {}, {}, {}, None)
+        self.assertIsNone(snap.case_facts)
+        self.assertIn("case_facts", snap.to_dict())
+        self.assertIsNone(snap.to_dict()["case_facts"])
+
+    def test_startup_is_unavailable_even_with_preconfigured_progress(self):
+        for state in (DemoState(), DemoState(target_groups=[], graph_input={
+            "case_facts": {"primary_site": "C509"},
+        })):
+            with self.subTest(preconfigured=state.snapshot().progress is not None):
+                self.assertIsNone(state.snapshot().case_facts)
+                state.ingest(DemoEvent(seq=0, t=0.0, type="run_start"))
+                data = json.loads(json.dumps(state.snapshot().to_dict(), allow_nan=False))
+                self.assertIn("case_facts", data)
+                self.assertIsNone(data["case_facts"])
+
+    def test_missing_null_or_unhydratable_root_is_unavailable(self):
+        for payload in (
+            {}, {"case_facts": None}, None, [],
+            {"case_facts": {"primary_site": ["invalid"]}},
+            {"case_facts": {"primary_site": "C509"}, "note_corpus": {"1": {"note_id": 1}}},
+        ):
+            with self.subTest(payload=payload):
+                state = replay([self.values(1, {"case_facts": {"primary_site": "C509"}})])
+                state.ingest(self.values(2, payload))
+                self.assertIsNone(state.snapshot().case_facts)
+                self.assertIsNone(state.snapshot().to_dict()["case_facts"])
+
+    def test_explicit_unknown_object_has_all_six_nullable_fields(self):
+        self.assertEqual(set(CaseFacts.model_fields), set(self.UNKNOWN))
+        for facts in ({}, self.UNKNOWN):
+            with self.subTest(facts=facts):
+                snap = replay([self.values(1, {"case_facts": facts})]).snapshot()
+                self.assertEqual(snap.case_facts, self.UNKNOWN)
+                self.assertEqual(snap.to_dict()["case_facts"], self.UNKNOWN)
+
+    def test_new_root_facts_replace_prior_fields_including_explicit_nulls(self):
+        state = replay([self.values(1, {"case_facts": {
+            "primary_site": "C509", "gross_primary_site": "breast", "histology": "8500",
+        }})])
+        earlier = state.snapshot()
+        state.ingest(self.values(2, {"case_facts": {"primary_site": None, "sex": "2"}}))
+        self.assertEqual(state.snapshot().case_facts, {**self.UNKNOWN, "sex": "2"})
+        state.ingest(self.values(3, {"case_facts": None}))
+        self.assertIsNone(state.snapshot().case_facts)
+        self.assertEqual(earlier.case_facts["primary_site"], "C509")
+
+    def test_results_and_subagent_or_task_facts_cannot_override_root(self):
+        for root_facts in (None, {}, {"primary_site": "C509"}):
+            with self.subTest(root_facts=root_facts):
+                state = replay([self.values(1, {
+                    "case_facts": root_facts,
+                    "structured_data": {400: "C349"},
+                    "variable_results": {
+                        400: {"item_id": 400, "status": "structured_data", "value": "C349"},
+                    },
+                })])
+                self.assertIsNotNone(state.latest_case)
+                expected = None if root_facts is None else {**self.UNKNOWN, **root_facts}
+                self.assertEqual(state.snapshot().case_facts, expected)
+                events = [
+                    _task_start(2, "extract_branch", "g", (), "fan_out_groups", "orchestrator",
+                                payload={"case_facts": {"primary_site": "C349"}}),
+                    self.values(3, {"case_facts": {"primary_site": "C349"}}, ("extract_branch:g",)),
+                    _task_end(4, "merge_and_update", "m", (), "merge_and_update", "orchestrator",
+                              payload={"case_facts": {"primary_site": "C349"}}),
+                ]
+                for event in events:
+                    state.ingest(event)
+                    self.assertEqual(state.snapshot().case_facts, expected)
+
+    def test_snapshot_copies_model_and_returns_fresh_json_safe_facts(self):
+        original = {**self.UNKNOWN, "gross_primary_site": "left bréast", "behavior": "3"}
+        state = replay([self.values(1, {"case_facts": original})])
+        snap = state.snapshot()
+        with self.assertRaises(TypeError):
+            snap.case_facts["behavior"] = "2"
+        data = json.loads(json.dumps(snap.to_dict(), allow_nan=False))
+        self.assertEqual(data["case_facts"], original)
+        detached = snap.to_dict()
+        detached["case_facts"]["behavior"] = "2"
+        state.latest_case.case_facts.behavior = "0"
+        self.assertEqual(snap.to_dict()["case_facts"], original)
+        self.assertEqual(state.snapshot().case_facts["behavior"], "0")
+        state.ingest(self.values(2, {"case_facts": {"primary_site": "C509"}}))
+        self.assertEqual(snap.case_facts, original)
+
+
+class CurrentCaseFactsReplayTests(unittest.TestCase):
+    """Real root updates survive live capture, trace round trips, and rewinds."""
+
+    def test_structured_characterized_and_extracted_facts_are_cursor_local(self):
+        agent = build_fake_orchestrator(Script(outcomes={400: Outcome(value="C509")}))
+        agent._target_variables = agent._target_variables[:1]
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)
+            job = DemoRun(
+                [load_notes()[0].model_dump()], structured_data={390: "20250224"},
+                agent_factory=lambda: agent, max_concurrency=2,
+                output_dir=path, record_path=path / "trace.jsonl",
+            )
+            live = LiveDemoSession(job)
+            captured = []
+
+            def consume(event):
+                live.append(event)
+                if event.type == "values" and not event.namespace:
+                    captured.append((event, live._latest.snapshot()))
+
+            job.execute(consume)
+            self.assertEqual(job.status, "completed", job.error)
+            self.assertFalse(job.issues)
+            events = read_trace(path / "trace.jsonl")
+            session = load_replay_session(path / "trace.jsonl", artifact_path=job.output_path)
+            self.assertEqual(session.artifact["case"]["case_facts"]["primary_site"], "C509")
+
+            structured = {**CaseFactsSnapshotTests.UNKNOWN, "date_of_diagnosis": "20250224"}
+            characterized = {**structured, "gross_primary_site": "breast"}
+            extracted = {**characterized, "primary_site": "C509"}
+            self.assertIsNone(captured[0][1].case_facts)
+            observed = [snap.to_dict()["case_facts"] for _, snap in captured]
+            self.assertIn(structured, observed)
+            self.assertIn(characterized, observed)
+            self.assertEqual(observed[-1], extracted)
+            # Extraction results arrive before merge_and_update writes scoping facts.
+            self.assertTrue(any(
+                event.payload.get("variable_results", {}).get("400", {}).get("value") == "C509"
+                and snap.case_facts == characterized
+                for event, snap in captured
+            ))
+
+            for event, snap in reversed(captured):
+                with self.subTest(seq=event.seq):
+                    expected = event.payload.get("case_facts")
+                    self.assertEqual(snap.case_facts, expected)  # retained live snapshot
+                    prefix = [item for item in events if item.seq <= event.seq]
+                    self.assertEqual(replay(prefix).snapshot().case_facts, expected)
+                    self.assertEqual(live.snapshot_at_seq(event.seq)["case_facts"], expected)
+                    self.assertEqual(session.snapshot_at_seq(event.seq)["case_facts"], expected)
+
+            # Step caching and final artifacts must not leak facts into earlier steps.
+            session.goto(len(session.steps) - 1)
+            for step in reversed(session.steps):
+                prefix = [event for event in events if event.seq <= step.end_seq]
+                expected = replay(prefix).snapshot().to_dict()["case_facts"]
+                self.assertEqual(session.goto(step.index)["snapshot"]["case_facts"], expected)
+
+
 class FixtureReplayTests(unittest.TestCase):
     """Replaying the committed trace yields a coherent, JSON-safe final state."""
 
@@ -410,6 +581,23 @@ class FixtureReplayTests(unittest.TestCase):
         self.assertFalse(snap.finished)
         self.assertTrue(snap.active_map_nodes)
         self.assertIsNotNone(snap.current_map_node)
+
+    def test_legacy_facts_follow_exact_root_values_at_every_step(self):
+        state = DemoState()
+        expected = None
+        for event in self.events:
+            state.ingest(event)
+            if event.type == "values" and not event.namespace:
+                expected = event.payload.get("case_facts")
+            with self.subTest(seq=event.seq):
+                self.assertEqual(state.snapshot().to_dict()["case_facts"], expected)
+        self.assertIsNotNone(expected)
+        session = DemoSession(self.events)
+        session.goto(len(session.steps) - 1)
+        for step in reversed(session.steps):
+            prefix = [event for event in self.events if event.seq <= step.end_seq]
+            self.assertEqual(session.goto(step.index)["snapshot"]["case_facts"],
+                             replay(prefix).snapshot().to_dict()["case_facts"])
 
 
 if __name__ == "__main__":

@@ -28,6 +28,7 @@ replaying a prefix of the trace.
 from __future__ import annotations
 
 from dataclasses import dataclass, field as dc_field, replace
+from types import MappingProxyType
 from typing import Any, Iterable, Mapping
 
 from cipoc.agents.orchestrator import CaseState
@@ -170,6 +171,8 @@ class DemoSnapshot:
     details: Mapping[str, NodeDetail]
     instances: Mapping[str, InstanceDetail]
     progress: Snapshot | None
+    # Exact root facts at this cursor; None means unavailable, not all unknown.
+    case_facts: Mapping[str, str | None] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -184,6 +187,7 @@ class DemoSnapshot:
             "details": {key: _detail_to_dict(value) for key, value in self.details.items()},
             "instances": {key: _instance_to_dict(value) for key, value in self.instances.items()},
             "progress": _progress_to_dict(self.progress),
+            "case_facts": dict(self.case_facts) if self.case_facts is not None else None,
         }
 
 
@@ -439,6 +443,7 @@ class DemoState:
     def snapshot(self) -> DemoSnapshot:
         active = tuple(node for node, n in self._active.items() if n > 0)
         multiplicity = {node: n for node, n in self._active.items() if n > 0}
+        facts = self._case.case_facts if self._case is not None else None
         return DemoSnapshot(
             seq=self._seq,
             t=self._t,
@@ -451,6 +456,7 @@ class DemoState:
             details=dict(self._details),
             instances={key: self._instances[key] for key in self._instance_order},
             progress=self._model.snapshot() if self._model is not None else None,
+            case_facts=MappingProxyType(facts.model_dump(mode="json")) if facts is not None else None,
         )
 
     @property

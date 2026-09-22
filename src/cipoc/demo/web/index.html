@@ -79,31 +79,14 @@
       </div>
     </section>
 
-    <!-- Invisible fit rectangle: excludes the floating card and variable drawer,
+    <!-- Invisible fit rectangle: excludes the floating card,
          and remains identical when a card opens or closes. -->
     <div id="map-layout" class="map-layout" aria-hidden="true"></div>
-
-    <!-- Panel 3: variable overview -->
-    <!-- Collapsed to its header by default and pulled up from the bottom edge
-         when wanted. Its explicit toggle is independent of entity selection. -->
-    <section class="panel panel-vars" aria-label="Variable overview">
-      <!-- Sits in the grid gap above this panel: drag the map/variables
-           boundary, double-click to reset (see wireSplitter in app.js). -->
-      <div id="row-split" class="row-split" role="separator" aria-orientation="horizontal"
-           title="Drag to resize · double-click to reset"></div>
-      <div id="vars-toggle" class="panel-head vars-head" role="button" tabindex="0"
-           aria-expanded="false" aria-controls="vars" title="Show variables (V)">
-        <h2>Variables</h2>
-        <div id="vars-summary" class="vars-summary muted"></div>
-        <span class="vars-caret" aria-hidden="true">⌃</span>
-      </div>
-      <div id="vars" class="vars scroll"></div>
-    </section>
   </main>
 
-  <!-- OMOP row preview, raised from a variable's button in panel 3.
-       Declared here rather than built in JS because it must live outside #vars,
-       which renderVars replaces wholesale on every cursor message; the body is
+  <!-- OMOP row preview, raised from a variable's button in the case table.
+       Declared here rather than built in JS because it must live outside #detail,
+       which is replaced when selections change; the body is
        the only part that is filled in. -->
   <div id="omop-modal" class="modal" hidden>
     <div id="omop-back" class="modal-back"></div>

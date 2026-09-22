@@ -1,13 +1,12 @@
 /*
  * CIPOC extraction demo — frontend (Phase 3).
  *
- * Renders three panels from the demo server's SSE cursor stream:
+ * Renders the map and floating details from the demo server's SSE cursor stream:
  *   1. Workflow map   — this run's fan-out/fan-in graph: one node per note, per
  *                       variable group's gate, and per variable, animated
  *                       through each step's own span of the trace.
- *   2. Details        — a selected note, group, or variable, resolved against
+ *   2. Details        — a selected case, note, group, or variable, resolved against
  *                       the presenter's current step-end snapshot.
- *   3. Variables      — the reused ProgressModel variable table, grouped.
  *
  * The server is the single source of truth: every control (Prev/Next/goto/play)
  * POSTs to the server, which broadcasts the new cursor over SSE to keep replay
@@ -132,13 +131,6 @@ const ATTEMPT_LABELS = {
   repair_invalid_extraction: "repair",
 };
 
-// Layout: default share of the left column given to the Variables panel, and
-// where a presenter's dragged size is remembered across reloads.
-const VARS_H_KEY = "cipoc.demo.varsHeight";
-const VARS_OPEN_KEY = "cipoc.demo.varsOpen";
-const VARS_MIN = 120;
-const MAP_MIN = 200;
-
 // --- runtime state -------------------------------------------------------
 const els = {};
 let cy = null;
@@ -168,8 +160,6 @@ async function init() {
   cacheEls();
   wireControls();
   wireDetailCards();
-  wireSplitter();
-  wireVarsPane();
   wireOmopModal();
 
   const [meta, graph] = await Promise.all([
@@ -230,8 +220,6 @@ function cacheEls() {
   els.detailHeading = document.getElementById("detail-heading");
   els.detailBack = document.getElementById("detail-back");
   els.detailClose = document.getElementById("detail-close");
-  els.vars = document.getElementById("vars");
-  els.varsSummary = document.getElementById("vars-summary");
   els.omopModal = document.getElementById("omop-modal");
   els.omopTitle = document.getElementById("omop-title");
   els.omopSub = document.getElementById("omop-sub");
@@ -1152,14 +1140,14 @@ function buildMap(graph) {
   });
 
   // The map lives in a flex panel that may not have its final size when
-  // Cytoscape initializes, and the presenter can drag the splitter at any time.
+  // Cytoscape initializes.
   // Since the packing is *chosen against* the container, a resize may want a
   // different one — so re-pack, not just re-fit.
   const container = document.getElementById("cy");
   if (window.ResizeObserver) {
     new ResizeObserver(refitMap).observe(container);
-    // The drawer changes the drawing rectangle while the canvas itself stays
-    // full-size. Card visibility never changes either observed rectangle.
+    // CSS can change the drawing rectangle independently of the full canvas.
+    // Card visibility never changes either observed rectangle.
     const drawing = document.getElementById("map-layout");
     if (drawing) new ResizeObserver(refitMap).observe(drawing);
   }
@@ -1762,8 +1750,9 @@ const ENTITY_CONTROL = "[data-entity-kind][data-entity-id]";
 const panelHTML = new WeakMap();
 
 function entitySelection(value) {
-  if (!value || !["note", "group", "variable"].includes(value.kind)
+  if (!value || !["case", "note", "group", "variable"].includes(value.kind)
       || value.id == null || String(value.id) === "") return null;
+  if (value.kind === "case") return value.id === CASE_ID ? { kind: "case", id: CASE_ID } : null;
   const selection = { kind: value.kind, id: String(value.id) };
   if (value.groupId != null) selection.groupId = String(value.groupId);
   if (value.instanceKey) selection.instanceKey = String(value.instanceKey);
@@ -1783,6 +1772,7 @@ function sameSelection(a, b) {
 
 function mapSelection(node) {
   const id = node.id();
+  if (id === CASE_ID) return { kind: "case", id: CASE_ID };
   // Strip only the known prefix: clinical IDs and group IDs may contain colons,
   // quotes, slashes, or other characters meaningful to a CSS selector.
   if (id.startsWith("note:")) return entitySelection({ kind: "note", id: id.slice(5) });
@@ -1809,7 +1799,7 @@ function highlightEntity() {
     cy.nodes(".entity-selected").removeClass("entity-selected");
     if (!detailSelection) return;
     const { kind, id, groupId } = detailSelection;
-    const ids = kind === "note" ? [`note:${id}`]
+    const ids = kind === "case" ? [CASE_ID] : kind === "note" ? [`note:${id}`]
       : kind === "group" ? [`grp:${id}`, `gate:${id}`] : [`var:${id}`];
     for (const key of ids) {
       const node = cy.getElementById(key);
@@ -1838,7 +1828,8 @@ function cardCatalog(snapshot) {
 
 function rememberFocus(element, root) {
   if (!element) return null;
-  return { element, root, id: element.id, selection: controlSelection(element) };
+  return { element, root, id: element.id, selection: controlSelection(element),
+    omopItemId: element.matches?.(".omop-btn") ? element.dataset.itemId : null };
 }
 
 function restoreFocus(reference) {
@@ -1849,6 +1840,10 @@ function restoreFocus(reference) {
     if (!element && reference.selection) {
       element = [...reference.root.querySelectorAll(ENTITY_CONTROL)]
         .find((control) => sameSelection(controlSelection(control), reference.selection));
+    }
+    if (!element && reference.omopItemId != null) {
+      element = [...reference.root.querySelectorAll(".omop-btn")]
+        .find((control) => control.dataset.itemId === reference.omopItemId);
     }
   }
   if (element?.isConnected && !element.disabled && !element.closest("[hidden]")) {
@@ -1876,7 +1871,7 @@ function openEntityCard(value, origin = null, navigate = false) {
     if (!sameSelection(selection, detailSelection)) detailHistory.push(detailSelection);
   } else {
     detailHistory = [];
-    detailOrigin = rememberFocus(origin, els.vars);
+    detailOrigin = rememberFocus(origin || els.mapReplay, els.detail);
   }
   detailSelection = selection;
   renderDetail(lastView || {});
@@ -1904,19 +1899,15 @@ function closeEntityCard(restore = true) {
 function wireDetailCards() {
   if (detailCardsWired) return;
   detailCardsWired = true;
-  const delegate = (root, navigate) => {
-    root?.addEventListener("click", (event) => {
-      if (event.target.closest(".omop-btn")) return;
-      const control = event.target.closest(ENTITY_CONTROL);
-      if (!control || !root.contains(control)) return;
-      const selection = controlSelection(control);
-      if (!selection) return;
-      event.preventDefault();
-      openEntityCard(selection, control, navigate);
-    });
-  };
-  delegate(els.detail, true);
-  delegate(els.vars, false);
+  els.detail?.addEventListener("click", (event) => {
+    if (event.target.closest(".omop-btn")) return;
+    const control = event.target.closest(ENTITY_CONTROL);
+    if (!control || !els.detail.contains(control)) return;
+    const selection = controlSelection(control);
+    if (!selection) return;
+    event.preventDefault();
+    openEntityCard(selection, control, true);
+  });
   els.detailBack?.addEventListener("click", backEntityCard);
   els.detailClose?.addEventListener("click", () => closeEntityCard());
 }
@@ -1953,14 +1944,19 @@ function detailHeadline(title, subtitle, agent, extra) {
 function renderDetail(view) {
   const snapshot = view.snapshot || {};
   const step = view.step;
-  if (els.detailWindow) els.detailWindow.hidden = detailSelection === null;
+  const isCase = detailSelection?.kind === "case";
+  if (els.detailWindow) {
+    els.detailWindow.hidden = detailSelection === null;
+    els.detailWindow.classList.toggle("case-table-open", isCase);
+  }
   if (els.detailHeading) els.detailHeading.textContent = "Details";
   if (els.detailNode) els.detailNode.textContent = step
     ? `Step ${(step.index ?? view.cursor ?? 0) + 1} · ${step.title || nodeTitle(step.map_node_id) || "Current step"}`
     : "Run start";
   if (els.detailBack) els.detailBack.hidden = detailHistory.length === 0;
   if (els.detailClose) els.detailClose.hidden = detailSelection === null;
-  const html = typeof DemoCards !== "undefined" && typeof DemoCards.render === "function"
+  const html = isCase ? renderCaseTable(snapshot)
+    : typeof DemoCards !== "undefined" && typeof DemoCards.render === "function"
     ? DemoCards.render(detailSelection, snapshot, notesById, cardCatalog(snapshot))
     : detailSelection ? `<p class="empty">Entity details are unavailable.</p>` : "";
   replacePanelHTML(els.detail, html);
@@ -2971,62 +2967,98 @@ function blockAgent(block) {
   return n && n.nonempty() ? n.data("agent") : null;
 }
 
-// --- Panel 3: variable overview -----------------------------------------
-function renderVars(snapshot) {
-  const prog = snapshot.progress;
-  if (!prog) {
-    els.varsSummary.textContent = "";
-    replacePanelHTML(els.vars, `<p class="empty">The extraction plan has not been produced yet.</p>`);
-    return;
+// --- Case card: recorded facts and variable overview ---------------------
+const CASE_FACT_LABELS = [
+  ["primary_site", "Primary site"],
+  ["gross_primary_site", "Gross primary site"],
+  ["histology", "Histology"],
+  ["behavior", "Behavior"],
+  ["sex", "Sex"],
+  ["date_of_diagnosis", "Date of diagnosis"],
+];
+
+// Pure: neither the full-run map catalog nor later artifacts supply case data.
+function renderCaseTable(snapshot = {}) {
+  const facts = snapshot.case_facts;
+  const recordedFacts = facts != null && typeof facts === "object" && !Array.isArray(facts);
+  const labels = [...CASE_FACT_LABELS];
+  if (recordedFacts) {
+    const known = new Set(labels.map(([key]) => key));
+    for (const key of Object.keys(facts)) {
+      if (!known.has(key)) labels.push([key, key.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase())]);
+    }
   }
-  const t = prog.totals;
-  els.varsSummary.innerHTML =
-    `<span>Variables <b>${t.terminal}/${t.variables}</b></span>` +
-    `<span>Groups <b>${t.done_groups}/${t.groups}</b></span>` +
-    `<span>Notes <b>${prog.notes_done}/${prog.notes_total}</b></span>` +
-    (prog.review_flags ? `<span class="flag">⚑ ${prog.review_flags} flag(s)</span>` : "");
+  const factsHTML = recordedFacts
+    ? `<dl class="case-fact-grid">${labels.map(([key, label]) =>
+      `<div class="case-fact"><dt>${esc(label)}</dt><dd>${esc(fmt(facts[key]))}</dd></div>`).join("")}</dl>`
+    : `<p class="empty">Case facts not recorded at this step</p>`;
+  const prog = snapshot.progress;
+  const t = prog?.totals || {};
+  const summary = prog
+    ? `<div class="case-summary vars-summary">
+        <span>Variables <b>${esc(fmt(t.terminal))}/${esc(fmt(t.variables))}</b></span>
+        <span>Groups <b>${esc(fmt(t.done_groups))}/${esc(fmt(t.groups))}</b></span>
+        <span>Notes <b>${esc(fmt(prog.notes_done))}/${esc(fmt(prog.notes_total))}</b></span>
+        ${prog.review_flags ? `<span class="flag">⚑ ${esc(fmt(prog.review_flags))} flag(s)</span>` : ""}
+      </div>` : "";
+  return `<article class="entity-card entity-case">
+    <header class="entity-header"><h2 class="entity-title">Case</h2>${summary}</header>
+    <section class="case-facts"><h3 class="entity-section-title">Case facts</h3>${factsHTML}</section>
+    <section class="case-variables"><h3 class="entity-section-title">Variables</h3>
+      <div class="case-table-scroll" tabindex="0" role="region" aria-label="Case variables">${renderCaseVariables(prog)}</div>
+    </section>
+  </article>`;
+}
 
+function renderCaseVariables(prog) {
+  const empty = `<p class="empty">The extraction plan has not been recorded at this step.</p>`;
+  if (!prog) return empty;
   const byGroup = Object.create(null);
-  for (const v of prog.variables) (byGroup[v.group_id] = byGroup[v.group_id] || []).push(v);
-
-  const groups = prog.groups.length
-    ? prog.groups
-    : Object.keys(byGroup).map((id) => ({ group_id: id, name: id, stage: "pending" }));
-
-  const html = groups
+  for (const v of prog.variables || []) (byGroup[v.group_id] = byGroup[v.group_id] || []).push(v);
+  const groups = [...(prog.groups || [])];
+  const known = new Set(groups.map((g) => String(g.group_id)));
+  // Preserve recorded variables even if their group metadata was not captured.
+  for (const id of Object.keys(byGroup)) {
+    if (!known.has(id)) groups.push({ group_id: id, name: id });
+  }
+  return groups
     .map((g) => {
       const vars = byGroup[g.group_id] || [];
       const rows = vars
-        .map(
-          (v) => `<tr>
+        .map((v) => {
+          const status = v.status ?? v.stage ?? "not recorded";
+          return `<tr>
+            <td class="vt-id">${esc(fmt(v.item_id))}</td>
             <td class="vt-name"><button type="button" class="entity-link" data-entity-kind="variable"
-              data-entity-id="${esc(v.item_id)}" data-group-id="${esc(v.group_id)}">${esc(v.name)}</button>${v.flag ? ` <span class="flag" title="${esc(v.flag)}">⚑</span>` : ""}</td>
+              data-entity-id="${esc(v.item_id)}" data-group-id="${esc(v.group_id)}">${esc(v.name ?? v.item_id)}</button>${v.flag ? ` <span class="flag" title="${esc(v.flag)}">⚑</span>` : ""}</td>
             <td class="vt-value">${v.value == null || v.value === "" ? "—" : esc(fmt(v.value))}
-              ${v.confidence ? `<span class="conf"> · ${esc(v.confidence)}</span>` : ""}</td>
-            <td class="vt-status st-${esc(v.status)}">${esc(v.status || v.stage)}</td>
+              ${v.confidence != null && v.confidence !== "" ? `<span class="conf"> · ${esc(fmt(v.confidence))}</span>` : ""}</td>
+            <td class="vt-status st-${esc(status)}">${esc(status)}</td>
             <td class="vt-omop"><button type="button" class="omop-btn" data-item-id="${esc(v.item_id)}"
-              data-name="${esc(v.name)}" title="OMOP rows for this variable">OMOP</button></td>
-          </tr>`
-        )
+              data-name="${esc(v.name ?? v.item_id)}" title="OMOP rows for this variable">OMOP</button></td>
+          </tr>`;
+        })
         .join("");
       return `<div class="vargroup">
         <div class="vargroup-head">
           <button type="button" class="entity-link" data-entity-kind="group"
             data-entity-id="${esc(g.group_id)}">${esc(g.name || g.group_id)}</button>
-          <span class="stage-badge stage-${esc(g.stage)}">${esc(g.stage)}</span>
+          ${g.stage != null ? `<span class="stage-badge stage-${esc(g.stage)}">${esc(g.stage)}</span>` : ""}
           <span class="gcount">${vars.length} var${vars.length === 1 ? "" : "s"}</span>
         </div>
-        ${rows ? `<table class="vartable">${rows}</table>` : `<p class="muted" style="padding:.3rem .5rem;font-size:.78rem">No variables yet.</p>`}
+        ${rows ? `<table class="vartable"><thead><tr>
+          <th scope="col" class="vt-id">Item ID</th><th scope="col" class="vt-name">Variable</th>
+          <th scope="col" class="vt-value">Value / confidence</th><th scope="col" class="vt-status">Status</th>
+          <th scope="col" class="vt-omop">Export</th>
+        </tr></thead><tbody>${rows}</tbody></table>` : `<p class="muted">No variables recorded for this group yet.</p>`}
       </div>`;
     })
-    .join("");
-  replacePanelHTML(els.vars, html || `<p class="empty">No variable groups planned.</p>`);
+    .join("") || empty;
 }
 
 /* --- OMOP row preview ----------------------------------------------------
  *
- * A coded value is not the deliverable; the NOTE_NLP row is. Panel 3 stops at
- * the value, so each variable carries a button that shows the rows the export
+ * Each variable in the case table carries a button that shows the rows the export
  * would actually write for it — its NOTE_NLP rows, one per evidence span, and
  * the NOTE rows for only the notes those spans cite.
  *
@@ -3035,12 +3067,17 @@ function renderVars(snapshot) {
  * `scripts/export_omop.py` writes cannot drift; re-deriving the column set in JS
  * would have been a second, quieter definition of the export.
  */
+let omopWired = false;
+let omopOrigin = null;
+let omopRequest = 0;
+
 function omopIsOpen() {
   return els.omopModal && !els.omopModal.hasAttribute("hidden");
 }
 
 async function openOmopModal(itemId, name) {
   if (!els.omopModal) return;
+  const request = ++omopRequest;
   // Pinned to the cursor the presenter is standing on, not to the newest state:
   // the panel behind it shows this step, and rows from a later one would not be
   // the rows for what is on screen.
@@ -3054,14 +3091,20 @@ async function openOmopModal(itemId, name) {
   try {
     const url = `/api/omop/${encodeURIComponent(itemId)}` + (seq == null ? "" : `?seq=${seq}`);
     const data = await getJSON(url);
+    if (request !== omopRequest) return;
     els.omopBody.innerHTML = omopBody(data);
   } catch (err) {
+    if (request !== omopRequest) return;
     els.omopBody.innerHTML = `<p class="empty">Could not build the OMOP rows (${esc(String(err))}).</p>`;
   }
 }
 
 function closeOmopModal() {
+  const wasOpen = omopIsOpen();
+  ++omopRequest;
   if (els.omopModal) els.omopModal.setAttribute("hidden", "");
+  if (wasOpen) restoreFocus(omopOrigin || rememberFocus(els.detailClose, els.detail));
+  omopOrigin = null;
 }
 
 function omopBody(data) {
@@ -3123,13 +3166,13 @@ function omopErrors(errors) {
 }
 
 function wireOmopModal() {
-  if (!els.vars || !els.omopModal) return;
-  // Delegated: renderVars replaces the pane's innerHTML on every cursor message,
-  // so a listener per button would be re-attached on every step and leak the old
-  // ones. One listener on the container outlives every re-render.
-  els.vars.addEventListener("click", (e) => {
+  if (omopWired || !els.detail || !els.omopModal) return;
+  omopWired = true;
+  // One delegated handler survives case-card replacement and Back navigation.
+  els.detail.addEventListener("click", (e) => {
     const btn = e.target.closest(".omop-btn");
-    if (!btn) return;
+    if (!btn || !els.detail.contains(btn)) return;
+    omopOrigin = rememberFocus(btn, els.detail);
     openOmopModal(btn.dataset.itemId, btn.dataset.name);
   });
   els.omopClose.addEventListener("click", closeOmopModal);
@@ -3139,7 +3182,7 @@ function wireOmopModal() {
 // --- controls ------------------------------------------------------------
 function interactiveTarget(target) {
   return !!(target?.isContentEditable || target?.closest(
-    'button, input, textarea, select, a[href], summary, [role="button"], [role="link"], [contenteditable]:not([contenteditable="false"])'
+    'button, input, textarea, select, a[href], summary, .case-table-scroll, [role="button"], [role="link"], [contenteditable]:not([contenteditable="false"])'
   ));
 }
 
@@ -3170,124 +3213,6 @@ function wireControls() {
     if (e.key === "ArrowRight") { e.preventDefault(); post("/api/next"); }
     else if (e.key === "ArrowLeft") { e.preventDefault(); post("/api/prev"); }
     else if (e.key === " ") { e.preventDefault(); togglePlay(); }
-  });
-}
-
-// How tall the variables panel may grow before the map hits its floor, and the
-// clamp both the splitter drag and the first open share so neither can push the
-// map below MAP_MIN.
-//
-// The grid's own padding and row gap are not available to either row, so they
-// have to come off first — `clientHeight` includes the padding, and subtracting
-// MAP_MIN from it alone left the map about 40px short of its floor.
-function maxVarsHeight(grid) {
-  const cs = getComputedStyle(grid);
-  const gap = parseFloat(cs.rowGap) || 0;
-  const padding = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
-  return Math.max(VARS_MIN, grid.clientHeight - padding - gap - MAP_MIN);
-}
-
-function setVarsHeight(grid, px) {
-  const clamped = Math.max(VARS_MIN, Math.min(px, maxVarsHeight(grid)));
-  grid.style.setProperty("--vars-h", `${Math.round(clamped)}px`);
-  return clamped;
-}
-
-/* The variables panel is put away by default and pulled up from the bottom edge
- * when it is wanted. The map is the thing being presented; the variable table is
- * a reference the presenter opens to answer a question and closes again, and
- * left open it was taking a third of the map's height for the whole talk.
- *
- * Collapsed is a class on the grid rather than a height, so the row falls back
- * to `auto` and the inline `--vars-h` the splitter wrote is simply not consulted
- * until the panel opens again — reopening lands on the size it was dragged to.
- */
-function wireVarsPane() {
-  const toggle = document.getElementById("vars-toggle");
-  const grid = document.querySelector(".grid");
-  if (!toggle || !grid) return;
-
-  const apply = (collapsed) => {
-    // Opened before it has ever been dragged, it takes everything the map can
-    // spare. Someone reaching for the variable table wants to read the table,
-    // and a third of a screen shows a handful of rows out of forty-four; the
-    // map is one keystroke away again. Once dragged, that size wins instead —
-    // and double-clicking the splitter to forget it comes back here.
-    if (!collapsed && !localStorage.getItem(VARS_H_KEY)) {
-      setVarsHeight(grid, maxVarsHeight(grid));
-    }
-    grid.classList.toggle("vars-collapsed", collapsed);
-    toggle.setAttribute("aria-expanded", String(!collapsed));
-    toggle.title = collapsed ? "Show variables (V)" : "Hide variables (V)";
-    localStorage.setItem(VARS_OPEN_KEY, collapsed ? "0" : "1");
-    // Explicitly, rather than leaving it to the map's ResizeObserver: this is
-    // the largest shape change the map ever sees, and we know for certain it
-    // just happened. The observer stays as the catch-all for the splitter drag
-    // and the window, but it is not reliably delivered for a container that
-    // resizes because a grid track changed.
-    refitMap();
-  };
-  const toggleOpen = () => apply(!grid.classList.contains("vars-collapsed"));
-
-  // Closed unless this presenter has opened it before.
-  apply(localStorage.getItem(VARS_OPEN_KEY) !== "1");
-
-  toggle.addEventListener("click", toggleOpen);
-  toggle.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      toggleOpen();
-    }
-  });
-  document.addEventListener("keydown", (e) => {
-    if (e.key !== "v" && e.key !== "V") return;
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    if (omopIsOpen()) return;  // the pane behind the preview stays as it was
-    if (e.defaultPrevented || interactiveTarget(e.target)) return;
-    toggleOpen();
-  });
-}
-
-// Drag the boundary between the workflow map and the variables panel. The size
-// is written as a pixel `--vars-h` on the grid; the map's ResizeObserver re-fits
-// Cytoscape as it changes, so the flowchart redraws live during the drag.
-function wireSplitter() {
-  const handle = document.getElementById("row-split");
-  const grid = document.querySelector(".grid");
-  if (!handle || !grid) return;
-
-  const setHeight = (px) => setVarsHeight(grid, px);
-
-  const saved = Number(localStorage.getItem(VARS_H_KEY));
-  if (saved > 0) setHeight(saved);
-
-  handle.addEventListener("pointerdown", (e) => {
-    e.preventDefault();
-    handle.setPointerCapture(e.pointerId);
-    handle.classList.add("dragging");
-    document.body.classList.add("row-resizing");
-
-    const onMove = (ev) => {
-      // The variables panel runs from the pointer to the bottom of the grid.
-      setHeight(grid.getBoundingClientRect().bottom - ev.clientY);
-    };
-    const onUp = () => {
-      handle.classList.remove("dragging");
-      document.body.classList.remove("row-resizing");
-      handle.removeEventListener("pointermove", onMove);
-      handle.removeEventListener("pointerup", onUp);
-      handle.removeEventListener("pointercancel", onUp);
-      const current = grid.style.getPropertyValue("--vars-h");
-      if (current) localStorage.setItem(VARS_H_KEY, String(parseFloat(current)));
-    };
-    handle.addEventListener("pointermove", onMove);
-    handle.addEventListener("pointerup", onUp);
-    handle.addEventListener("pointercancel", onUp);
-  });
-
-  handle.addEventListener("dblclick", () => {
-    grid.style.removeProperty("--vars-h");
-    localStorage.removeItem(VARS_H_KEY);
   });
 }
 
@@ -3397,7 +3322,6 @@ function applyView(view) {
   if (stepChanged && !view.follow_live) playStep(view.step, view.snapshot);
   else settleStep(view.step, view.snapshot);
   renderDetail(view);
-  renderVars(view.snapshot);
   // Self-heal auto-play: if still playing and more steps are now available
   // (live growth), make sure the timer is running.
 }

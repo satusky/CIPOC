@@ -183,7 +183,7 @@ function liveMap(t) {
   harness.context.performance = { now: () => 0 };
   harness.run(`cy = cytoscape({headless: true});
     fitMap = () => {}; startDashLoop = () => {};
-    renderDetail = () => {}; renderVars = () => {}; updateControls = () => {};
+    renderDetail = () => {}; updateControls = () => {};
     closeOmopModal = () => {}; applyMeta = () => {}; buildStepSelect = () => {};`);
   t.after(() => harness.run('cy.destroy()'));
   harness.update = async (newEvents, snapshot, options = {}) => {

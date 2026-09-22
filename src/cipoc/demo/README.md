@@ -69,11 +69,12 @@ per process; separate server processes have separate model budgets.
 ## Replay entity cards
 
 The presentation target is **Full HD (1920 × 1080)**. The orchestration map spans
-the presentation board, with the Variables drawer over its lower-left corner.
+the presentation board. Click the central **Case** bubble, in any phase, to open
+the grouped variable table and the case facts recorded at the selected step.
 A content-sized floating window, capped at **896px wide**, appears over the
 clear right-hand portion of the map when an entity is selected. Workflow nodes
 are fitted to the available space beside it, keeping their layout stable when
-cards open or close. One note, group, or variable card is shown at a time,
+cards open or close. One case, note, group, or variable card is shown at a time,
 with all its sections together rather than behind tabs or accordions. Live mode
 uses the same frontend.
 
@@ -81,6 +82,10 @@ uses the same frontend.
   cancer mentions and temporality, and evidence. Concepts occupy a uniform grid:
   ✓ indicates present, − absent, and ? unrecorded; present concepts have a teal fill.
 - **Group:** summary and variable tiles with recorded status, value, and reasons.
+- **Case:** recorded primary/gross site, histology, behavior, sex, and diagnosis
+  date above a locally scrolling variable table. The table includes item IDs,
+  values, confidence, statuses, review flags, and OMOP preview links. Facts and
+  progress totals stay visible while the table scrolls.
 - **Variable:** item/name, value or candidate value, the first sentence of the
   recorded definition where available, extraction explanation/confidence, evidence, and validation checks
   with candidate values, outcomes, and recorded failure reasons. These checks
@@ -190,7 +195,7 @@ Use the trusted local interface and handle downloaded files accordingly.
 PYTHONPATH=src python -m unittest tests.test_demo_state tests.test_demo_steps \
     tests.test_demo_server tests.test_demo_web tests.test_demo_live
 node --test tests/demo_live.test.js tests/demo_cards.test.js \
-    tests/demo_card_navigation.test.js tests/demo_map_viewport.test.js
+    tests/demo_card_navigation.test.js tests/demo_map_viewport.test.js tests/demo_case_table.test.js
 ```
 
 Tests use stdlib unittest and deterministic graphs; they do not call endpoints.

@@ -30,7 +30,11 @@ class Element {
     this.textContent = '';
     this.disabled = false;
     this.value = '';
-    this.classList = {toggle() {}};
+    const classes = new Set();
+    this.classList = {
+      toggle(name, on) { if (on) classes.add(name); else classes.delete(name); },
+      contains(name) { return classes.has(name); },
+    };
     this.style = {setProperty() { throw new Error('card navigation changed layout'); }};
     for (const [key, value] of Object.entries(attributes)) this.setAttribute(key, value);
   }
@@ -45,7 +49,12 @@ class Element {
   set hidden(value) { if (value) this.setAttribute('hidden', ''); else this.removeAttribute('hidden'); }
   get isConnected() { return this === this.document.body || !!this.parentElement?.isConnected; }
   get isContentEditable() { return this.attributes.contenteditable === 'true' || !!this.parentElement?.isContentEditable; }
-  append(child) { child.parentElement = this; this.children.push(child); return child; }
+  append(child) {
+    if (child.parentElement) child.parentElement.children = child.parentElement.children.filter((el) => el !== child);
+    child.parentElement = this;
+    this.children.push(child);
+    return child;
+  }
   contains(child) { return !!child && (child === this || this.children.some((c) => c.contains(child))); }
   matches(selector) {
     return selector.split(',').some((part) => {
@@ -103,12 +112,15 @@ function browser({viewer = false, cards = true} = {}) {
   document.activeElement = document.body;
   const ids = ['run-title', 'run-sub', 'mode-badge', 'btn-prev', 'btn-next', 'btn-play',
     'step-select', 'step-counter', 'btn-replay-step', 'map-scrub', 'map-tip', 'detail',
-    'detail-node', 'detail-heading', 'detail-window', 'detail-back', 'detail-close', 'vars', 'vars-summary',
+    'detail-node', 'detail-heading', 'detail-window', 'detail-back', 'detail-close',
     'omop-modal', 'omop-title', 'omop-sub', 'omop-body', 'omop-close', 'omop-back', 'run-issues'];
   for (const id of ids) {
     const tag = /^(btn-|detail-back|detail-close|omop-close)/.test(id) ? 'button' : 'div';
     const el = document.body.append(new Element(document, tag, {id}));
     if (['omop-modal', 'detail-window', 'detail-back', 'detail-close'].includes(id)) el.hidden = true;
+  }
+  for (const id of ['detail', 'detail-node', 'detail-heading', 'detail-back', 'detail-close']) {
+    document.getElementById('detail-window').append(document.getElementById(id));
   }
   const calls = [];
   const requests = [];
@@ -155,12 +167,15 @@ function browser({viewer = false, cards = true} = {}) {
   // Layout and timing functions are tripwires during local navigation. applyView
   // still follows its normal render path; separate map tests install real nodes.
   run(`syncMap = () => {}; playStep = () => {}; settleStep = () => {};
-    fitMap = refitMap = computeLayout = setVarsHeight = () => { throw new Error('unexpected geometry work'); };`);
-  return {context, document, calls, requests, run, get, click, key, selection, controls, view, setView};
+    fitMap = refitMap = computeLayout = () => { throw new Error('unexpected geometry work'); };`);
+  const openCase = () => run('openEntityCard({kind: "case", id: CASE_ID})');
+  return {context, document, calls, requests, run, get, click, key, selection, controls, view, setView, openCase};
 }
 
 function snapshot(seq = 29, phase = 'done') {
-  return {seq, phase, instances: {[scope]: {key: scope, node: 'extract_branch', input: {
+  return {seq, phase, case_facts: {primary_site: 'C509', gross_primary_site: 'breast',
+    histology: null, behavior: null, sex: null, date_of_diagnosis: null},
+    instances: {[scope]: {key: scope, node: 'extract_branch', input: {
     requested_variables: {group_id: groupId}}, result: {}}}, details: {}, progress: {
     totals: {terminal: 0, variables: 1, done_groups: 0, groups: 1}, notes_done: 0, notes_total: 1,
     groups: [{group_id: groupId, name: '<Group>', stage: 'extracting', annotation: 'gate: future?'}],
@@ -207,7 +222,7 @@ test('map discs select exact entities, including compound bubbling and special I
     assert.equal(h.calls.length, before + 1, 'compound parent must not open a second card');
     assert.equal(h.calls.at(-1).snapshot, h.run('lastView.snapshot'));
   }
-  for (const node of ['stage:case', 'stage:corpus', 'stage:corpus:mark']) {
+  for (const node of ['stage:corpus', 'stage:corpus:mark']) {
     h.tap(`var:${itemId}`);
     h.tap(node);
     assert.equal(h.selection(), null);
@@ -243,6 +258,32 @@ test('selection highlight survives animation and close without resizing, fitting
   h.tap(`gate:${groupId}`);
   assert.equal(h.run('cy.nodes(".entity-selected").length'), 2);
   assert.equal(geometry(), before);
+  for (const map_node_id of ['initialize_case', 'check_state', 'plan_extraction', 'merge_and_update', 'finalize_case']) {
+    h.context.phaseNode = map_node_id;
+    h.run('lastView.step.map_node_id = phaseNode; renderMapAt(0, lastView.snapshot, lastView.step)');
+    const phaseGeometry = geometry();
+    h.tap('stage:case');
+    assert.deepEqual(h.selection(), {kind: 'case', id: 'stage:case'});
+    assert.equal(h.get('detail-window').classList.contains('case-table-open'), true);
+    assert.equal(h.get('detail-window').hidden, false);
+    assert.match(h.get('detail').innerHTML, /entity-case/);
+    assert.match(h.get('detail').innerHTML, /C509/);
+    assert.equal(h.run('cy.getElementById(CASE_ID).hasClass("entity-selected")'), true);
+    assert.equal(geometry(), phaseGeometry);
+    h.run('renderMapAt(0, lastView.snapshot, lastView.step)');
+    assert.equal(h.run('cy.getElementById(CASE_ID).hasClass("entity-selected")'), true);
+    h.key('Escape');
+    assert.equal(h.get('detail-window').hidden, true);
+    assert.equal(h.get('detail-window').classList.contains('case-table-open'), false);
+    assert.equal(h.get('detail').innerHTML, '');
+    assert.equal(h.run('cy.nodes(".entity-selected").length'), 0);
+    assert.equal(geometry(), phaseGeometry);
+  }
+  assert.deepEqual(h.requests, []);
+  assert.equal(h.run('lastView.cursor'), 2);
+  assert.equal(h.run('lastView.playing'), true);
+  assert.equal(h.run('stepAnim'), 77);
+  assert.equal(h.run('stepFallback'), 88);
 });
 
 test('within-step scrubbing animates the map without changing the step-end card', (t) => {
@@ -260,39 +301,114 @@ test('within-step scrubbing animates the map without changing the step-end card'
   assert.deepEqual(h.requests, []);
 });
 
+test('the selected case refreshes at the current step and never restores future facts on replay', (t) => {
+  const h = mapHarness(t);
+  h.tap('stage:case');
+  const control = h.controls('detail')[0];
+  control.focus();
+  h.run('renderDetail(lastView)');
+  assert.equal(h.controls('detail')[0], control, 'identical HTML preserves table DOM and its local scroll');
+  assert.equal(h.document.activeElement, control);
+  const next = snapshot(30);
+  next.case_facts.histology = '8500';
+  next.progress.variables[0].value = 'new recorded value';
+  h.setView(h.view(next));
+  assert.deepEqual(h.selection(), {kind: 'case', id: 'stage:case'});
+  assert.match(h.get('detail').innerHTML, /8500|new recorded value/);
+  assert.equal(h.document.activeElement, h.controls('detail')[0]);
+  h.run(`mapIndex.groups.set('future', {id: 'future', name: 'FUTURE', variables: []});`);
+  h.setView(h.view({seq: 1, progress: null, case_facts: null}, 0));
+  assert.deepEqual(h.selection(), {kind: 'case', id: 'stage:case'});
+  assert.match(h.get('detail').innerHTML, /Case facts not recorded at this step/);
+  assert.match(h.get('detail').innerHTML, /plan has not been recorded/);
+  assert.doesNotMatch(h.get('detail').innerHTML, /C509|8500|new recorded value|FUTURE/);
+  assert.equal(h.get('detail-back').hidden, true);
+  h.click(h.get('detail-close'));
+  assert.equal(h.get('detail').innerHTML, '');
+  h.setView(h.view(snapshot()));
+  assert.equal(h.selection(), null);
+  assert.equal(h.get('detail').innerHTML, '');
+  assert.deepEqual(h.requests, []);
+});
+
+test('case OMOP delegation is seq-scoped, restores focus, and discards closed preview responses', async () => {
+  const h = browser({viewer: true});
+  h.setView(h.view(snapshot()));
+  h.openCase();
+  const finishes = [];
+  h.context.fetch = (url) => {
+    h.requests.push({url});
+    return new Promise((resolve) => finishes.push((data) => resolve({ok: true, json: async () => data})));
+  };
+  h.run('wireOmopModal(); wireDetailCards();');
+  let button = h.get('detail').querySelectorAll('.omop-btn')[0];
+  h.click(button.append(new Element(h.document, 'span')));
+  assert.deepEqual(h.requests, [{url: `/api/omop/${encodeURIComponent(itemId)}?seq=29`}]);
+  assert.equal(h.get('omop-modal').hidden, false);
+  assert.equal(h.selection().kind, 'case');
+  assert.equal(h.document.activeElement, h.get('omop-close'));
+  h.key('Escape');
+  assert.equal(h.get('omop-modal').hidden, true);
+  assert.equal(h.document.activeElement, button);
+  assert.equal(h.selection().kind, 'case');
+  h.setView(h.view(snapshot(30)));
+  button = h.get('detail').querySelectorAll('.omop-btn')[0];
+  h.click(button);
+  finishes[0]({note_nlp: {rows: [['STALE']]} });
+  await new Promise(setImmediate);
+  assert.doesNotMatch(h.get('omop-body').innerHTML, /STALE|Could not build/);
+  const table = {rows: [], columns: [], total: 0, shown: 0};
+  finishes[1]({note: table, note_nlp: table, errors: [], status: 'pending'});
+  await new Promise(setImmediate);
+  assert.match(h.get('omop-body').innerHTML, /pending/);
+  h.key('Escape');
+  assert.equal(h.document.activeElement, button);
+  h.key('Escape');
+  assert.equal(h.selection(), null);
+  assert.equal(h.get('detail').innerHTML, '');
+  assert.equal(h.requests.length, 2);
+  assert.equal(h.requests[1].url, `/api/omop/${encodeURIComponent(itemId)}?seq=30`);
+});
+
 test('table names and group headings are escaped native buttons; OMOP remains independent', () => {
   const h = browser();
   h.setView(h.view(snapshot()));
-  const [group, variable] = h.controls('vars');
+  h.openCase();
+  const [group, variable] = h.controls('detail');
   assert.equal(group.tagName, 'BUTTON');
   assert.equal(variable.tagName, 'BUTTON');
-  assert.match(h.get('vars').innerHTML, /&lt;Group&gt;/);
-  assert.match(h.get('vars').innerHTML, /&lt;Variable&gt;/);
+  assert.match(h.get('detail').innerHTML, /&lt;Group&gt;/);
+  assert.match(h.get('detail').innerHTML, /&lt;Variable&gt;/);
   h.click(group);
   assert.deepEqual(h.selection(), {kind: 'group', id: groupId});
-  const nested = variable.append(new Element(h.document, 'span'));
+  h.click(h.get('detail-back'));
+  const nested = h.controls('detail')[1].append(new Element(h.document, 'span'));
   h.click(nested);
   assert.deepEqual(h.selection(), {kind: 'variable', id: itemId, groupId});
-  h.run('var previews = []; openOmopModal = (...args) => previews.push(args); wireDetailCards();');
+  h.click(h.get('detail-back'));
+  h.run('var previews = []; openOmopModal = (...args) => previews.push(args); wireDetailCards(); wireOmopModal();');
   const renders = h.calls.length;
-  h.click(h.get('vars').querySelectorAll('.omop-btn')[0]);
+  h.click(h.get('detail').querySelectorAll('.omop-btn')[0]);
   assert.equal(h.calls.length, renders);
   assert.deepEqual(JSON.parse(h.run('JSON.stringify(previews)')), [[itemId, '<Variable>']]);
-  assert.equal(h.get('detail').listeners.get('click').length, 1);
+  assert.deepEqual(h.selection(), {kind: 'case', id: 'stage:case'});
+  assert.equal(h.get('detail').listeners.get('click').length, 2, 'one entity handler and one OMOP handler');
   assert.equal(h.get('detail').listeners.has('toggle'), false);
   assert.deepEqual(h.requests, []);
 });
 
-test('group → scoped variable → evidence note supports Back and Close restores the replaced origin', () => {
+test('case → group → scoped variable → evidence note supports Back and Close restores a map control', () => {
   const h = browser();
   h.setView(h.view(snapshot()));
-  const origin = h.controls('vars')[0];
   assert.equal(h.get('detail-window').hidden, true);
+  h.openCase();
+  const origin = h.controls('detail')[0];
   origin.focus();
   h.click(origin);
   assert.equal(h.get('detail-window').hidden, false);
   assert.equal(h.get('detail-close').hidden, false);
-  assert.equal(h.get('detail-back').hidden, true);
+  assert.equal(h.get('detail-back').hidden, false);
+  assert.equal(h.get('detail-window').classList.contains('case-table-open'), false);
   h.click(h.controls('detail')[0]);
   assert.deepEqual(h.selection(), {kind: 'variable', id: itemId, groupId, instanceKey: scope});
   h.click(h.controls('detail')[0]);
@@ -302,6 +418,10 @@ test('group → scoped variable → evidence note supports Back and Close restor
   assert.equal(h.selection().instanceKey, scope);
   h.click(h.get('detail-back'));
   assert.deepEqual(h.selection(), {kind: 'group', id: groupId});
+  assert.equal(h.get('detail-back').hidden, false);
+  h.click(h.get('detail-back'));
+  assert.deepEqual(h.selection(), {kind: 'case', id: 'stage:case'});
+  assert.equal(h.get('detail-window').classList.contains('case-table-open'), true);
   assert.equal(h.get('detail-back').hidden, true);
   const next = snapshot(30);
   next.progress.variables[0].value = 'updated';
@@ -311,7 +431,8 @@ test('group → scoped variable → evidence note supports Back and Close restor
   assert.equal(h.selection(), null);
   assert.equal(h.get('detail-window').hidden, true);
   assert.equal(h.get('detail-close').hidden, true);
-  assert.equal(h.document.activeElement, h.controls('vars')[0]);
+  assert.equal(h.document.activeElement, h.get('btn-replay-step'));
+  assert.equal(h.get('detail').innerHTML, '');
   assert.equal(h.document.focuses.at(-1).options.preventScroll, true);
   assert.deepEqual(h.requests, []);
 });
@@ -320,7 +441,8 @@ test('replay retains entity identity but clears pass/history, supplying only cur
   const h = browser();
   const later = snapshot();
   h.setView(h.view(later));
-  h.click(h.controls('vars')[0]);
+  h.openCase();
+  h.click(h.controls('detail')[0]);
   h.click(h.controls('detail')[0]);
   h.run(`mapIndex.notes = [{id: 'note:future', noteId: 'future', type: 'Pathology', result: 'FUTURE'}];
     mapIndex.groups.set('future', {id: 'future', name: 'Future group', annotation: 'FUTURE',
@@ -350,7 +472,8 @@ test('replay retains entity identity but clears pass/history, supplying only cur
 test('same-step live updates preserve scope and focused links; a rewind drops stale pass bindings', () => {
   const h = browser();
   h.setView(h.view(snapshot()));
-  h.click(h.controls('vars')[0]);
+  h.openCase();
+  h.click(h.controls('detail')[0]);
   h.click(h.controls('detail')[0]);
   const link = h.controls('detail')[0];
   link.focus();
@@ -369,7 +492,8 @@ test('same-step live updates preserve scope and focused links; a rewind drops st
 test('a pending notes fetch rerenders the current selection/snapshot, including a closed card', async () => {
   const h = browser();
   h.setView(h.view(snapshot()));
-  h.click(h.controls('vars')[0]);
+  h.openCase();
+  h.click(h.controls('detail')[0]);
   let finish;
   h.context.fetch = (url) => {
     h.requests.push({url});
@@ -398,11 +522,12 @@ test('a pending notes fetch rerenders the current selection/snapshot, including 
 test('interactive controls keep native keys; global replay keys work only outside them', () => {
   const h = browser();
   h.setView(h.view(snapshot()));
-  const targets = [h.controls('vars')[0], h.controls('vars')[1], h.get('detail-close')];
+  h.openCase();
+  const targets = [h.controls('detail')[0], h.controls('detail')[1], h.get('detail-close')];
   for (const tag of ['input', 'select', 'textarea', 'button', 'summary']) {
     targets.push(h.document.body.append(new Element(h.document, tag)));
   }
-  for (const attrs of [{contenteditable: 'true'}, {contenteditable: ''}, {role: 'button'}]) {
+  for (const attrs of [{contenteditable: 'true'}, {contenteditable: ''}, {role: 'button'}, {class: 'case-table-scroll', tabindex: '0'}]) {
     targets.push(h.document.body.append(new Element(h.document, 'div', attrs)).append(new Element(h.document, 'span')));
   }
   targets.push(h.document.body.append(new Element(h.document, 'a', {href: '#'})));
@@ -412,6 +537,8 @@ test('interactive controls keep native keys; global replay keys work only outsid
     }
   }
   assert.deepEqual(h.requests, []);
+  for (const value of ['v', 'V']) assert.equal(h.key(value, h.document.body).defaultPrevented, false);
+  assert.equal(h.selection().kind, 'case');
   for (const value of ['ArrowLeft', 'ArrowRight', ' ']) assert.equal(h.key(value, h.document.body).defaultPrevented, true);
   assert.deepEqual(h.requests.map(({url}) => url), ['/api/prev', '/api/next', '/api/pause']);
 });
@@ -419,7 +546,8 @@ test('interactive controls keep native keys; global replay keys work only outsid
 test('Escape closes OMOP before the card, and viewers can navigate cards without control requests', () => {
   const h = browser({viewer: true});
   h.setView(h.view(snapshot()));
-  const origin = h.controls('vars')[1];
+  h.openCase();
+  const origin = h.controls('detail')[1];
   h.click(origin);
   h.get('omop-modal').hidden = false;
   assert.equal(h.key('Escape', h.get('omop-close')).defaultPrevented, true);
@@ -427,7 +555,7 @@ test('Escape closes OMOP before the card, and viewers can navigate cards without
   assert.equal(h.selection().kind, 'variable');
   assert.equal(h.key('Escape', h.get('detail-close')).defaultPrevented, true);
   assert.equal(h.selection(), null);
-  assert.equal(h.document.activeElement, origin);
+  assert.equal(h.document.activeElement, h.get('btn-replay-step'));
   for (const value of ['ArrowLeft', 'ArrowRight', ' ']) h.key(value, h.document.body);
   assert.deepEqual(h.requests, []);
 });
@@ -443,7 +571,9 @@ test('missing cards.js keeps the empty stage blank and reports unavailable selec
   assert.equal(h.get('detail').innerHTML, '');
   assert.equal(h.get('detail-window').hidden, true);
   assert.equal(h.get('detail-heading').textContent, 'Details');
-  h.click(h.controls('vars')[1]);
+  h.openCase();
+  assert.match(h.get('detail').innerHTML, /entity-case/);
+  h.click(h.controls('detail')[1]);
   assert.match(h.get('detail').innerHTML, /Entity details are unavailable/);
   assert.doesNotMatch(h.get('detail').innerHTML, /RAW PROMPT|Model call|pinned component/);
 });
@@ -469,7 +599,8 @@ test('real DemoCards links bind a variable pass and evidence note, then replay c
   h.context.sourceNotes = {[noteId]: {note_id: noteId, content: 'A cancer finding.', summary: 'RAW FUTURE SUMMARY'}};
   h.run('notesById = sourceNotes;');
   h.setView(h.view(later));
-  h.click(h.controls('vars')[0]);
+  h.openCase();
+  h.click(h.controls('detail')[0]);
   const tile = h.controls('detail').find((el) => el.dataset.entityKind === 'variable');
   assert.equal(tile.dataset.instanceKey, variableKey);
   h.click(tile);

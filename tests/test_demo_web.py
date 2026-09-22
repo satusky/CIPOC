@@ -141,12 +141,18 @@ class WebAssetTests(unittest.TestCase):
         for symbol in ("viewCaseFacts", "viewFinalSummary"):
             self.assertIn(symbol, app_js, f"app.js missing {symbol}")
 
-    def test_app_js_wires_the_panel_splitter(self):
+    def test_case_table_replaces_the_bottom_tray(self):
         app_js = (WEB_DIR / "app.js").read_text()
         html = (WEB_DIR / "index.html").read_text()
-        self.assertIn("wireSplitter", app_js)
-        self.assertIn("--vars-h", app_js)
-        self.assertIn('id="row-split"', html)
+        for removed in ("wireSplitter", "wireVarsPane", "maxVarsHeight", "setVarsHeight",
+                        "VARS_H_KEY", "VARS_OPEN_KEY", "VARS_MIN", "MAP_MIN",
+                        "els.vars", "renderVars", "--vars-h"):
+            self.assertNotIn(removed, app_js)
+        for removed in ("vars", "vars-summary", "vars-toggle", "row-split"):
+            self.assertNotIn(f'id="{removed}"', html)
+        for shared in ("detail-window", "detail-heading", "detail-node", "detail-back",
+                       "detail-close", "detail", "map-layout"):
+            self.assertEqual(html.count(f'id="{shared}"'), 1)
 
     def test_styles_cover_phase4_views(self):
         css = (WEB_DIR / "styles.css").read_text()
@@ -158,7 +164,7 @@ class WebAssetTests(unittest.TestCase):
         css = (WEB_DIR / "styles.css").read_text()
         for cls in (".node-head", ".node-head-title", ".minor-row",
                     ".node-detail.variable", ".node-detail.group", ".attempt",
-                    ".row-split", "--vars-h", ".msg.role-system", ".call-icon",
+                    ".msg.role-system", ".call-icon",
                     ".j-key", "pre.code.json", ".map-tip", ".map-scrub", ".cy-wrap"):
             self.assertIn(cls, css, f"styles.css missing {cls}")
 
@@ -404,38 +410,27 @@ class WebAssetTests(unittest.TestCase):
         app_js = (WEB_DIR / "app.js").read_text()
         self.assertIn('check_state: ["plan_extraction", "finalize_case"]', app_js)
 
-    def test_the_variables_panel_is_put_away_by_default(self):
-        """The map is what is being presented; the variable table is a reference.
-
-        Left open it took a third of the map's height for the whole talk, so it
-        collapses to its own header at the bottom edge and is pulled up when
-        wanted — and reopens at whatever size the splitter was last dragged to.
-        """
+    def test_the_case_table_opens_in_the_shared_detail_window(self):
+        """Case facts stay above the locally scrolling grouped variable table."""
         app_js = (WEB_DIR / "app.js").read_text()
         css = (WEB_DIR / "styles.css").read_text()
         html = (WEB_DIR / "index.html").read_text()
-        self.assertIn("function wireVarsPane", app_js)
-        self.assertIn("wireVarsPane()", app_js)
-        self.assertIn("const VARS_OPEN_KEY", app_js)      # remembered per presenter
-        # Opened before it has ever been dragged it takes everything the map can
-        # spare — a third of a screen shows a handful of forty-four rows — and
-        # the clamp is shared with the drag so neither can starve the map.
-        self.assertIn("function maxVarsHeight", app_js)
-        self.assertIn("setVarsHeight(grid, maxVarsHeight(grid))", app_js)
-        # One clamp, shared with the drag, and it discounts the grid's own
-        # padding and row gap — those belong to neither row, so ignoring them
-        # left the map about 40px short of MAP_MIN.
-        self.assertIn("padding - gap - MAP_MIN", app_js)
-        self.assertEqual(app_js.count("grid.style.setProperty(\"--vars-h\""), 1)
-        self.assertIn('id="vars-toggle"', html)
-        self.assertIn('aria-expanded="false"', html)      # closed on first load
-        # Collapsed is a row of `auto`, not a height, so it cannot disagree with
-        # what the header measures and the dragged size survives underneath it.
-        self.assertIn(".grid.vars-collapsed { grid-template-rows: minmax(0, 1fr) auto; }", css)
-        self.assertIn(".grid.vars-collapsed #vars { display: none; }", css)
+        self.assertRegex(html, r'<div\b[^>]*id="detail-window"[^>]*\bhidden>')
+        selection = app_js.split("function mapSelection", 1)[1].split("\n}", 1)[0]
+        self.assertIn('if (id === CASE_ID) return { kind: "case", id: CASE_ID }', selection)
+        render = app_js.split("function renderDetail", 1)[1].split("\n}", 1)[0]
+        self.assertIn('classList.toggle("case-table-open", isCase)', render)
+        self.assertIn("renderCaseTable(snapshot)", render)
+        self.assertIn("DemoCards.render", render)
+        for cls in (".entity-case", ".case-table-open", ".case-facts", ".case-fact-grid",
+                    ".case-variables", ".case-table-scroll", ".vt-id"):
+            self.assertIn(cls, css)
+        self.assertIn('tabindex="0" role="region" aria-label="Case variables"', app_js)
+        self.assertIn("snapshot.case_facts", app_js)
+        self.assertIn("Case facts not recorded at this step", app_js)
 
     def test_a_variable_row_opens_the_rows_it_would_export(self):
-        """Panel 3 stops at the coded value; the export is the deliverable.
+        """The case table links a variable to its recorded export rows.
 
         Each variable carries a button that shows the OMOP rows the real
         exporter would write for it. The rows are fetched, never computed in
@@ -459,26 +454,25 @@ class WebAssetTests(unittest.TestCase):
         ):
             self.assertIn(symbol, app_js, f"app.js is missing {symbol}")
 
-        # One delegated listener for the whole pane, not one per rendered row:
-        # renderVars replaces the pane wholesale on every cursor message, so
-        # per-button wiring would re-attach on every step and leak the old ones.
-        self.assertEqual(app_js.count('els.vars.addEventListener("click"'), 1)
-        self.assertIn('closest(".omop-btn")', app_js)
+        # One OMOP listener on the shared detail container survives replacement.
+        omop_wiring = app_js.split("function wireOmopModal", 1)[1].split("\n}", 1)[0]
+        self.assertEqual(omop_wiring.count('els.detail.addEventListener("click"'), 1)
+        self.assertIn('closest(".omop-btn")', omop_wiring)
+        self.assertIn("omopWired", omop_wiring)
 
-        # The modal owns the keyboard while it is up. Without both guards the
+        # The modal owns the keyboard while it is up. Without the guard the
         # arrows would move the presentation for every viewer, and space would
         # toggle play, while the presenter is reading a table.
-        for function in ("wireControls", "wireVarsPane"):
-            scoped = app_js.split(f"function {function}", 1)[1].split("\n}", 1)[0]
-            keyboard = scoped.split('document.addEventListener("keydown"', 1)[1]
-            self.assertRegex(keyboard, r"if \(omopIsOpen\(\)(?: \|\| [^\n]+)?\) return;")
-            self.assertIn("interactiveTarget(e.target)", keyboard)
+        scoped = app_js.split("function wireControls", 1)[1].split("\n}", 1)[0]
+        keyboard = scoped.split('document.addEventListener("keydown"', 1)[1]
+        self.assertRegex(keyboard, r"if \(omopIsOpen\(\)(?: \|\| [^\n]+)?\) return;")
+        self.assertIn("interactiveTarget(e.target)", keyboard)
 
         # OMOP rows are pinned to a seq, so a step change closes the preview
         # while entity cards re-resolve against the newly selected snapshot.
         self.assertIn("closeOmopModal();", app_js.split("function applyView")[1])
 
-        # Outside #vars, which is replaced on every render, and outside .panel,
+        # Outside #detail, which is replaced on selection, and outside .panel,
         # which clips its own content.
         self.assertIn('id="omop-modal"', html)
         self.assertIn('id="omop-body"', html)
