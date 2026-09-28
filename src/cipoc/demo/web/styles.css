@@ -472,13 +472,15 @@ body {
 }
 .entity-section { display: grid; align-content: start; gap: .3rem; min-width: 0; margin: 0; }
 .entity-section-wide { grid-column: 1 / -1; }
-/* Evidence gets an uninterrupted reading column. The note's shorter summary,
-   concept assessment and mention facts stack beside it without row-height gaps. */
+/* Keywords and evidence share a reading column. The note's summary, concept
+   assessment and mention facts stack beside it without row-height gaps. */
 .entity-note .entity-body { grid-template-areas: "summary evidence" "concepts evidence" "mentions evidence"; }
 .entity-note .entity-summary { grid-area: summary; }
 .entity-note .entity-concepts { grid-area: concepts; }
 .entity-note .entity-cancer { grid-area: mentions; }
-.entity-note .entity-evidence-section { grid-area: evidence; }
+.entity-note .entity-note-context { grid-area: evidence; display: flex; flex-direction: column; gap: .6rem; min-width: 0; }
+.entity-keywords-list { display: flex; flex-wrap: wrap; gap: .3rem; list-style: none; margin: 0; padding: 0; }
+.entity-keyword { padding: .15rem .45rem; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-sunk); color: var(--ink); font-size: .9375rem; line-height: 1.3; }
 /* Multiple cancer mentions share a full-width row rather than crowding the
    summary column while the adjacent evidence column has already finished. */
 .entity-note .entity-body:has(.entity-mention + .entity-mention) {
@@ -1151,6 +1153,18 @@ table.omop-table { border-collapse: collapse; font-size: .72rem; width: max-cont
   .entity-variable .entity-section { break-inside: avoid; }
   .entity-variable .entity-explanation, .entity-variable .entity-validation { margin-top: .6rem; }
   .entity-variable .entity-evidence-section { break-before: column; }
+
+  /* Dense source columns make room for keywords through leading and spacing;
+     source text stays 16px and every keyword and citation remains visible. */
+  .entity-note-context:has(.entity-evidence-item:nth-child(3)) { line-height: 1.25; gap: .4rem; }
+  .entity-note-context:has(.entity-evidence-item:nth-child(3)) .entity-section { gap: .2rem; }
+  .entity-note-context:has(.entity-evidence-item:nth-child(3)) .entity-note-text { line-height: 1.25; }
+  .entity-note-context:has(.entity-evidence-item:nth-child(3)) .entity-evidence { gap: .35rem; }
+  .entity-note-context:has(.entity-evidence-item:nth-child(3)) .entity-evidence-item { padding-block: .2rem; }
+  .entity-note-context:has(.entity-evidence-item:nth-child(3)) .entity-source { row-gap: 0; margin-bottom: .15rem; }
+  .entity-note-context:has(.entity-evidence-item:nth-child(3)) .entity-evidence-item > .entity-muted { margin-bottom: .15rem; }
+  .entity-note-context:has(.entity-evidence-item:nth-child(3)) .entity-keywords-list { gap: .2rem; }
+  .entity-note-context:has(.entity-evidence-item:nth-child(3)) .entity-keyword { padding-block: .05rem; }
 }
 
 /* Short presentation frames need less spacing around the same readable content,
@@ -1180,6 +1194,7 @@ table.omop-table { border-collapse: collapse; font-size: .72rem; width: max-cont
   .entity-note .entity-body:has(.entity-mention + .entity-mention) { grid-template-areas: none; }
   .entity-mentions:has(.entity-mention + .entity-mention) { grid-template-columns: minmax(0, 1fr); }
   .entity-note .entity-body > .entity-section, .entity-variable .entity-body > .entity-section { grid-area: auto; }
+  .entity-note .entity-note-context { grid-area: auto; }
   .entity-header { grid-template-columns: minmax(0, 1fr); }
   .entity-header > .entity-status { grid-column: 1; grid-row: auto; justify-self: start; }
   .entity-variable .entity-header > .entity-status { grid-row: auto; }

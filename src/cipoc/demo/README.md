@@ -78,7 +78,7 @@ cards open or close. One case, note, group, or variable card is shown at a time,
 with all its sections together rather than behind tabs or accordions. Live mode
 uses the same frontend.
 
-- **Note:** ID, date/type, scan status, summary, concept presence/confidence,
+- **Note:** ID, date/type, scan status, summary, recorded keywords, concept presence/confidence,
   cancer mentions and temporality, and evidence. Concepts occupy a uniform grid:
   ✓ indicates present, − absent, and ? unrecorded; present concepts have a teal fill.
 - **Group:** summary and variable tiles with recorded status, value, and reasons.

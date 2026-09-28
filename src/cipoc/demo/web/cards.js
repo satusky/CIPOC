@@ -354,6 +354,10 @@
     const unavailable = selection.instanceKey != null && !instance;
     const result = obj(obj(instance).result);
     const note = {...obj(obj(instance).input), ...rawNote(notes, id)};
+    // The scanner stores its search keywords as flags on the processed note.
+    const keywords = Array.isArray(result.flags) && result.flags.length
+      ? `<ul class="entity-keywords-list">${result.flags.map((keyword) => `<li class="entity-keyword">${esc(keyword)}</li>`).join("")}</ul>`
+      : empty(Array.isArray(result.flags) ? "No keywords recorded" : "Keywords not recorded");
     const refs = [];
     const concepts = Object.entries(obj(result.concepts));
     const chips = concepts.map(([name, concept]) => {
@@ -385,7 +389,8 @@
         (present(obj(instance).error) ? prose(typeof instance.error === "object" ? instance.error.message : instance.error) : ""), "entity-summary") +
       section("Concepts", chips ? `<div class="entity-concept-grid">${chips}</div>` : empty("Concept assessment not recorded"), "entity-concepts") +
       section("Cancer mentions", mentions ? `<div class="entity-mentions">${mentions}</div>` : empty(Array.isArray(result.cancer_mentions) ? "No cancer mentions recorded" : "Cancer mentions not recorded"), "entity-cancer") +
-      section("Evidence", evidence(refs, notes), "entity-evidence-section"));
+      `<div class="entity-note-context">${section("Keywords", keywords, "entity-keywords")}` +
+      section("Evidence", evidence(refs, notes), "entity-evidence-section") + `</div>`);
   }
 
   function renderVariable(selection, snapshot, notes, catalog, all) {

@@ -46,18 +46,22 @@ test('standalone global/CommonJS export, blank empty selection, deterministic an
   assert.doesNotMatch(render(variableSelection, state), /<details|<summary|role="tab|overflow|onclick|<script/);
 });
 
-test('concurrent notes keep their own summary, concepts, mentions and metadata', () => {
+test('concurrent notes keep their own summary, keywords, concepts, mentions and metadata', () => {
   const a = note('01', 'Summary A', {result: {summary: 'Summary A',
+    flags: ['biopsy', 'ER+/PR+ & HER2−'],
     concepts: {surgery: {presence: false, confidence: 'max'}, cancer: {presence: true, confidence: 'high'}},
     cancer_mentions: [{affected_tissue: 'Breast A', histology: 'Ductal A', status: 'current', confidence: 'high', metastasis: false}],
   }});
   const b = note('02', 'Summary B', {started_t: 10, result: {summary: 'Summary B',
+    flags: ['lung resection'],
     concepts: {immunotherapy: {presence: true}}, cancer_mentions: [{affected_tissue: 'Lung B'}]}});
   const state = {...snapshot(a, b), details: {scanner_summarize_note: {result: b.result}}};
   const html = render({kind: 'note', id: 'note:01'}, state, {}, catalog);
   for (const expected of ['Summary A', '2025-02-24', 'Pathology', 'Absent', 'Breast A', 'Ductal A', 'current', 'Confidence: high']) assert.ok(html.includes(expected), expected);
-  assert.doesNotMatch(html, /Summary B|Lung B|immunotherapy/);
-  assert.equal(occurrenceCount(html, 'class="entity-section-title"'), 4);
+  assert.doesNotMatch(html, /Summary B|Lung B|immunotherapy|lung resection/);
+  assert.match(html, /class="entity-keyword">biopsy<\/li>/);
+  assert.match(html, /class="entity-keyword">ER\+\/PR\+ &amp; HER2−<\/li>/);
+  assert.equal(occurrenceCount(html, 'class="entity-section-title"'), 5);
   const missing = render({kind: 'note', id: '02'}, state);
   assert.match(missing, /Histology: Not recorded/);
 });
