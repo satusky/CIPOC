@@ -16,8 +16,12 @@ from cipoc.models import (
     ConfidenceLevel,
     ConceptWithEvidence,
     CONCEPT_DESCRIPTIONS,
+    DiagnosticCertainty,
+    MentionBehavior,
     TextSpan,
+    behavior_field,
     confidence_field,
+    diagnostic_certainty_field,
 )
 from cipoc.utils import CipocConfig, run_with_progress
 from cipoc.prompts.note_scanner import (
@@ -57,8 +61,14 @@ def concept_findings_model(
     )
 
 
+class CancerMentionFinding(CancerMention):
+    """Scanner output for one mention, requiring the fields the saved model defaults for old artifacts."""
+    behavior: MentionBehavior = behavior_field()
+    diagnostic_certainty: DiagnosticCertainty = diagnostic_certainty_field()
+
+
 class CancerMentions(BaseModel):
-    mentions: list[CancerMention] = Field(description="List of cancer mentions; empty if no cancer is mentioned.")
+    mentions: list[CancerMentionFinding] = Field(description="List of cancer mentions; empty if no cancer is mentioned.")
 
 
 class NoteSummary(BaseModel):
@@ -143,10 +153,11 @@ class NoteScannerAgent(BaseAgent):
         response = self.agent.structured(
             CancerMentions, state.messages + [HumanMessage(CANCER_MENTIONS_PROMPT)]
         )
+        mentions = [CancerMention.model_validate(m.model_dump()) for m in response.mentions]
         # Roll the per-mention temporality up to a note-level set (empty -> None).
         return {
-            "cancer_mentions": response.mentions,
-            "cancer_status": {m.status for m in response.mentions} or None,
+            "cancer_mentions": mentions,
+            "cancer_status": {m.status for m in mentions} or None,
         }
 
     @staticmethod

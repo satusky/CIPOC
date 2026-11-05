@@ -249,9 +249,9 @@ function normalizeRunResult(result) {
   if (!result || typeof result !== "object" || Array.isArray(result)) {
     throw new Error("Expected an OrchestratorRunResult JSON object.");
   }
-  if (!["1.0", "1.1", "1.2"].includes(result.schema_version)) {
+  if (!["1.0", "1.1", "1.2", "1.3"].includes(result.schema_version)) {
     const version = result.schema_version == null ? "missing" : String(result.schema_version);
-    throw new Error("Unsupported schema_version " + version + "; expected 1.0, 1.1 or 1.2.");
+    throw new Error("Unsupported schema_version " + version + "; expected 1.0, 1.1, 1.2 or 1.3.");
   }
 
   for (const domain of ["run", "case", "inputs", "corpus", "observability"]) {

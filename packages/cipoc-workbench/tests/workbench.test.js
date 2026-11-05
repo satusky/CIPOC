@@ -8,7 +8,7 @@ const vm = require("node:vm");
 
 const { loadWorkbench, canonicalResult, descendants } = require("./helpers");
 
-for (const schemaVersion of ["1.0", "1.1", "1.2"]) {
+for (const schemaVersion of ["1.0", "1.1", "1.2", "1.3"]) {
 test(`recognizes canonical ${schemaVersion} and indexes every result domain without rewriting it`, () => {
   const { context } = loadWorkbench();
   const result = canonicalResult(schemaVersion);
@@ -84,6 +84,27 @@ test(`all views render canonical ${schemaVersion} data and typed note-selection 
   assert.match(context.variableView.textContent, /Group extraction call/);
 });
 }
+
+test("a 1.3 mention with behavior and diagnostic certainty loads without rewriting", () => {
+  const { context } = loadWorkbench();
+  const result = canonicalResult("1.3");
+  const note = result.corpus.note_corpus["note-2"];
+  note.cancer_mentions = [{
+    presence: true, confidence: "max", evidence: [{ note_id: "note-2", text: note.content }],
+    status: "current", affected_tissue: "breast", metastasis: false,
+    behavior: "benign", diagnostic_certainty: "probable",
+  }];
+  const original = JSON.stringify(result);
+  context.result = result;
+  vm.runInContext("indexState(result)", context);
+
+  assert.equal(vm.runInContext("App.schemaVersion", context), "1.3");
+  assert.equal(vm.runInContext("App.notes.get('note-2').cancer_mentions[0].diagnostic_certainty", context), "probable");
+  context.noteView = vm.runInContext("noteDetail('note-2')", context);
+  assert.match(context.noteView.textContent, /breastcurrentmax/);
+  assert.doesNotMatch(context.noteView.textContent, /No cancer mentions recorded/);
+  assert.equal(JSON.stringify(result), original);
+});
 
 test("string and integer primary citations navigate without losing leading zeros or scalar types", () => {
   for (const schemaVersion of ["1.0", "1.1"]) {

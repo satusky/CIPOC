@@ -49,6 +49,12 @@ Identify every distinct cancer case mentioned in the note. For each mention, rep
 - status: "current" (ongoing), "recent" (resolved <10 years prior), or "historical" (resolved 10+ years prior).
 - affected_tissue: the primary organ or tissue affected.
 - metastasis: whether metastases are mentioned for that case.
+- behavior: "malignant" (including in situ), "benign" (including borderline or uncertain whether \
+benign or malignant), or "unknown" (the note doesn't establish behavior).
+- diagnostic_certainty: how certain the note's wording makes the diagnosis. "definite" when the \
+diagnosis is stated, for example on pathology or as the clinician's diagnosis; "probable" for wording \
+such as "probable", "likely", "suspicious for" or "consistent with"; "possible" for wording such as \
+"possible", "cannot rule out" or "questionable". This describes the note's wording, not your confidence.
 - presence: true (each reported mention is, by definition, present in the note).
 - confidence: your confidence in the reported details for that mention.
 - evidence: verbatim text span(s) from the note supporting that mention.

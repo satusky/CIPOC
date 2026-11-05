@@ -22,6 +22,8 @@ CONCEPT_DESCRIPTIONS: dict[str, str] = {
 CONCEPTS = list(CONCEPT_DESCRIPTIONS)
 
 CancerStatus = Literal["historical", "recent", "current"]
+MentionBehavior = Literal["benign", "malignant", "unknown"]
+DiagnosticCertainty = Literal["definite", "probable", "possible"]
 
 
 class NoteSelectionRejectionCode(str, Enum):
@@ -98,6 +100,22 @@ class ConceptWithEvidence(BaseModel):
     model_config = ConfigDict(protected_namespaces=())
 
 
+def behavior_field(**kwargs):
+    """Pydantic field for a mention's behavior, with the category definitions in its description."""
+    return Field(
+        description="Behavior of the tumor as the note establishes it. {'malignant': malignant, including in situ; 'benign': benign, borderline, or uncertain whether benign or malignant; 'unknown': the note doesn't establish behavior}",
+        **kwargs,
+    )
+
+
+def diagnostic_certainty_field(**kwargs):
+    """Pydantic field for a mention's diagnostic certainty, with the wording rules in its description."""
+    return Field(
+        description="How certain the note's wording makes the diagnosis. This describes the note, not your confidence in this answer, which belongs in `confidence`: a note that says 'possible lung cancer' is 'possible' here even though the note states it plainly. {'definite': the diagnosis is stated, for example on pathology or as the clinician's diagnosis; 'probable': wording such as 'probable', 'likely', 'suspicious for' or 'consistent with'; 'possible': wording such as 'possible', 'cannot rule out' or 'questionable'}",
+        **kwargs,
+    )
+
+
 class CancerMention(BaseModel):
     presence: Literal[True] = Field(description="Every reported cancer mention is present in the note.")
     confidence: ConfidenceLevel = confidence_field()
@@ -105,6 +123,10 @@ class CancerMention(BaseModel):
     status: CancerStatus = Field(description="Approximate timeframe of cancer case. {'current': ongoing case, 'recent': case resolved <10 years prior, 'historical': case resolved 10+ years prior}")
     affected_tissue: str = Field(description="Primary organ or tissue affected.")
     metastasis: bool = Field(description="Metastases mentioned in the note.")
+    # The defaults describe mentions saved before these fields existed, when the
+    # scanner captured only diagnosed malignancies. The scanner must answer both.
+    behavior: MentionBehavior = behavior_field(default="malignant")
+    diagnostic_certainty: DiagnosticCertainty = diagnostic_certainty_field(default="definite")
     model_config = ConfigDict(protected_namespaces=())
     
 

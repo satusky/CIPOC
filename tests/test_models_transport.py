@@ -13,9 +13,10 @@ from uuid import uuid4
 
 import httpx
 from openai import BadRequestError, InternalServerError, NotFoundError, RateLimitError, UnprocessableEntityError
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from cipoc.agents import NoteScannerAgent, OrchestratorAgent
+from cipoc.agents.note_scanner import CancerMentions
 from cipoc.llm import ChatCompletionStatusError, FoundryModelsTransport, OpenAIAgentModel, retry_on_transient
 from cipoc.utils import CipocConfig, load_config
 
@@ -96,6 +97,36 @@ class ChatOpenAIRoundTripTests(_HttpClientCase):
         self.assertEqual(request["messages"], [{"role": "user", "content": "synthetic prompt"}])
         self.assertEqual(request["response_format"]["type"], "json_schema")
         self.assertEqual(request["response_format"]["json_schema"]["name"], "Answer")
+
+    def test_mention_schema_requires_behavior_and_diagnostic_certainty_on_the_wire(self):
+        mention = {
+            "presence": True, "confidence": "max", "evidence": [{"note_id": 1, "text": "lung nodule"}],
+            "status": "current", "affected_tissue": "lung", "metastasis": False,
+            "behavior": "unknown", "diagnostic_certainty": "possible",
+        }
+        for compatibility in ("standard", "databricks"):
+            with self.subTest(endpoint_compatibility=compatibility):
+                model = _FakeFoundryModel(content=json.dumps({"mentions": [mention]}))
+                agent = self.agent(_transport(model), endpoint_compatibility=compatibility)
+
+                result = agent.structured(CancerMentions, [{"role": "user", "content": "synthetic prompt"}])
+
+                self.assertEqual(result.mentions[0].diagnostic_certainty, "possible")
+                [request] = model.requests
+                schema = request["response_format"]["json_schema"]["schema"]
+                sent = schema["properties"]["mentions"]["items"]
+                if "$ref" in sent:
+                    sent = schema["$defs"][sent["$ref"].rsplit("/", 1)[-1]]
+                for field in ("behavior", "diagnostic_certainty"):
+                    self.assertIn(field, sent["required"])
+                    self.assertNotIn("default", sent["properties"][field])
+
+                for field in ("behavior", "diagnostic_certainty"):
+                    incomplete = {key: value for key, value in mention.items() if key != field}
+                    model = _FakeFoundryModel(content=json.dumps({"mentions": [incomplete]}))
+                    agent = self.agent(_transport(model), endpoint_compatibility=compatibility)
+                    with self.assertRaises(ValidationError):
+                        agent.structured(CancerMentions, [{"role": "user", "content": "synthetic prompt"}])
 
     def test_plain_invoke_reports_usage_and_defaults_the_model_name(self):
         agent = self.agent(_transport(_FakeFoundryModel(content="hello")))

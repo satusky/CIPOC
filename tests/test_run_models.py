@@ -139,12 +139,44 @@ class OrchestratorRunModelTests(unittest.TestCase):
         restored = OrchestratorRunResult.model_validate_json(result.model_dump_json())
 
         self.assertEqual(restored, result)
-        self.assertEqual(restored.schema_version, "1.2")
+        self.assertEqual(restored.schema_version, "1.3")
         self.assertEqual(restored.run.started_at.tzinfo, timezone.utc)
         self.assertNotIn(
             "api_key",
             restored.run.config_fingerprint.agent_llm_config["note_scanner"],
         )
+
+    def test_1_3_artifact_round_trips_mention_behavior_and_certainty(self):
+        payload = OrchestratorRunResult(
+            run=run_info(), case=Case(), inputs=inputs(), corpus=corpus(),
+            observability=observability(),
+        ).model_dump(mode="json")
+        payload["corpus"]["note_corpus"]["note-A"]["cancer_mentions"][0].update(
+            behavior="benign", diagnostic_certainty="probable",
+        )
+
+        result = OrchestratorRunResult.model_validate(payload)
+        restored = OrchestratorRunResult.model_validate_json(result.model_dump_json())
+
+        self.assertEqual(restored, result)
+        self.assertEqual(restored.schema_version, "1.3")
+        mention = restored.corpus.note_corpus["note-A"].cancer_mentions[0]
+        self.assertEqual((mention.behavior, mention.diagnostic_certainty), ("benign", "probable"))
+
+    def test_legacy_mentions_load_as_definite_malignant(self):
+        payload = OrchestratorRunResult(
+            run=run_info(), case=Case(), inputs=inputs(), corpus=corpus(),
+            observability=observability(),
+        ).model_dump(mode="json")
+        payload["schema_version"] = "1.2"
+        legacy = payload["corpus"]["note_corpus"]["note-A"]["cancer_mentions"][0]
+        del legacy["behavior"], legacy["diagnostic_certainty"]
+
+        restored = OrchestratorRunResult.model_validate(payload)
+
+        self.assertEqual(restored.schema_version, "1.2")
+        mention = restored.corpus.note_corpus["note-A"].cancer_mentions[0]
+        self.assertEqual((mention.behavior, mention.diagnostic_certainty), ("malignant", "definite"))
 
     def test_unknown_schema_version_is_rejected(self):
         result = OrchestratorRunResult(
@@ -195,8 +227,8 @@ class OrchestratorRunModelTests(unittest.TestCase):
             (OrchestratorRunFailure, {"run": run_info("failed"), "error": "failure"}),
         ):
             artifact = model(inputs=inputs(), observability=observability(), **extra)
-            self.assertEqual(artifact.schema_version, "1.2")
-            for version in ("1.0", "1.1", "1.2"):
+            self.assertEqual(artifact.schema_version, "1.3")
+            for version in ("1.0", "1.1", "1.2", "1.3"):
                 with self.subTest(model=model.__name__, version=version):
                     payload = {**artifact.model_dump(mode="json"), "schema_version": version}
                     restored = model.model_validate(payload)

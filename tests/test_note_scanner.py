@@ -3,6 +3,8 @@ import unittest
 from pydantic import ValidationError
 
 from cipoc.agents.note_scanner import (
+    CancerMentionFinding,
+    CancerMentions,
     ConceptFinding,
     NoteScannerAgent,
     ScannerState,
@@ -197,6 +199,22 @@ class CancerMentionSchemaTests(unittest.TestCase):
 
         self.assertTrue(mention.presence)
         self.assertEqual(mention.affected_tissue, "breast")
+
+    def test_scanner_output_answers_behavior_and_certainty_and_saves_the_base_mention(self):
+        values = self.mention().model_dump(exclude={"behavior", "diagnostic_certainty"})
+        with self.assertRaises(ValidationError):
+            CancerMentionFinding(**values)
+        finding = CancerMentionFinding(**values, behavior="benign", diagnostic_certainty="possible")
+        scanner = _scanner_with(CancerMentions(mentions=[finding]))
+
+        result = scanner.get_cancer_mentions(_state())
+
+        [mention] = result["cancer_mentions"]
+        self.assertIs(type(mention), CancerMention)
+        self.assertEqual((mention.behavior, mention.diagnostic_certainty), ("benign", "possible"))
+        prompt = scanner.agent.messages[-1].content
+        self.assertIn("- behavior:", prompt)
+        self.assertIn("- diagnostic_certainty:", prompt)
 
 
 if __name__ == "__main__":

@@ -186,8 +186,8 @@ agent's graph; saved diagrams are in `src/cipoc/agents/visualization/`.
 
 ## Run artifacts
 
-New artifacts use `schema_version` 1.2. The runtime and the Workbench read 1.0
-through 1.2. An artifact has five sections:
+New artifacts use `schema_version` 1.3. The runtime and the Workbench read 1.0
+through 1.3. An artifact has five sections:
 
 - `run`: run ID, timing, status, a config fingerprint (no credentials), and
   `contains_phi`.

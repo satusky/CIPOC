@@ -3,8 +3,8 @@
 The CIPOC Workbench is a standalone browser interface for reviewing a canonical
 CIPOC `OrchestratorRunResult` JSON artifact, comparing extracted values with
 optional ground truth, and saving reviewer feedback. It accepts
-`schema_version: "1.0"`, `"1.1"`, and `"1.2"` and does not import the CIPOC runtime.
-New runtime result and failure artifacts emit `1.2`; runtime readers accept all three.
+`schema_version: "1.0"`, `"1.1"`, `"1.2"`, and `"1.3"` and does not import the CIPOC runtime.
+New runtime result and failure artifacts emit `1.3`; runtime readers accept all four.
 Historical artifacts are displayed as recorded, without rewriting or revalidating
 their clinical results. The bundled example remains a `1.0` compatibility fixture.
 
