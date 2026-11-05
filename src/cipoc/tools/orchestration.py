@@ -634,7 +634,7 @@ def _result_from_extraction(extraction: ValidatedVariableOutput) -> CaseVariable
 
 
 # NAACCR item IDs whose coded value is also a case-scoping fact. Populating these
-# after an initial-stage group extracts lets dependent groups be scoped (site
+# after an earlier-stage group extracts lets later groups be scoped (site
 # applicability, dictionary selection) against real coded values instead of only the
 # coarse characterization facts. Laterality (410) has no CaseFacts field, so it is
 # deliberately absent.

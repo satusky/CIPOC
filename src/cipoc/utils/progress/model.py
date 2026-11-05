@@ -242,8 +242,9 @@ def _annotation(group: Any) -> str:
         return "gate:" + "+".join(
             GATE_LABELS.get(enum_value(gate), str(enum_value(gate))) for gate in gates
         )
-    if field(group, "stage") == "initial":
-        return "initial"
+    stage = field(group, "stage")
+    if stage and stage != "dependent":
+        return str(stage)
     return ""
 
 

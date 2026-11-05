@@ -183,6 +183,20 @@ class ProgressLayoutTests(unittest.TestCase):
                     model = ProgressModel("Orchestrator", 0.0, target_groups=[group])
                     self.assertEqual(model.snapshot().groups[0].annotation, expected)
 
+    def test_stage_annotation_names_every_stage_but_dependent(self):
+        for stage, expected in (
+            ("initial", "initial"),
+            ("histology", "histology"),
+            ("discriminator", "discriminator"),
+            ("dependent", ""),
+            (None, ""),
+        ):
+            typed = TargetGroup(group_id="staged", variables=[{"item_id": 522}], stage=stage)
+            for group in (typed, typed.model_dump(mode="json")):
+                with self.subTest(stage=stage, representation=type(group).__name__):
+                    model = ProgressModel("Orchestrator", 0.0, target_groups=[group])
+                    self.assertEqual(model.snapshot().groups[0].annotation, expected)
+
     def test_viewport_goldens(self):
         sections = []
         for width, height in VIEWPORTS:

@@ -408,7 +408,7 @@ class SchedulingGraphRegressionTests(unittest.TestCase):
         final = states[-1]
         configured = {group.group_id: group for group in final.target_variables}
         self.assertEqual(configured["site_specific_codes"].stage, "dependent")
-        self.assertEqual(configured["histologic_type_and_behavior"].stage, "initial")
+        self.assertEqual(configured["histologic_type_and_behavior"].stage, "histology")
         self.assertEqual(final.variable_results[522].status, VariableStatus.EXTRACTED)
         self.assertEqual(final.case_facts.histology, "8247")
         self.assertEqual(final.variable_results[832].status, VariableStatus.NOT_APPLICABLE)
@@ -487,6 +487,27 @@ class SchedulingGraphRegressionTests(unittest.TestCase):
         self.assertEqual(middle_launch.variable_results[410].status, VariableStatus.PENDING)
         self.assertEqual(last_launch.variable_results[522].status, VariableStatus.EXTRACTED)
         self.assertEqual(states[-1].variable_results[410].status, VariableStatus.EXTRACTED)
+
+    def test_configured_histology_stage_runs_between_initial_and_dependents(self):
+        # A NOT_FOUND Primary Site is terminal, so it still releases the histology stage.
+        for primary_site, status in (("C504", VariableStatus.EXTRACTED), (None, VariableStatus.NOT_FOUND)):
+            with self.subTest(primary_site=primary_site):
+                states, launches, _ = self.run_graph(
+                    Script(outcomes={
+                        400: Outcome(value=primary_site), 522: Outcome(value="8500"), 523: Outcome(value="3"),
+                    }),
+                    {},
+                )
+                self.assertEqual([item_ids for item_ids, _ in launches[:2]], [(390, 400, 410), (522, 523)])
+                histology_launch = launches[1][1]
+                self.assertEqual(histology_launch.variable_results[400].status, status)
+                dependent_ids = {item_id for item_ids, _ in launches[2:] for item_id in item_ids}
+                self.assertTrue(dependent_ids)
+                for item_id in dependent_ids:
+                    self.assertEqual(histology_launch.variable_results[item_id].status, VariableStatus.PENDING)
+                for _, state in launches[2:]:
+                    self.assertEqual(state.variable_results[522].status, VariableStatus.EXTRACTED)
+                    self.assertEqual(state.variable_results[523].status, VariableStatus.EXTRACTED)
 
 
 class TreatmentGateTests(unittest.TestCase):

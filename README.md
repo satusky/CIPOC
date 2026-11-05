@@ -95,9 +95,11 @@ export RENCI_AZURE_API_KEY=...
 
 `config/variable_groups.json` defines what to extract: ordered groups of NAACCR
 item IDs, each with gates, note filters, and a stage. Its `stages` list sets the
-order, `["initial", "dependent"]` by default. Each stage waits until every group
-in the stages before it has finished, even ones that found nothing. A stage
-name that isn't in the list fails at load.
+order: `["initial", "histology", "dependent"]` in the shipped files, and
+`["initial", "dependent"]` when a file has no list. Histology (522, 523) runs
+after the initial stage codes Primary Site, and before the dependent groups.
+Each stage waits until every group in the stages before it has finished, even
+ones that found nothing. A stage name that isn't in the list fails at load.
 
 `llm.max_concurrency` caps simultaneous calls to one model at one endpoint,
 across the whole process. The separate `run(max_concurrency=...)` setting limits
