@@ -1,7 +1,16 @@
 import unittest
+from pathlib import Path
 
 from cipoc.models import ConfidenceLevel, VariableInfo, VariableOutput
-from cipoc.tools import VariableValueValidator, resolve_evidence_text
+from cipoc.tools import VariableValueValidator, build_variable_group, resolve_evidence_text
+
+
+BASE_DICTIONARY = (
+    Path(__file__).resolve().parents[1]
+    / "documents"
+    / "manuals"
+    / "naaccr_data_dictionary_v25.json"
+)
 
 
 class EvidenceTextMatchingTests(unittest.TestCase):
@@ -222,6 +231,30 @@ class VariableValueValidatorTests(unittest.TestCase):
         self.assertTrue(self.validator.validate(self.date_variable, candidate.model_copy(update={"item_id": 1})))
         with self.assertRaisesRegex(ValueError, "metadata"):
             self.validator.validate(VariableInfo(item_id=1280), candidate)
+
+
+class PrimarySiteCodeListTests(unittest.TestCase):
+    """Item 400 lists every ICD-O-3 topography code, not just the original 10 sites."""
+
+    @classmethod
+    def setUpClass(cls):
+        if not BASE_DICTIONARY.exists():
+            raise unittest.SkipTest(f"{BASE_DICTIONARY} not present")
+        cls.primary_site = build_variable_group(400, BASE_DICTIONARY).variables[0]
+
+    def test_sites_outside_the_original_ten_validate_without_scoping(self):
+        validator = VariableValueValidator()
+        for value, valid in (("C649", True), ("C809", True), ("C999", False)):
+            with self.subTest(value=value):
+                candidate = VariableOutput(
+                    item_id=400,
+                    value=value,
+                    explanation="Test candidate.",
+                    most_important_note=1,
+                    spans=[],
+                    presence_confidence=ConfidenceLevel.HIGH,
+                )
+                self.assertEqual(not validator.validate(self.primary_site, candidate), valid)
 
 
 if __name__ == "__main__":
