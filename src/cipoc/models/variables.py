@@ -43,7 +43,7 @@ class SiteApplicability(BaseModel):
     """
     gross_primary_sites: list[str] = Field(default_factory=list, description="Tissue-level primary sites the group applies to.")
     primary_sites: list[Annotated[str, Field(pattern=r"^C[0-9]{3}(-C[0-9]{3})?$")]] = Field(default_factory=list, description="ICD-O-3 topography codes or inclusive ranges, e.g. C440-C449.")
-    histology_families: list[str] = Field(default_factory=list, description="Histology family labels, preserved as serialized. Runtime configuration supports melanoma (8720-8790), independent of site.")
+    histology_families: list[str] = Field(default_factory=list, description="3-digit histology prefixes, e.g. 872 for 8720-8729. A coded histology matches by its first 3 digits, independent of site. Preserved as serialized, so older labels still load; config loading rejects anything else.")
     any_of: list["SiteApplicability"] = Field(default_factory=list, description="OR alternatives; excludes only when every alternative is definitively false.")
     all_of: list["SiteApplicability"] = Field(default_factory=list, description="AND conditions; any definitively false condition excludes this alternative.")
 

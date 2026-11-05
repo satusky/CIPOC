@@ -150,7 +150,7 @@ class ProgressLayoutTests(unittest.TestCase):
     def test_typed_and_mapping_composites_have_conditional_annotations(self):
         conjunction = {"all_of": [
             {"primary_sites": ["C440-C449"]},
-            {"histology_families": ["melanoma"]},
+            {"histology_families": ["872", "873"]},
         ]}
         for applies_to in (
             conjunction,
@@ -170,8 +170,9 @@ class ProgressLayoutTests(unittest.TestCase):
             ({"gross_primary_sites": ["ovary"]}, "site:ovary"),
             ({"primary_sites": ["C440-C449"]}, "site:C440-C449"),
             ({"primary_sites": ["C500", "C504"]}, "site:C500/C504"),
+            ({"histology_families": ["872", "873", "874"]}, "site:872/873"),
+            ({"gross_primary_sites": ["breast"], "histology_families": ["872"]}, "site:breast/872"),
             ({"histology_families": ["melanoma"]}, "site:melanoma"),
-            ({"gross_primary_sites": ["breast"], "histology_families": ["melanoma"]}, "site:breast/melanoma"),
             ({"any_of": [], "all_of": []}, "gate:treatment"),
         ):
             typed = TargetGroup(

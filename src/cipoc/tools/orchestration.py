@@ -388,7 +388,8 @@ def site_applies(applies_to: SiteApplicability | None, facts: CaseFacts | None) 
     false; AND is false when even one condition is false. An informative coded
     primary outranks gross-site inference, including when they conflict. An
     explicit unknown/malformed primary also suppresses gross-site fallback.
-    Unsupported family labels raise here, not during historical artifact parsing.
+    Histology families are 3-digit prefixes of a coded histology; anything else
+    raises here, not during historical artifact parsing.
     """
     if applies_to is None:
         return True
@@ -415,8 +416,11 @@ def site_applies(applies_to: SiteApplicability | None, facts: CaseFacts | None) 
 
     def evaluate(restriction: SiteApplicability) -> bool | None:
         for family in restriction.histology_families:
-            if family.casefold() != "melanoma":
-                raise ValueError(f"Unsupported histology family: {family!r}. Supported: melanoma.")
+            if not re.fullmatch(r"[0-9]{3}", family):
+                raise ValueError(
+                    f"Unsupported histology family: {family!r}. "
+                    "Expected a 3-digit histology prefix, such as '872'."
+                )
         if restriction.all_of:
             conditions = [evaluate(child) for child in restriction.all_of]
             return False if False in conditions else None if None in conditions else True
@@ -432,9 +436,8 @@ def site_applies(applies_to: SiteApplicability | None, facts: CaseFacts | None) 
             if restriction.primary_sites:
                 alternatives.append(matches_sites(restriction.primary_sites))
             if restriction.histology_families:
-                # The validated live family vocabulary currently contains melanoma only.
                 alternatives.append(
-                    8720 <= int(histology) <= 8790
+                    histology[:3] in restriction.histology_families
                     if re.fullmatch(r"[0-9]{4}", histology) else None
                 )
         if not alternatives:

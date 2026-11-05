@@ -38,6 +38,7 @@ from tests.fake_orchestrator import Outcome, Script, build_fake_orchestrator, gr
 
 
 VARIABLE_GROUPS = Path(__file__).resolve().parents[1] / "config" / "variable_groups.json"
+MELANOMA_FAMILIES = ["872", "873", "874", "875", "876", "877", "878", "879"]
 
 
 class ApplicabilityRegressionTests(unittest.TestCase):
@@ -101,10 +102,10 @@ class ApplicabilityRegressionTests(unittest.TestCase):
         ))
 
     def test_melanoma_family_is_numeric_and_not_site_limited(self):
-        melanoma = SiteApplicability(histology_families=["melanoma"])
+        melanoma = SiteApplicability(histology_families=MELANOMA_FAMILIES)
         for histology, expected in (
             ("8719", False), ("8720", True), ("8743", True),
-            ("8790", True), ("8791", False), ("8500", False),
+            ("8790", True), ("8799", True), ("8800", False), ("8500", False),
             (None, True), ("", True), ("melanoma", True), ("872", True),
             ("87200", True), ("8720/3", True),
         ):
@@ -113,10 +114,32 @@ class ApplicabilityRegressionTests(unittest.TestCase):
                     melanoma, CaseFacts(primary_site="C693", histology=histology)
                 ), expected)
 
+    def test_histology_family_matches_a_coded_histology_by_its_first_three_digits(self):
+        families = SiteApplicability(histology_families=["814", "850"])
+        for histology, expected in (
+            ("8140", True), ("8147", True), ("8500", True), ("8507", True),
+            ("8130", False), ("8150", False), ("8720", False), ("8814", False),
+        ):
+            with self.subTest(histology=histology):
+                self.assertEqual(
+                    site_applies(families, CaseFacts(histology=histology)), expected
+                )
+
+    def test_family_labels_and_other_non_codes_fail_config_load(self):
+        for family in ("melanoma", "MELANOMA", "87", "8720", " 872", "87x", "\uff18\uff17\uff12"):
+            config = json.dumps({"groups": [{
+                "group_id": "family", "variables": [{"item_id": 832}],
+                "applies_to": {"histology_families": [family]},
+            }]})
+            with self.subTest(family=family):
+                with patch("cipoc.tools.orchestration.open", mock_open(read_data=config)):
+                    with self.assertRaisesRegex(ValueError, "Unsupported histology family"):
+                        load_variable_groups("synthetic.json")
+
     def test_unsupported_family_fails_runtime_and_config_load_even_when_nested(self):
         for value in (
             {"histology_families": ["not-a-family"]},
-            {"histology_families": ["melanoma", "not-a-family"]},
+            {"histology_families": ["872", "not-a-family"]},
             {"any_of": [{}, {"histology_families": ["not-a-family"]}]},
             {"all_of": [
                 {"gross_primary_sites": ["breast"]},
@@ -142,27 +165,27 @@ class ApplicabilityRegressionTests(unittest.TestCase):
     def test_legacy_family_labels_round_trip_without_runtime_revalidation(self):
         legacy = {
             "group_id": "legacy", "variables": [{"item_id": 832}],
-            "applies_to": {"histology_families": ["Sarcoma", "LYMPHOMA"]},
+            "applies_to": {"histology_families": ["melanoma", "Sarcoma", "LYMPHOMA"]},
         }
         with patch("cipoc.tools.orchestration.site_applies", side_effect=AssertionError("Runtime evaluation during artifact parsing")):
             group = TargetGroup.model_validate(legacy)
             restored = TargetGroup.model_validate_json(group.model_dump_json())
-        self.assertEqual(restored.applies_to.histology_families, ["Sarcoma", "LYMPHOMA"])
+        self.assertEqual(restored.applies_to.histology_families, ["melanoma", "Sarcoma", "LYMPHOMA"])
 
-    def test_runtime_family_matching_casefolds_without_changing_stored_labels(self):
+    def test_nested_config_families_match_without_changing_stored_codes(self):
         config = {"groups": [{
             "group_id": "melanoma", "variables": [{"item_id": 832}],
-            "applies_to": {"any_of": [{"histology_families": ["MeLaNoMa"]}]},
+            "applies_to": {"any_of": [{"histology_families": ["879", "872"]}]},
         }]}
         with patch("cipoc.tools.orchestration.open", mock_open(read_data=json.dumps(config))):
             group = load_variable_groups("synthetic.json")[0]
         self.assertTrue(site_applies(group.applies_to, CaseFacts(histology="8720")))
         self.assertFalse(site_applies(group.applies_to, CaseFacts(histology="8247")))
-        self.assertEqual(group.applies_to.any_of[0].histology_families, ["MeLaNoMa"])
+        self.assertEqual(group.applies_to.any_of[0].histology_families, ["879", "872"])
 
     def test_leaf_alternatives_remain_or_and_unknown_keeps_scope_open(self):
         restriction = SiteApplicability(
-            gross_primary_sites=["ovary"], histology_families=["melanoma"]
+            gross_primary_sites=["ovary"], histology_families=MELANOMA_FAMILIES
         )
         self.assertTrue(site_applies(restriction, CaseFacts(histology="8500")))
         self.assertTrue(site_applies(restriction, CaseFacts(primary_site="C349")))
@@ -177,7 +200,7 @@ class ApplicabilityRegressionTests(unittest.TestCase):
         for operator in ("any_of", "all_of"):
             restriction = SiteApplicability.model_validate({operator: [
                 {"gross_primary_sites": ["breast"]},
-                {"histology_families": ["melanoma"]},
+                {"histology_families": MELANOMA_FAMILIES},
             ]})
             for site, site_match in (("C504", True), ("C349", False), (None, None)):
                 for histology, histology_match in (("8720", True), ("8500", False), (None, None)):
@@ -359,7 +382,7 @@ class SentinelNodeTargetingTests(unittest.TestCase):
         )
         self.assertEqual(len(restored.any_of), 2)
         self.assertEqual(len(restored.any_of[1].all_of), 2)
-        self.assertEqual(restored.any_of[1].all_of[1].histology_families, ["melanoma"])
+        self.assertEqual(restored.any_of[1].all_of[1].histology_families, MELANOMA_FAMILIES)
         self.assertEqual(self.group.stage, "dependent")
 
 
