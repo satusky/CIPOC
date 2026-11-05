@@ -292,7 +292,8 @@ function normalizeRunResult(result) {
     }
   };
   const evidence = (value, name) => {
-    texts(value, ["value", "explanation", "presence_confidence", "confidence", "affected_tissue", "status"], name);
+    texts(value, ["value", "explanation", "presence_confidence", "confidence", "affected_tissue", "status",
+      "behavior", "diagnostic_certainty"], name);
     if (value.most_important_note != null) identifier(value.most_important_note, name + ".most_important_note");
     for (const key of ["spans", "evidence"]) if (value[key] != null) {
       for (const span of list(value[key], name + "." + key)) {

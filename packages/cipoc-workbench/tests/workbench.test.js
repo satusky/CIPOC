@@ -106,6 +106,90 @@ test("a 1.3 mention with behavior and diagnostic certainty loads without rewriti
   assert.equal(JSON.stringify(result), original);
 });
 
+const cancerMention = (fields = {}) => ({
+  presence: true, confidence: "max", evidence: [{ note_id: "note-2", text: "Upper-outer quadrant" }],
+  status: "current", affected_tissue: "breast", metastasis: false, ...fields,
+});
+
+// The header chips of each mention card in a rendered note view.
+function mentionChips(view) {
+  const mentions = view.querySelectorAll(".section")
+    .find((section) => section.firstChild.textContent === "Cancer mentions");
+  return mentions.querySelectorAll(".card").map((card) => card.querySelectorAll("h4 .chip")
+    .map((chip) => ({ text: chip.textContent, className: chip.className, title: chip.getAttribute("title") })));
+}
+
+function renderedMentionChips(schemaVersion, mentions) {
+  const { context } = loadWorkbench();
+  context.result = canonicalResult(schemaVersion);
+  context.result.corpus.note_corpus["note-2"].cancer_mentions = mentions;
+  vm.runInContext("indexState(result)", context);
+  return mentionChips(vm.runInContext("noteDetail('note-2')", context));
+}
+
+test("mention cards label behavior and diagnostic certainty apart from model confidence", () => {
+  const [chips] = renderedMentionChips("1.3", [
+    cancerMention({ confidence: "max", behavior: "malignant", diagnostic_certainty: "possible" }),
+  ]);
+
+  assert.deepEqual(chips.map((chip) => chip.text),
+    ["current", "max", "behavior: malignant", "certainty: possible"]);
+  assert.equal(chips[1].title, null);
+  assert.match(chips[2].title, /behavior/i);
+  assert.match(chips[3].title, /not the model's confidence/);
+  for (const chip of chips.slice(2)) assert.equal(chip.className, "chip");
+});
+
+test("mention cards show only the 1.3 fields a mention records, with no defaults", () => {
+  const cards = renderedMentionChips("1.3", [
+    cancerMention({ metastasis: true }),
+    cancerMention({ behavior: "unknown" }),
+    cancerMention({ diagnostic_certainty: "definite" }),
+    cancerMention({ behavior: null, diagnostic_certainty: null }),
+  ]);
+
+  assert.deepEqual(cards.map((chips) => chips.map((chip) => chip.text)), [
+    ["current", "max", "metastatic"],
+    ["current", "max", "behavior: unknown"],
+    ["current", "max", "certainty: definite"],
+    ["current", "max"],
+  ]);
+  const [legacy] = renderedMentionChips("1.2", [cancerMention()]);
+  assert.deepEqual(legacy.map((chip) => chip.text), ["current", "max"]);
+});
+
+test("a mention field that is not text is rejected when the artifact loads", () => {
+  for (const fields of [{ behavior: 1 }, { diagnostic_certainty: { value: "definite" } }]) {
+    const { context } = loadWorkbench();
+    context.result = canonicalResult("1.3");
+    context.result.corpus.note_corpus["note-2"].cancer_mentions = [cancerMention(fields)];
+    assert.throws(() => vm.runInContext("indexState(result)", context),
+      new RegExp("mention\\." + Object.keys(fields)[0]));
+  }
+});
+
+test("the packaged 1.0 example renders its mention cards without the 1.3 chips", () => {
+  const { context } = loadWorkbench();
+  const examplePath = path.join(__dirname, "..", "src", "cipoc_workbench", "example", "case_state.json");
+  const example = JSON.parse(fs.readFileSync(examplePath, "utf8"));
+  context.result = example;
+  vm.runInContext("indexState(result)", context);
+
+  let rendered = 0;
+  for (const [noteId, note] of Object.entries(example.corpus.note_corpus)) {
+    if (!(note.cancer_mentions || []).length) continue;
+    context.noteId = noteId;
+    const cards = mentionChips(vm.runInContext("noteDetail(noteId)", context));
+    assert.deepEqual(cards.map((chips) => chips.map((chip) => [chip.text, chip.className, chip.title])),
+      note.cancer_mentions.map((m) => [
+        [m.status, "chip on", null], [m.confidence, "chip", null],
+        ...(m.metastasis ? [["metastatic", "chip warn", null]] : []),
+      ]));
+    rendered += cards.length;
+  }
+  assert.ok(rendered > 0);
+});
+
 test("string and integer primary citations navigate without losing leading zeros or scalar types", () => {
   for (const schemaVersion of ["1.0", "1.1"]) {
     for (const noteId of [0, 1, "001", "note-A"]) {

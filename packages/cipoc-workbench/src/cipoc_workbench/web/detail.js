@@ -276,6 +276,12 @@ function noteDetail(noteId) {
             h("span", { text: m.affected_tissue || "unspecified tissue" }),
             h("span", { class: "chip on", text: m.status }),
             h("span", { class: "chip", text: m.confidence }),
+            /* Schema 1.3 fields. Older mentions lack them: show nothing, not a default. */
+            m.behavior ? h("span", { class: "chip", title: "Tumor behavior as the note establishes it",
+              text: "behavior: " + m.behavior }) : null,
+            m.diagnostic_certainty ? h("span", { class: "chip",
+              title: "How certain the note's wording makes the diagnosis, not the model's confidence",
+              text: "certainty: " + m.diagnostic_certainty }) : null,
             m.metastasis ? h("span", { class: "chip warn", text: "metastatic" }) : null),
           evidenceList(m.evidence, { showNote: false })))
       : h("p", { class: "faint", text: "No cancer mentions recorded." })));

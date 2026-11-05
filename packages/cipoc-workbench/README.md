@@ -258,6 +258,14 @@ Treatment-gate explanations include `hormonal_therapy` and `immunotherapy`
 independently of chemotherapy. Missing concept keys in historical notes or
 corpus descriptors mean **unknown (not recorded)**, not an absent finding.
 
+Schema 1.3 adds `behavior` and `diagnostic_certainty` to cancer mentions. Mention
+cards show them as `behavior:` and `certainty:` chips beside the model's
+confidence chip. `diagnostic_certainty` describes the note's wording, not the
+model's confidence. Mentions without these fields show no chip for them; the
+Workbench doesn't fill in the runtime's `malignant`/`definite` defaults. A note's
+cancer status counts only definite malignant mentions, so a note can list
+mentions while its status reads "none".
+
 ### Backend Interface
 
 `build_app(state_path=None)` does not read or fall back to the bundled example.
