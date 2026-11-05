@@ -151,7 +151,7 @@ class ProcessedClinicalNote(ClinicalNote):
     concepts: dict[str, ConceptWithEvidence] = Field(
         default_factory=build_concept_presence_dict
     ) # type: ignore
-    cancer_status: set[CancerStatus] | None = Field(default=None, description="Distinct temporality statuses across all cancer mentions in the note. `None` when no cancer is present.")
+    cancer_status: set[CancerStatus] | None = Field(default=None, description="Distinct temporality statuses across the note's definite malignant mentions. `None` when the note has none.")
     cancer_mentions: list[CancerMention] | None = Field(default=None, description="List of cancer mentions.")
     flags: list[str] | None = Field(default=None, description="Keywords associated with the note contents for search.")
     model_config = ConfigDict(protected_namespaces=())
@@ -181,7 +181,7 @@ class NoteCorpusDescriptors(BaseModel):
     )
     affected_tissues: dict[CancerStatus, set[str]] | None = Field(
         default_factory=dict,
-        description="Dictionary of affected tissues keyed by the status (current, recent, historical) associated with tumors in that tissue. `None` if no cancer is present."
+        description="Dictionary of affected tissues from definite malignant mentions, keyed by the status (current, recent, historical) associated with tumors in that tissue. `None` if no cancer is present."
     )
     concepts: dict[str, ConceptWithEvidence] = Field(default_factory=build_concept_presence_dict) # type: ignore
     unique_flags: set[str]

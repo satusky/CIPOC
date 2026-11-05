@@ -18,7 +18,7 @@ from cipoc.models import (
     ProcessedClinicalNote,
     TextSpan,
 )
-from cipoc.tools.orchestration import build_corpus_descriptors, corpus_gate_passes
+from cipoc.tools.orchestration import build_corpus_descriptors, corpus_gate_passes, is_definite_malignant
 
 
 class FakeLLM:
@@ -215,6 +215,76 @@ class CancerMentionSchemaTests(unittest.TestCase):
         prompt = scanner.agent.messages[-1].content
         self.assertIn("- behavior:", prompt)
         self.assertIn("- diagnostic_certainty:", prompt)
+
+
+class DefiniteMalignantMentionTests(unittest.TestCase):
+    """Only definite malignant mentions feed note status and affected tissues."""
+
+    def finding(self, status, tissue, behavior="malignant", diagnostic_certainty="definite"):
+        return CancerMentionFinding(
+            presence=True,
+            confidence="max",
+            evidence=[TextSpan(note_id=1, text="Final diagnosis: invasive carcinoma.")],
+            status=status,
+            affected_tissue=tissue,
+            metastasis=False,
+            behavior=behavior,
+            diagnostic_certainty=diagnostic_certainty,
+        )
+
+    def scan(self, *findings):
+        """Run the mention step on one note, then roll the corpus up from it."""
+        state = _state()
+        result = _scanner_with(CancerMentions(mentions=list(findings))).get_cancer_mentions(state)
+        note = ProcessedClinicalNote(**state.note.model_dump(), **result)
+        return note, build_corpus_descriptors({note.note_id: note})
+
+    def test_benign_unknown_probable_and_possible_mentions_are_excluded(self):
+        for behavior, certainty in (
+            ("benign", "definite"),
+            ("unknown", "definite"),
+            ("malignant", "probable"),
+            ("malignant", "possible"),
+        ):
+            with self.subTest(behavior=behavior, diagnostic_certainty=certainty):
+                note, descriptors = self.scan(self.finding("current", "lung", behavior, certainty))
+
+                self.assertEqual(len(note.cancer_mentions), 1)
+                self.assertIsNone(note.cancer_status)
+                self.assertEqual(descriptors.affected_tissues, {})
+
+    def test_definite_malignant_mention_is_included(self):
+        note, descriptors = self.scan(self.finding("current", "breast"))
+
+        self.assertEqual(note.cancer_status, {"current"})
+        self.assertEqual(descriptors.affected_tissues, {"current": {"breast"}})
+
+    def test_mixed_note_keeps_only_definite_malignant_mentions(self):
+        note, descriptors = self.scan(
+            self.finding("current", "breast"),
+            self.finding("current", "lung", behavior="unknown"),
+            self.finding("recent", "colon", diagnostic_certainty="probable"),
+            self.finding("historical", "ovary", behavior="benign"),
+        )
+
+        self.assertEqual(len(note.cancer_mentions), 4)
+        self.assertEqual(note.cancer_status, {"current"})
+        self.assertEqual(descriptors.affected_tissues, {"current": {"breast"}})
+
+    def test_legacy_mentions_without_the_fields_still_count(self):
+        legacy = self.finding("historical", "prostate").model_dump(
+            mode="json", exclude={"behavior", "diagnostic_certainty"}
+        )
+        note = ProcessedClinicalNote.model_validate(
+            {**_state().note.model_dump(), "cancer_mentions": [legacy], "cancer_status": ["historical"]}
+        )
+
+        [mention] = note.cancer_mentions
+        self.assertTrue(is_definite_malignant(mention))
+        self.assertEqual(
+            build_corpus_descriptors({note.note_id: note}).affected_tissues,
+            {"historical": {"prostate"}},
+        )
 
 
 if __name__ == "__main__":

@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Callable, Iterable, Sequence
 
 from cipoc.models import (
+    CancerMention,
     CaseFacts,
     CaseReport,
     CaseVariableResult,
@@ -295,6 +296,15 @@ def prefilter_notes(
     return [note for note in notes if note_matches_filter(note, note_filter, anchor=anchor)]
 
 
+def is_definite_malignant(mention: CancerMention) -> bool:
+    """Whether a mention counts toward note status and affected tissues.
+
+    Benign, unknown-behavior, probable and possible mentions are kept on the
+    note for review but don't establish a cancer.
+    """
+    return mention.behavior == "malignant" and mention.diagnostic_certainty == "definite"
+
+
 def build_corpus_descriptors(note_corpus: dict[int | str, ProcessedClinicalNote]) -> NoteCorpusDescriptors:
     notes = list(note_corpus.values())
     dates = sorted([note.date for note in notes])
@@ -305,7 +315,8 @@ def build_corpus_descriptors(note_corpus: dict[int | str, ProcessedClinicalNote]
     for note in notes:
         if note.cancer_mentions is not None:
             for mention in note.cancer_mentions:
-                affected_tissues[mention.status].add(mention.affected_tissue)
+                if is_definite_malignant(mention):
+                    affected_tissues[mention.status].add(mention.affected_tissue)
 
         if note.flags is not None:
             unique_flags.update(note.flags)

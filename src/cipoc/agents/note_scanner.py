@@ -23,6 +23,7 @@ from cipoc.models import (
     confidence_field,
     diagnostic_certainty_field,
 )
+from cipoc.tools import is_definite_malignant
 from cipoc.utils import CipocConfig, run_with_progress
 from cipoc.prompts.note_scanner import (
     NOTE_SCANNER_SYSTEM_PROMPT,
@@ -78,7 +79,7 @@ class NoteSummary(BaseModel):
 
 class ScannerOutput(BaseModel):
     concepts: dict[str, ConceptWithEvidence] | None = Field(default=None, description="Per-concept presence/evidence findings keyed by concept name.")
-    cancer_status: set[CancerStatus] | None = Field(default=None, description="Distinct temporality statuses across all cancer mentions in the note. `None` when no cancer is present.")
+    cancer_status: set[CancerStatus] | None = Field(default=None, description="Distinct temporality statuses across the note's definite malignant mentions. `None` when the note has none.")
     summary: str | None = Field(default=None, description="Summary of clinical note.")
     flags: list[str] | None = Field(default=None, description="Keywords associated with the note contents for search.")
     cancer_mentions: list[CancerMention] | None = Field(default=None, description="List of cancer mentions.")
@@ -154,10 +155,11 @@ class NoteScannerAgent(BaseAgent):
             CancerMentions, state.messages + [HumanMessage(CANCER_MENTIONS_PROMPT)]
         )
         mentions = [CancerMention.model_validate(m.model_dump()) for m in response.mentions]
-        # Roll the per-mention temporality up to a note-level set (empty -> None).
+        # Roll the definite malignant mentions' temporality up to a note-level
+        # set (empty -> None). Every mention is still saved.
         return {
             "cancer_mentions": mentions,
-            "cancer_status": {m.status for m in mentions} or None,
+            "cancer_status": {m.status for m in mentions if is_definite_malignant(m)} or None,
         }
 
     @staticmethod
