@@ -554,25 +554,37 @@ function groupState(group) {
   return { counts, total, coded, unresolved, kind, label, reason, items };
 }
 
-/* Waves: `initial` runs first; `dependent` groups follow. `depends_on` is
- * honoured when the state carries it, so a config that adds it renders a third
- * wave without a code change here. */
+/* Waves follow the runtime's stage order, one per stage, labelled with the
+ * stage name. A group with no stage counts as `initial`. The artifact doesn't
+ * record the config's stage list, so stages not named here come last, in
+ * code-point order. `depends_on` is honoured when the state carries it:
+ * dependent groups that list it get their own wave after the other dependents. */
+const STAGE_ORDER = ["initial", "histology", "discriminator", "dependent"];
+
 function waves() {
-  const buckets = new Map();
+  const stages = new Map();
   for (const group of App.groups) {
-    const dependent = group.stage === "dependent";
-    const gated = dependent && (group.depends_on || []).length > 0;
-    const index = !dependent ? 0 : gated ? 2 : 1;
-    if (!buckets.has(index)) buckets.set(index, []);
-    buckets.get(index).push(group);
+    const stage = group.stage || "initial";
+    const gated = stage === "dependent" && (group.depends_on || []).length > 0;
+    if (!stages.has(stage)) stages.set(stage, { groups: [], gated: [] });
+    stages.get(stage)[gated ? "gated" : "groups"].push(group);
   }
-  const labels = ["initial", "dependent", "dependent · after prerequisites"];
-  return [...buckets.entries()]
-    .sort((a, b) => a[0] - b[0])
-    .map(([index, groups], position) => ({
-      title: "wave " + (position + 1) + " · " + labels[index],
-      groups,
-    }));
+  const rank = (stage) => {
+    const index = STAGE_ORDER.indexOf(stage);
+    return index < 0 ? STAGE_ORDER.length : index;
+  };
+  const ordered = [...stages.keys()]
+    .sort((a, b) => rank(a) - rank(b) || (a < b ? -1 : a > b ? 1 : 0));
+  const list = [];
+  for (const stage of ordered) {
+    const { groups, gated } = stages.get(stage);
+    if (groups.length) list.push({ label: stage, groups });
+    if (gated.length) list.push({ label: stage + " · after prerequisites", groups: gated });
+  }
+  return list.map((wave, position) => ({
+    title: "wave " + (position + 1) + " · " + wave.label,
+    groups: wave.groups,
+  }));
 }
 
 /* ---------------------------------------------------------------- tooltip */

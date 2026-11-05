@@ -308,6 +308,78 @@ test("the packaged example is a canonical artifact", () => {
   assert.doesNotThrow(() => vm.runInContext("variableDetail(App.variables[0].item_id)", context));
 });
 
+const stageGroup = (groupId, stage, dependsOn) => ({
+  group_id: groupId, name: groupId, stage, depends_on: dependsOn, variables: [],
+});
+function waveLayout(context, groups) {
+  context.groups = groups;
+  return JSON.parse(vm.runInContext(
+    "if (groups) App.groups = groups; JSON.stringify(waves().map((w) => [w.title, w.groups.map((g) => g.group_id)]))",
+    context));
+}
+
+test("waves follow the stage order initial, histology, discriminator, dependent", () => {
+  const { context, document } = loadWorkbench();
+  assert.deepEqual(waveLayout(context, [
+    stageGroup("treatment", "dependent"), stageGroup("schema", "discriminator"),
+    stageGroup("histology", "histology"), stageGroup("site", "initial"),
+    stageGroup("ssf", "dependent", ["schema"]), stageGroup("grade", "histology"),
+  ]), [
+    ["wave 1 · initial", ["site"]],
+    ["wave 2 · histology", ["histology", "grade"]],
+    ["wave 3 · discriminator", ["schema"]],
+    ["wave 4 · dependent", ["treatment"]],
+    ["wave 5 · dependent · after prerequisites", ["ssf"]],
+  ]);
+
+  const result = canonicalResult("1.2");
+  result.inputs.target_variables[0].stage = "histology";
+  context.result = result;
+  vm.runInContext("indexState(result); renderControlRoom()", context);
+  assert.deepEqual(document.querySelectorAll("#control .wave-head").map((node) => node.textContent),
+    ["wave 1 · histology"]);
+});
+
+test("unknown stages come after every known stage, in code-point order", () => {
+  const { context } = loadWorkbench();
+  assert.deepEqual(waveLayout(context, [
+    stageGroup("z", "zeta"), stageGroup("late", "dependent", ["a"]), stageGroup("b", "beta"),
+    stageGroup("dep", "dependent"), stageGroup("A", "Alpha"), stageGroup("first", "initial"),
+  ]), [
+    ["wave 1 · initial", ["first"]],
+    ["wave 2 · dependent", ["dep"]],
+    ["wave 3 · dependent · after prerequisites", ["late"]],
+    ["wave 4 · Alpha", ["A"]],
+    ["wave 5 · beta", ["b"]],
+    ["wave 6 · zeta", ["z"]],
+  ]);
+});
+
+test("two-stage artifacts keep their waves, and a group without a stage counts as initial", () => {
+  const { context } = loadWorkbench();
+  const examplePath = path.join(__dirname, "..", "src", "cipoc_workbench", "example", "case_state.json");
+  context.result = JSON.parse(fs.readFileSync(examplePath, "utf8"));
+  vm.runInContext("indexState(result)", context);
+  assert.deepEqual(waveLayout(context, null), [
+    ["wave 1 · initial", ["initial_llm_extraction"]],
+    ["wave 2 · dependent", ["histologic_type_and_behavior", "first_course_treatment", "lymph_node_removal",
+      "metastases", "site_specific_codes", "other", "breast_melanoma_only", "ovary_only", "prostate_only"]],
+  ]);
+
+  assert.deepEqual(waveLayout(context, [
+    stageGroup("dep", "dependent"), stageGroup("unset"), stageGroup("site", "initial"),
+    stageGroup("gated", "dependent", ["site"]), stageGroup("null", null), stageGroup("blank", ""),
+  ]), [
+    ["wave 1 · initial", ["unset", "site", "null", "blank"]],
+    ["wave 2 · dependent", ["dep"]],
+    ["wave 3 · dependent · after prerequisites", ["gated"]],
+  ]);
+  assert.deepEqual(waveLayout(context, [stageGroup("gated", "dependent", ["a"]), stageGroup("dep", "dependent")]), [
+    ["wave 1 · dependent", ["dep"]],
+    ["wave 2 · dependent · after prerequisites", ["gated"]],
+  ]);
+});
+
 const settle = () => new Promise((resolve) => setImmediate(resolve));
 const runB = () => {
   const result = canonicalResult("1.2");
