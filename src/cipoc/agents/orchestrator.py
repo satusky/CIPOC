@@ -19,7 +19,7 @@ from langgraph.graph.message import add_messages
 from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
-from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key
+from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key
 from cipoc.utils import CipocConfig, ObservabilityCollector, run_graph_stream
 from cipoc.utils.progress.events import ProgressEvent
 from cipoc.utils.progress.runner import validate_graph_concurrency
@@ -210,6 +210,7 @@ class OrchestratorAgent(BaseAgent):
         variable_groups_path = self._config.documents().variable_groups_path
         self._variable_groups_path = variable_groups_path
         self._target_variables = load_variable_groups(variable_groups_path)
+        self._stages = load_stages(variable_groups_path)
         self._target_group_hierarchy = load_group_hierarchy(variable_groups_path)
         # Config groups carry only item_id/name; the NAACCR dictionary supplies
         # metadata and the tissue-keyed dictionary supplies case-scoped codes.
@@ -403,6 +404,7 @@ class OrchestratorAgent(BaseAgent):
             state.variable_results,
             state.note_corpus_descriptors,
             state.case_facts,
+            stages=self._stages,
         )
         if ready:
             # Extract only each group's still-pending variables, so structured-data
@@ -428,6 +430,7 @@ class OrchestratorAgent(BaseAgent):
                 state.variable_results,
                 state.note_corpus_descriptors,
                 state.case_facts,
+                stages=self._stages,
             )},
         )
 

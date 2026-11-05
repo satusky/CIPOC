@@ -20,11 +20,13 @@ from cipoc.models import (
     VariableStatus,
 )
 from cipoc.tools.orchestration import (
+    DEFAULT_STAGES,
     TREATMENT_CONCEPTS,
     build_corpus_descriptors,
     corpus_gate_passes,
     derive_case_facts,
     eligible_groups,
+    load_stages,
     load_variable_groups,
     pending_group,
     resolve_leftovers,
@@ -251,6 +253,67 @@ class ApplicabilityRegressionTests(unittest.TestCase):
         self.assertEqual(eligible_groups(groups, results, corpus, facts), [ovary])
 
 
+class StageOrderTests(unittest.TestCase):
+    STAGES = ("initial", "histology", "dependent")
+
+    @staticmethod
+    def load(config):
+        with patch("cipoc.tools.orchestration.open", mock_open(read_data=json.dumps(config))):
+            return load_variable_groups("synthetic.json"), load_stages("synthetic.json")
+
+    def test_unknown_stage_fails_config_load(self):
+        group = {"group_id": "histology", "stage": "histology", "variables": [{"item_id": 522}]}
+        inherited = {"group_id": "parent", "stage": "histology", "subgroups": [
+            {"group_id": "child", "variables": [{"item_id": 522}]},
+        ]}
+        for config in (
+            {"groups": [group]},
+            {"stages": ["initial", "dependent"], "groups": [group]},
+            {"stages": ["initial", "dependent"], "groups": [inherited]},
+        ):
+            with self.subTest(config=config), self.assertRaisesRegex(ValueError, "unknown stage 'histology'"):
+                self.load(config)
+        for stages in ([], ["initial", "initial"], "initial"):
+            with self.subTest(stages=stages), self.assertRaisesRegex(ValueError, "'stages' must be"):
+                self.load({"stages": stages, "groups": []})
+
+        self.assertEqual(self.load({"groups": []})[1], DEFAULT_STAGES)
+        groups, stages = self.load({"stages": list(self.STAGES), "groups": [group]})
+        self.assertEqual(stages, self.STAGES)
+        self.assertEqual(groups[0].stage, "histology")
+
+    def test_each_stage_waits_for_earlier_ones_and_leftovers_close_the_earliest(self):
+        first = TargetGroup(group_id="first", stage="initial", variables=[VariableInfo(item_id=400)])
+        middle = TargetGroup(group_id="middle", stage="histology", variables=[VariableInfo(item_id=522)])
+        last = TargetGroup(group_id="last", stage="dependent", variables=[VariableInfo(item_id=410)])
+        unstaged = TargetGroup(group_id="unstaged", variables=[VariableInfo(item_id=820)])
+        groups = [last, unstaged, middle, first]
+        results = {
+            item_id: CaseVariableResult(item_id=item_id, status=VariableStatus.PENDING)
+            for item_id in (400, 522, 410, 820)
+        }
+        corpus = NoteCorpusDescriptors(unique_flags=set())
+        self.assertEqual(
+            eligible_groups(groups, results, corpus, None, stages=self.STAGES), [unstaged, first]
+        )
+
+        results[400] = CaseVariableResult(item_id=400, status=VariableStatus.STRUCTURED_DATA, value="C504")
+        self.assertTrue(stage_is_ready(middle, groups, results, stages=self.STAGES))
+        self.assertFalse(stage_is_ready(last, groups, results, stages=self.STAGES))
+        updates = resolve_leftovers(groups, results, corpus, None, stages=self.STAGES)
+        self.assertEqual(set(updates), {522})
+        self.assertEqual(updates[522].status, VariableStatus.BLOCKED)
+        self.assertEqual(updates[522].reason, "Prerequisite histology-stage extraction did not complete.")
+        self.assertEqual(updates[522].blocking_item_ids, [522])
+
+        # An unstaged group never holds a stage, and closes with the last one.
+        results.update(updates)
+        self.assertTrue(stage_is_ready(last, groups, results, stages=self.STAGES))
+        self.assertEqual(
+            set(resolve_leftovers(groups, results, corpus, None, stages=self.STAGES)), {410, 820}
+        )
+
+
 class SentinelNodeTargetingTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -301,12 +364,14 @@ class SentinelNodeTargetingTests(unittest.TestCase):
 
 
 class SchedulingGraphRegressionTests(unittest.TestCase):
-    def run_graph(self, script, structured_data, *, groups=None):
+    def run_graph(self, script, structured_data, *, groups=None, stages=None):
         # Only the subagent responses/metadata are fake; planner, gates, stage
         # readiness, leftover resolution, and result/fact roll-up are production.
         agent = build_fake_orchestrator(script)
         if groups is not None:
             agent._target_variables = groups
+        if stages is not None:
+            agent._stages = stages
         note = ClinicalNote(
             note_id="note-A", date="2025-01-02", note_type="Pathology",
             content="Synthetic skin cancer pathology and sentinel node biopsy.",
@@ -401,6 +466,27 @@ class SchedulingGraphRegressionTests(unittest.TestCase):
             with self.subTest(item_id=item_id):
                 self.assertEqual(final.variable_results[item_id].status, VariableStatus.STRUCTURED_DATA)
                 self.assertEqual(final.variable_results[item_id].value, value)
+
+    def test_three_configured_stages_run_in_list_order(self):
+        groups = [
+            TargetGroup(group_id="last", stage="dependent", variables=[VariableInfo(item_id=410)]),
+            TargetGroup(
+                group_id="middle", stage="histology",
+                variables=[VariableInfo(item_id=item) for item in (522, 523)],
+            ),
+            TargetGroup(group_id="first", stage="initial", variables=[VariableInfo(item_id=400)]),
+        ]
+        states, launches, extracted_ids = self.run_graph(
+            Script(outcomes={400: Outcome(value="C504"), 522: Outcome(value="8500"), 523: Outcome(value="3")}),
+            {}, groups=groups, stages=("initial", "histology", "dependent"),
+        )
+        self.assertEqual([item_ids for item_ids, _ in launches], [(400,), (522, 523), (410,)])
+        self.assertEqual(extracted_ids, [400, 522, 523, 410])
+        middle_launch, last_launch = launches[1][1], launches[2][1]
+        self.assertEqual(middle_launch.variable_results[400].status, VariableStatus.EXTRACTED)
+        self.assertEqual(middle_launch.variable_results[410].status, VariableStatus.PENDING)
+        self.assertEqual(last_launch.variable_results[522].status, VariableStatus.EXTRACTED)
+        self.assertEqual(states[-1].variable_results[410].status, VariableStatus.EXTRACTED)
 
 
 class TreatmentGateTests(unittest.TestCase):

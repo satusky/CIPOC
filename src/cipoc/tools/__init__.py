@@ -9,6 +9,7 @@ from .extraction import (
 )
 from .orchestration import (
     load_variable_groups,
+    load_stages,
     load_group_hierarchy,
     GroupNode,
     corpus_gate_passes,
@@ -46,6 +47,7 @@ __all__ = [
     "resolve_site_key",
     "resolve_evidence_text",
     "load_variable_groups",
+    "load_stages",
     "load_group_hierarchy",
     "GroupNode",
     "corpus_gate_passes",

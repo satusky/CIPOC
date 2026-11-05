@@ -94,8 +94,10 @@ export RENCI_AZURE_API_KEY=...
 ```
 
 `config/variable_groups.json` defines what to extract: ordered groups of NAACCR
-item IDs, each with gates, note filters, and a stage. `dependent` groups wait
-until every `initial` group has finished, even ones that found nothing.
+item IDs, each with gates, note filters, and a stage. Its `stages` list sets the
+order, `["initial", "dependent"]` by default. Each stage waits until every group
+in the stages before it has finished, even ones that found nothing. A stage
+name that isn't in the list fails at load.
 
 `llm.max_concurrency` caps simultaneous calls to one model at one endpoint,
 across the whole process. The separate `run(max_concurrency=...)` setting limits

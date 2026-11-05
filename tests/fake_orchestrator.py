@@ -47,7 +47,7 @@ from cipoc.models import (
     VariableOutput,
     build_concept_presence_dict,
 )
-from cipoc.tools import load_group_hierarchy, load_variable_groups
+from cipoc.tools import load_group_hierarchy, load_stages, load_variable_groups
 from cipoc.utils.utils import CipocConfig
 
 
@@ -413,6 +413,7 @@ def build_fake_orchestrator(script: Script | None = None) -> OrchestratorAgent:
         subagent._llm_config = llm_config
         subagent._retry_policy = retry_policy
     agent._target_variables = load_variable_groups(VARIABLE_GROUPS)
+    agent._stages = load_stages(VARIABLE_GROUPS)
     agent._target_group_hierarchy = load_group_hierarchy(VARIABLE_GROUPS)
     agent._variable_groups_path = VARIABLE_GROUPS
     agent._data_dictionary_path = None

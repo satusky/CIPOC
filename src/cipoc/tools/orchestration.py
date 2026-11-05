@@ -9,7 +9,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
-from typing import Callable, Iterable
+from typing import Callable, Iterable, Sequence
 
 from cipoc.models import (
     CaseFacts,
@@ -83,9 +83,13 @@ def load_variable_groups(path: str | Path) -> list[TargetGroup]:
     Only ``item_id`` and ``name`` are read per variable; richer data-dictionary
     and case-scoped metadata is filled later by
     :func:`cipoc.tools.build_variable_group` once case facts are known.
+
+    A ``stage`` outside the file's ``stages`` list (see :func:`load_stages`)
+    fails here, at load.
     """
     with open(path, "r") as f:
         config = json.load(f)
+    stages = _config_stages(config)
 
     def _to_group(node: dict, *, gate=None, stage=None, note_filter=None) -> TargetGroup:
         group = TargetGroup(
@@ -102,6 +106,7 @@ def load_variable_groups(path: str | Path) -> list[TargetGroup]:
             ],
         )
         site_applies(group.applies_to, None)
+        _stage_index(group, stages)
         return group
 
     groups: list[TargetGroup] = []
@@ -119,6 +124,27 @@ def load_variable_groups(path: str | Path) -> list[TargetGroup]:
                     )
                 )
     return groups
+
+
+def load_stages(path: str | Path) -> tuple[str, ...]:
+    """Read the variable-group config's stage order, earliest first.
+
+    A config without ``stages`` uses :data:`DEFAULT_STAGES`.
+    """
+    with open(path, "r") as f:
+        return _config_stages(json.load(f))
+
+
+def _config_stages(config: dict) -> tuple[str, ...]:
+    stages = config.get("stages", list(DEFAULT_STAGES))
+    if (
+        not isinstance(stages, list)
+        or not stages
+        or not all(isinstance(stage, str) and stage for stage in stages)
+        or len(set(stages)) != len(stages)
+    ):
+        raise ValueError(f"'stages' must be a non-empty list of unique stage names, got {stages!r}.")
+    return tuple(stages)
 
 
 @dataclass(frozen=True)
@@ -337,10 +363,22 @@ def build_corpus_digests(
 
 
 # --- Extraction planning (flow Step 5) ---
-# Stage names on ``TargetGroup.stage``: initials run first and scope later groups;
-# dependents wait until every initial-stage group is terminal.
-INITIAL_STAGE = "initial"
-DEPENDENT_STAGE = "dependent"
+# Stage order comes from the variable-group config's ``stages`` list. Each stage
+# waits until every group in the stages before it is terminal. A group with no
+# stage runs right away and holds no other stage.
+DEFAULT_STAGES = ("initial", "dependent")
+
+
+def _stage_index(group: TargetGroup, stages: Sequence[str]) -> int | None:
+    """Position of the group's stage in ``stages``, or None when it has no stage."""
+    if group.stage is None:
+        return None
+    if group.stage not in stages:
+        raise ValueError(
+            f"Group {group.group_id!r} has unknown stage {group.stage!r}; "
+            f"expected one of {list(stages)}."
+        )
+    return stages.index(group.stage)
 
 
 def site_applies(applies_to: SiteApplicability | None, facts: CaseFacts | None) -> bool:
@@ -458,15 +496,18 @@ def stage_is_ready(
     group: TargetGroup,
     groups: list[TargetGroup],
     results: dict[int, CaseVariableResult],
+    *,
+    stages: Sequence[str] = DEFAULT_STAGES,
 ) -> bool:
-    """Initial groups are always stage-ready; dependents wait until every
-    initial-stage group has reached a terminal status."""
-    if group.stage != DEPENDENT_STAGE:
+    """First-stage and unstaged groups are always stage-ready; a later stage waits
+    until every group in the stages before it has reached a terminal status."""
+    index = _stage_index(group, stages)
+    if index is None or index == 0:
         return True
     return all(
         group_is_terminal(other, results)
         for other in groups
-        if other.stage == INITIAL_STAGE
+        if (other_index := _stage_index(other, stages)) is not None and other_index < index
     )
 
 
@@ -475,6 +516,8 @@ def eligible_groups(
     results: dict[int, CaseVariableResult],
     descriptors: NoteCorpusDescriptors,
     facts: CaseFacts | None,
+    *,
+    stages: Sequence[str] = DEFAULT_STAGES,
 ) -> list[TargetGroup]:
     """Groups that can run right now: unstarted, stage-ready, and passing both the
     corpus gate and the site restriction.
@@ -488,7 +531,7 @@ def eligible_groups(
         group
         for group in groups
         if group_has_pending(group, results)
-        and stage_is_ready(group, groups, results)
+        and stage_is_ready(group, groups, results, stages=stages)
         and corpus_gate_passes(group.gate, descriptors)
         and site_applies(group.applies_to, facts)
     ]
@@ -499,28 +542,37 @@ def resolve_leftovers(
     results: dict[int, CaseVariableResult],
     descriptors: NoteCorpusDescriptors,
     facts: CaseFacts | None,
+    *,
+    stages: Sequence[str] = DEFAULT_STAGES,
 ) -> dict[int, CaseVariableResult]:
     """When nothing is eligible, close pending work ruled out by site or gate.
 
-    Resolve only initials while any remain pending: making them terminal can
-    release dependent work on the next planner pass. Already-terminal variables
-    (e.g. structured-data seeds) are left alone.
+    Resolve only the earliest stage with pending work: making it terminal can
+    release the next stage on the next planner pass. Unstaged groups close with
+    the last stage. Already-terminal variables (e.g. structured-data seeds) are
+    left alone.
 
     Reason precedence is deliberate — site, then gate, then deps:
       * site does not match  -> NOT_APPLICABLE (a definitive exclusion)
       * corpus gate unmet    -> NOT_APPLICABLE (a definitive exclusion)
       * otherwise            -> BLOCKED (defensive fallback for unexplained work)
     """
-    pending_initials = [
-        item_id
-        for group in groups
-        if group.stage == INITIAL_STAGE
-        for item_id in pending_item_ids(group, results)
-    ]
+    def leftover_index(group: TargetGroup) -> int:
+        index = _stage_index(group, stages)
+        return len(stages) - 1 if index is None else index
+
+    pending_by_stage: dict[int, list[int]] = defaultdict(list)
+    for group in groups:
+        pending_by_stage[leftover_index(group)].extend(pending_item_ids(group, results))
+    pending_stages = [index for index, item_ids in pending_by_stage.items() if item_ids]
+    if not pending_stages:
+        return {}
+    closing = min(pending_stages)
+    pending_in_stage = pending_by_stage[closing]
 
     updates: dict[int, CaseVariableResult] = {}
     for group in groups:
-        if pending_initials and group.stage != INITIAL_STAGE:
+        if leftover_index(group) != closing:
             continue
         pending = pending_item_ids(group, results)
         if not pending:
@@ -536,8 +588,8 @@ def resolve_leftovers(
             blockers = []
         else:
             status = VariableStatus.BLOCKED
-            reason = "Prerequisite initial-stage extraction did not complete."
-            blockers = pending_initials
+            reason = f"Prerequisite {stages[closing]}-stage extraction did not complete."
+            blockers = pending_in_stage
 
         for item_id in pending:
             updates[item_id] = CaseVariableResult(

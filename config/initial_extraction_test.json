@@ -1,4 +1,5 @@
 {
+  "stages": ["initial", "dependent"],
   "groups": [
     {
       "group_id": "initial_llm_extraction",
