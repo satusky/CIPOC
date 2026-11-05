@@ -69,7 +69,7 @@ class CancerMentionFinding(CancerMention):
 
 
 class CancerMentions(BaseModel):
-    mentions: list[CancerMentionFinding] = Field(description="List of cancer mentions; empty if no cancer is mentioned.")
+    mentions: list[CancerMentionFinding] = Field(description="List of neoplasm mentions, including masses, nodules, and lesions that could be neoplasms; empty if the note mentions none.")
 
 
 class NoteSummary(BaseModel):
@@ -90,8 +90,8 @@ class ScannerState(ScannerInput, ScannerOutput):
 
 
 class NoteScannerAgent(BaseAgent):
-    """Scans a single clinical note: gates on cancer presence, then fans out to
-    summarization and cancer-mention extraction."""
+    """Scans a single clinical note: summarizes it, detects concepts, then gates
+    mention extraction on cancer or neoplasm presence."""
     _state = ScannerState
     _input_schema = ScannerInput
     _output_schema = ScannerOutput
@@ -129,12 +129,16 @@ class NoteScannerAgent(BaseAgent):
                 ] if finding.presence else [],
             )
 
-        # Every non-cancer concept is cancer-specific by definition. Preserve
+        # Every concept but neoplasm is cancer-specific by definition. Preserve
         # the broad cancer gate when treatment is the note's only cancer signal.
+        # A neoplasm can be benign, so it never implies cancer.
         cancer = concepts["cancer"]
         if not cancer.presence:
             implied_by = next(
-                (finding for name, finding in concepts.items() if name != "cancer" and finding.presence),
+                (
+                    finding for name, finding in concepts.items()
+                    if name not in ("cancer", "neoplasm") and finding.presence
+                ),
                 None,
             )
             if implied_by is not None:
@@ -164,9 +168,13 @@ class NoteScannerAgent(BaseAgent):
 
     @staticmethod
     def cancer_gate(state: ScannerState) -> str:
-        """Gate function: detail cancer mentions if the cancer concept is present, else stop."""
-        cancer = (state.concepts or {}).get("cancer")
-        return "get_cancer_mentions" if cancer and cancer.presence else END
+        """Gate function: detail mentions if the cancer or neoplasm concept is present, else stop."""
+        concepts = state.concepts or {}
+        present = any(
+            concept is not None and concept.presence
+            for concept in (concepts.get("cancer"), concepts.get("neoplasm"))
+        )
+        return "get_cancer_mentions" if present else END
 
     # --- Graph wiring (compiled once per instance) ---
     def _wire_graph(self, workflow: StateGraph) -> None:

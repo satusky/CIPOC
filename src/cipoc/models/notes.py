@@ -10,6 +10,7 @@ from .base import ConfidenceLevel, confidence_field
 
 CONCEPT_DESCRIPTIONS: dict[str, str] = {
     "cancer": "Any malignant neoplasm — current, recent, or historical — including explicit diagnoses, pathology findings, cancer-directed treatment, or clear reference to a prior malignancy.",
+    "neoplasm": "Any neoplasm — benign, borderline, or malignant; current, recent, or historical — or any mass, nodule, or lesion that could be one, even without a diagnosis.",
     "metastasis": "Any indication that cancer has spread beyond its primary site (distant or regional metastatic disease).",
     "surgery": "Any cancer-directed surgical procedure (e.g. resection, excision, mastectomy, lobectomy).",
     "chemotherapy": "Any systemic cytotoxic chemotherapy that was administered or planned.",
@@ -103,7 +104,7 @@ class ConceptWithEvidence(BaseModel):
 def behavior_field(**kwargs):
     """Pydantic field for a mention's behavior, with the category definitions in its description."""
     return Field(
-        description="Behavior of the tumor as the note establishes it. {'malignant': malignant, including in situ; 'benign': benign, borderline, or uncertain whether benign or malignant; 'unknown': the note doesn't establish behavior}",
+        description="Behavior of the neoplasm or finding as the note establishes it. {'malignant': malignant, including in situ; 'benign': benign, borderline, or uncertain whether benign or malignant; 'unknown': the note doesn't establish behavior, including a mass, nodule, or lesion with no diagnosis yet}",
         **kwargs,
     )
 
@@ -117,10 +118,10 @@ def diagnostic_certainty_field(**kwargs):
 
 
 class CancerMention(BaseModel):
-    presence: Literal[True] = Field(description="Every reported cancer mention is present in the note.")
+    presence: Literal[True] = Field(description="Every reported mention is present in the note.")
     confidence: ConfidenceLevel = confidence_field()
-    evidence: list[TextSpan] = Field(min_length=1, description="Verbatim text spans supporting the cancer mention.")
-    status: CancerStatus = Field(description="Approximate timeframe of cancer case. {'current': ongoing case, 'recent': case resolved <10 years prior, 'historical': case resolved 10+ years prior}")
+    evidence: list[TextSpan] = Field(min_length=1, description="Verbatim text spans supporting the mention.")
+    status: CancerStatus = Field(description="Approximate timeframe of the neoplasm or finding. {'current': ongoing case, 'recent': case resolved <10 years prior, 'historical': case resolved 10+ years prior}")
     affected_tissue: str = Field(description="Primary organ or tissue affected.")
     metastasis: bool = Field(description="Metastases mentioned in the note.")
     # The defaults describe mentions saved before these fields existed, when the

@@ -18,6 +18,7 @@ from cipoc.models import (
     ProcessedClinicalNote,
     TextSpan,
 )
+from cipoc.prompts.note_scanner import CANCER_MENTIONS_PROMPT
 from cipoc.tools.orchestration import build_corpus_descriptors, corpus_gate_passes, is_definite_malignant
 
 
@@ -285,6 +286,88 @@ class DefiniteMalignantMentionTests(unittest.TestCase):
             build_corpus_descriptors({note.note_id: note}).affected_tissues,
             {"historical": {"prostate"}},
         )
+
+
+class NeoplasmGateTests(unittest.TestCase):
+    """The neoplasm concept opens the mention step without implying cancer."""
+
+    def mention(self, tissue, behavior, content):
+        return CancerMentionFinding(
+            presence=True,
+            confidence="max",
+            evidence=[TextSpan(note_id=1, text=content)],
+            status="current",
+            affected_tissue=tissue,
+            metastasis=False,
+            behavior=behavior,
+            diagnostic_certainty="definite",
+        )
+
+    def run_scanner(self, content, present, mentions):
+        """Run the real scanner graph with scripted concept and mention answers."""
+        class ScriptedLLM:
+            def structured(self, schema, messages, **kwargs):
+                if schema.__name__ == "NoteSummary":
+                    return schema(summary=content, keywords=["imaging"])
+                if schema.__name__ == "CancerMentions":
+                    return schema(mentions=mentions)
+                return schema(**{
+                    name: _finding(name in present, evidence=content)
+                    for name in CONCEPT_DESCRIPTIONS
+                })
+
+        scanner = _scanner_with(None)
+        scanner.agent = ScriptedLLM()
+        scanner._retry_policy = None
+        scanner._graph = scanner._build_graph()
+        note = scanner.run(ClinicalNote(
+            note_id=1, date="2025-01-01", note_type="Radiology", content=content
+        ), progress=False)
+        return ProcessedClinicalNote.model_validate_json(note.model_dump_json())
+
+    def test_neoplasm_does_not_imply_cancer(self):
+        result = _scanner_with(_findings(neoplasm=True)).detect_concepts(_state())
+        self.assertTrue(result["concepts"]["neoplasm"].presence)
+        self.assertFalse(result["concepts"]["cancer"].presence)
+
+        result = _scanner_with(_findings(neoplasm=True, chemotherapy=True)).detect_concepts(_state())
+        self.assertEqual(result["concepts"]["cancer"].evidence[0].text, "chemotherapy")
+
+    def test_benign_only_note_reaches_the_mention_step(self):
+        content = "MRI brain: 2 cm dural-based meningioma, WHO grade 1."
+        meningioma = self.mention("meninges", "benign", content)
+
+        note = self.run_scanner(content, {"neoplasm"}, [meningioma])
+
+        self.assertTrue(note.concepts["neoplasm"].presence)
+        self.assertFalse(note.concepts["cancer"].presence)
+        [mention] = note.cancer_mentions
+        self.assertEqual(mention.behavior, "benign")
+        self.assertIsNone(note.cancer_status)
+
+        # With neither concept present, the scripted mention is never requested.
+        self.assertIsNone(self.run_scanner(content, set(), [meningioma]).cancer_mentions)
+
+    def test_lone_lung_nodule_is_saved_with_unknown_behavior(self):
+        behavior_line = next(
+            line for line in CANCER_MENTIONS_PROMPT.splitlines() if line.startswith("- behavior:")
+        )
+        self.assertIn("nodule", behavior_line.split('"unknown"', 1)[1])
+        sent_schema = CancerMentions.model_json_schema()
+        behavior = sent_schema["$defs"]["CancerMentionFinding"]["properties"]["behavior"]
+        self.assertIn("nodule", behavior["description"].split("'unknown'", 1)[1])
+        scope = CANCER_MENTIONS_PROMPT.split("For each mention", 1)[0]
+        for finding in ("benign", "borderline", "mass", "nodule", "lesion"):
+            with self.subTest(finding=finding):
+                self.assertIn(finding, scope)
+
+        content = "CT chest: 8 mm indeterminate right upper lobe nodule. Recommend follow-up CT in 3 months."
+        note = self.run_scanner(content, {"neoplasm"}, [self.mention("lung", "unknown", content)])
+
+        [mention] = note.cancer_mentions
+        self.assertEqual(mention.behavior, "unknown")
+        self.assertIsNone(note.cancer_status)
+        self.assertEqual(build_corpus_descriptors({note.note_id: note}).affected_tissues, {})
 
 
 if __name__ == "__main__":

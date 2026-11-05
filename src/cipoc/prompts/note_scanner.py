@@ -45,12 +45,15 @@ Guidelines:
 
 
 CANCER_MENTIONS_PROMPT = """\
-Identify every distinct cancer case mentioned in the note. For each mention, report:
+Identify every distinct neoplasm mentioned in the note: malignant, borderline, and benign tumors, \
+and any mass, nodule, lesion, or similar finding that could be a neoplasm, even without a diagnosis. \
+For each mention, report:
 - status: "current" (ongoing), "recent" (resolved <10 years prior), or "historical" (resolved 10+ years prior).
 - affected_tissue: the primary organ or tissue affected.
-- metastasis: whether metastases are mentioned for that case.
+- metastasis: whether metastases are mentioned for that neoplasm.
 - behavior: "malignant" (including in situ), "benign" (including borderline or uncertain whether \
-benign or malignant), or "unknown" (the note doesn't establish behavior).
+benign or malignant), or "unknown" (the note doesn't establish behavior, including a mass, nodule, \
+or lesion with no diagnosis yet).
 - diagnostic_certainty: how certain the note's wording makes the diagnosis. "definite" when the \
 diagnosis is stated, for example on pathology or as the clinician's diagnosis; "probable" for wording \
 such as "probable", "likely", "suspicious for" or "consistent with"; "possible" for wording such as \
@@ -59,5 +62,5 @@ such as "probable", "likely", "suspicious for" or "consistent with"; "possible" 
 - confidence: your confidence in the reported details for that mention.
 - evidence: verbatim text span(s) from the note supporting that mention.
 
-If no cancer is mentioned, return an empty list.
+If the note mentions no neoplasm, mass, nodule, or lesion, return an empty list.
 """
