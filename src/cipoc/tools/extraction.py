@@ -352,6 +352,25 @@ def resolve_site_key(case_facts: "CaseFacts | None", site_dictionary: dict) -> s
     return None
 
 
+def tissue_site_codes(site_dictionary: dict | None) -> dict[str, frozenset[str]]:
+    """Map each tissue key in the site dictionary to its Primary Site (400) codes.
+
+    Codes are upper-cased without the dot, so 'C50.4' and 'C504' agree. A key with
+    no 400 codes is left out, so it reads as an unknown tissue.
+    """
+    table: dict[str, frozenset[str]] = {}
+    for tissue, entries in (site_dictionary or {}).items():
+        site_codes = _entry_codes((entries or {}).get("400"))
+        if site_codes is _MISSING:
+            continue
+        site_codes = _normalize_code_descriptions(site_codes)
+        if isinstance(site_codes, dict) and site_codes:
+            table[tissue] = frozenset(
+                code.strip().upper().replace(".", "") for code in site_codes
+            )
+    return table
+
+
 def _variable_info(item_id: int, item_entry: dict | None) -> VariableInfo:
     if not item_entry:
         raise ValueError(f"No entry exists in the data dictionary for item {item_id}.")

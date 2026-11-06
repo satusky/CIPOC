@@ -9,7 +9,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
-from typing import Callable, Iterable, Sequence, get_args
+from typing import Callable, Collection, Iterable, Mapping, Sequence, get_args
 
 from cipoc.models import (
     CancerMention,
@@ -38,7 +38,7 @@ from cipoc.models import (
     GrossSite,
 )
 from cipoc.models.case import TERMINAL_VARIABLE_STATUSES
-from .coding_context import ranges_overlap, resolve_gross_site, site_in_ranges
+from .coding_context import ranges_overlap, site_in_ranges
 
 
 def _concept_present(corpus: NoteCorpusDescriptors, concept: str) -> bool:
@@ -399,12 +399,12 @@ def _stage_index(group: TargetGroup, stages: Sequence[str]) -> int | None:
 _RESTRICTABLE_GROSS_SITES = frozenset(get_args(GrossSite)) - {"unspecified"}
 
 
-def _gross_site_ranges(gross_site: str | None) -> list[str] | None:
-    # Tissue names are snake_case, and the range table's keys use spaces.
-    return resolve_gross_site(gross_site.replace("_", " ") if gross_site else gross_site)
-
-
-def site_applies(applies_to: SiteApplicability | None, facts: CaseFacts | None) -> bool:
+def site_applies(
+    applies_to: SiteApplicability | None,
+    facts: CaseFacts | None,
+    *,
+    tissue_codes: Mapping[str, Collection[str]] | None = None,
+) -> bool:
     """Exclude only definitively false restrictions, evaluating relevant facts.
 
     Internally None means unknown. OR excludes only when all alternatives are
@@ -414,12 +414,19 @@ def site_applies(applies_to: SiteApplicability | None, facts: CaseFacts | None) 
     Histology families are 3-digit prefixes of a coded histology, and gross
     primary sites are ``GrossSite`` tissues other than "unspecified"; anything
     else raises here, not during historical artifact parsing.
+
+    ``tissue_codes`` gives each tissue's Primary Site codes (``tissue_site_codes``).
+    A tissue missing from it is unknown, so it never excludes.
     """
     if applies_to is None:
         return True
 
+    def tissue_ranges(tissue: str | None) -> list[str] | None:
+        codes = (tissue_codes or {}).get(tissue) if tissue else None
+        return list(codes) if codes else None
+
     gross_site = facts.gross_primary_site if facts and not facts.primary_site else None
-    gross_ranges = _gross_site_ranges(gross_site)
+    gross_ranges = tissue_ranges(gross_site)
     primary_site = (facts.primary_site or "").strip().upper() if facts else ""
     # C809 is unknown primary; malformed/out-of-range codes cannot exclude sites.
     if (
@@ -459,7 +466,7 @@ def site_applies(applies_to: SiteApplicability | None, facts: CaseFacts | None) 
         else:
             alternatives: list[bool | None] = []
             for site in restriction.gross_primary_sites:
-                match = matches_sites(_gross_site_ranges(site))
+                match = matches_sites(tissue_ranges(site))
                 if not primary_site and gross_site and site.casefold() == gross_site.casefold():
                     match = True
                 alternatives.append(match)
@@ -551,6 +558,7 @@ def eligible_groups(
     facts: CaseFacts | None,
     *,
     stages: Sequence[str] = DEFAULT_STAGES,
+    tissue_codes: Mapping[str, Collection[str]] | None = None,
 ) -> list[TargetGroup]:
     """Groups that can run right now: unstarted, stage-ready, and passing both the
     corpus gate and the site restriction.
@@ -566,7 +574,7 @@ def eligible_groups(
         if group_has_pending(group, results)
         and stage_is_ready(group, groups, results, stages=stages)
         and corpus_gate_passes(group.gate, descriptors)
-        and site_applies(group.applies_to, facts)
+        and site_applies(group.applies_to, facts, tissue_codes=tissue_codes)
     ]
 
 
@@ -577,6 +585,7 @@ def resolve_leftovers(
     facts: CaseFacts | None,
     *,
     stages: Sequence[str] = DEFAULT_STAGES,
+    tissue_codes: Mapping[str, Collection[str]] | None = None,
 ) -> dict[int, CaseVariableResult]:
     """When nothing is eligible, close pending work ruled out by site or gate.
 
@@ -611,7 +620,7 @@ def resolve_leftovers(
         if not pending:
             continue
 
-        if not site_applies(group.applies_to, facts):
+        if not site_applies(group.applies_to, facts, tissue_codes=tissue_codes):
             status = VariableStatus.NOT_APPLICABLE
             reason = "Group does not apply to the case's primary site/histology."
             blockers: list[int] = []

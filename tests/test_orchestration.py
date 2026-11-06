@@ -25,7 +25,7 @@ from cipoc.models import (
 from cipoc.tools import build_corpus_descriptors, load_variable_groups, site_applies
 from cipoc.utils.progress.events import normalize
 
-from tests.fake_orchestrator import build_fake_orchestrator, graph_input, load_notes
+from tests.fake_orchestrator import TISSUE_CODES, build_fake_orchestrator, graph_input, load_notes
 
 
 VARIABLE_GROUPS = Path(__file__).resolve().parents[1] / "config" / "variable_groups.json"
@@ -48,8 +48,12 @@ class SiteApplicabilityTests(unittest.TestCase):
             if any(variable.item_id == 832 for variable in group.variables)
         )
 
-        self.assertTrue(site_applies(group.applies_to, CaseFacts(primary_site="C50.4")))
-        self.assertFalse(site_applies(group.applies_to, CaseFacts(primary_site="C34.9")))
+        self.assertTrue(site_applies(
+            group.applies_to, CaseFacts(primary_site="C50.4"), tissue_codes=TISSUE_CODES
+        ))
+        self.assertFalse(site_applies(
+            group.applies_to, CaseFacts(primary_site="C34.9"), tissue_codes=TISSUE_CODES
+        ))
 
 
 class VariableCitationTests(unittest.TestCase):

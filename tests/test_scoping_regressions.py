@@ -33,8 +33,9 @@ from cipoc.tools.orchestration import (
     site_applies,
     stage_is_ready,
 )
+from cipoc.tools.extraction import tissue_site_codes
 from cipoc.utils.progress.events import field
-from tests.fake_orchestrator import Outcome, Script, build_fake_orchestrator, graph_input
+from tests.fake_orchestrator import TISSUE_CODES, Outcome, Script, build_fake_orchestrator, graph_input
 
 
 VARIABLE_GROUPS = Path(__file__).resolve().parents[1] / "config" / "variable_groups.json"
@@ -55,22 +56,27 @@ class ApplicabilityRegressionTests(unittest.TestCase):
             CaseFacts(gross_primary_site="unsupported tissue", histology="8500"),
         ):
             with self.subTest(facts=facts):
-                self.assertTrue(site_applies(ovary, facts))
+                self.assertTrue(site_applies(ovary, facts, tissue_codes=TISSUE_CODES))
         self.assertTrue(site_applies(SiteApplicability(), CaseFacts(histology="8500")))
-        self.assertFalse(site_applies(ovary, CaseFacts(primary_site="C349")))
+        self.assertFalse(site_applies(
+            ovary, CaseFacts(primary_site="C349"), tissue_codes=TISSUE_CODES
+        ))
 
     def test_coded_primary_overrides_conflicting_gross_in_both_directions(self):
         breast = SiteApplicability(gross_primary_sites=["breast"])
         for primary in ("C349", "C34.9", "C693"):
             with self.subTest(primary=primary):
                 self.assertFalse(site_applies(
-                    breast, CaseFacts(primary_site=primary, gross_primary_site="breast")
+                    breast, CaseFacts(primary_site=primary, gross_primary_site="breast"),
+                    tissue_codes=TISSUE_CODES,
                 ))
         self.assertTrue(site_applies(
-            breast, CaseFacts(primary_site="C504", gross_primary_site="lung")
+            breast, CaseFacts(primary_site="C504", gross_primary_site="lung"),
+            tissue_codes=TISSUE_CODES,
         ))
         self.assertTrue(site_applies(
-            breast, CaseFacts(primary_site="C809", gross_primary_site="left breast")
+            breast, CaseFacts(primary_site="C809", gross_primary_site="left breast"),
+            tissue_codes=TISSUE_CODES,
         ))
 
     def test_newly_coded_primary_supersedes_earlier_gross_inference(self):
@@ -82,7 +88,8 @@ class ApplicabilityRegressionTests(unittest.TestCase):
         )
         self.assertEqual(facts.primary_site, "C349")
         self.assertFalse(site_applies(
-            SiteApplicability(gross_primary_sites=["breast"]), facts
+            SiteApplicability(gross_primary_sites=["breast"]), facts,
+            tissue_codes=TISSUE_CODES,
         ))
 
     def test_explicit_unknown_primary_never_excludes_using_gross_site(self):
@@ -95,10 +102,12 @@ class ApplicabilityRegressionTests(unittest.TestCase):
                     self.assertTrue(site_applies(
                         restriction,
                         CaseFacts(primary_site=primary, gross_primary_site="lung"),
+                        tissue_codes=TISSUE_CODES,
                     ))
         self.assertFalse(site_applies(
             SiteApplicability(gross_primary_sites=["breast"]),
             CaseFacts(gross_primary_site="lung"),
+            tissue_codes=TISSUE_CODES,
         ))
 
     def test_melanoma_family_is_numeric_and_not_site_limited(self):
@@ -173,13 +182,6 @@ class ApplicabilityRegressionTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError, "Unsupported gross primary site"):
                         load_variable_groups("synthetic.json")
 
-    def test_multiword_tissue_names_still_resolve_to_their_ranges(self):
-        breast = SiteApplicability(gross_primary_sites=["breast"])
-        self.assertFalse(site_applies(breast, CaseFacts(gross_primary_site="small_intestine")))
-        small_intestine = SiteApplicability(gross_primary_sites=["small_intestine"])
-        self.assertFalse(site_applies(small_intestine, CaseFacts(primary_site="C349")))
-        self.assertTrue(site_applies(small_intestine, CaseFacts(primary_site="C171")))
-
     def test_legacy_family_labels_round_trip_without_runtime_revalidation(self):
         legacy = {
             "group_id": "legacy", "variables": [{"item_id": 832}],
@@ -205,13 +207,19 @@ class ApplicabilityRegressionTests(unittest.TestCase):
         restriction = SiteApplicability(
             gross_primary_sites=["ovary"], histology_families=MELANOMA_FAMILIES
         )
-        self.assertTrue(site_applies(restriction, CaseFacts(histology="8500")))
-        self.assertTrue(site_applies(restriction, CaseFacts(primary_site="C349")))
         self.assertTrue(site_applies(
-            restriction, CaseFacts(primary_site="C349", histology="8720")
+            restriction, CaseFacts(histology="8500"), tissue_codes=TISSUE_CODES
+        ))
+        self.assertTrue(site_applies(
+            restriction, CaseFacts(primary_site="C349"), tissue_codes=TISSUE_CODES
+        ))
+        self.assertTrue(site_applies(
+            restriction, CaseFacts(primary_site="C349", histology="8720"),
+            tissue_codes=TISSUE_CODES,
         ))
         self.assertFalse(site_applies(
-            restriction, CaseFacts(primary_site="C349", histology="8500")
+            restriction, CaseFacts(primary_site="C349", histology="8500"),
+            tissue_codes=TISSUE_CODES,
         ))
 
     def test_explicit_boolean_operators_cover_all_truth_combinations(self):
@@ -229,7 +237,9 @@ class ApplicabilityRegressionTests(unittest.TestCase):
                             not all(value is False for value in truth_values)
                             if operator == "any_of" else False not in truth_values
                         )
-                        self.assertEqual(site_applies(restriction, facts), expected)
+                        self.assertEqual(
+                            site_applies(restriction, facts, tissue_codes=TISSUE_CODES), expected
+                        )
 
     def test_malformed_expressions_and_ranges_fail_configuration_validation(self):
         for value in (
@@ -244,11 +254,16 @@ class ApplicabilityRegressionTests(unittest.TestCase):
 
     def test_coarse_site_overlap_stays_open_without_overriding_coded_site(self):
         nipple = SiteApplicability(primary_sites=["C500"])
-        self.assertTrue(site_applies(nipple, CaseFacts(gross_primary_site="breast")))
-        self.assertFalse(site_applies(
-            nipple, CaseFacts(primary_site="C504", gross_primary_site="breast")
+        self.assertTrue(site_applies(
+            nipple, CaseFacts(gross_primary_site="breast"), tissue_codes=TISSUE_CODES
         ))
-        self.assertFalse(site_applies(nipple, CaseFacts(gross_primary_site="lung")))
+        self.assertFalse(site_applies(
+            nipple, CaseFacts(primary_site="C504", gross_primary_site="breast"),
+            tissue_codes=TISSUE_CODES,
+        ))
+        self.assertFalse(site_applies(
+            nipple, CaseFacts(gross_primary_site="lung"), tissue_codes=TISSUE_CODES
+        ))
 
     def test_unknown_site_survives_planning_and_leftovers_preserve_seeds(self):
         initial = TargetGroup(
@@ -292,6 +307,86 @@ class ApplicabilityRegressionTests(unittest.TestCase):
         )
         self.assertTrue(stage_is_ready(ovary, groups, results))
         self.assertEqual(eligible_groups(groups, results, corpus, facts), [ovary])
+
+
+class TissueCodeTableTests(unittest.TestCase):
+    def test_table_holds_each_tissues_primary_site_codes(self):
+        site_dictionary = {
+            "breast": {
+                "400": {"allowed_codes": [
+                    {"code": "C50.0", "description": "Nipple"},
+                    {"code": "c504", "description": "Upper-outer quadrant of breast"},
+                ]},
+                "522": {"allowed_codes": [{"code": "8500", "description": "Duct carcinoma"}]},
+            },
+            "small_intestine": {"400": {"Code Descriptions": {"C171": "Jejunum"}}},
+            "liver": {"522": {"allowed_codes": []}},
+            "lung": {"400": {"allowed_codes": []}},
+        }
+        table = tissue_site_codes(site_dictionary)
+        self.assertEqual(table, {
+            "breast": frozenset({"C500", "C504"}),
+            "small_intestine": frozenset({"C171"}),
+        })
+        self.assertEqual(tissue_site_codes(None), {})
+        self.assertEqual(tissue_site_codes({}), {})
+
+        breast = SiteApplicability(gross_primary_sites=["breast"])
+        self.assertTrue(site_applies(breast, CaseFacts(primary_site="C50.4"), tissue_codes=table))
+        self.assertFalse(site_applies(breast, CaseFacts(primary_site="C501"), tissue_codes=table))
+
+    def test_restrictions_and_gross_facts_both_read_the_table(self):
+        # The old site dictionary's colon includes rectosigmoid and rectum, and
+        # leaves out the appendix.
+        table = {
+            **TISSUE_CODES,
+            "colon": frozenset({
+                "C180", "C182", "C183", "C184", "C185", "C186", "C187", "C188", "C189",
+                "C199", "C209",
+            }),
+            "appendix": frozenset({"C181"}),
+        }
+        colon = SiteApplicability(gross_primary_sites=["colon"])
+        self.assertTrue(site_applies(colon, CaseFacts(primary_site="C209"), tissue_codes=table))
+        self.assertFalse(site_applies(colon, CaseFacts(primary_site="C181"), tissue_codes=table))
+        self.assertFalse(site_applies(
+            SiteApplicability(gross_primary_sites=["appendix"]),
+            CaseFacts(gross_primary_site="colon"), tissue_codes=table,
+        ))
+        self.assertFalse(site_applies(
+            SiteApplicability(primary_sites=["C181"]),
+            CaseFacts(gross_primary_site="colon"), tissue_codes=table,
+        ))
+        small_intestine = SiteApplicability(gross_primary_sites=["small_intestine"])
+        self.assertFalse(site_applies(
+            SiteApplicability(gross_primary_sites=["breast"]),
+            CaseFacts(gross_primary_site="small_intestine"), tissue_codes=table,
+        ))
+        self.assertFalse(site_applies(
+            small_intestine, CaseFacts(primary_site="C349"), tissue_codes=table
+        ))
+        self.assertTrue(site_applies(
+            small_intestine, CaseFacts(primary_site="C171"), tissue_codes=table
+        ))
+
+    def test_a_tissue_missing_from_the_table_never_excludes(self):
+        ovary = SiteApplicability(gross_primary_sites=["ovary"])
+        nipple = SiteApplicability(primary_sites=["C500"])
+        for table in (None, {}, {"breast": TISSUE_CODES["breast"]}):
+            with self.subTest(table=table):
+                self.assertTrue(site_applies(
+                    ovary, CaseFacts(primary_site="C349"), tissue_codes=table
+                ))
+                self.assertTrue(site_applies(
+                    ovary, CaseFacts(gross_primary_site="breast"), tissue_codes=table
+                ))
+                self.assertTrue(site_applies(
+                    nipple, CaseFacts(gross_primary_site="lung"), tissue_codes=table
+                ))
+                # A restriction naming the case's own tissue still matches by name.
+                self.assertTrue(site_applies(
+                    ovary, CaseFacts(gross_primary_site="ovary"), tissue_codes=table
+                ))
 
 
 class StageOrderTests(unittest.TestCase):
@@ -372,12 +467,14 @@ class SentinelNodeTargetingTests(unittest.TestCase):
         ):
             with self.subTest(site=site):
                 self.assertTrue(site_applies(
-                    self.group.applies_to, CaseFacts(primary_site=site, histology="8720")
+                    self.group.applies_to, CaseFacts(primary_site=site, histology="8720"),
+                    tissue_codes=TISSUE_CODES,
                 ))
         for site in ("C003", "C005", "C009", "C520", "C690", "C693", "C349"):
             with self.subTest(site=site):
                 self.assertFalse(site_applies(
-                    self.group.applies_to, CaseFacts(primary_site=site, histology="8720")
+                    self.group.applies_to, CaseFacts(primary_site=site, histology="8720"),
+                    tissue_codes=TISSUE_CODES,
                 ))
 
     def test_known_and_unknown_facts_follow_three_valued_logic(self):
@@ -391,7 +488,8 @@ class SentinelNodeTargetingTests(unittest.TestCase):
         ):
             with self.subTest(site=site, histology=histology):
                 self.assertEqual(site_applies(
-                    self.group.applies_to, CaseFacts(primary_site=site, histology=histology)
+                    self.group.applies_to, CaseFacts(primary_site=site, histology=histology),
+                    tissue_codes=TISSUE_CODES,
                 ), expected)
 
     def test_serialized_config_keeps_explicit_conjunction(self):

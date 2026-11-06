@@ -1,5 +1,6 @@
 import unittest
 
+from cipoc.models import CaseFacts, NoteCorpusDescriptors, TargetGroup
 from cipoc.tools import GroupNode, load_group_hierarchy, load_variable_groups
 from cipoc.utils.progress.events import ProgressEvent, normalize
 from cipoc.utils.progress.layout import build_rows, render_lines
@@ -8,6 +9,7 @@ from cipoc.utils.progress.renderers import PlainLog
 from tests.fake_orchestrator import (
     Outcome,
     Script,
+    TISSUE_CODES,
     VARIABLE_GROUPS,
     graph_input,
     record_events,
@@ -269,6 +271,25 @@ class ProgressModelTests(unittest.TestCase):
         self.assertEqual(snapshot.variables[5].detail, "←390,400")
         self.assertEqual(snapshot.variables[6].detail, "Invalid code")
         self.assertEqual(snapshot.variables[6].flag, "!")
+
+    def test_site_verdict_reads_the_planners_tissue_table(self):
+        group = TargetGroup(
+            group_id="ovary_only",
+            variables=[{"item_id": 3836}],
+            applies_to={"gross_primary_sites": ["ovary"]},
+        )
+        values = {
+            "note_corpus_descriptors": NoteCorpusDescriptors(unique_flags=set()),
+            "case_facts": CaseFacts(gross_primary_site="breast"),
+        }
+        # Without the table, a breast case can't rule out an ovary-only group.
+        for tissue_codes, expected in ((TISSUE_CODES, "site:ovary ✗"), (None, "site:ovary ✓")):
+            with self.subTest(table=tissue_codes is not None):
+                model = ProgressModel(
+                    "Orchestrator", 0.0, target_groups=[group], tissue_codes=tissue_codes
+                )
+                model.ingest(ProgressEvent(kind="values", namespace=(), payload=values), 1.0)
+                self.assertEqual(model.snapshot().groups[0].annotation, expected)
 
     def test_standalone_extractor_projects_both_output_shapes(self):
         graph_input = {

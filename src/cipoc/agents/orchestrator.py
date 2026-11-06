@@ -20,7 +20,7 @@ from langgraph.graph.message import add_messages
 from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
-from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_data_dictionary, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key, checkpoint_one_stop_reason, checkpoint_two_stop_reason, stop_pending_results
+from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_data_dictionary, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key, tissue_site_codes, checkpoint_one_stop_reason, checkpoint_two_stop_reason, stop_pending_results
 from cipoc.utils import CipocConfig, ObservabilityCollector, run_graph_stream
 from cipoc.utils.progress.events import ProgressEvent
 from cipoc.utils.progress.runner import validate_graph_concurrency
@@ -247,6 +247,11 @@ class OrchestratorAgent(BaseAgent):
         with open(path, "r") as file:
             return json.load(file)
 
+    @cached_property
+    def _tissue_codes(self) -> dict[str, frozenset[str]]:
+        """Each tissue's Primary Site codes, which ``site_applies`` narrows by."""
+        return tissue_site_codes(self._site_dictionary)
+
     # --- Graph wiring (compiled once per instance) ---
     def _wire_graph(self, workflow: StateGraph) -> None:
         extract_branch = self._build_extract_branch()
@@ -463,6 +468,7 @@ class OrchestratorAgent(BaseAgent):
             state.note_corpus_descriptors,
             state.case_facts,
             stages=self._stages,
+            tissue_codes=self._tissue_codes,
         )
         if ready:
             # Extract only each group's still-pending variables, so structured-data
@@ -489,6 +495,7 @@ class OrchestratorAgent(BaseAgent):
                 state.note_corpus_descriptors,
                 state.case_facts,
                 stages=self._stages,
+                tissue_codes=self._tissue_codes,
             )},
         )
 
@@ -885,6 +892,7 @@ class OrchestratorAgent(BaseAgent):
                 description="Orchestrator",
                 target_groups=self._target_variables,
                 group_hierarchy=self._target_group_hierarchy,
+                tissue_codes=self._tissue_codes,
                 pause_before_summary=pause_before_summary,
                 event_observer=observe,
             )

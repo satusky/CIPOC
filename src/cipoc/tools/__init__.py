@@ -6,6 +6,7 @@ from .extraction import (
     lookup_variable_info,
     build_variable_group,
     resolve_site_key,
+    tissue_site_codes,
     resolve_evidence_text,
 )
 from .orchestration import (
@@ -56,6 +57,7 @@ __all__ = [
     "lookup_variable_info",
     "build_variable_group",
     "resolve_site_key",
+    "tissue_site_codes",
     "resolve_evidence_text",
     "load_variable_groups",
     "load_stages",

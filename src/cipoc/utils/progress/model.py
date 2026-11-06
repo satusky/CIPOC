@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field as dc_field, replace
 from enum import IntEnum
-from typing import Any, Iterable, Literal, Mapping
+from typing import Any, Collection, Iterable, Literal, Mapping
 
 from cipoc.models import VariableStatus
 from cipoc.models.case import TERMINAL_VARIABLE_STATUSES
@@ -260,6 +260,7 @@ class ProgressModel:
         *,
         target_groups: Iterable[Any] | None = None,
         group_hierarchy: Iterable[GroupNode] | None = None,
+        tissue_codes: Mapping[str, Collection[str]] | None = None,
         graph_input: Any = None,
         node_kinds: Mapping[str, TaskKind] | None = None,
         show_note_counts: bool = False,
@@ -269,6 +270,7 @@ class ProgressModel:
         self.started_at = started_at
         self.show_note_counts = show_note_counts
         self._node_kinds = {**DEFAULT_NODE_KINDS, **(node_kinds or {})}
+        self._tissue_codes = tissue_codes
 
         self._configs: dict[str, Any] = {
             str(field(group, "group_id") or index): group
@@ -559,7 +561,9 @@ class ProgressModel:
                 continue
             base = group.annotation.split(" ")[0]
             if base.startswith("site:"):
-                passes = site_applies(field(config, "applies_to"), facts)
+                passes = site_applies(
+                    field(config, "applies_to"), facts, tissue_codes=self._tissue_codes
+                )
             elif base.startswith("gate:"):
                 passes = corpus_gate_passes(field(config, "gate"), descriptors)
             else:

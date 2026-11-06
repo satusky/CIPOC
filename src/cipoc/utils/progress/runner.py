@@ -8,7 +8,7 @@ import shutil
 import sys
 import threading
 import time
-from typing import Any, Callable, Iterable, Mapping, TextIO
+from typing import Any, Callable, Collection, Iterable, Mapping, TextIO
 
 from langgraph._internal._config import ensure_config
 from langgraph.graph.state import CompiledStateGraph
@@ -411,6 +411,7 @@ def run_graph_stream(
     show_branches: bool = False,
     target_groups: Any = None,
     group_hierarchy: Iterable[GroupNode] | None = None,
+    tissue_codes: Mapping[str, Collection[str]] | None = None,
     show_note_counts: bool = False,
     pause_before_summary: bool = False,
     event_observer: Callable[[ProgressEvent], None] | None = None,
@@ -433,6 +434,7 @@ def run_graph_stream(
             started_at,
             target_groups=target_groups,
             group_hierarchy=group_hierarchy,
+            tissue_codes=tissue_codes,
             graph_input=graph_input,
             node_kinds=node_kinds,
             show_note_counts=show_note_counts,

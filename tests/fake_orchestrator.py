@@ -54,6 +54,14 @@ from cipoc.utils.utils import CipocConfig
 REPO_ROOT = Path(__file__).resolve().parents[1]
 NOTE_BUNDLE = REPO_ROOT / "tests" / "fixtures" / "note_bundle.json"
 VARIABLE_GROUPS = REPO_ROOT / "config" / "variable_groups.json"
+# Primary Site codes per tissue, in the form ``tissue_site_codes`` builds from the
+# site dictionary, for the tissues the tests restrict or infer.
+TISSUE_CODES = {
+    "breast": frozenset({"C500", "C501", "C502", "C503", "C504", "C505", "C506", "C508", "C509"}),
+    "lung": frozenset({"C340", "C341", "C342", "C343", "C348", "C349"}),
+    "ovary": frozenset({"C569"}),
+    "small_intestine": frozenset({"C170", "C171", "C172", "C173", "C178", "C179"}),
+}
 
 
 def load_notes() -> list[ClinicalNote]:
@@ -391,7 +399,8 @@ def build_fake_orchestrator(script: Script | None = None) -> OrchestratorAgent:
 
     ``_scope_group`` is stubbed to a pass-through so the 2 MB data dictionary is
     never read: it only fills variable metadata the dashboard does not display,
-    and skipping it keeps the fixture fast and hermetic.
+    and skipping it keeps the fixture fast and hermetic. ``TISSUE_CODES`` stands
+    in for the site dictionary's tissue table.
     """
     script = script or Script()
     agent = object.__new__(OrchestratorAgent)
@@ -418,6 +427,7 @@ def build_fake_orchestrator(script: Script | None = None) -> OrchestratorAgent:
     agent._variable_groups_path = VARIABLE_GROUPS
     agent._data_dictionary_path = None
     agent._site_data_dictionary_path = None
+    agent._tissue_codes = TISSUE_CODES
     agent._rule_store = None
     agent._scope_group = lambda group, case_facts: group  # type: ignore[method-assign]
     agent._graph = agent._build_graph()
