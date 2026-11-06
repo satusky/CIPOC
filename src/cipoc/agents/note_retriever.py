@@ -98,7 +98,7 @@ if __name__ == "__main__":
     import json
     from pathlib import Path
 
-    from cipoc.tools import build_variable_group
+    from cipoc.tools import build_variable_group, load_data_dictionary
 
     agent = NoteRetrieverAgent()
     agent.draw(path="src/cipoc/agents/visualization/note_retriever.png")
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     # Same variables the extractor demo extracts (Primary Site, Laterality, Histology).
     variable_group = build_variable_group(
         [400, 410, 522],
-        data_dictionary_path=agent._config.documents().data_dictionary_path,
+        data_dictionary=load_data_dictionary(agent._config.documents().data_dictionary_path),
     )
 
     relevant_ids = agent.run(

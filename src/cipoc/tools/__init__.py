@@ -2,6 +2,7 @@
 
 from .extraction import (
     VariableValueValidator,
+    load_data_dictionary,
     lookup_variable_info,
     build_variable_group,
     resolve_site_key,
@@ -51,6 +52,7 @@ from .coding_context import (
 
 __all__ = [
     "VariableValueValidator",
+    "load_data_dictionary",
     "lookup_variable_info",
     "build_variable_group",
     "resolve_site_key",

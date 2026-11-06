@@ -41,10 +41,6 @@ class DocumentsConfig(BaseModel):
         default=None,
         description="Path to the tissue-keyed CIPOC data dictionary JSON.",
     )
-    site_data_dictionary_path: Path | None = Field(
-        default=None,
-        description="Path to the tissue-keyed CIPOC data dictionary JSON.",
-    )
     variable_groups_path: Path = Field(
         default=Path("config/variable_groups.json"),
         description="Path to the JSON defining the extraction target variable groups (the orchestrator's plan).",

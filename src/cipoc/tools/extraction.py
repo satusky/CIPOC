@@ -375,38 +375,48 @@ def _variable_info(item_id: int, item_entry: dict | None) -> VariableInfo:
     return VariableInfo(item_id=item_id, **fields)
 
 
+def load_data_dictionary(data_dictionary_path: str | Path | None) -> dict:
+    """Read the NAACCR data dictionary as a JSON object keyed by item ID as a string.
+
+    An ``{"items": [...]}`` export is re-keyed by each item's ``item_number``.
+    """
+    if data_dictionary_path is None:
+        raise ValueError("Cannot retrieve variable information. Please supply a data dictionary path.")
+
+    with open(data_dictionary_path, "r") as f:
+        data_dictionary = json.load(f)
+
+    if "items" in data_dictionary:
+        data_dictionary = {str(item["item_number"]): item for item in data_dictionary["items"]}
+    return data_dictionary
+
+
 def lookup_variable_info(
     item_id: int,
-    data_dictionary_path: str | Path,
+    data_dictionary: dict,
     *,
-    site_data_dictionary_path: str | Path | None = None,
+    site_dictionary: dict | None = None,
     case_facts: "CaseFacts | None" = None,
 ) -> VariableInfo:
-    """Look up NAACCR variable metadata by item ID from a JSON data dictionary.
+    """Look up NAACCR variable metadata by item ID from a loaded data dictionary.
 
     Use this tool when you need the name, description, required value format,
-    and valid coding values for a specific NAACCR data item. The data dictionary
-    must be a JSON object keyed by item ID as a string.
+    and valid coding values for a specific NAACCR data item.
 
     Args:
         item_id: NAACCR item ID number to look up.
-        data_dictionary_path: Path to the NAACCR data dictionary JSON file.
-        site_data_dictionary_path: Optional tissue-keyed dictionary whose code
+        data_dictionary: NAACCR data dictionary from ``load_data_dictionary``.
+        site_dictionary: Optional loaded tissue-keyed dictionary whose code
             descriptions override the NAACCR entry.
         case_facts: Facts used to select a tissue from the site dictionary.
 
     Returns:
         Variable metadata. Unknown item IDs raise ValueError.
     """
-    with open(data_dictionary_path, "r") as f:
-        data_dictionary = json.load(f)
-
     item_entry = data_dictionary.get(str(item_id))
     if not item_entry:
         raise ValueError(f"No entry exists in the data dictionary for item {item_id}.")
-    if site_data_dictionary_path is not None:
-        with open(site_data_dictionary_path, "r") as f:
-            site_dictionary = json.load(f)
+    if site_dictionary is not None:
         site = resolve_site_key(case_facts, site_dictionary)
         site_entry = site_dictionary.get(site, {}).get(str(item_id)) if site else None
         item_entry = _overlay_site_codes(item_entry, site_entry)
@@ -416,28 +426,16 @@ def lookup_variable_info(
 
 def build_variable_group(
     item_ids: int | list[int],
-    data_dictionary_path: str | Path | None,
+    data_dictionary: dict,
     *,
     case_facts: "CaseFacts | None" = None,
-    site_data_dictionary_path: str | Path | None = None,
+    site_dictionary: dict | None = None,
 ) -> VariableGroupInfo:
     """Build NAACCR variable metadata with optional tissue-specific code tables."""
-    if data_dictionary_path is None:
-        raise ValueError("Cannot retrieve variable information. Please supply a data dictionary path.")
-
     if isinstance(item_ids, int):
         item_ids = [item_ids]
 
-    with open(data_dictionary_path, "r") as f:
-        data_dictionary = json.load(f)
-
-    if "items" in data_dictionary:
-        data_dictionary = {str(item["item_number"]): item for item in data_dictionary["items"]}
-
-    site_dictionary: dict = {}
-    if site_data_dictionary_path is not None:
-        with open(site_data_dictionary_path, "r") as f:
-            site_dictionary = json.load(f)
+    site_dictionary = site_dictionary or {}
     site = resolve_site_key(case_facts, site_dictionary)
 
     item_info = []

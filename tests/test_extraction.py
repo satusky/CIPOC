@@ -2,7 +2,7 @@ import unittest
 from pathlib import Path
 
 from cipoc.models import ConfidenceLevel, VariableInfo, VariableOutput
-from cipoc.tools import VariableValueValidator, build_variable_group, resolve_evidence_text
+from cipoc.tools import VariableValueValidator, build_variable_group, load_data_dictionary, resolve_evidence_text
 
 
 BASE_DICTIONARY = (
@@ -240,7 +240,7 @@ class PrimarySiteCodeListTests(unittest.TestCase):
     def setUpClass(cls):
         if not BASE_DICTIONARY.exists():
             raise unittest.SkipTest(f"{BASE_DICTIONARY} not present")
-        cls.primary_site = build_variable_group(400, BASE_DICTIONARY).variables[0]
+        cls.primary_site = build_variable_group(400, load_data_dictionary(BASE_DICTIONARY)).variables[0]
 
     def test_sites_outside_the_original_ten_validate_without_scoping(self):
         validator = VariableValueValidator()

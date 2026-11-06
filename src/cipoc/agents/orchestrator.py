@@ -3,6 +3,7 @@ import hashlib
 import time
 from collections import Counter
 from datetime import datetime, timezone
+from functools import cached_property
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from uuid import uuid4
@@ -19,7 +20,7 @@ from langgraph.graph.message import add_messages
 from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
-from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key, checkpoint_one_stop_reason, checkpoint_two_stop_reason, stop_pending_results
+from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_data_dictionary, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key, checkpoint_one_stop_reason, checkpoint_two_stop_reason, stop_pending_results
 from cipoc.utils import CipocConfig, ObservabilityCollector, run_graph_stream
 from cipoc.utils.progress.events import ProgressEvent
 from cipoc.utils.progress.runner import validate_graph_concurrency
@@ -225,6 +226,27 @@ class OrchestratorAgent(BaseAgent):
         self._data_dictionary_path = self._config.documents().data_dictionary_path
         self._site_data_dictionary_path = self._config.documents().site_data_dictionary_path
 
+    @cached_property
+    def _data_dictionary(self) -> dict:
+        """The NAACCR data dictionary, read once per agent on first use.
+
+        Deferred for the same reason as ``_site_dictionary``.
+        """
+        return load_data_dictionary(getattr(self, "_data_dictionary_path", None))
+
+    @cached_property
+    def _site_dictionary(self) -> dict | None:
+        """The tissue-keyed site dictionary, read once per agent on first use.
+
+        Deferred rather than read here so that a missing file still fails the run
+        that needs it, not construction; ``run()`` digests the same file first.
+        """
+        path = getattr(self, "_site_data_dictionary_path", None)
+        if path is None:
+            return None
+        with open(path, "r") as file:
+            return json.load(file)
+
     # --- Graph wiring (compiled once per instance) ---
     def _wire_graph(self, workflow: StateGraph) -> None:
         extract_branch = self._build_extract_branch()
@@ -328,11 +350,7 @@ class OrchestratorAgent(BaseAgent):
         stop_reason = checkpoint_one_stop_reason(state.case_facts, state.note_corpus)
         case_facts = state.case_facts
         if case_facts is None or (not case_facts.primary_site and not case_facts.gross_primary_site):
-            site_dictionary = {}
-            site_dictionary_path = getattr(self, "_site_data_dictionary_path", None)
-            if site_dictionary_path is not None:
-                with open(site_dictionary_path, "r") as file:
-                    site_dictionary = json.load(file)
+            site_dictionary = self._site_dictionary or {}
             for status in ("current", "recent", "historical"):
                 affected_tissues = (descriptors.affected_tissues or {}).get(
                     status, set()
@@ -403,9 +421,9 @@ class OrchestratorAgent(BaseAgent):
         """
         enriched = build_variable_group(
             [variable.item_id for variable in group.variables],
-            self._data_dictionary_path,
+            self._data_dictionary,
             case_facts=case_facts,
-            site_data_dictionary_path=self._site_data_dictionary_path,
+            site_dictionary=self._site_dictionary,
         )
         enriched_by_id = {variable.item_id: variable for variable in enriched.variables}
         return group.model_copy(

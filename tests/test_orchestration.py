@@ -1,6 +1,7 @@
 import json
 import unittest
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 from unittest.mock import patch
 from uuid import uuid4
@@ -16,7 +17,9 @@ from cipoc.models import (
     OrchestratorRunError,
     OrchestratorRunResult,
     ProcessedClinicalNote,
+    TargetGroup,
     TextSpan,
+    VariableInfo,
     VariableOutput,
 )
 from cipoc.tools import build_corpus_descriptors, load_variable_groups, site_applies
@@ -144,6 +147,33 @@ class CorpusCharacterizationTests(unittest.TestCase):
         self.assertEqual(len(primary_site.valid_codes), 9)
         self.assertIn("C504", primary_site.valid_codes)
         self.assertNotIn("C341", primary_site.valid_codes)
+
+    def test_characterization_and_scoping_read_each_dictionary_once(self):
+        directory = TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        base_path = Path(directory.name) / "base.json"
+        site_path = Path(directory.name) / "site.json"
+        base_path.write_text(json.dumps({"400": {
+            "item_name": "Primary Site", "item_length": 4,
+            "allowed_codes": {"C504": "Breast", "C349": "Lung"},
+        }}))
+        site_path.write_text(json.dumps({"breast": {"400": {"allowed_codes": {"C504": "Breast"}}}}))
+        agent = object.__new__(OrchestratorAgent)
+        agent._data_dictionary_path = base_path
+        agent._site_data_dictionary_path = site_path
+        group = TargetGroup(group_id="initial", variables=[VariableInfo(item_id=400)])
+
+        with patch("builtins.open", wraps=open) as opened:
+            for _ in range(2):
+                state = CaseState(note_corpus={2: self.breast_note})
+                facts = agent.characterize_corpus(state)["case_facts"]
+                scoped = agent._scope_group(group, facts)
+
+        for path in (base_path, site_path):
+            reads = [call for call in opened.call_args_list if Path(call.args[0]) == path]
+            self.assertEqual(len(reads), 1, path.name)
+        self.assertEqual(facts.gross_primary_site, "breast")
+        self.assertEqual(scoped.variables[0].valid_codes, {"C504": "Breast"})
 
 
 class OrchestratorRunTests(unittest.TestCase):
