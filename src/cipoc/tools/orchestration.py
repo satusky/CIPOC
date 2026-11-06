@@ -9,7 +9,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
-from typing import Callable, Iterable, Sequence
+from typing import Callable, Iterable, Sequence, get_args
 
 from cipoc.models import (
     CancerMention,
@@ -35,6 +35,7 @@ from cipoc.models import (
     VariableInfo,
     VariableStatus,
     ConceptWithEvidence,
+    GrossSite,
 )
 from cipoc.models.case import TERMINAL_VARIABLE_STATUSES
 from .coding_context import ranges_overlap, resolve_gross_site, site_in_ranges
@@ -392,6 +393,15 @@ def _stage_index(group: TargetGroup, stages: Sequence[str]) -> int | None:
     return stages.index(group.stage)
 
 
+# "unspecified" never narrows, so a group can't be restricted to it.
+_RESTRICTABLE_GROSS_SITES = frozenset(get_args(GrossSite)) - {"unspecified"}
+
+
+def _gross_site_ranges(gross_site: str | None) -> list[str] | None:
+    # Tissue names are snake_case, and the range table's keys use spaces.
+    return resolve_gross_site(gross_site.replace("_", " ") if gross_site else gross_site)
+
+
 def site_applies(applies_to: SiteApplicability | None, facts: CaseFacts | None) -> bool:
     """Exclude only definitively false restrictions, evaluating relevant facts.
 
@@ -399,14 +409,15 @@ def site_applies(applies_to: SiteApplicability | None, facts: CaseFacts | None) 
     false; AND is false when even one condition is false. An informative coded
     primary outranks gross-site inference, including when they conflict. An
     explicit unknown/malformed primary also suppresses gross-site fallback.
-    Histology families are 3-digit prefixes of a coded histology; anything else
-    raises here, not during historical artifact parsing.
+    Histology families are 3-digit prefixes of a coded histology, and gross
+    primary sites are ``GrossSite`` tissues other than "unspecified"; anything
+    else raises here, not during historical artifact parsing.
     """
     if applies_to is None:
         return True
 
     gross_site = facts.gross_primary_site if facts and not facts.primary_site else None
-    gross_ranges = resolve_gross_site(gross_site)
+    gross_ranges = _gross_site_ranges(gross_site)
     primary_site = (facts.primary_site or "").strip().upper() if facts else ""
     # C809 is unknown primary; malformed/out-of-range codes cannot exclude sites.
     if (
@@ -432,6 +443,12 @@ def site_applies(applies_to: SiteApplicability | None, facts: CaseFacts | None) 
                     f"Unsupported histology family: {family!r}. "
                     "Expected a 3-digit histology prefix, such as '872'."
                 )
+        for site in restriction.gross_primary_sites:
+            if site not in _RESTRICTABLE_GROSS_SITES:
+                raise ValueError(
+                    f"Unsupported gross primary site: {site!r}. "
+                    "Expected a GrossSite tissue name, such as 'breast'."
+                )
         if restriction.all_of:
             conditions = [evaluate(child) for child in restriction.all_of]
             return False if False in conditions else None if None in conditions else True
@@ -440,7 +457,7 @@ def site_applies(applies_to: SiteApplicability | None, facts: CaseFacts | None) 
         else:
             alternatives: list[bool | None] = []
             for site in restriction.gross_primary_sites:
-                match = matches_sites(resolve_gross_site(site))
+                match = matches_sites(_gross_site_ranges(site))
                 if not primary_site and gross_site and site.casefold() == gross_site.casefold():
                     match = True
                 alternatives.append(match)

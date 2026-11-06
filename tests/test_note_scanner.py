@@ -1,4 +1,5 @@
 import unittest
+from typing import get_args
 
 from pydantic import ValidationError
 
@@ -15,6 +16,7 @@ from cipoc.models import (
     ClinicalNote,
     CONCEPT_DESCRIPTIONS,
     CorpusGate,
+    GrossSite,
     ProcessedClinicalNote,
     TextSpan,
 )
@@ -216,6 +218,21 @@ class CancerMentionSchemaTests(unittest.TestCase):
         prompt = scanner.agent.messages[-1].content
         self.assertIn("- behavior:", prompt)
         self.assertIn("- diagnostic_certainty:", prompt)
+
+
+    def test_scanner_output_chooses_the_tissue_from_the_vocabulary(self):
+        sent = CancerMentions.model_json_schema()["$defs"]["CancerMentionFinding"]
+        tissue = sent["properties"]["affected_tissue"]
+        self.assertEqual(tissue["enum"], list(get_args(GrossSite)))
+        self.assertIn("affected_tissue", sent["required"])
+        self.assertIn("'unspecified'", tissue["description"])
+        self.assertNotIn("enum", CancerMention.model_json_schema()["properties"]["affected_tissue"])
+
+        values = self.mention().model_dump()
+        self.assertEqual(CancerMentionFinding(**values).affected_tissue, "breast")
+        with self.assertRaises(ValidationError):
+            CancerMentionFinding(**{**values, "affected_tissue": "left breast"})
+        self.assertEqual(self.mention(affected_tissue="left breast").affected_tissue, "left breast")
 
 
 class DefiniteMalignantMentionTests(unittest.TestCase):

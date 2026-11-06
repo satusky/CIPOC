@@ -178,6 +178,23 @@ class OrchestratorRunModelTests(unittest.TestCase):
         mention = restored.corpus.note_corpus["note-A"].cancer_mentions[0]
         self.assertEqual((mention.behavior, mention.diagnostic_certainty), ("malignant", "definite"))
 
+    def test_legacy_free_text_tissues_load_as_written(self):
+        payload = OrchestratorRunResult(
+            run=run_info(), case=Case(), inputs=inputs(), corpus=corpus(),
+            observability=observability(),
+        ).model_dump(mode="json")
+        payload["schema_version"] = "1.2"
+        payload["corpus"]["note_corpus"]["note-A"]["cancer_mentions"][0]["affected_tissue"] = "left breast"
+        payload["inputs"]["target_variables"][0]["applies_to"] = {"gross_primary_sites": ["Left Breast"]}
+
+        restored = OrchestratorRunResult.model_validate(payload)
+
+        mention = restored.corpus.note_corpus["note-A"].cancer_mentions[0]
+        self.assertEqual(mention.affected_tissue, "left breast")
+        self.assertEqual(
+            restored.inputs.target_variables[0].applies_to.gross_primary_sites, ["Left Breast"]
+        )
+
     def test_unknown_schema_version_is_rejected(self):
         result = OrchestratorRunResult(
             run=run_info(),

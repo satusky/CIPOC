@@ -49,7 +49,7 @@ Identify every distinct neoplasm mentioned in the note: malignant, borderline, a
 and any mass, nodule, lesion, or similar finding that could be a neoplasm, even without a diagnosis. \
 For each mention, report:
 - status: "current" (ongoing), "recent" (resolved <10 years prior), or "historical" (resolved 10+ years prior).
-- affected_tissue: the primary organ or tissue affected.
+- affected_tissue: the primary organ or tissue affected, chosen from the listed tissues.
 - metastasis: whether metastases are mentioned for that neoplasm.
 - behavior: "malignant" (including in situ), "benign" (including borderline or uncertain whether \
 benign or malignant), or "unknown" (the note doesn't establish behavior, including a mass, nodule, \

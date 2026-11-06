@@ -387,7 +387,7 @@ class OrchestratorRemediationTests(unittest.TestCase):
 
     def test_unresolved_current_tissue_does_not_narrow_or_fall_back_to_history(self):
         model = _ScannerModel(tissues={"note-A": [
-            ("current", "left breast"), ("current", "unclassified integument"),
+            ("current", "breast"), ("current", "unspecified"),
             ("historical", "breast"),
         ]})
         agent = _agent(model=model)
@@ -400,16 +400,7 @@ class OrchestratorRemediationTests(unittest.TestCase):
             {"C504", "C349", "C693"},
         )
         self.assertEqual(result.corpus.note_corpus_descriptors.affected_tissues["current"],
-                         {"left breast", "unclassified integument"})
-
-    def test_recognized_breast_aliases_still_narrow(self):
-        model = _ScannerModel(tissues={"note-A": [("current", "left breast"), ("current", "right breast")]})
-        agent = _agent(model=model)
-        self._dictionaries(agent)
-        with patch.object(agent._extractor, "run", wraps=agent._extractor.run) as extract:
-            result = agent.run([_note().model_dump()], progress=False)
-        self.assertEqual(result.case.case_facts.gross_primary_site, "breast")
-        self.assertEqual(extract.call_args.args[0].requested_variables.variables[0].valid_codes, {"C504": "Breast"})
+                         {"breast", "unspecified"})
 
     def test_known_primary_without_site_dictionary_never_falls_back_to_gross_breast(self):
         agent = _agent()

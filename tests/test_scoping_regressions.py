@@ -162,6 +162,24 @@ class ApplicabilityRegressionTests(unittest.TestCase):
                         with self.assertRaisesRegex(ValueError, "Unsupported histology family.*not-a-family"):
                             load_variable_groups("synthetic.json")
 
+    def test_gross_sites_outside_the_vocabulary_fail_config_load(self):
+        for site in ("brest", "Breast", "left breast", "small intestine", "unspecified"):
+            config = json.dumps({"groups": [{
+                "group_id": "site", "variables": [{"item_id": 832}],
+                "applies_to": {"any_of": [{"gross_primary_sites": ["ovary", site]}]},
+            }]})
+            with self.subTest(site=site):
+                with patch("cipoc.tools.orchestration.open", mock_open(read_data=config)):
+                    with self.assertRaisesRegex(ValueError, "Unsupported gross primary site"):
+                        load_variable_groups("synthetic.json")
+
+    def test_multiword_tissue_names_still_resolve_to_their_ranges(self):
+        breast = SiteApplicability(gross_primary_sites=["breast"])
+        self.assertFalse(site_applies(breast, CaseFacts(gross_primary_site="small_intestine")))
+        small_intestine = SiteApplicability(gross_primary_sites=["small_intestine"])
+        self.assertFalse(site_applies(small_intestine, CaseFacts(primary_site="C349")))
+        self.assertTrue(site_applies(small_intestine, CaseFacts(primary_site="C171")))
+
     def test_legacy_family_labels_round_trip_without_runtime_revalidation(self):
         legacy = {
             "group_id": "legacy", "variables": [{"item_id": 832}],

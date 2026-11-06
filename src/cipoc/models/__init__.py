@@ -8,6 +8,7 @@ from .base import (
 
 from .notes import (
     CancerStatus,
+    GrossSite,
     MentionBehavior,
     DiagnosticCertainty,
     CONCEPTS,
@@ -92,6 +93,7 @@ __all__ = [
     "confidence_instructions",
     "confidence_field",
     "CancerStatus",
+    "GrossSite",
     "MentionBehavior",
     "DiagnosticCertainty",
     "CONCEPTS",

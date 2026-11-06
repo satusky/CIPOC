@@ -17,6 +17,7 @@ from cipoc.models import (
     ConceptWithEvidence,
     CONCEPT_DESCRIPTIONS,
     DiagnosticCertainty,
+    GrossSite,
     MentionBehavior,
     TextSpan,
     behavior_field,
@@ -63,7 +64,9 @@ def concept_findings_model(
 
 
 class CancerMentionFinding(CancerMention):
-    """Scanner output for one mention, requiring the fields the saved model defaults for old artifacts."""
+    """Scanner output for one mention, requiring the fields the saved model defaults for old artifacts
+    and choosing the tissue from the vocabulary the saved model keeps as a string."""
+    affected_tissue: GrossSite = Field(description="Primary organ or tissue affected, as its ICD-O-3 topography group. {'unspecified': the mention names no tissue; 'unknown_primary_site': the notes call the primary site unknown; 'colon': colorectal with no segment named; 'uterus': endometrium; 'female_genital_organ': fallopian tube, not 'ovary'; 'liver': intrahepatic bile duct, not 'biliary_tract'; 'parotid_gland': parotid, not 'major_salivary_gland'; 'other_endocrine_gland': pituitary; 'spinal_cord_and_cranial_nerves': acoustic neuroma; 'heart_mediastinum_and_pleura': pleura; 'hematopoietic_system': spleen; 'urinary_system': urethra}")
     behavior: MentionBehavior = behavior_field()
     diagnostic_certainty: DiagnosticCertainty = diagnostic_certainty_field()
 
