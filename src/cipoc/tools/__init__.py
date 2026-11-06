@@ -34,6 +34,7 @@ from .reportability import (
     is_reportable,
     mention_continues,
     checkpoint_one_stop_reason,
+    checkpoint_two_stop_reason,
     stop_pending_results,
 )
 from .coding_context import (
@@ -78,6 +79,7 @@ __all__ = [
     "is_reportable",
     "mention_continues",
     "checkpoint_one_stop_reason",
+    "checkpoint_two_stop_reason",
     "stop_pending_results",
     "RuleStore",
     "load_rule_store",

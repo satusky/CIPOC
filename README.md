@@ -47,6 +47,10 @@ initialize → scan_notes → note_branch ×notes → characterize_corpus → ch
   extraction.
 - **Plan:** gates, site applicability, and stage order decide which variable
   groups can run on this pass. Values the caller already knows skip extraction.
+  Once the histology stage is done, each pass first checks reportability again
+  on the coded site and behavior. A benign or borderline tumor outside the CNS
+  closes the variables left the same way, with `reportability_stop` at
+  checkpoint 2.
 - **Retrieve:** a fixed `NoteFilter` narrows the notes, then
   `NoteRetrieverAgent` picks the relevant ones from their digests.
 - **Extract:** `ExtractorAgent` codes the group's variables and validates each

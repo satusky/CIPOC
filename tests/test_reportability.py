@@ -8,12 +8,16 @@ from cipoc.models import (
     ConfidenceLevel,
     ExtractionStop,
     ProcessedClinicalNote,
+    TargetGroup,
     TextSpan,
+    ValidatedVariableOutput,
+    VariableInfo,
     VariableStatus,
 )
 from cipoc.tools import (
     CNS_TISSUES,
     checkpoint_one_stop_reason,
+    checkpoint_two_stop_reason,
     is_reportable,
     mention_continues,
     stop_pending_results,
@@ -146,6 +150,84 @@ class CheckpointOneStopReasonTests(unittest.TestCase):
         facts = CaseFacts(sex="2", date_of_diagnosis="2026-08-01", gross_primary_site="breast")
         self.assertIsNotNone(checkpoint_one_stop_reason(facts, {}))
         self.assertIsNone(checkpoint_one_stop_reason(facts, _corpus([_mention()])))
+
+
+def _extracted(item_id, value):
+    return CaseVariableResult(
+        item_id=item_id, status=VariableStatus.EXTRACTED, value=value,
+        extraction=ValidatedVariableOutput(
+            item_id=item_id, value=value, explanation="Coded.", most_important_note=1,
+            spans=[], presence_confidence=ConfidenceLevel.HIGH, is_valid=True,
+        ),
+    )
+
+
+def _groups(*stages_and_items):
+    return [
+        TargetGroup(group_id=stage, stage=stage, variables=[VariableInfo(item_id=item_id) for item_id in items])
+        for stage, items in stages_and_items
+    ]
+
+
+class CheckpointTwoStopReasonTests(unittest.TestCase):
+    GROUPS = _groups(("initial", (400,)), ("histology", (522, 523)), ("dependent", (410,)))
+
+    def results(self, *overrides):
+        results = {
+            400: _extracted(400, "C500"),
+            522: _extracted(522, "8010"),
+            523: _extracted(523, "0"),
+            410: CaseVariableResult(item_id=410),
+        }
+        results.update({result.item_id: result for result in overrides})
+        return results
+
+    def test_benign_or_borderline_outside_cns_stops_citing_each_item(self):
+        facts = CaseFacts(primary_site="C500", histology="8010", behavior="0")
+        self.assertEqual(
+            checkpoint_two_stop_reason(facts, self.GROUPS, self.results()),
+            "Not reportable: primary site C500 (item 400, extracted), histology 8010 "
+            "(item 522, extracted), behavior 0 (item 523, extracted). Benign and "
+            "borderline tumors are reportable only at CNS sites (C700-C729, C751-C753).",
+        )
+        borderline = CaseFacts(primary_site="C569", behavior="1")
+        results = self.results(_extracted(400, "C569"), _extracted(523, "1"))
+        self.assertIsNotNone(checkpoint_two_stop_reason(borderline, self.GROUPS, results))
+
+    def test_waits_until_every_histology_group_is_terminal(self):
+        facts = CaseFacts(primary_site="C500", behavior="0")
+        pending = self.results(CaseVariableResult(item_id=522))
+        self.assertIsNone(checkpoint_two_stop_reason(facts, self.GROUPS, pending))
+        closed = self.results(CaseVariableResult(
+            item_id=522, status=VariableStatus.NOT_APPLICABLE, reason="Gate unmet."
+        ))
+        self.assertIsNotNone(checkpoint_two_stop_reason(facts, self.GROUPS, closed))
+
+    def test_reportable_or_undecided_facts_continue(self):
+        for facts in (
+            CaseFacts(primary_site="C710", behavior="0"),
+            CaseFacts(primary_site="C449", behavior="2"),
+            CaseFacts(primary_site="C500", behavior="3"),
+            CaseFacts(primary_site="C500"),
+            CaseFacts(primary_site="C809", behavior="0"),
+            None,
+        ):
+            with self.subTest(facts=facts):
+                self.assertIsNone(checkpoint_two_stop_reason(facts, self.GROUPS, self.results()))
+
+    def test_without_histology_groups_it_checks_at_once(self):
+        groups = _groups(("initial", (400, 523)), ("dependent", (410,)))
+        facts = CaseFacts(primary_site="C500", behavior="0")
+        self.assertIsNotNone(checkpoint_two_stop_reason(facts, groups, self.results()))
+
+    def test_cites_supplied_values_and_leaves_unknown_sources_unlabeled(self):
+        facts = CaseFacts(primary_site="C500", behavior="0")
+        results = self.results(CaseVariableResult(
+            item_id=523, status=VariableStatus.STRUCTURED_DATA, value="0"
+        ))
+        del results[400]
+        reason = checkpoint_two_stop_reason(facts, self.GROUPS, results)
+        self.assertIn("primary site C500 (item 400), behavior 0 (item 523, supplied).", reason)
 
 
 class StopPendingResultsTests(unittest.TestCase):

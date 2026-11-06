@@ -139,8 +139,8 @@ class _ScannerModel(BaseChatModel):
         ))])
 
 
-def _agent(*, model=None, groups=None):
-    agent = build_fake_orchestrator(Script(outcomes={400: Outcome(value="C504")}))
+def _agent(*, model=None, groups=None, outcomes=None):
+    agent = build_fake_orchestrator(Script(outcomes=outcomes or {400: Outcome(value="C504")}))
     agent._target_variables = groups if groups is not None else [_group()]
     agent._target_group_hierarchy = []
     scanner = object.__new__(NoteScannerAgent)
@@ -800,6 +800,105 @@ class ReportabilityCheckpointOneTests(unittest.TestCase):
             {variable.item_id for group in agent._target_variables for variable in group.variables},
         )
         self.assertEqual(OrchestratorRunResult.model_validate_json(result.model_dump_json()), result)
+
+
+class ReportabilityCheckpointTwoTests(unittest.TestCase):
+    """Checkpoint 2 stops a case the histology stage shows isn't reportable, before the dependent stage."""
+
+    def _run(self, outcomes, *, structured_data=None, histology_gate=None):
+        groups = [
+            _group("initial", (400,)),
+            _group("histology", (522, 523), stage="histology", gate=histology_gate),
+            _group("dependent", (410, 420), stage="dependent"),
+        ]
+        agent = _agent(
+            groups=groups,
+            outcomes={item_id: Outcome(value=value) for item_id, value in outcomes.items()},
+        )
+        with patch.object(agent._extractor, "run", wraps=agent._extractor.run) as extract:
+            result = agent.run([_note().model_dump()], structured_data, progress=False)
+        extracted = [
+            [variable.item_id for variable in call.args[0].requested_variables.variables]
+            for call in extract.call_args_list
+        ]
+        return result, extracted
+
+    def assertStopped(self, result, extracted, expected=([400], [522, 523])):
+        """Only the dependent stage closes; coded values stay and the case holds the reason once."""
+        self.assertEqual(result.run.status, "completed")
+        self.assertIsNone(result.case.fatal_blocker)
+        self.assertEqual(extracted, list(expected))
+        results = result.case.variable_results
+        for item_id in (410, 420):
+            self.assertEqual(results[item_id].status, VariableStatus.NOT_APPLICABLE)
+            self.assertEqual(results[item_id].stopped_by, ExtractionStop.NOT_REPORTABLE)
+            self.assertIsNone(results[item_id].reason)
+        for item_id in (400, 522, 523):
+            self.assertIsNone(results[item_id].stopped_by)
+        stop = result.case.reportability_stop
+        self.assertEqual(stop.checkpoint, 2)
+        return stop.reason
+
+    def assertContinued(self, result, extracted):
+        self.assertEqual(extracted, [[400], [522, 523], [410, 420]])
+        self.assertIsNone(result.case.reportability_stop)
+
+    def test_benign_breast_stops_citing_the_coded_values(self):
+        result, extracted = self._run({400: "C500", 522: "8010", 523: "0"})
+        reason = self.assertStopped(result, extracted)
+        self.assertEqual(
+            reason,
+            "Not reportable: primary site C500 (item 400, extracted), histology 8010 "
+            "(item 522, extracted), behavior 0 (item 523, extracted). Benign and "
+            "borderline tumors are reportable only at CNS sites (C700-C729, C751-C753).",
+        )
+        results = result.case.variable_results
+        self.assertEqual(
+            {item_id: (results[item_id].status, results[item_id].value) for item_id in (400, 522, 523)},
+            {
+                400: (VariableStatus.EXTRACTED, "C500"),
+                522: (VariableStatus.EXTRACTED, "8010"),
+                523: (VariableStatus.EXTRACTED, "0"),
+            },
+        )
+        self.assertEqual(OrchestratorRunResult.model_validate_json(result.model_dump_json()), result)
+
+    def test_borderline_ovary_stops(self):
+        result, extracted = self._run({400: "C569", 522: "8442", 523: "1"})
+        self.assertIn("behavior 1 (item 523, extracted)", self.assertStopped(result, extracted))
+
+    def test_benign_brain_continues(self):
+        result, extracted = self._run({400: "C710", 522: "9530", 523: "0"})
+        self.assertContinued(result, extracted)
+
+    def test_unknown_behavior_continues(self):
+        result, extracted = self._run({400: "C500", 522: "8000", 523: None})
+        self.assertEqual(result.case.variable_results[523].status, VariableStatus.NOT_FOUND)
+        self.assertContinued(result, extracted)
+
+    def test_in_situ_skin_continues_without_exclusions(self):
+        result, extracted = self._run({400: "C449", 522: "8070", 523: "2"})
+        self.assertContinued(result, extracted)
+
+    def test_waits_for_the_histology_stage_even_when_the_facts_already_decide(self):
+        # Supplied benign behavior and a coded breast site say False after the
+        # initial stage, but histology is still pending, so it runs first.
+        result, extracted = self._run({400: "C500", 522: "8010"}, structured_data={523: "0"})
+        reason = self.assertStopped(result, extracted, expected=([400], [522]))
+        self.assertEqual(result.case.variable_results[522].value, "8010")
+        self.assertIn("behavior 0 (item 523, supplied)", reason)
+
+    def test_histology_stage_closed_at_plan_time_still_stops(self):
+        # The gate closes the histology group in resolve_leftovers, which never
+        # reaches merge_and_update; the next planning pass still checks.
+        result, extracted = self._run(
+            {400: "C500"}, structured_data={523: "0"}, histology_gate=["treatment_present"]
+        )
+        reason = self.assertStopped(result, extracted, expected=([400],))
+        self.assertEqual(result.case.variable_results[522].status, VariableStatus.NOT_APPLICABLE)
+        self.assertIsNotNone(result.case.variable_results[522].reason)
+        self.assertIn("primary site C500 (item 400, extracted)", reason)
+        self.assertIn("behavior 0 (item 523, supplied)", reason)
 
 if __name__ == "__main__":
     unittest.main()

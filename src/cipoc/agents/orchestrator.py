@@ -19,7 +19,7 @@ from langgraph.graph.message import add_messages
 from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
-from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key, checkpoint_one_stop_reason, stop_pending_results
+from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key, checkpoint_one_stop_reason, checkpoint_two_stop_reason, stop_pending_results
 from cipoc.utils import CipocConfig, ObservabilityCollector, run_graph_stream
 from cipoc.utils.progress.events import ProgressEvent
 from cipoc.utils.progress.runner import validate_graph_concurrency
@@ -422,7 +422,23 @@ class OrchestratorAgent(BaseAgent):
         branch; at the fixed point (nothing eligible) resolve the leftovers so
         check_state finalizes. Note-level filtering is intentionally NOT here — it
         is per-group and happens inside the branch.
+
+        Reportability checkpoint 2 runs first. Every route to a later stage passes
+        through here, whether the histology stage closed by extraction, at plan
+        time, or from structured data, so a case it shows isn't reportable stops
+        before any later-stage group is planned.
         """
+        if state.reportability_stop is None:
+            stop_reason = checkpoint_two_stop_reason(
+                state.case_facts, state.target_variables, state.variable_results
+            )
+            if stop_reason is not None:
+                return Command(goto="check_state", update={
+                    "reportability_stop": ReportabilityStop(checkpoint=2, reason=stop_reason),
+                    "variable_results": stop_pending_results(
+                        state.variable_results, ExtractionStop.NOT_REPORTABLE
+                    ),
+                })
         ready = eligible_groups(
             state.target_variables,
             state.variable_results,

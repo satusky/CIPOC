@@ -142,6 +142,22 @@ test("a stopped case states its reason once and flags each variable as not repor
   }
 });
 
+test("a checkpoint 2 stop shows its checkpoint and coded reason", () => {
+  const { context, document } = loadWorkbench();
+  context.result = stoppedResult();
+  context.result.case.reportability_stop = {
+    checkpoint: 2,
+    reason: "Not reportable: primary site C500 (item 400, extracted), behavior 0 (item 523, extracted).",
+  };
+  vm.runInContext("indexState(result)", context);
+  vm.runInContext("renderChrome()", context);
+  const chip = document.querySelector("#facts").querySelectorAll(".chip")
+    .find((node) => node.textContent === "not reportable (checkpoint 2)");
+  assert.match(chip.getAttribute("title"), /behavior 0 \(item 523, extracted\)/);
+  vm.runInContext("renderTable()", context);
+  assert.match(document.querySelector("#table-wrap").textContent, /Not reportable/);
+});
+
 test("artifacts without a stop render no stop chip, and a malformed stop is rejected", () => {
   for (const schemaVersion of ["1.0", "1.2", "1.3"]) {
     const { context, document } = loadWorkbench();
