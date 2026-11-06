@@ -79,6 +79,11 @@ from .observability import (
     RunObservability,
 )
 
+from .scoping import (
+    TissueCodes,
+    ScopingDictionary,
+)
+
 from .run import (
     OrchestratorConfigFingerprint,
     OrchestratorRunCorpus,
@@ -152,6 +157,8 @@ __all__ = [
     "ObservabilityIssue",
     "VariableAttempt",
     "RunObservability",
+    "TissueCodes",
+    "ScopingDictionary",
     "OrchestratorConfigFingerprint",
     "OrchestratorRunCorpus",
     "OrchestratorRunError",

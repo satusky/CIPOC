@@ -39,6 +39,11 @@ from .reportability import (
     checkpoint_two_stop_reason,
     stop_pending_results,
 )
+from .scoping import (
+    load_scoping_dictionary,
+    parse_scoping_dictionary,
+    check_primary_site_coverage,
+)
 from .coding_context import (
     RuleStore,
     load_rule_store,
@@ -85,6 +90,9 @@ __all__ = [
     "checkpoint_one_stop_reason",
     "checkpoint_two_stop_reason",
     "stop_pending_results",
+    "load_scoping_dictionary",
+    "parse_scoping_dictionary",
+    "check_primary_site_coverage",
     "RuleStore",
     "load_rule_store",
     "applicable_sources",
