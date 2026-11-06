@@ -263,8 +263,14 @@ cards show them as `behavior:` and `certainty:` chips beside the model's
 confidence chip. `diagnostic_certainty` describes the note's wording, not the
 model's confidence. Mentions without these fields show no chip for them; the
 Workbench doesn't fill in the runtime's `malignant`/`definite` defaults. A note's
-cancer status counts only definite malignant mentions, so a note can list
-mentions while its status reads "none".
+cancer status counts only definite or probable malignant mentions, so a note can
+list mentions while its status reads "none".
+
+A reportability checkpoint that stops a case records `case.reportability_stop`
+(its checkpoint and reason) once. The variables it closed are `not_applicable`
+with `stopped_by: "not_reportable"` and no reason of their own. The facts rail
+shows a plain "not reportable" chip, not the red fatal one, with the reason in
+its tooltip, and the stopped variables read "Not reportable". Artifacts without these fields render as before.
 
 ### Backend Interface
 

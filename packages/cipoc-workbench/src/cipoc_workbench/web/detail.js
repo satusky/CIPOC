@@ -466,7 +466,7 @@ function groupDetail(groupId) {
       h("span", { class: "dot " + statusDot(v.result), style: "margin-top:5px" }),
       h("div", {},
         crossLink("variable", v.item_id, v.item_id + " " + v.name),
-        h("span", { class: "chip", style: "margin-left:6px", text: statusLabel(v.result.status) }),
+        h("span", { class: "chip", style: "margin-left:6px", text: resultLabel(v.result) }),
         v.result.value ? h("span", { class: "chip on", style: "margin-left:4px", text: v.result.value }) : null,
         v.result.reason ? h("div", { class: "observed", text: v.result.reason }) : null)))));
 
@@ -491,7 +491,7 @@ function variableDetail(itemId) {
   body.append(section("Outcome", kv([
     ["item id", id],
     ["group", crossLink("group", entry.group_id, entry.group_name)],
-    ["status", statusLabel(result.status)],
+    ["status", resultLabel(result)],
     ["value", result.value == null ? "—" : result.value],
     ["confidence", extraction ? extraction.presence_confidence : null],
     ["valid", extraction ? (extraction.is_valid ? "yes" : "no") : null],

@@ -2,7 +2,9 @@ import unittest
 
 from cipoc.tools import GroupNode, load_group_hierarchy, load_variable_groups
 from cipoc.utils.progress.events import ProgressEvent, normalize
+from cipoc.utils.progress.layout import build_rows, render_lines
 from cipoc.utils.progress.model import ProgressModel, Stage
+from cipoc.utils.progress.renderers import PlainLog
 from tests.fake_orchestrator import (
     Outcome,
     Script,
@@ -409,6 +411,33 @@ class FakeOrchestratorStreamTests(unittest.TestCase):
         self.assertEqual(snapshot.branches, ())
         self.assertEqual(snapshot.counts.get("pending", 0), 0)
         self.assertTrue(snapshot.finished)
+
+    def test_stopped_case_flags_each_variable_and_states_the_reason_once(self):
+        target_groups = load_variable_groups(VARIABLE_GROUPS)
+        model = ProgressModel(
+            "Orchestrator",
+            0.0,
+            target_groups=target_groups,
+            group_hierarchy=load_group_hierarchy(VARIABLE_GROUPS),
+            graph_input=graph_input(),
+        )
+        raw_events = record_events(Script(concepts={"cancer": False}))
+        for index, raw_event in enumerate(raw_events, 1):
+            model.ingest(normalize(raw_event, subgraphs=True), index / 10)
+        model.finish()
+        snapshot = model.snapshot()
+
+        reason = "Not reportable: no note mentions a neoplasm."
+        self.assertEqual(snapshot.stop, reason)
+        self.assertIsNone(snapshot.fatal)
+        self.assertEqual(
+            {(variable.status, variable.detail) for variable in snapshot.variables.values()},
+            {("not_applicable", "not reportable")},
+        )
+        frame = render_lines(build_rows(snapshot, 200, None, now=5.0))
+        self.assertEqual(sum(reason in line for line in frame), 1)
+        self.assertTrue(frame[-1].endswith(reason), frame[-1])
+        self.assertTrue(PlainLog._completion_line(snapshot, 5.0).endswith(" · " + reason))
 
 
 if __name__ == "__main__":

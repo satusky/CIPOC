@@ -29,6 +29,13 @@ from .orchestration import (
     to_case_results,
     build_report,
 )
+from .reportability import (
+    CNS_TISSUES,
+    is_reportable,
+    mention_continues,
+    checkpoint_one_stop_reason,
+    stop_pending_results,
+)
 from .coding_context import (
     RuleStore,
     load_rule_store,
@@ -67,6 +74,11 @@ __all__ = [
     "not_found_results",
     "to_case_results",
     "build_report",
+    "CNS_TISSUES",
+    "is_reportable",
+    "mention_continues",
+    "checkpoint_one_stop_reason",
+    "stop_pending_results",
     "RuleStore",
     "load_rule_store",
     "applicable_sources",

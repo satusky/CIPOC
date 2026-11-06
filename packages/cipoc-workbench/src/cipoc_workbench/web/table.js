@@ -102,7 +102,7 @@ function bodyRow(entry) {
     if (column.key === "status") {
       return h("td", {},
         h("span", { class: "dot " + statusDot(r) }),
-        statusLabel(r.status));
+        resultLabel(r));
     }
     if (column.key === "verdict") {
       const verdict = verdictFor(entry).verdict;

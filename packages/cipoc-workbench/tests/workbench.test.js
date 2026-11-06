@@ -106,6 +106,58 @@ test("a 1.3 mention with behavior and diagnostic certainty loads without rewriti
   assert.equal(JSON.stringify(result), original);
 });
 
+function stoppedResult() {
+  const result = canonicalResult("1.3");
+  result.case.variable_results[400] = {
+    item_id: 400, status: "not_applicable", value: null, extraction: null,
+    reason: null, blocking_item_ids: [], stopped_by: "not_reportable",
+  };
+  result.case.reportability_stop = { checkpoint: 1, reason: "Not reportable: no note mentions a neoplasm." };
+  return result;
+}
+
+test("a stopped case states its reason once and flags each variable as not reportable", () => {
+  const { context, document } = loadWorkbench();
+  const result = stoppedResult();
+  const original = JSON.stringify(result);
+  context.result = result;
+  vm.runInContext("indexState(result)", context);
+  assert.equal(JSON.stringify(result), original);
+
+  vm.runInContext("renderChrome()", context);
+  const chip = document.querySelector("#facts").querySelectorAll(".chip")
+    .find((node) => node.textContent === "not reportable (checkpoint 1)");
+  assert.equal(chip.getAttribute("title"), "Not reportable: no note mentions a neoplasm.");
+  assert.equal(chip.className, "chip");
+
+  vm.runInContext("renderTable()", context);
+  assert.match(document.querySelector("#table-wrap").textContent, /Not reportable/);
+  vm.runInContext("renderControlRoom()", context);
+  assert.match(document.querySelector("#control").textContent, /Not reportable/);
+  const views = [vm.runInContext("variableDetail(400)", context), vm.runInContext("groupDetail('diagnosis')", context)];
+  for (const view of views) assert.match(view.textContent, /Not reportable/);
+  for (const text of [document.querySelector("#table-wrap").textContent, document.querySelector("#control").textContent,
+    ...views.map((view) => view.textContent)]) {
+    assert.doesNotMatch(text, /no note mentions a neoplasm/);
+  }
+});
+
+test("artifacts without a stop render no stop chip, and a malformed stop is rejected", () => {
+  for (const schemaVersion of ["1.0", "1.2", "1.3"]) {
+    const { context, document } = loadWorkbench();
+    context.result = canonicalResult(schemaVersion);
+    vm.runInContext("indexState(result)", context);
+    vm.runInContext("renderChrome()", context);
+    assert.doesNotMatch(document.querySelector("#facts").textContent, /not reportable \(checkpoint/);
+  }
+  const { context } = loadWorkbench();
+  for (const stop of [{ checkpoint: "1", reason: "x" }, { checkpoint: 1, reason: 2 }, "stopped"]) {
+    context.bad = stoppedResult();
+    context.bad.case.reportability_stop = stop;
+    assert.throws(() => vm.runInContext("indexState(bad)", context), /reportability_stop/);
+  }
+});
+
 const cancerMention = (fields = {}) => ({
   presence: true, confidence: "max", evidence: [{ note_id: "note-2", text: "Upper-outer quadrant" }],
   status: "current", affected_tissue: "breast", metastasis: false, ...fields,

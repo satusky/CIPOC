@@ -27,6 +27,23 @@ COMPLETED_VARIABLE_STATUSES = {
 TERMINAL_VARIABLE_STATUSES = COMPLETED_VARIABLE_STATUSES | {VariableStatus.BLOCKED}
 
 
+class ExtractionStop(str, Enum):
+    """Case-level determinations that close every variable still pending."""
+
+    NOT_REPORTABLE = "not_reportable"
+
+
+class ReportabilityStop(BaseModel):
+    """The reportability checkpoint that stopped a case, recorded once for the case."""
+
+    checkpoint: int = Field(
+        description="Checkpoint that stopped the case: 1 after the note scan, 2 after the histology stage.",
+    )
+    reason: str = Field(
+        description="The determination and what it rests on: the caller-supplied facts, or each mention's note, behavior, diagnostic certainty and evidence.",
+    )
+
+
 class CaseVariableResult(BaseModel):
     """Orchestration state for one requested variable."""
 
@@ -47,6 +64,10 @@ class CaseVariableResult(BaseModel):
     blocking_item_ids: list[int] = Field(
         default_factory=list,
         description="Unresolved variable dependencies when status is blocked.",
+    )
+    stopped_by: ExtractionStop | None = Field(
+        default=None,
+        description="Set when extraction didn't run because a case-level determination stopped it. The case holds the evidence, so the variable carries no reason of its own.",
     )
 
     @model_validator(mode="after")
@@ -92,8 +113,8 @@ class CaseVariableResult(BaseModel):
         elif self.status == VariableStatus.NOT_APPLICABLE:
             if self.extraction is not None:
                 raise ValueError("Not-applicable variables cannot carry an extraction.")
-            if not self.reason:
-                raise ValueError("Not-applicable variables require a reason.")
+            if not self.reason and self.stopped_by is None:
+                raise ValueError("Not-applicable variables require a reason or a case-level stop.")
 
         elif self.status == VariableStatus.ERROR:
             if self.extraction is not None and self.extraction.is_valid:
@@ -111,6 +132,8 @@ class CaseVariableResult(BaseModel):
 
         if self.status != VariableStatus.BLOCKED and self.blocking_item_ids:
             raise ValueError("Only blocked variables may identify blocking variable IDs.")
+        if self.status != VariableStatus.NOT_APPLICABLE and self.stopped_by is not None:
+            raise ValueError("Only not-applicable variables may record a case-level stop.")
         if self.status not in {
             VariableStatus.STRUCTURED_DATA,
             VariableStatus.EXTRACTED,
@@ -158,9 +181,9 @@ class Case(BaseModel):
     """Durable snapshot of a finished extraction.
 
     Holds the final coded values plus the explanations needed to interpret them
-    — blocked/not-applicable reasons, errors, and any fatal blocker. Live
-    orchestration bookkeeping (what's still pending, whether the run may
-    continue) belongs to ``CaseState``, not here.
+    — blocked/not-applicable reasons, errors, any reportability stop, and any
+    fatal blocker. Live orchestration bookkeeping (what's still pending, whether
+    the run may continue) belongs to ``CaseState``, not here.
     """
 
     case_facts: CaseFacts | None = Field(
@@ -175,6 +198,10 @@ class Case(BaseModel):
     fatal_blocker: str | None = Field(
         default=None,
         description="Reason no further extraction could be attempted for this case.",
+    )
+    reportability_stop: ReportabilityStop | None = Field(
+        default=None,
+        description="The reportability checkpoint that closed the case's remaining variables, if one did. A normal outcome, unlike fatal_blocker.",
     )
     report: CaseReport | None = Field(
         default=None,

@@ -240,6 +240,8 @@ class PlainLog:
         )
         if snapshot.review_flags:
             line += f" · {snapshot.review_flags} flagged for review"
+        if snapshot.stop:
+            line += f" · {_short(snapshot.stop)}"
         return line
 
     def close(self) -> None:

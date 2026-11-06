@@ -55,9 +55,11 @@ For each mention, report:
 benign or malignant), or "unknown" (the note doesn't establish behavior, including a mass, nodule, \
 or lesion with no diagnosis yet).
 - diagnostic_certainty: how certain the note's wording makes the diagnosis. "definite" when the \
-diagnosis is stated, for example on pathology or as the clinician's diagnosis; "probable" for wording \
-such as "probable", "likely", "suspicious for" or "consistent with"; "possible" for wording such as \
-"possible", "cannot rule out" or "questionable". This describes the note's wording, not your confidence.
+diagnosis is stated, for example on pathology or as the clinician's diagnosis; "probable" for SEER \
+ambiguous terms that count as a diagnosis, such as "probable", "presumed", "most likely", "suspicious for", \
+"consistent with" or "compatible with"; "possible" for those that don't, such as "possible", \
+"cannot be ruled out", "questionable", "suggests" or "worrisome", and for bare "likely". This \
+describes the note's wording, not your confidence.
 - presence: true (each reported mention is, by definition, present in the note).
 - confidence: your confidence in the reported details for that mention.
 - evidence: verbatim text span(s) from the note supporting that mention.

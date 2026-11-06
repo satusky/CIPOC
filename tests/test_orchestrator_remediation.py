@@ -31,6 +31,7 @@ from cipoc.models import (
     CaseFacts,
     ClinicalNote,
     CONCEPT_DESCRIPTIONS,
+    ExtractionStop,
     OrchestratorRunError,
     OrchestratorRunFailure,
     OrchestratorRunResult,
@@ -79,6 +80,8 @@ class _ScannerModel(BaseChatModel):
 
     model_name: str = "offline-scanner"
     before_call: Callable | None = Field(default=None, exclude=True, repr=False)
+    # Per note: (status, tissue) for a definite malignant mention, or
+    # (status, tissue, behavior, diagnostic_certainty).
     tissues: dict = Field(default_factory=dict, exclude=True)
     calls: list = Field(default_factory=list, exclude=True)
 
@@ -114,9 +117,12 @@ class _ScannerModel(BaseChatModel):
                 {
                     "presence": True, "confidence": "high", "evidence": evidence,
                     "status": status, "affected_tissue": tissue, "metastasis": False,
-                    "behavior": "malignant", "diagnostic_certainty": "definite",
+                    "behavior": behavior, "diagnostic_certainty": certainty,
                 }
-                for status, tissue in self.tissues.get(note.note_id, [("current", "breast")])
+                for status, tissue, behavior, certainty in (
+                    (*mention, "malignant", "definite")[:4]
+                    for mention in self.tissues.get(note.note_id, [("current", "breast")])
+                )
             ]}
         else:
             answer = {
@@ -688,6 +694,112 @@ class OrchestratorRemediationTests(unittest.TestCase):
             return
         self._fanout_failure(during_teardown=True, snapshot_failure=True)
 
+
+
+class ReportabilityCheckpointOneTests(unittest.TestCase):
+    """Checkpoint 1 stops non-reportable cases in characterize_corpus, as a normal outcome."""
+
+    def _run(self, tissues, *, notes=None, structured_data=None, groups=None):
+        notes = notes or [_note()]
+        agent = _agent(model=_ScannerModel(tissues=tissues), groups=groups)
+        with patch.object(agent._extractor, "run", wraps=agent._extractor.run) as extract:
+            result = agent.run([note.model_dump() for note in notes], structured_data, progress=False)
+        return result, extract
+
+    def assertStopped(self, result, extract):
+        """Each closed variable has only the flag; the case holds the evidence once."""
+        self.assertIsInstance(result, OrchestratorRunResult)
+        self.assertEqual(result.run.status, "completed")
+        self.assertIsNone(result.case.fatal_blocker)
+        extract.assert_not_called()
+        for variable in result.case.variable_results.values():
+            if variable.status != VariableStatus.STRUCTURED_DATA:
+                self.assertEqual(variable.status, VariableStatus.NOT_APPLICABLE)
+                self.assertEqual(variable.stopped_by, ExtractionStop.NOT_REPORTABLE)
+                self.assertIsNone(variable.reason)
+        stop = result.case.reportability_stop
+        self.assertEqual(stop.checkpoint, 1)
+        self.assertTrue(stop.reason.startswith("Not reportable:"), stop.reason)
+        return stop.reason
+
+    def assertContinued(self, result, extract):
+        extract.assert_called_once()
+        self.assertEqual(result.case.variable_results[400].status, VariableStatus.EXTRACTED)
+        self.assertIsNone(result.case.reportability_stop)
+
+    def test_no_mentions_closes_every_variable_and_completes(self):
+        result, extract = self._run(
+            {"note-A": []}, groups=[_group(), _group("dependent", (410, 420), stage="dependent")]
+        )
+        reason = self.assertStopped(result, extract)
+        self.assertEqual(set(result.case.variable_results), {400, 410, 420})
+        self.assertEqual(reason, "Not reportable: no note mentions a neoplasm.")
+        self.assertIsNotNone(result.case.report)
+
+    def test_lone_lung_nodule_stops_citing_its_note_and_evidence(self):
+        note = ClinicalNote(note_id="note-A", date="2026-09-01", note_type="Radiology",
+                            content="4 mm nodule in the right upper lobe.")
+        result, extract = self._run({"note-A": [("current", "lung", "unknown", "definite")]}, notes=[note])
+        reason = self.assertStopped(result, extract)
+        self.assertIn("note note-A (lung, behavior unknown, definite)", reason)
+        self.assertIn("4 mm nodule in the right upper lobe.", reason)
+
+    def test_lone_brain_lesion_continues(self):
+        result, extract = self._run({"note-A": [("current", "brain", "unknown", "definite")]})
+        self.assertContinued(result, extract)
+
+    def test_probable_lung_cancer_alone_continues(self):
+        result, extract = self._run({"note-A": [("current", "lung", "malignant", "probable")]})
+        self.assertContinued(result, extract)
+
+    def test_possible_lung_cancer_alone_stops(self):
+        result, extract = self._run({"note-A": [("current", "lung", "malignant", "possible")]})
+        reason = self.assertStopped(result, extract)
+        self.assertIn("malignant, possible", reason)
+
+    def test_possible_note_with_definite_pathology_continues(self):
+        result, extract = self._run(
+            {"note-A": [("current", "lung", "malignant", "possible")],
+             "note-B": [("current", "lung")]},
+            notes=[_note("note-A"), _note("note-B")],
+        )
+        self.assertContinued(result, extract)
+
+    def test_supplied_benign_breast_stops_despite_malignant_mentions(self):
+        result, extract = self._run(
+            {"note-A": [("current", "breast")]},
+            structured_data={400: "C500", 523: "0"},
+            groups=[_group(item_ids=(400, 523, 410))],
+        )
+        reason = self.assertStopped(result, extract)
+        results = result.case.variable_results
+        self.assertEqual(results[400].status, VariableStatus.STRUCTURED_DATA)
+        self.assertEqual(results[400].value, "C500")
+        self.assertEqual(results[523].status, VariableStatus.STRUCTURED_DATA)
+        self.assertEqual(results[523].value, "0")
+        self.assertIsNone(results[400].stopped_by)
+        self.assertEqual(results[410].stopped_by, ExtractionStop.NOT_REPORTABLE)
+        self.assertIn("supplied primary site C500, behavior 0", reason)
+
+    def test_supplied_primary_site_without_mentions_continues(self):
+        result, extract = self._run(
+            {"note-A": []}, structured_data={400: "C341"}, groups=[_group(item_ids=(400, 390))]
+        )
+        extract.assert_called_once()
+        self.assertEqual(result.case.variable_results[400].status, VariableStatus.STRUCTURED_DATA)
+        self.assertEqual(result.case.variable_results[390].status, VariableStatus.EXTRACTED)
+
+    def test_full_config_without_cancer_stops_every_group(self):
+        script = Script(concepts={"cancer": False})
+        agent = build_fake_orchestrator(script)
+        with patch.object(agent._extractor, "run", wraps=agent._extractor.run) as extract:
+            result = agent.run([_note().model_dump()], progress=False)
+        self.assertStopped(result, extract)
+        self.assertEqual(
+            set(result.case.variable_results),
+            {variable.item_id for group in agent._target_variables for variable in group.variables},
+        )
+        self.assertEqual(OrchestratorRunResult.model_validate_json(result.model_dump_json()), result)
 
 if __name__ == "__main__":
     unittest.main()

@@ -39,7 +39,12 @@ initialize → scan_notes → note_branch ×notes → characterize_corpus → ch
 
 - **Scan:** `NoteScannerAgent` reads each note for concept evidence, cancer
   temporality, a summary, and search keywords.
-- **Characterize:** builds corpus descriptors and a short digest of each note.
+- **Characterize:** builds corpus descriptors and a short digest of each note,
+  then checks reportability. If the caller's site and behavior, or else the
+  notes' neoplasm mentions, show the case isn't reportable, every variable left
+  is closed as not applicable and flagged `stopped_by`, the reason is recorded
+  once as the case's `reportability_stop`, and the case finalizes without
+  extraction.
 - **Plan:** gates, site applicability, and stage order decide which variable
   groups can run on this pass. Values the caller already knows skip extraction.
 - **Retrieve:** a fixed `NoteFilter` narrows the notes, then

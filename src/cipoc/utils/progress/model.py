@@ -166,6 +166,8 @@ class Snapshot:
     notes_done: int = 0
     counts: Mapping[str, int] = dc_field(default_factory=dict)
     fatal: str | None = None
+    # A reportability checkpoint's reason: the case ended normally, early.
+    stop: str | None = None
     finished: bool = False
     show_note_counts: bool = False
     review_flags: int = 0
@@ -306,6 +308,7 @@ class ProgressModel:
         self._notes_total = len(note_corpus or {})
         self._notes_done = 0
         self._fatal: str | None = None
+        self._stop: str | None = None
         self._finished = False
         self._review_flags = 0
         self._report_seen = False
@@ -505,6 +508,7 @@ class ProgressModel:
             self._notes_total = max(self._notes_total, len(note_corpus))
 
         self._fatal = field(values, "fatal_blocker") or self._fatal
+        self._stop = field(field(values, "reportability_stop"), "reason") or self._stop
         report = field(values, "report")
         if report is not None:
             self._report_seen = True
@@ -663,6 +667,7 @@ class ProgressModel:
             notes_done=self._notes_done,
             counts=counts,
             fatal=self._fatal,
+            stop=self._stop,
             finished=self._finished,
             show_note_counts=self.show_note_counts,
             review_flags=review_flags,
@@ -685,7 +690,9 @@ def _apply_result(variable: VariableSnapshot, result: Any) -> VariableSnapshot:
         blockers = field(result, "blocking_item_ids", []) or []
         detail = "←" + ",".join(str(item) for item in blockers[:3]) if blockers else field(result, "reason")
     elif status in {VariableStatus.ERROR.value, VariableStatus.NOT_APPLICABLE.value}:
-        detail = field(result, "reason")
+        # A case-level stop flags the variable instead of repeating its evidence.
+        stopped_by = enum_value(field(result, "stopped_by"))
+        detail = field(result, "reason") or (str(stopped_by).replace("_", " ") if stopped_by else None)
     else:
         detail = None
 

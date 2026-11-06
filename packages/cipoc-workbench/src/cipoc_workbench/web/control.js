@@ -14,7 +14,7 @@ function bubbleTooltip(entry) {
   const e = r.extraction || {};
   const rows = [
     ["item", String(entry.item_id)],
-    ["status", statusLabel(r.status)],
+    ["status", resultLabel(r)],
     ["value", r.value == null ? "—" : r.value],
   ];
   if (e.presence_confidence) rows.push(["confidence", e.presence_confidence]);

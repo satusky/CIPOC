@@ -55,6 +55,8 @@ from .rules import (
 
 from .case import (
     VariableStatus,
+    ExtractionStop,
+    ReportabilityStop,
     CaseVariableResult,
     ReviewFlagType,
     ReviewFlag,
@@ -132,6 +134,8 @@ __all__ = [
     "NoteFilterEvaluation",
     "NoteSelectionProvenance",
     "CaseVariableResult",
+    "ExtractionStop",
+    "ReportabilityStop",
     "ReviewFlagType",
     "ReviewFlag",
     "CaseReport",

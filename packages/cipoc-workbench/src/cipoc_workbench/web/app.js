@@ -109,6 +109,17 @@ const STATUS = {
 };
 const statusLabel = (s) => (STATUS[s] || { label: s }).label;
 
+/* A case-level determination, such as a reportability checkpoint, closes the
+ * variables still pending as not applicable and flags them `stopped_by`. The
+ * evidence is recorded once, on the case (`reportability_stop`), so a stopped
+ * variable shows the flag in place of its status and has no reason of its own. */
+const STOP = {
+  not_reportable: { label: "Not reportable" },
+};
+const stopLabel = (s) => (STOP[s] || { label: String(s).replace(/_/g, " ") }).label;
+const resultLabel = (result) => (result.stopped_by ? stopLabel(result.stopped_by) : statusLabel(result.status));
+const resultReason = (result) => result.reason || (result.stopped_by ? stopLabel(result.stopped_by) : null);
+
 const CONFIDENCE_LEVELS = ["max", "high", "medium", "low"];
 
 const hasValue = (result) => result.value != null && result.value !== "";
@@ -319,7 +330,7 @@ function normalizeRunResult(result) {
   }
   for (const value of records(result.case.variable_results, "case.variable_results")) {
     text(value.status, "variable result.status");
-    texts(value, ["value", "reason"], "variable result");
+    texts(value, ["value", "reason", "stopped_by"], "variable result");
     idArrays(value, ["blocking_item_ids"], "variable result");
     if (value.extraction != null) evidence(object(value.extraction, "extraction"), "extraction");
   }
@@ -341,6 +352,11 @@ function normalizeRunResult(result) {
   if (result.case.case_facts != null) texts(object(result.case.case_facts, "case_facts"),
     ["primary_site", "gross_primary_site", "histology", "behavior", "sex", "date_of_diagnosis"], "case_facts");
   texts(result.case, ["fatal_blocker"], "case");
+  if (result.case.reportability_stop != null) {
+    const stop = object(result.case.reportability_stop, "reportability_stop");
+    if (!Number.isSafeInteger(stop.checkpoint)) throw new Error("reportability_stop.checkpoint must be an integer.");
+    text(stop.reason, "reportability_stop.reason");
+  }
   if (result.case.report != null) {
     const report = object(result.case.report, "report");
     if (report.flags != null) for (const flag of list(report.flags, "report.flags")) texts(flag, ["flag_type", "detail"], "report flag");
@@ -548,8 +564,8 @@ function groupState(group) {
 
   let reason = null;
   if (kind === "excluded") {
-    const first = items.find((r) => r.reason);
-    reason = first ? first.reason : null;
+    const first = items.find((r) => resultReason(r));
+    reason = first ? resultReason(first) : null;
   }
 
   return { counts, total, coded, unresolved, kind, label, reason, items };
@@ -855,6 +871,16 @@ function renderChrome() {
   }
   if (App.case.fatal_blocker) {
     rail.append(h("span", { class: "chip bad", text: "fatal: " + App.case.fatal_blocker }));
+  }
+  /* A normal outcome, so a plain chip rather than the red fatal one. The
+     reason can quote every mention's evidence, so it goes in the tooltip. */
+  if (App.case.reportability_stop) {
+    const stop = App.case.reportability_stop;
+    rail.append(h("span", {
+      class: "chip",
+      title: stop.reason,
+      text: "not reportable (checkpoint " + stop.checkpoint + ")",
+    }));
   }
   if (!hasCapture()) {
     rail.append(h("span", {

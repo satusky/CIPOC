@@ -19,7 +19,7 @@ from langgraph.graph.message import add_messages
 from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
-from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key
+from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key, checkpoint_one_stop_reason, stop_pending_results
 from cipoc.utils import CipocConfig, ObservabilityCollector, run_graph_stream
 from cipoc.utils.progress.events import ProgressEvent
 from cipoc.utils.progress.runner import validate_graph_concurrency
@@ -50,6 +50,8 @@ from cipoc.models import (
     VariableStatus,
     ProcessedClinicalNote,
     CancerStatus,
+    ExtractionStop,
+    ReportabilityStop,
     confidence_field,
 )
 
@@ -92,6 +94,10 @@ class CaseState(BaseModel):
         default=None,
         description="Reason no further extraction can be attempted for this case.",
     )
+    reportability_stop: ReportabilityStop | None = Field(
+        default=None,
+        description="Set once, by the reportability checkpoint that closed the case's pending variables.",
+    )
     report: CaseReport | None = Field(
         default=None,
         description="Review roll-up assembled at finalization; absent until then.",
@@ -128,6 +134,7 @@ class CaseState(BaseModel):
             variable_results=dict(self.variable_results),
             note_selection=dict(self.note_selection),
             fatal_blocker=self.fatal_blocker,
+            reportability_stop=self.reportability_stop,
             report=self.report,
         )
 
@@ -192,6 +199,7 @@ class OrchestratorOutput(BaseModel):
     variable_results: dict[int, CaseVariableResult] = Field(default_factory=dict)
     note_selection: dict[str, NoteSelectionProvenance] = Field(default_factory=dict)
     fatal_blocker: str | None = None
+    reportability_stop: ReportabilityStop | None = None
     report: CaseReport | None = None
 
 
@@ -306,8 +314,18 @@ class OrchestratorAgent(BaseAgent):
         return {"note_corpus": {note.note_id: processed_note}}
     
     def characterize_corpus(self, state: CaseState) -> dict:
+        """Roll the scanned notes up into corpus descriptors and digests, infer
+        a gross primary site from the mentions, and run reportability checkpoint
+        1. A case that isn't reportable has every PENDING variable closed as
+        NOT_APPLICABLE, flagged ``stopped_by`` with the evidence recorded once
+        in ``reportability_stop``, so ``route_from_check`` finalizes it. That's
+        a normal outcome, not a ``fatal_blocker``.
+        """
         descriptors = build_corpus_descriptors(state.note_corpus)
         digests = build_corpus_digests(state.note_corpus)
+        # Checkpoint 1 reads the caller-supplied facts, before characterization
+        # adds a gross site of its own.
+        stop_reason = checkpoint_one_stop_reason(state.case_facts, state.note_corpus)
         case_facts = state.case_facts
         if case_facts is None or (not case_facts.primary_site and not case_facts.gross_primary_site):
             site_dictionary = {}
@@ -342,11 +360,17 @@ class OrchestratorAgent(BaseAgent):
                         update={"gross_primary_site": resolved_sites.pop()}
                     )
                 break
-        return {
+        update = {
             "note_corpus_descriptors": descriptors,
             "note_digests": digests,
             "case_facts": case_facts,
         }
+        if stop_reason is not None:
+            update["reportability_stop"] = ReportabilityStop(checkpoint=1, reason=stop_reason)
+            update["variable_results"] = stop_pending_results(
+                state.variable_results, ExtractionStop.NOT_REPORTABLE
+            )
+        return update
 
     def check_state(self, state: CaseState) -> dict:
         """Loop hub (flow Step 4). Pure pass-through: the branch decision lives

@@ -7,8 +7,10 @@ from pydantic import ValidationError
 from cipoc.models import (
     CancerMention,
     Case,
+    CaseVariableResult,
     ClinicalNote,
     ConfidenceLevel,
+    ExtractionStop,
     NoteCorpusDescriptors,
     NoteDigest,
     OrchestratorConfigFingerprint,
@@ -19,10 +21,13 @@ from cipoc.models import (
     OrchestratorRunInputs,
     OrchestratorRunResult,
     ProcessedClinicalNote,
+    ReportabilityStop,
     RunObservability,
     TargetGroup,
     TextSpan,
+    ValidatedVariableOutput,
     VariableInfo,
+    VariableStatus,
 )
 
 
@@ -162,6 +167,50 @@ class OrchestratorRunModelTests(unittest.TestCase):
         self.assertEqual(restored.schema_version, "1.3")
         mention = restored.corpus.note_corpus["note-A"].cancer_mentions[0]
         self.assertEqual((mention.behavior, mention.diagnostic_certainty), ("benign", "probable"))
+
+    def test_stopped_1_3_artifact_round_trips_the_flag_and_the_case_stop(self):
+        stop = ReportabilityStop(checkpoint=1, reason="Not reportable: no note mentions a neoplasm.")
+        case = Case(
+            variable_results={
+                390: CaseVariableResult(item_id=390, status=VariableStatus.STRUCTURED_DATA, value="8500"),
+                400: CaseVariableResult(
+                    item_id=400, status=VariableStatus.NOT_APPLICABLE,
+                    stopped_by=ExtractionStop.NOT_REPORTABLE,
+                ),
+            },
+            reportability_stop=stop,
+        )
+        result = OrchestratorRunResult(
+            run=run_info(), case=case, inputs=inputs(), corpus=corpus(),
+            observability=observability(),
+        )
+
+        payload = result.model_dump(mode="json")
+        restored = OrchestratorRunResult.model_validate_json(result.model_dump_json())
+
+        self.assertEqual(restored, result)
+        self.assertEqual(restored.schema_version, "1.3")
+        self.assertEqual(payload["case"]["reportability_stop"], {"checkpoint": 1, "reason": stop.reason})
+        self.assertEqual(payload["case"]["variable_results"]["400"]["stopped_by"], "not_reportable")
+        self.assertIsNone(payload["case"]["variable_results"]["400"]["reason"])
+        self.assertIsNone(payload["case"]["variable_results"]["390"]["stopped_by"])
+
+    def test_legacy_artifacts_load_without_a_stop(self):
+        payload = OrchestratorRunResult(
+            run=run_info(), case=Case(), inputs=inputs(), corpus=corpus(),
+            observability=observability(),
+        ).model_dump(mode="json")
+        payload["schema_version"] = "1.2"
+        del payload["case"]["reportability_stop"]
+        payload["case"]["variable_results"] = {
+            "400": {"item_id": 400, "status": "not_applicable", "reason": "Corpus gate not met."},
+        }
+
+        restored = OrchestratorRunResult.model_validate(payload)
+
+        self.assertIsNone(restored.case.reportability_stop)
+        self.assertIsNone(restored.case.variable_results[400].stopped_by)
+        self.assertEqual(restored.case.variable_results[400].reason, "Corpus gate not met.")
 
     def test_legacy_mentions_load_as_definite_malignant(self):
         payload = OrchestratorRunResult(
@@ -322,6 +371,48 @@ class OrchestratorRunModelTests(unittest.TestCase):
             OrchestratorRunFailure(
                 run=run_info(), error="failed", **common
             )
+
+
+
+class CaseVariableStopTests(unittest.TestCase):
+    """``stopped_by`` marks a variable closed by a case-level determination."""
+
+    def test_only_not_applicable_variables_may_carry_the_flag(self):
+        extraction = dict(
+            explanation="Scripted.", most_important_note=None, spans=[],
+            presence_confidence=ConfidenceLevel.LOW, is_valid=True,
+        )
+        others = {
+            VariableStatus.PENDING: {},
+            VariableStatus.STRUCTURED_DATA: {"value": "C500"},
+            VariableStatus.EXTRACTED: {
+                "value": "C500",
+                "extraction": ValidatedVariableOutput(item_id=400, value="C500", **extraction),
+            },
+            VariableStatus.NOT_FOUND: {
+                "extraction": ValidatedVariableOutput(item_id=400, value=None, **extraction),
+            },
+            VariableStatus.ERROR: {"reason": "Extraction failed."},
+            VariableStatus.BLOCKED: {"reason": "Waiting.", "blocking_item_ids": [390]},
+        }
+        self.assertEqual(set(others) | {VariableStatus.NOT_APPLICABLE}, set(VariableStatus))
+        for status, fields in others.items():
+            with self.subTest(status=status):
+                CaseVariableResult(item_id=400, status=status, **fields)
+                with self.assertRaisesRegex(ValidationError, "case-level stop"):
+                    CaseVariableResult(
+                        item_id=400, status=status, stopped_by=ExtractionStop.NOT_REPORTABLE, **fields
+                    )
+
+    def test_not_applicable_needs_a_reason_or_the_flag(self):
+        with self.assertRaisesRegex(ValidationError, "require a reason or a case-level stop"):
+            CaseVariableResult(item_id=400, status=VariableStatus.NOT_APPLICABLE)
+        stopped = CaseVariableResult(
+            item_id=400, status=VariableStatus.NOT_APPLICABLE, stopped_by=ExtractionStop.NOT_REPORTABLE
+        )
+        self.assertIsNone(stopped.reason)
+        gated = CaseVariableResult(item_id=400, status=VariableStatus.NOT_APPLICABLE, reason="Gate unmet.")
+        self.assertIsNone(gated.stopped_by)
 
 
 if __name__ == "__main__":

@@ -602,6 +602,8 @@ def _status_row(
             )
         if snapshot.review_flags:
             summary += f" · {snapshot.review_flags} flagged for review"
+        if snapshot.stop:
+            summary += f" · {snapshot.stop}"
         if report_prompt:
             prompt = " · Press Enter to view report"
             summary = clip(summary, max(0, cols.total - len(prompt))) + prompt

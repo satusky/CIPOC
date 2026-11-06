@@ -187,7 +187,7 @@ def behavior_field(**kwargs):
 def diagnostic_certainty_field(**kwargs):
     """Pydantic field for a mention's diagnostic certainty, with the wording rules in its description."""
     return Field(
-        description="How certain the note's wording makes the diagnosis. This describes the note, not your confidence in this answer, which belongs in `confidence`: a note that says 'possible lung cancer' is 'possible' here even though the note states it plainly. {'definite': the diagnosis is stated, for example on pathology or as the clinician's diagnosis; 'probable': wording such as 'probable', 'likely', 'suspicious for' or 'consistent with'; 'possible': wording such as 'possible', 'cannot rule out' or 'questionable'}",
+        description="How certain the note's wording makes the diagnosis. This describes the note, not your confidence in this answer, which belongs in `confidence`: a note that says 'possible lung cancer' is 'possible' here even though the note states it plainly. {'definite': the diagnosis is stated, for example on pathology or as the clinician's diagnosis; 'probable': SEER ambiguous terms that count as a diagnosis: 'apparent(ly)', 'appears', 'comparable with', 'compatible with', 'consistent with', 'favor(s)', 'malignant appearing', 'most likely', 'presumed', 'probable', 'suspect(ed)', 'suspicious (for)', 'typical (of)'; 'possible': SEER ambiguous terms that don't: 'cannot be ruled out', 'equivocal', 'possible', 'potentially malignant', 'questionable', 'rule out', 'suggests', 'worrisome'; bare 'likely' is also 'possible'}",
         **kwargs,
     )
 
