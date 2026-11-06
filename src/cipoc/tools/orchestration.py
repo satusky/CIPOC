@@ -297,13 +297,15 @@ def prefilter_notes(
     return [note for note in notes if note_matches_filter(note, note_filter, anchor=anchor)]
 
 
-def is_definite_malignant(mention: CancerMention) -> bool:
+def is_diagnosed_malignant(mention: CancerMention) -> bool:
     """Whether a mention counts toward note status and affected tissues.
 
-    Benign, unknown-behavior, probable and possible mentions are kept on the
-    note for review but don't establish a cancer.
+    Probable wording is a SEER ambiguous term that counts as a diagnosis, so a
+    probable malignant mention counts like a definite one. Benign,
+    unknown-behavior and possible mentions are kept on the note for review but
+    don't establish a cancer.
     """
-    return mention.behavior == "malignant" and mention.diagnostic_certainty == "definite"
+    return mention.behavior == "malignant" and mention.diagnostic_certainty in ("definite", "probable")
 
 
 def build_corpus_descriptors(note_corpus: dict[int | str, ProcessedClinicalNote]) -> NoteCorpusDescriptors:
@@ -316,7 +318,7 @@ def build_corpus_descriptors(note_corpus: dict[int | str, ProcessedClinicalNote]
     for note in notes:
         if note.cancer_mentions is not None:
             for mention in note.cancer_mentions:
-                if is_definite_malignant(mention):
+                if is_diagnosed_malignant(mention):
                     affected_tissues[mention.status].add(mention.affected_tissue)
 
         if note.flags is not None:

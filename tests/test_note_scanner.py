@@ -21,7 +21,7 @@ from cipoc.models import (
     TextSpan,
 )
 from cipoc.prompts.note_scanner import CANCER_MENTIONS_PROMPT
-from cipoc.tools.orchestration import build_corpus_descriptors, corpus_gate_passes, is_definite_malignant
+from cipoc.tools.orchestration import build_corpus_descriptors, corpus_gate_passes, is_diagnosed_malignant
 
 
 class FakeLLM:
@@ -235,8 +235,8 @@ class CancerMentionSchemaTests(unittest.TestCase):
         self.assertEqual(self.mention(affected_tissue="left breast").affected_tissue, "left breast")
 
 
-class DefiniteMalignantMentionTests(unittest.TestCase):
-    """Only definite malignant mentions feed note status and affected tissues."""
+class DiagnosedMalignantMentionTests(unittest.TestCase):
+    """Only definite or probable malignant mentions feed note status and affected tissues."""
 
     def finding(self, status, tissue, behavior="malignant", diagnostic_certainty="definite"):
         return CancerMentionFinding(
@@ -257,11 +257,11 @@ class DefiniteMalignantMentionTests(unittest.TestCase):
         note = ProcessedClinicalNote(**state.note.model_dump(), **result)
         return note, build_corpus_descriptors({note.note_id: note})
 
-    def test_benign_unknown_probable_and_possible_mentions_are_excluded(self):
+    def test_benign_unknown_and_possible_mentions_are_excluded(self):
         for behavior, certainty in (
             ("benign", "definite"),
+            ("benign", "probable"),
             ("unknown", "definite"),
-            ("malignant", "probable"),
             ("malignant", "possible"),
         ):
             with self.subTest(behavior=behavior, diagnostic_certainty=certainty):
@@ -271,23 +271,28 @@ class DefiniteMalignantMentionTests(unittest.TestCase):
                 self.assertIsNone(note.cancer_status)
                 self.assertEqual(descriptors.affected_tissues, {})
 
-    def test_definite_malignant_mention_is_included(self):
-        note, descriptors = self.scan(self.finding("current", "breast"))
+    def test_definite_and_probable_malignant_mentions_are_included(self):
+        for certainty in ("definite", "probable"):
+            with self.subTest(diagnostic_certainty=certainty):
+                note, descriptors = self.scan(
+                    self.finding("current", "breast", diagnostic_certainty=certainty)
+                )
 
-        self.assertEqual(note.cancer_status, {"current"})
-        self.assertEqual(descriptors.affected_tissues, {"current": {"breast"}})
+                self.assertEqual(note.cancer_status, {"current"})
+                self.assertEqual(descriptors.affected_tissues, {"current": {"breast"}})
 
-    def test_mixed_note_keeps_only_definite_malignant_mentions(self):
+    def test_mixed_note_keeps_only_definite_and_probable_malignant_mentions(self):
         note, descriptors = self.scan(
             self.finding("current", "breast"),
             self.finding("current", "lung", behavior="unknown"),
             self.finding("recent", "colon", diagnostic_certainty="probable"),
+            self.finding("recent", "pancreas", diagnostic_certainty="possible"),
             self.finding("historical", "ovary", behavior="benign"),
         )
 
-        self.assertEqual(len(note.cancer_mentions), 4)
-        self.assertEqual(note.cancer_status, {"current"})
-        self.assertEqual(descriptors.affected_tissues, {"current": {"breast"}})
+        self.assertEqual(len(note.cancer_mentions), 5)
+        self.assertEqual(note.cancer_status, {"current", "recent"})
+        self.assertEqual(descriptors.affected_tissues, {"current": {"breast"}, "recent": {"colon"}})
 
     def test_legacy_mentions_without_the_fields_still_count(self):
         legacy = self.finding("historical", "prostate").model_dump(
@@ -298,7 +303,7 @@ class DefiniteMalignantMentionTests(unittest.TestCase):
         )
 
         [mention] = note.cancer_mentions
-        self.assertTrue(is_definite_malignant(mention))
+        self.assertTrue(is_diagnosed_malignant(mention))
         self.assertEqual(
             build_corpus_descriptors({note.note_id: note}).affected_tissues,
             {"historical": {"prostate"}},
