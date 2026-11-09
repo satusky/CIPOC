@@ -86,6 +86,32 @@ class ApplicabilityRegressionTests(unittest.TestCase):
             tissue_codes=TISSUE_CODES,
         ))
 
+    def test_candidate_gross_sites_are_or(self):
+        candidates = CaseFacts(candidate_gross_sites=["breast", "lung"])
+        for restriction, expected in (
+            (SiteApplicability(gross_primary_sites=["breast"]), True),
+            (SiteApplicability(gross_primary_sites=["lung"]), True),
+            (SiteApplicability(primary_sites=["C340-C349"]), True),
+            (SiteApplicability(gross_primary_sites=["ovary"]), False),
+            (SiteApplicability(primary_sites=["C440-C449"]), False),
+        ):
+            with self.subTest(restriction=restriction):
+                self.assertIs(site_applies(restriction, candidates, tissue_codes=TISSUE_CODES), expected)
+        # A coded primary outranks the candidates.
+        self.assertFalse(site_applies(
+            SiteApplicability(gross_primary_sites=["breast"]),
+            CaseFacts(primary_site="C569", candidate_gross_sites=["breast", "lung"]),
+            tissue_codes=TISSUE_CODES,
+        ))
+        # A candidate missing from the table makes the gross site unknown, so it can't exclude.
+        for missing in (["breast", "kidney"], ["lung", "unspecified"]):
+            with self.subTest(candidates=missing):
+                self.assertTrue(site_applies(
+                    SiteApplicability(gross_primary_sites=["ovary"]),
+                    CaseFacts(candidate_gross_sites=missing),
+                    tissue_codes=TISSUE_CODES,
+                ))
+
     def test_newly_coded_primary_supersedes_earlier_gross_inference(self):
         facts = derive_case_facts(
             CaseFacts(gross_primary_site="breast"),

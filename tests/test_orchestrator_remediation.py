@@ -408,6 +408,36 @@ class OrchestratorRemediationTests(unittest.TestCase):
         self.assertEqual(result.corpus.note_corpus_descriptors.affected_tissues["current"],
                          {"breast", "unspecified"})
 
+    def test_two_current_tissues_narrow_to_their_union_plus_unknown_primary(self):
+        model = _ScannerModel(tissues={"note-A": [("current", "breast"), ("current", "ovary")]})
+        agent = _agent(model=model)
+        self._dictionaries(agent)
+        with patch.object(agent._extractor, "run", wraps=agent._extractor.run) as extract:
+            result = agent.run([_note().model_dump()], progress=False)
+        facts = result.case.case_facts
+        self.assertEqual((facts.candidate_gross_sites, facts.gross_primary_site), (["breast", "ovary"], None))
+        self.assertEqual(
+            set(extract.call_args.args[0].requested_variables.variables[0].valid_codes),
+            {code for code in primary_site_codes() if code[:3] in ("C50", "C56")} | {"C809"},
+        )
+        restored = OrchestratorRunResult.model_validate_json(result.model_dump_json())
+        self.assertEqual(restored.case.case_facts.candidate_gross_sites, ["breast", "ovary"])
+
+    def test_current_benign_meningioma_does_not_narrow_to_a_historical_breast_cancer(self):
+        model = _ScannerModel(tissues={"note-A": [
+            ("current", "meninges", "benign", "definite"), ("historical", "breast"),
+        ]})
+        agent = _agent(model=model)
+        self._dictionaries(agent)
+        with patch.object(agent._extractor, "run", wraps=agent._extractor.run) as extract:
+            result = agent.run([_note().model_dump()], progress=False)
+        facts = result.case.case_facts
+        self.assertEqual((facts.candidate_gross_sites, facts.gross_primary_site), ([], None))
+        self.assertEqual(
+            set(extract.call_args.args[0].requested_variables.variables[0].valid_codes),
+            set(primary_site_codes()),
+        )
+
     def test_coded_primary_scopes_by_its_own_tissue_never_the_gross_breast(self):
         agent = _agent()
         self._dictionaries(agent)
@@ -420,7 +450,7 @@ class OrchestratorRemediationTests(unittest.TestCase):
                     CaseFacts(primary_site=primary, gross_primary_site="breast"),
                 )
                 site, laterality = scoped.variables
-                self.assertEqual(set(site.valid_codes), eye)
+                self.assertEqual(set(site.valid_codes), eye | {"C809"})
                 self.assertEqual(laterality.valid_codes,
                                  {"0": "Base only", "1": "Breast", "2": "Lung"})
 

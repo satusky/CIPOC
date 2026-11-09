@@ -9,7 +9,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from operator import add
-from typing import Any, Callable, Mapping, get_args
+from typing import Any, Callable, Mapping
 from typing_extensions import Annotated, Literal
 from pydantic import BaseModel, Field, model_validator
 
@@ -20,7 +20,7 @@ from langgraph.graph.message import add_messages
 from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
-from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_data_dictionary, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, load_scoping_dictionary, check_primary_site_coverage, lookup_variable_info, tissue_site_codes, checkpoint_one_stop_reason, checkpoint_two_stop_reason, stop_pending_results
+from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_data_dictionary, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, candidate_gross_sites, not_found_results, to_case_results, build_report, load_scoping_dictionary, check_primary_site_coverage, lookup_variable_info, tissue_site_codes, checkpoint_one_stop_reason, checkpoint_two_stop_reason, stop_pending_results
 from cipoc.utils import CipocConfig, ObservabilityCollector, run_graph_stream
 from cipoc.utils.progress.events import ProgressEvent
 from cipoc.utils.progress.runner import validate_graph_concurrency
@@ -52,7 +52,6 @@ from cipoc.models import (
     ProcessedClinicalNote,
     CancerStatus,
     ExtractionStop,
-    GrossSite,
     ReportabilityStop,
     ScopingDictionary,
     confidence_field,
@@ -64,7 +63,6 @@ from .note_scanner import NoteScannerAgent, ScannerState
 from .note_retriever import NoteRetrieverAgent, RetrieverInput
 
 ORCHESTRATOR_SYSTEM_PROMPT = ""
-_GROSS_SITES = frozenset(get_args(GrossSite))
 
 def index_notes(note_corpus: dict[int | str, ProcessedClinicalNote]) -> dict[int | str, str | None]:
     return {note_id: processed_note.summary for note_id, processed_note in note_corpus.items()}
@@ -349,7 +347,7 @@ class OrchestratorAgent(BaseAgent):
     
     def characterize_corpus(self, state: CaseState) -> dict:
         """Roll the scanned notes up into corpus descriptors and digests, infer
-        a gross primary site from the mentions, and run reportability checkpoint
+        candidate gross sites from the mentions, and run reportability checkpoint
         1. A case that isn't reportable has every PENDING variable closed as
         NOT_APPLICABLE, flagged ``stopped_by`` with the evidence recorded once
         in ``reportability_stop``, so ``route_from_check`` finalizes it. That's
@@ -361,27 +359,21 @@ class OrchestratorAgent(BaseAgent):
         # adds a gross site of its own.
         stop_reason = checkpoint_one_stop_reason(state.case_facts, state.note_corpus)
         case_facts = state.case_facts
-        if case_facts is None or (not case_facts.primary_site and not case_facts.gross_primary_site):
-            for status in ("current", "recent", "historical"):
-                affected_tissues = (descriptors.affected_tissues or {}).get(
-                    status, set()
+        if case_facts is None or not (
+            case_facts.primary_site
+            or case_facts.gross_primary_site
+            or case_facts.candidate_gross_sites
+        ):
+            candidates = candidate_gross_sites(state.note_corpus)
+            if candidates:
+                # The Workbench validates the gross site as text, so it holds
+                # only a lone candidate.
+                case_facts = (case_facts or CaseFacts()).model_copy(
+                    update={
+                        "candidate_gross_sites": candidates,
+                        "gross_primary_site": candidates[0] if len(candidates) == 1 else None,
+                    }
                 )
-                if isinstance(affected_tissues, str):
-                    affected_tissues = [affected_tissues]
-                # A saved name outside the vocabulary, from an old artifact or a
-                # test double, names no tissue.
-                tissues = {
-                    tissue.strip() if tissue.strip() in _GROSS_SITES else "unspecified"
-                    for tissue in affected_tissues
-                    if tissue.strip()
-                }
-                if not tissues:
-                    continue
-                if len(tissues) == 1 and "unspecified" not in tissues:
-                    case_facts = (case_facts or CaseFacts()).model_copy(
-                        update={"gross_primary_site": tissues.pop()}
-                    )
-                break
         update = {
             "note_corpus_descriptors": descriptors,
             "note_digests": digests,

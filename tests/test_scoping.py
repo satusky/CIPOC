@@ -13,7 +13,8 @@ from cipoc.tools import (
     load_scoping_dictionary,
     matching_schemas,
     parse_scoping_dictionary,
-    primary_site_tissue,
+    gross_site_candidates,
+    primary_site_tissues,
     scoped_codes,
     scoped_item_codes,
 )
@@ -203,6 +204,21 @@ class SchemaMatchingTests(unittest.TestCase):
                 self.assertIn("eod/breast", matched)
                 self.assertIn("eod/lung", matched)
 
+    def test_candidate_tissues_match_as_or(self):
+        facts = {"histology": "8140", "date_of_diagnosis": "2020-06-15"}
+        both = self.match(CaseFacts(candidate_gross_sites=["breast", "lung"], **facts))
+        self.assertEqual(both, ["eod/breast", "eod/lung"])
+        self.assertEqual(
+            set(both),
+            set(self.match(CaseFacts(gross_primary_site="breast", **facts)))
+            | set(self.match(CaseFacts(gross_primary_site="lung", **facts))),
+        )
+        # One candidate outside the file makes the site unknown.
+        self.assertEqual(
+            self.match(CaseFacts(candidate_gross_sites=["breast", "left lung"], **facts)),
+            self.match(CaseFacts(**facts)),
+        )
+
     def test_c809_is_a_site_code_not_an_unknown_site(self):
         self.assertEqual(
             self.match(CaseFacts(primary_site="C80.9", histology="8500", date_of_diagnosis="2020-06-15")),
@@ -294,31 +310,48 @@ class ScopedCodesTests(unittest.TestCase):
         self.assertIsNone(scoped_codes(self.scoping, matched, 820))
 
 
-class PrimarySiteTissueTests(unittest.TestCase):
+class PrimarySiteTissuesTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.scoping = load_scoping_dictionary(FIXTURE)
 
-    def tissue(self, **facts):
-        return primary_site_tissue(self.scoping, CaseFacts(**facts))
+    def tissues(self, **facts):
+        return primary_site_tissues(self.scoping, CaseFacts(**facts))
 
-    def test_a_coded_primary_picks_its_tissue_over_the_gross_site(self):
+    def test_candidates_or_else_the_gross_site(self):
+        self.assertEqual(gross_site_candidates(CaseFacts(candidate_gross_sites=["breast", "ovary"])),
+                         ["breast", "ovary"])
+        self.assertEqual(gross_site_candidates(CaseFacts(gross_primary_site="breast")), ["breast"])
+        self.assertEqual(gross_site_candidates(CaseFacts()), [])
+        self.assertEqual(gross_site_candidates(None), [])
+
+    def test_a_coded_primary_picks_its_tissue_over_the_candidates(self):
         for code, tissue in (("C504", "breast"), ("c34.1", "lung"), ("C181", "appendix"), ("C209", "rectum")):
             with self.subTest(code=code):
-                self.assertEqual(self.tissue(primary_site=code, gross_primary_site="ovary"), tissue)
+                self.assertEqual(self.tissues(primary_site=code, gross_primary_site="ovary"), [tissue])
+                self.assertEqual(
+                    self.tissues(primary_site=code, candidate_gross_sites=["ovary", "kidney"]), [tissue]
+                )
 
     def test_unknown_malformed_or_unlisted_primaries_pick_none(self):
         for code in ("C809", "C80.9", "C34", "C3491", "unknown", " ", "C999"):
             with self.subTest(code=code):
-                self.assertIsNone(self.tissue(primary_site=code, gross_primary_site="breast"))
+                self.assertEqual(self.tissues(primary_site=code, gross_primary_site="breast"), [])
+                self.assertEqual(self.tissues(primary_site=code, candidate_gross_sites=["breast", "ovary"]), [])
 
     def test_the_gross_site_counts_only_as_a_tissue_name(self):
-        self.assertEqual(self.tissue(gross_primary_site="unknown_primary_site"), "unknown_primary_site")
-        self.assertEqual(self.tissue(gross_primary_site="breast"), "breast")
+        self.assertEqual(self.tissues(gross_primary_site="unknown_primary_site"), ["unknown_primary_site"])
+        self.assertEqual(self.tissues(gross_primary_site="breast"), ["breast"])
         for gross_site in ("unspecified", "left breast", "Breast", None):
             with self.subTest(gross_site=gross_site):
-                self.assertIsNone(self.tissue(gross_primary_site=gross_site))
-        self.assertIsNone(primary_site_tissue(self.scoping, None))
+                self.assertEqual(self.tissues(gross_primary_site=gross_site), [])
+        self.assertEqual(primary_site_tissues(self.scoping, None), [])
+
+    def test_every_candidate_counts_unless_one_is_unknown(self):
+        self.assertEqual(self.tissues(candidate_gross_sites=["breast", "ovary"]), ["breast", "ovary"])
+        for candidates in (["breast", "unspecified"], ["breast", "left breast"]):
+            with self.subTest(candidates=candidates):
+                self.assertEqual(self.tissues(candidate_gross_sites=candidates), [])
 
 
 class ScopedItemCodesTests(unittest.TestCase):
@@ -326,11 +359,24 @@ class ScopedItemCodesTests(unittest.TestCase):
     def setUpClass(cls):
         cls.scoping = load_scoping_dictionary(FIXTURE)
 
-    def test_primary_site_takes_one_tissues_codes(self):
-        scoped = scoped_item_codes(self.scoping, CaseFacts(gross_primary_site="breast"), [400])
-        self.assertEqual(scoped, {400: self.scoping.tissues["breast"].codes[400]})
-        # C809 isn't added to a tissue's codes.
-        self.assertNotIn("C809", scoped[400])
+    def test_primary_site_takes_its_tissues_codes_plus_unknown_primary(self):
+        tissues = self.scoping.tissues
+        unknown = {"C809": "Unknown primary site"}
+        for facts, expected in (
+            (CaseFacts(gross_primary_site="breast"), {**tissues["breast"].codes[400], **unknown}),
+            (CaseFacts(primary_site="C341", gross_primary_site="breast"), {**tissues["lung"].codes[400], **unknown}),
+            (
+                CaseFacts(candidate_gross_sites=["breast", "ovary"]),
+                {**tissues["breast"].codes[400], **tissues["ovary"].codes[400], **unknown},
+            ),
+            (CaseFacts(gross_primary_site="unknown_primary_site"), unknown),
+        ):
+            with self.subTest(facts=facts):
+                self.assertEqual(scoped_item_codes(self.scoping, facts, [400]), {400: expected})
+
+    def test_primary_site_is_unscoped_when_a_candidate_is_unspecified(self):
+        facts = CaseFacts(candidate_gross_sites=["breast", "unspecified"])
+        self.assertEqual(scoped_item_codes(self.scoping, facts, [400]), {})
 
     def test_histology_is_never_scoped(self):
         for facts in (CaseFacts(primary_site="C504"), CaseFacts(gross_primary_site="breast"), None):

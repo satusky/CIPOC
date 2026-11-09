@@ -39,6 +39,7 @@ from cipoc.models import (
 )
 from cipoc.models.case import TERMINAL_VARIABLE_STATUSES
 from .coding_context import ranges_overlap, site_in_ranges
+from .scoping import gross_site_candidates
 
 
 def _concept_present(corpus: NoteCorpusDescriptors, concept: str) -> bool:
@@ -308,6 +309,43 @@ def is_diagnosed_malignant(mention: CancerMention) -> bool:
     return mention.behavior == "malignant" and mention.diagnostic_certainty in ("definite", "probable")
 
 
+def candidate_gross_sites(note_corpus: dict[int | str, ProcessedClinicalNote]) -> list[str]:
+    """The tissues Primary Site is narrowed to, read from the notes' mentions.
+
+    The first status, in the order current, recent, historical, with any
+    definite or probable mention of any behavior decides. A current benign
+    tumor therefore blocks falling back to an older cancer, while a current
+    mention the notes only call possible doesn't. Its tissues come from its
+    definite or probable malignant mentions, and a name outside ``GrossSite``
+    counts as "unspecified". No tissues, or any "unspecified", gives [], which
+    doesn't narrow.
+    """
+    mentions = [
+        mention
+        for note in note_corpus.values()
+        for mention in note.cancer_mentions or []
+    ]
+    for status in ("current", "recent", "historical"):
+        diagnosed = [
+            mention
+            for mention in mentions
+            if mention.status == status
+            and mention.diagnostic_certainty in ("definite", "probable")
+        ]
+        if not diagnosed:
+            continue
+        tissues = {
+            tissue if tissue in _RESTRICTABLE_GROSS_SITES else "unspecified"
+            for tissue in (
+                mention.affected_tissue.strip()
+                for mention in diagnosed
+                if is_diagnosed_malignant(mention)
+            )
+        }
+        return sorted(tissues) if tissues and "unspecified" not in tissues else []
+    return []
+
+
 def build_corpus_descriptors(note_corpus: dict[int | str, ProcessedClinicalNote]) -> NoteCorpusDescriptors:
     notes = list(note_corpus.values())
     dates = sorted([note.date for note in notes])
@@ -411,6 +449,7 @@ def site_applies(
     false; AND is false when even one condition is false. An informative coded
     primary outranks gross-site inference, including when they conflict. An
     explicit unknown/malformed primary also suppresses gross-site fallback.
+    Candidate gross sites are OR: a restriction matches if any candidate does.
     Histology families are 3-digit prefixes of a coded histology, and gross
     primary sites are ``GrossSite`` tissues other than "unspecified"; anything
     else raises here, not during historical artifact parsing.
@@ -425,8 +464,15 @@ def site_applies(
         codes = (tissue_codes or {}).get(tissue) if tissue else None
         return list(codes) if codes else None
 
-    gross_site = facts.gross_primary_site if facts and not facts.primary_site else None
-    gross_ranges = tissue_ranges(gross_site)
+    candidates = gross_site_candidates(facts) if facts and not facts.primary_site else []
+    candidate_ranges = [tissue_ranges(tissue) for tissue in candidates]
+    # Candidates are OR, so their union stands for them. One unknown candidate
+    # makes the whole gross site unknown.
+    gross_ranges = (
+        sorted(set().union(*candidate_ranges))
+        if candidate_ranges and None not in candidate_ranges
+        else None
+    )
     primary_site = (facts.primary_site or "").strip().upper() if facts else ""
     # C809 is unknown primary; malformed/out-of-range codes cannot exclude sites.
     if (
@@ -467,7 +513,7 @@ def site_applies(
             alternatives: list[bool | None] = []
             for site in restriction.gross_primary_sites:
                 match = matches_sites(tissue_ranges(site))
-                if not primary_site and gross_site and site.casefold() == gross_site.casefold():
+                if not primary_site and any(site.casefold() == tissue.casefold() for tissue in candidates):
                     match = True
                 alternatives.append(match)
             if restriction.primary_sites:

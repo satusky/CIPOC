@@ -11,6 +11,7 @@ from cipoc.models import CaseFacts, GrossSite, ScopingDictionary
 
 PRIMARY_SITE_ITEM = 400
 HISTOLOGY_ITEM = 522
+UNKNOWN_PRIMARY_SITE = "C809"
 _GENERATOR = "`python -m canonical_naaccr.cipoc_scoping` in canonical-naaccr"
 _TISSUES = frozenset(get_args(GrossSite)) - {"unspecified"}
 # The select keys the generator writes. CIPOC doesn't extract the discriminators
@@ -176,32 +177,61 @@ def tissue_site_codes(scoping: ScopingDictionary | None) -> dict[str, frozenset[
     return table
 
 
-def primary_site_tissue(scoping: ScopingDictionary, facts: CaseFacts | None) -> str | None:
-    """The tissue whose codes scope Primary Site, or None to leave it unscoped.
+def gross_site_candidates(facts: CaseFacts | None) -> list[str]:
+    """The tissues the notes point to, which count as OR.
 
-    A coded primary picks the tissue that holds it, outranking the gross site.
-    C809 or a malformed coded primary picks none and, as in ``site_applies``,
-    also stops the gross-site fallback. Otherwise the gross site counts only if
-    it's a tissue in the file, so "unspecified" and names outside the
-    vocabulary never narrow.
+    These are ``candidate_gross_sites``, or else the lone ``gross_primary_site``,
+    so facts from callers or older artifacts that only set the gross site read
+    as one candidate. A coded primary outranks them; callers check it first.
     """
     if facts is None:
-        return None
+        return []
+    if facts.candidate_gross_sites:
+        return list(facts.candidate_gross_sites)
+    return [facts.gross_primary_site] if facts.gross_primary_site else []
+
+
+def _candidate_tissues(scoping: ScopingDictionary, facts: CaseFacts | None) -> list[str]:
+    # One candidate that isn't a tissue in the file, such as "unspecified" or a
+    # free-text name, makes the whole gross-site fact unknown.
+    tissues = gross_site_candidates(facts)
+    return tissues if all(tissue in scoping.tissues for tissue in tissues) else []
+
+
+def primary_site_tissues(scoping: ScopingDictionary, facts: CaseFacts | None) -> list[str]:
+    """The tissues whose codes scope Primary Site, or [] to leave it unscoped.
+
+    A coded primary picks the tissue that holds it, outranking the candidates.
+    C809 or a malformed coded primary picks none and, as in ``site_applies``,
+    also stops the gross-site fallback. Otherwise every candidate must be a
+    tissue in the file, so "unspecified" and names outside the vocabulary never
+    narrow.
+    """
+    if facts is None:
+        return []
     if facts.primary_site:
         coded = facts.primary_site.strip().upper()
         code = coded.replace(".", "")
-        if not _CODED_PRIMARY.fullmatch(coded) or code == "C809":
-            return None
-        return next(
-            (
-                tissue
-                for tissue, entry in scoping.tissues.items()
-                if any(_normalize_code(site) == code for site in entry.codes.get(PRIMARY_SITE_ITEM, {}))
-            ),
-            None,
-        )
-    gross_site = facts.gross_primary_site
-    return gross_site if gross_site in scoping.tissues else None
+        if not _CODED_PRIMARY.fullmatch(coded) or code == UNKNOWN_PRIMARY_SITE:
+            return []
+        return [
+            tissue
+            for tissue, entry in scoping.tissues.items()
+            if any(_normalize_code(site) == code for site in entry.codes.get(PRIMARY_SITE_ITEM, {}))
+        ][:1]
+    return _candidate_tissues(scoping, facts)
+
+
+def _primary_site_codes(scoping: ScopingDictionary, tissues: Sequence[str]) -> dict[str, str]:
+    """The union of the tissues' Primary Site codes, always allowing C809."""
+    codes: dict[str, str] = {}
+    for tissue in tissues:
+        codes.update(scoping.tissues[tissue].codes.get(PRIMARY_SITE_ITEM, {}))
+    for entry in scoping.tissues.values():
+        for code, description in entry.codes.get(PRIMARY_SITE_ITEM, {}).items():
+            if _normalize_code(code) == UNKNOWN_PRIMARY_SITE:
+                codes.setdefault(code, description)
+    return codes
 
 
 def _diagnosis_year(value: str | None) -> int | None:
@@ -225,10 +255,14 @@ def _case_values(scoping: ScopingDictionary, facts: CaseFacts | None) -> dict[st
         if _SITE_CODE.fullmatch(code):
             values["site"] = frozenset({code})
     else:
-        tissue = scoping.tissues.get(facts.gross_primary_site or "")
-        codes = tissue.codes.get(PRIMARY_SITE_ITEM) if tissue else None
+        # The candidates are OR, so the site could be any of their codes.
+        codes = {
+            _normalize_code(code)
+            for tissue in _candidate_tissues(scoping, facts)
+            for code in scoping.tissues[tissue].codes.get(PRIMARY_SITE_ITEM, {})
+        }
         if codes:
-            values["site"] = frozenset(_normalize_code(code) for code in codes)
+            values["site"] = frozenset(codes)
 
     histology = (facts.histology or "").strip()
     if re.match(r"[0-9]{4}", histology):
@@ -270,10 +304,10 @@ def matching_schemas(scoping: ScopingDictionary, facts: CaseFacts | None) -> lis
     """Keys of the schemas the case could belong to, in file order.
 
     A known fact filters and an unknown one matches anything. The site is the
-    coded Primary Site, or else every code of the gross-site tissue, which
-    matches a row whose sites overlap it. Histology is the coded morphology's 4
-    digits, behavior comes from the behavior fact or the histology's ``/n``
-    suffix, and the year is parsed from the date of diagnosis.
+    coded Primary Site, or else every code of the candidate tissues, which
+    matches a row whose sites overlap any of them. Histology is the coded
+    morphology's 4 digits, behavior comes from the behavior fact or the
+    histology's ``/n`` suffix, and the year is parsed from the date of diagnosis.
     """
     values = _case_values(scoping, facts)
     return [
@@ -310,16 +344,17 @@ def scoped_item_codes(
 ) -> dict[int, dict[str, str]]:
     """The codes that replace NAACCR's for each of the items the case narrows.
 
-    Primary Site (400) takes its tissue's codes (``primary_site_tissue``).
-    Histology (522) isn't narrowed. Every other item takes ``scoped_codes`` over
-    the schemas the case matches. Items left out keep NAACCR's codes.
+    Primary Site (400) takes its tissues' codes (``primary_site_tissues``) plus
+    C809. Histology (522) isn't narrowed. Every other item takes
+    ``scoped_codes`` over the schemas the case matches. Items left out keep
+    NAACCR's codes.
     """
     scoped: dict[int, dict[str, str]] = {}
     schema_keys: list[str] | None = None
     for item_id in item_ids:
         if item_id == PRIMARY_SITE_ITEM:
-            tissue = primary_site_tissue(scoping, facts)
-            codes = scoping.tissues[tissue].codes.get(PRIMARY_SITE_ITEM) if tissue else None
+            tissues = primary_site_tissues(scoping, facts)
+            codes = _primary_site_codes(scoping, tissues) if tissues else None
         elif item_id == HISTOLOGY_ITEM:
             codes = None
         else:

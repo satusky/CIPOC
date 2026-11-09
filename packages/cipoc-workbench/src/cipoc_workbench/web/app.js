@@ -349,8 +349,11 @@ function normalizeRunResult(result) {
     const descriptors = object(result.corpus.note_corpus_descriptors, "note_corpus_descriptors");
     if (descriptors.concepts != null) records(descriptors.concepts, "descriptor concepts");
   }
-  if (result.case.case_facts != null) texts(object(result.case.case_facts, "case_facts"),
-    ["primary_site", "gross_primary_site", "histology", "behavior", "sex", "date_of_diagnosis"], "case_facts");
+  if (result.case.case_facts != null) {
+    const facts = object(result.case.case_facts, "case_facts");
+    texts(facts, ["primary_site", "gross_primary_site", "histology", "behavior", "sex", "date_of_diagnosis"], "case_facts");
+    optionalArrays(facts, ["candidate_gross_sites"], "case_facts");
+  }
   texts(result.case, ["fatal_blocker"], "case");
   if (result.case.reportability_stop != null) {
     const stop = object(result.case.reportability_stop, "reportability_stop");
@@ -849,7 +852,8 @@ function renderChrome() {
   }
 
   const facts = App.case.case_facts || {};
-  const order = ["primary_site", "gross_primary_site", "histology", "behavior", "sex", "date_of_diagnosis"];
+  const order = ["primary_site", "gross_primary_site", "candidate_gross_sites", "histology", "behavior", "sex",
+    "date_of_diagnosis"];
   const rail = clear($("#facts"));
   rail.append(h("span", { class: "faint", style: "font-size:11px;text-transform:uppercase;letter-spacing:.08em" },
     "Case facts"));
@@ -863,7 +867,10 @@ function renderChrome() {
     onclick: () => { clearSelection(); setView("run"); },
   }));
   for (const key of order) {
-    const value = facts[key];
+    let value = facts[key];
+    /* Candidate tissues are OR, and only artifacts that set them show the row. */
+    if (Array.isArray(value)) value = value.join(" or ");
+    if (key === "candidate_gross_sites" && !value) continue;
     rail.append(h("span", { class: "fact" + (value ? "" : " unset") },
       h("span", { class: "k", text: key.replace(/_/g, " ") }),
       h("span", { class: "v", text: value == null || value === "" ? "unknown" : String(value) })

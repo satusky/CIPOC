@@ -56,7 +56,8 @@ class CaseFacts(BaseModel):
     Every field is optional; unknown facts widen scope, never narrow it.
     """
     primary_site: str | None = Field(default=None, description="ICD-O-3 topography code of the primary site, when known. Usually unknown while Primary Site is itself being extracted; prefer gross_primary_site in that case.")
-    gross_primary_site: str | None = Field(default=None, description="Tissue-level location of the primary from note characterization, e.g. 'breast' or 'left lung'. Coarser than primary_site and available before topography coding; used for scoping when primary_site is unknown.")
+    gross_primary_site: str | None = Field(default=None, description="GrossSite tissue of the primary from note characterization, e.g. 'breast'. Set only when there's exactly one candidate tissue. Coarser than primary_site and available before topography coding; used for scoping when primary_site is unknown.")
+    candidate_gross_sites: list[str] = Field(default_factory=list, description="GrossSite tissues the notes point to, used as OR for scoping when primary_site is unknown. Empty when the notes name no tissue or any mention's tissue is 'unspecified'.")
     histology: str | None = Field(default=None, description="ICD-O-3 morphology code, when known.")
     behavior: str | None = Field(default=None, description="ICD-O-3 behavior code, when known.")
     sex: str | None = Field(default=None, description="Patient sex, when known.")

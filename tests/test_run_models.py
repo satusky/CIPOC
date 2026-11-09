@@ -244,6 +244,26 @@ class OrchestratorRunModelTests(unittest.TestCase):
             restored.inputs.target_variables[0].applies_to.gross_primary_sites, ["Left Breast"]
         )
 
+    def test_case_facts_without_candidates_load_and_new_ones_round_trip(self):
+        payload = OrchestratorRunResult(
+            run=run_info(), case=Case(), inputs=inputs(), corpus=corpus(),
+            observability=observability(),
+        ).model_dump(mode="json")
+        payload["schema_version"] = "1.2"
+        payload["case"]["case_facts"] = {"gross_primary_site": "left breast"}
+
+        restored = OrchestratorRunResult.model_validate(payload)
+
+        self.assertEqual(restored.case.case_facts.gross_primary_site, "left breast")
+        self.assertEqual(restored.case.case_facts.candidate_gross_sites, [])
+
+        payload["schema_version"] = "1.3"
+        payload["case"]["case_facts"] = {"candidate_gross_sites": ["breast", "ovary"]}
+        restored = OrchestratorRunResult.model_validate_json(
+            OrchestratorRunResult.model_validate(payload).model_dump_json()
+        )
+        self.assertEqual(restored.case.case_facts.candidate_gross_sites, ["breast", "ovary"])
+
     def test_unknown_schema_version_is_rejected(self):
         result = OrchestratorRunResult(
             run=run_info(),

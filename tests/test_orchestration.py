@@ -2,7 +2,6 @@ import json
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from types import SimpleNamespace
 from unittest.mock import patch
 from uuid import uuid4
 
@@ -22,7 +21,7 @@ from cipoc.models import (
     VariableInfo,
     VariableOutput,
 )
-from cipoc.tools import build_corpus_descriptors, load_variable_groups, site_applies
+from cipoc.tools import build_corpus_descriptors, candidate_gross_sites, load_variable_groups, site_applies
 from cipoc.utils.progress.events import normalize
 
 from tests.fake_orchestrator import (
@@ -146,23 +145,75 @@ class CorpusCharacterizationTests(unittest.TestCase):
 
                 self.assertIsNone(update["case_facts"])
 
+    def corpus(self, *mentions):
+        """One note holding (status, tissue, behavior, diagnostic_certainty) mentions."""
+        template = self.note.cancer_mentions[0]
+        return {1: self.note.model_copy(update={"cancer_mentions": [
+            template.model_copy(update={
+                "status": status, "affected_tissue": tissue,
+                "behavior": behavior, "diagnostic_certainty": certainty,
+            })
+            for status, tissue, behavior, certainty in mentions
+        ]})}
+
+    def test_several_tissues_become_candidates_without_a_gross_site(self):
+        corpus = self.corpus(
+            ("current", "ovary", "malignant", "definite"),
+            ("current", "breast", "malignant", "probable"),
+        )
+        self.assertEqual(candidate_gross_sites(corpus), ["breast", "ovary"])
+
+        facts = self.agent().characterize_corpus(CaseState(note_corpus=corpus))["case_facts"]
+        self.assertEqual(facts.candidate_gross_sites, ["breast", "ovary"])
+        self.assertIsNone(facts.gross_primary_site)
+
+    def test_one_candidate_also_sets_the_gross_site(self):
+        facts = self.agent().characterize_corpus(CaseState(note_corpus={1: self.note}))["case_facts"]
+        self.assertEqual(facts.candidate_gross_sites, ["breast"])
+        self.assertEqual(facts.gross_primary_site, "breast")
+
+    def test_a_current_benign_tumor_blocks_an_older_cancer(self):
+        for behavior in ("benign", "unknown"):
+            with self.subTest(behavior=behavior):
+                corpus = self.corpus(
+                    ("current", "meninges", behavior, "definite"),
+                    ("historical", "breast", "malignant", "definite"),
+                )
+                self.assertEqual(candidate_gross_sites(corpus), [])
+                self.assertIsNone(self.agent().characterize_corpus(CaseState(note_corpus=corpus))["case_facts"])
+
+    def test_a_current_possible_mention_doesnt_block_history(self):
+        corpus = self.corpus(
+            ("current", "lung", "malignant", "possible"),
+            ("recent", "breast", "malignant", "definite"),
+            ("historical", "ovary", "malignant", "definite"),
+        )
+        self.assertEqual(candidate_gross_sites(corpus), ["breast"])
+
+    def test_an_unspecified_tissue_or_no_tissue_gives_no_candidates(self):
+        self.assertEqual(candidate_gross_sites(self.corpus(
+            ("current", "breast", "malignant", "definite"),
+            ("current", "unspecified", "malignant", "definite"),
+            ("historical", "lung", "malignant", "definite"),
+        )), [])
+        self.assertEqual(candidate_gross_sites({}), [])
+
+    def test_known_site_facts_are_kept(self):
+        for facts in (
+            CaseFacts(primary_site="C341"),
+            CaseFacts(gross_primary_site="lung"),
+            CaseFacts(candidate_gross_sites=["lung", "ovary"]),
+        ):
+            with self.subTest(facts=facts):
+                state = CaseState(note_corpus={1: self.note}, case_facts=facts)
+                self.assertIs(self.agent().characterize_corpus(state)["case_facts"], facts)
+
     def test_characterization_does_not_need_the_site_dictionary(self):
         agent = object.__new__(OrchestratorAgent)
         agent._site_data_dictionary_path = None
         state = CaseState(note_corpus={1: self.note})
 
         update = agent.characterize_corpus(state)
-
-        self.assertEqual(update["case_facts"].gross_primary_site, "breast")
-
-    @patch("cipoc.agents.orchestrator.build_corpus_descriptors")
-    def test_scalar_affected_tissue_is_not_split_into_characters(self, descriptors):
-        descriptors.return_value = SimpleNamespace(
-            affected_tissues={"current": "breast"}
-        )
-        state = CaseState(note_corpus={1: self.note})
-
-        update = self.agent().characterize_corpus(state)
 
         self.assertEqual(update["case_facts"].gross_primary_site, "breast")
 
@@ -179,8 +230,10 @@ class CorpusCharacterizationTests(unittest.TestCase):
             variable for variable in scoped.variables if variable.item_id == 400
         )
 
-        self.assertEqual(len(primary_site.valid_codes), 9)
+        # Breast's nine codes, plus C809 for an unknown primary.
+        self.assertEqual(len(primary_site.valid_codes), 10)
         self.assertIn("C504", primary_site.valid_codes)
+        self.assertIn("C809", primary_site.valid_codes)
         self.assertNotIn("C341", primary_site.valid_codes)
 
     def test_characterization_and_scoping_read_each_dictionary_once(self):
@@ -208,7 +261,7 @@ class CorpusCharacterizationTests(unittest.TestCase):
             reads = [call for call in opened.call_args_list if Path(call.args[0]) == path]
             self.assertEqual(len(reads), 1, path.name)
         self.assertEqual(facts.gross_primary_site, "breast")
-        self.assertEqual(set(scoped.variables[0].valid_codes), TISSUE_CODES["breast"])
+        self.assertEqual(set(scoped.variables[0].valid_codes), TISSUE_CODES["breast"] | {"C809"})
 
 
 class OrchestratorRunTests(unittest.TestCase):

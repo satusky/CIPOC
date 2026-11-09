@@ -11,7 +11,7 @@ from cipoc.tools import (
     load_data_dictionary,
     load_scoping_dictionary,
     lookup_variable_info,
-    primary_site_tissue,
+    primary_site_tissues,
 )
 
 from tests.fake_orchestrator import SCOPING_DICTIONARY, primary_site_codes
@@ -24,8 +24,10 @@ class SiteDataDictionaryTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.sites = load_scoping_dictionary(SCOPING_DICTIONARY)
-        cls.breast = cls.sites.tissues["breast"].codes[400]
-        cls.lung = cls.sites.tissues["lung"].codes[400]
+        # Narrowing by tissue always allows C809, unknown primary.
+        unknown = cls.sites.tissues["unknown_primary_site"].codes[400]
+        cls.breast = {**cls.sites.tissues["breast"].codes[400], **unknown}
+        cls.lung = {**cls.sites.tissues["lung"].codes[400], **unknown}
 
     def setUp(self):
         directory = TemporaryDirectory()
@@ -81,35 +83,35 @@ class SiteDataDictionaryTests(unittest.TestCase):
         for gross_site in ("upper outer left breast", "Breast", "unspecified", ""):
             with self.subTest(gross_site=gross_site):
                 facts = CaseFacts(gross_primary_site=gross_site)
-                self.assertIsNone(primary_site_tissue(self.sites, facts))
+                self.assertEqual(primary_site_tissues(self.sites, facts), [])
                 self.assertEqual(self.build_group(400, facts).variables[0].valid_codes, self.base_codes(400))
 
     def test_primary_site_outranks_conflicting_gross_site(self):
         for code in ("C349", "C34.1", "c34.9", " C340 "):
             with self.subTest(code=code):
                 facts = CaseFacts(primary_site=code, gross_primary_site="breast")
-                self.assertEqual(primary_site_tissue(self.sites, facts), "lung")
+                self.assertEqual(primary_site_tissues(self.sites, facts), ["lung"])
                 self.assertEqual(self.build_group(400, facts).variables[0].valid_codes, self.lung)
 
     def test_coded_primary_in_no_tissue_uses_base_not_gross(self):
         for code in ("C507", "C999"):
             with self.subTest(code=code):
                 facts = CaseFacts(primary_site=code, gross_primary_site="breast")
-                self.assertIsNone(primary_site_tissue(self.sites, facts))
+                self.assertEqual(primary_site_tissues(self.sites, facts), [])
                 self.assertEqual(self.build_group(400, facts).variables[0].valid_codes, self.base_codes(400))
 
     def test_unknown_or_malformed_primary_uses_base_not_gross(self):
         for code in ("C809", "C80.9", "unknown", "C34", "C.3.4.9", " "):
             with self.subTest(code=code):
                 facts = CaseFacts(primary_site=code, gross_primary_site="breast")
-                self.assertIsNone(primary_site_tissue(self.sites, facts))
+                self.assertEqual(primary_site_tissues(self.sites, facts), [])
                 self.assertEqual(self.build_group(400, facts).variables[0].valid_codes, self.base_codes(400))
 
     def test_absent_primary_allows_gross_site_fallback(self):
         for code in (None, ""):
             with self.subTest(code=code):
                 facts = CaseFacts(primary_site=code, gross_primary_site="breast")
-                self.assertEqual(primary_site_tissue(self.sites, facts), "breast")
+                self.assertEqual(primary_site_tissues(self.sites, facts), ["breast"])
                 self.assertEqual(self.build_group(400, facts).variables[0].valid_codes, self.breast)
 
     def test_lookup_scopes_like_the_group_builder(self):
@@ -170,7 +172,9 @@ class NaaccrDictionaryScopingTests(unittest.TestCase):
 
         site = group.variables[0]
         self.assertEqual(site.valid_codes["C504"], "Upper-outer quadrant of breast")
-        self.assertEqual(len(site.valid_codes), 9)
+        # Breast's nine codes, plus C809 for an unknown primary.
+        self.assertEqual(len(site.valid_codes), 10)
+        self.assertIn("C809", site.valid_codes)
         self.assertNotIn("C340", site.valid_codes)
         self.assertIsNotNone(site.coding_instructions)
 

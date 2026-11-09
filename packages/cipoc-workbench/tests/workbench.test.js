@@ -447,6 +447,31 @@ test("applicability preserves breast OR (cutaneous site AND melanoma) and histor
   assert.equal(vm.runInContext("applicabilityLabel({new_restriction: ['keep-visible']})", context), "new restriction: keep-visible");
 });
 
+test("candidate gross sites show as OR in the facts rail and applicability check, and stay optional", () => {
+  const { context, document } = loadWorkbench();
+  const result = canonicalResult("1.3");
+  result.inputs.target_variables[0].applies_to = { gross_primary_sites: ["ovary"], histology_families: [] };
+  result.case.case_facts = { candidate_gross_sites: ["breast", "ovary"] };
+  context.result = result;
+  vm.runInContext("indexState(result)", context);
+  vm.runInContext("renderChrome()", context);
+  assert.match(document.querySelector("#facts").textContent, /candidate gross sitesbreast or ovary/);
+  assert.match(vm.runInContext("groupDetail('diagnosis').textContent", context),
+    /gross_primary_site=unknown, candidate_gross_sites=breast or ovary/);
+
+  for (const facts of [{ gross_primary_site: "breast" }, { candidate_gross_sites: [] }]) {
+    const { context, document } = loadWorkbench();
+    context.result = canonicalResult("1.3");
+    context.result.case.case_facts = facts;
+    vm.runInContext("indexState(result)", context);
+    vm.runInContext("renderChrome()", context);
+    assert.doesNotMatch(document.querySelector("#facts").textContent, /candidate gross sites/);
+  }
+  context.bad = canonicalResult("1.3");
+  context.bad.case.case_facts = { candidate_gross_sites: "breast" };
+  assert.throws(() => vm.runInContext("indexState(bad)", context), /case_facts.candidate_gross_sites must be an array/);
+});
+
 test("alphanumeric note IDs remain strings and use lexical tie-breaking", () => {
   const { context } = loadWorkbench();
   context.result = canonicalResult();
