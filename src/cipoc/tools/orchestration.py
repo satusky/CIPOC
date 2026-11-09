@@ -39,7 +39,7 @@ from cipoc.models import (
 )
 from cipoc.models.case import TERMINAL_VARIABLE_STATUSES
 from .coding_context import ranges_overlap, site_in_ranges
-from .scoping import gross_site_candidates
+from .scoping import PRIMARY_SITE_ITEM, gross_site_candidates
 
 
 def _concept_present(corpus: NoteCorpusDescriptors, concept: str) -> bool:
@@ -821,45 +821,70 @@ def to_case_results(
     return results
 
 
-def build_report(results: dict[int, CaseVariableResult]) -> CaseReport:
+def _result_flag(item_id: int, result: CaseVariableResult) -> ReviewFlag | None:
+    if result.status == VariableStatus.ERROR:
+        return ReviewFlag(
+            item_id=item_id,
+            flag_type=ReviewFlagType.ERROR,
+            detail=result.reason or "Extraction ended in error.",
+        )
+    if result.extraction is not None and not result.extraction.is_valid:
+        return ReviewFlag(
+            item_id=item_id,
+            flag_type=ReviewFlagType.INVALID_EXTRACTION,
+            detail=(
+                "; ".join(result.extraction.validation_errors)
+                or "Retained extraction failed validation."
+            ),
+        )
+    if (
+        result.status == VariableStatus.EXTRACTED
+        and result.extraction is not None
+        and result.extraction.presence_confidence == ConfidenceLevel.LOW
+    ):
+        return ReviewFlag(
+            item_id=item_id,
+            flag_type=ReviewFlagType.LOW_CONFIDENCE,
+            detail=f"Value {result.value!r} was coded at low confidence.",
+        )
+    return None
+
+
+def build_report(
+    results: dict[int, CaseVariableResult],
+    case_facts: CaseFacts | None = None,
+) -> CaseReport:
     """Roll finished variable results up into a review report (flow Step 8).
 
-    Emits at most one flag per variable, in priority order so the report stays
-    scannable and non-redundant:
+    Emits at most one result flag per variable, in priority order so the report
+    stays scannable and non-redundant:
       * ERROR status               -> the reason already carries any validation
         detail, so no separate invalid-extraction flag is added;
       * a retained invalid extraction on a non-error result (a defensive guard;
         the current mapping funnels invalid extractions into ERROR);
       * an accepted value coded at LOW presence confidence.
     Variables that are clean (extracted/structured with adequate confidence,
-    not-found, not-applicable, blocked) raise no flag. Ordered by item ID.
+    not-found, not-applicable, blocked) raise no result flag. Separately, more
+    than one candidate gross site flags Primary Site (400), after any result
+    flag of its own and whether or not 400 was requested, since a run should
+    cover one tumor. Ordered by item ID.
     """
+    candidates = case_facts.candidate_gross_sites if case_facts is not None else []
+    multiple_sites = len(candidates) > 1
+    item_ids = set(results) | ({PRIMARY_SITE_ITEM} if multiple_sites else set())
     flags: list[ReviewFlag] = []
-    for item_id in sorted(results):
-        result = results[item_id]
-        if result.status == VariableStatus.ERROR:
+    for item_id in sorted(item_ids):
+        result = results.get(item_id)
+        flag = _result_flag(item_id, result) if result is not None else None
+        if flag is not None:
+            flags.append(flag)
+        if item_id == PRIMARY_SITE_ITEM and multiple_sites:
             flags.append(ReviewFlag(
                 item_id=item_id,
-                flag_type=ReviewFlagType.ERROR,
-                detail=result.reason or "Extraction ended in error.",
-            ))
-        elif result.extraction is not None and not result.extraction.is_valid:
-            flags.append(ReviewFlag(
-                item_id=item_id,
-                flag_type=ReviewFlagType.INVALID_EXTRACTION,
+                flag_type=ReviewFlagType.MULTIPLE_CANDIDATE_SITES,
                 detail=(
-                    "; ".join(result.extraction.validation_errors)
-                    or "Retained extraction failed validation."
+                    f"The notes point to more than one tissue ({', '.join(candidates)}); "
+                    "a run should cover one tumor."
                 ),
-            ))
-        elif (
-            result.status == VariableStatus.EXTRACTED
-            and result.extraction is not None
-            and result.extraction.presence_confidence == ConfidenceLevel.LOW
-        ):
-            flags.append(ReviewFlag(
-                item_id=item_id,
-                flag_type=ReviewFlagType.LOW_CONFIDENCE,
-                detail=f"Value {result.value!r} was coded at low confidence.",
             ))
     return CaseReport(flags=flags)

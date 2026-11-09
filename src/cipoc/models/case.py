@@ -152,6 +152,7 @@ class ReviewFlagType(str, Enum):
     ERROR = "error"
     INVALID_EXTRACTION = "invalid_extraction"
     LOW_CONFIDENCE = "low_confidence"
+    MULTIPLE_CANDIDATE_SITES = "multiple_candidate_sites"
 
 
 class ReviewFlag(BaseModel):
@@ -166,8 +167,9 @@ class CaseReport(BaseModel):
     """Auditability roll-up produced when a case is finalized.
 
     Carries the variables a human should look at — errors, extractions that
-    failed validation, and accepted-but-low-confidence values — so the report is
-    empty exactly when nothing needs review.
+    failed validation, accepted-but-low-confidence values, and a Primary Site
+    the notes split across several tissues — so the report is empty exactly
+    when nothing needs review.
     """
 
     flags: list[ReviewFlag] = Field(default_factory=list)
@@ -205,7 +207,7 @@ class Case(BaseModel):
     )
     report: CaseReport | None = Field(
         default=None,
-        description="Review roll-up flagging errors, invalid extractions, and low-confidence values.",
+        description="Review roll-up flagging errors, invalid extractions, low-confidence values, and several candidate tissues.",
     )
 
     @model_validator(mode="after")

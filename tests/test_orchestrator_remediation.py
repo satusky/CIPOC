@@ -36,6 +36,7 @@ from cipoc.models import (
     OrchestratorRunFailure,
     OrchestratorRunResult,
     ProcessedClinicalNote,
+    ReviewFlagType,
     RunObservability,
     SiteApplicability,
     TargetGroup,
@@ -422,6 +423,11 @@ class OrchestratorRemediationTests(unittest.TestCase):
         )
         restored = OrchestratorRunResult.model_validate_json(result.model_dump_json())
         self.assertEqual(restored.case.case_facts.candidate_gross_sites, ["breast", "ovary"])
+        site_flags = [
+            flag for flag in restored.case.report.flags
+            if flag.flag_type == ReviewFlagType.MULTIPLE_CANDIDATE_SITES
+        ]
+        self.assertEqual([flag.item_id for flag in site_flags], [400])
 
     def test_current_benign_meningioma_does_not_narrow_to_a_historical_breast_cancer(self):
         model = _ScannerModel(tissues={"note-A": [

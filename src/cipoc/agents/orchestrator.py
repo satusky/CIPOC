@@ -620,9 +620,10 @@ class OrchestratorAgent(BaseAgent):
     def finalize_case(self, state: CaseState) -> dict:
         """Flow Step 8. All variables are terminal (or a fatal blocker stopped the
         run); roll the results into a review report flagging errors, invalid
-        extractions, and low-confidence values. ``to_case()`` then folds this into
-        the durable ``Case`` snapshot returned to the caller."""
-        return {"report": build_report(state.variable_results)}
+        extractions, low-confidence values, and more than one candidate gross
+        site. ``to_case()`` then folds this into the durable ``Case`` snapshot
+        returned to the caller."""
+        return {"report": build_report(state.variable_results, state.case_facts)}
 
 
     # --- Public API ---

@@ -12,16 +12,20 @@ from cipoc.agents.orchestrator import CaseState, OrchestratorAgent
 from cipoc.models import (
     CancerMention,
     CaseFacts,
+    CaseVariableResult,
     ConfidenceLevel,
     OrchestratorRunError,
     OrchestratorRunResult,
     ProcessedClinicalNote,
+    ReviewFlagType,
     TargetGroup,
     TextSpan,
+    ValidatedVariableOutput,
     VariableInfo,
     VariableOutput,
+    VariableStatus,
 )
-from cipoc.tools import build_corpus_descriptors, candidate_gross_sites, load_variable_groups, site_applies
+from cipoc.tools import build_corpus_descriptors, build_report, candidate_gross_sites, load_variable_groups, site_applies
 from cipoc.utils.progress.events import normalize
 
 from tests.fake_orchestrator import (
@@ -262,6 +266,56 @@ class CorpusCharacterizationTests(unittest.TestCase):
             self.assertEqual(len(reads), 1, path.name)
         self.assertEqual(facts.gross_primary_site, "breast")
         self.assertEqual(set(scoped.variables[0].valid_codes), TISSUE_CODES["breast"] | {"C809"})
+
+
+def _extracted(item_id, value, confidence=ConfidenceLevel.HIGH):
+    return CaseVariableResult(
+        item_id=item_id, status=VariableStatus.EXTRACTED, value=value,
+        extraction=ValidatedVariableOutput(
+            item_id=item_id, value=value, explanation="Coded.", most_important_note=1,
+            spans=[], presence_confidence=confidence, is_valid=True,
+        ),
+    )
+
+
+class BuildReportTests(unittest.TestCase):
+    RESULTS = {400: _extracted(400, "C504"), 410: _extracted(410, "1", ConfidenceLevel.LOW)}
+
+    def flags(self, results, facts):
+        return [(flag.item_id, flag.flag_type) for flag in build_report(results, facts).flags]
+
+    def test_no_facts_or_one_candidate_raises_no_site_flag(self):
+        expected = [(410, ReviewFlagType.LOW_CONFIDENCE)]
+        for facts in (
+            None,
+            CaseFacts(gross_primary_site="breast"),
+            CaseFacts(candidate_gross_sites=["breast"], gross_primary_site="breast"),
+        ):
+            with self.subTest(facts=facts):
+                self.assertEqual(self.flags(self.RESULTS, facts), expected)
+
+    def test_two_candidates_flag_primary_site(self):
+        report = build_report(self.RESULTS, CaseFacts(candidate_gross_sites=["breast", "ovary"]))
+        self.assertEqual(
+            [(flag.item_id, flag.flag_type) for flag in report.flags],
+            [(400, ReviewFlagType.MULTIPLE_CANDIDATE_SITES), (410, ReviewFlagType.LOW_CONFIDENCE)],
+        )
+        self.assertIn("breast, ovary", report.flags[0].detail)
+
+    def test_site_flag_follows_primary_sites_own_flag(self):
+        results = {400: _extracted(400, "C504", ConfidenceLevel.LOW)}
+        self.assertEqual(
+            self.flags(results, CaseFacts(candidate_gross_sites=["breast", "ovary"])),
+            [(400, ReviewFlagType.LOW_CONFIDENCE), (400, ReviewFlagType.MULTIPLE_CANDIDATE_SITES)],
+        )
+
+    def test_site_flag_is_raised_when_primary_site_was_not_requested(self):
+        results = {410: _extracted(410, "1"), 380: _extracted(380, "00")}
+        self.assertEqual(
+            self.flags(results, CaseFacts(candidate_gross_sites=["breast", "ovary"])),
+            [(400, ReviewFlagType.MULTIPLE_CANDIDATE_SITES)],
+        )
+        self.assertEqual(self.flags(results, CaseFacts(candidate_gross_sites=["breast"])), [])
 
 
 class OrchestratorRunTests(unittest.TestCase):
