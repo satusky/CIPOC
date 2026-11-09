@@ -6,7 +6,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence, get_args
 
-from cipoc.models import CaseFacts, GrossSite, ScopingDictionary
+from cipoc.models import CaseFacts, GrossSite, HistologyScope, ScopingDictionary
 
 
 PRIMARY_SITE_ITEM = 400
@@ -549,3 +549,29 @@ def check_histology_pairs(scoping: ScopingDictionary, pairs: Iterable[str]) -> N
     if unlisted:
         raise ValueError(f"Histology groups list pairs that aren't in item 522: {unlisted}.")
     histology_block_listing(scoping, dict.fromkeys(pairs, ""))
+
+
+def build_histology_scope(
+    scoping: ScopingDictionary, primary_site: str | None, pairs: Mapping[str, str]
+) -> HistologyScope:
+    """Everything the extractor's histology steps offer for a coded Primary Site.
+
+    The site group's families, with the list's terms for the family step and
+    their v25 descriptions for the code step, plus every one of ``pairs``
+    (``histology_pairs``) grouped by ICD-O-3 block for the fallback. An uncoded
+    Primary Site gets the unknown primary's group (``histology_site_group``).
+    """
+    group = histology_site_group(scoping, primary_site)
+    site_group = scoping.histology[group]
+    block_codes = histology_block_listing(scoping, pairs)
+    return HistologyScope(
+        site_group=group,
+        site_group_label=site_group.label,
+        families=histology_family_listing(scoping, group),
+        family_codes={
+            number: histology_code_listing(scoping, group, [number])
+            for number in site_group.families
+        },
+        blocks={key: scoping.blocks[key].label for key in block_codes},
+        block_codes=block_codes,
+    )

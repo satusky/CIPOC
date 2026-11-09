@@ -117,6 +117,8 @@ class RetryWiringTests(unittest.TestCase):
                 "initialize": False,
                 "load_notes": False,
                 "extract_group_values": True,
+                "choose_histology_families": True,
+                "choose_histology_code": True,
                 "variable_branch": False,  # subgraph: its own nodes retry
                 "merge_variable_results": False,
             },

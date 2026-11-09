@@ -1,4 +1,5 @@
 import json
+import re
 from collections import Counter
 from pathlib import Path
 
@@ -16,6 +17,9 @@ from cipoc.models import (
     CaseFacts,
     ClinicalNote,
     ConfidenceLevel,
+    HistologyCodeOutput,
+    HistologyFamilyChoice,
+    HistologySelection,
     VariableGroupInfo,
     VariableGroupOutput,
     VariableInfo,
@@ -28,11 +32,18 @@ from cipoc.prompts import (
     EXTRACT_GROUP_VALUES_PROMPT,
     EXTRACT_VARIABLE_VALUE_PROMPT,
     REPAIR_VARIABLE_VALUE_PROMPT,
+    HISTOLOGY_FAMILY_PROMPT,
+    HISTOLOGY_BLOCK_PROMPT,
+    HISTOLOGY_CODE_PROMPT,
 )
-from cipoc.tools import VariableValueValidator, build_variable_group, load_data_dictionary, load_scoping_dictionary, resolve_evidence_text
+from cipoc.tools import VariableValueValidator, build_variable_group, load_data_dictionary, load_scoping_dictionary, resolve_evidence_text, variable_group_prompt_json, variable_prompt_dict, variable_prompt_json
 from cipoc.utils import CipocConfig, run_with_progress
 
 from .base import BaseAgent
+
+# The code step's pair fills Behavior (523) alongside the scoped Histology (522).
+BEHAVIOR_ITEM = 523
+_PAIR = re.compile(r"[0-9]{4}/[0-9]")
 
 
 # Graph state
@@ -49,6 +60,8 @@ class ExtractorState(ExtractorInput, ExtractorOutput):
     messages: Annotated[list[AnyMessage], add_messages]
     max_extraction_attempts: int = Field(default=3, description="Maximum number of attempts to repair an invalid extraction.")
     variable_results: Annotated[list[ValidatedVariableOutput], add] = Field(default_factory=list)
+    histology_families: HistologyFamilyChoice | None = Field(default=None, description="The histology family step's answer over the site group's families.")
+    histology_blocks: HistologyFamilyChoice | None = Field(default=None, description="The fallback's answer over the ICD-O-3 blocks, when the site's families didn't fit.")
 
 
 # Subgraphs
@@ -60,6 +73,7 @@ class VariableExtractionTask(BaseModel):
     validation_errors: list[str] = Field(default_factory=list)
     extraction_attempts: int = 0
     is_valid: bool = False
+    offered_values: dict[str, str] | None = Field(default=None, description="Values the histology code step offered for this variable. Validation holds the value to them, and repair shows them as the variable's codes.")
 
 
 class VariableBranchState(BaseModel):
@@ -105,23 +119,187 @@ class ExtractorAgent(BaseAgent):
         note_string = "\n".join(note.model_dump_json() for note in state.notes)
         return {"messages": [HumanMessage("Clinical notes:\n" + note_string)]}
 
-    def variables_to_extract(self, state: ExtractorState) -> Literal["extract_group_values"] | list[Send]:
+    def variables_to_extract(
+        self, state: ExtractorState
+    ) -> Literal["extract_group_values", "choose_histology_families"] | list[Send]:
         variables = state.requested_variables.variables
+
+        if self._histology_variable(state) is not None:
+            return "choose_histology_families"
 
         if len(variables) > 1 and state.requested_variables.extract_as_group:
             return "extract_group_values"
 
-        return [
+        return [self._individual_branch(state, variable) for variable in variables]
+
+    def _individual_branch(self, state: ExtractorState, variable: VariableInfo) -> Send:
+        return Send(
+            "variable_branch",
+            VariableBranchState(
+                task=VariableExtractionTask(variable=variable, extraction_mode="individual"),
+                notes=state.notes or [],
+                messages=list(state.messages),
+                max_extraction_attempts=state.max_extraction_attempts,
+            ),
+        )
+
+    @staticmethod
+    def _histology_variable(state: ExtractorState) -> VariableInfo | None:
+        """The requested Histology (522) that carries a histology scope, if any."""
+        return next(
+            (variable for variable in state.requested_variables.variables if variable.histology_scope is not None),
+            None,
+        )
+
+    # Two-step histology: a family step, then a code step over the chosen
+    # families' pairs. "None of these" reruns the family step once over the
+    # ICD-O-3 blocks, whose code step then offers every v25 pair in them.
+    def choose_histology_families(self, state: ExtractorState) -> dict:
+        """Choose the site group's families, or on the fallback pass the ICD-O-3 blocks."""
+        scope = self._histology_variable(state).histology_scope
+        # A trimmed test fixture can leave a group without families; it goes
+        # straight to the blocks.
+        block_mode = not scope.families or (
+            state.histology_families is not None and state.histology_families.none_of_these
+        )
+        choices = scope.blocks if block_mode else scope.families
+        heading = (
+            "ICD-O-3 morphology blocks:\n"
+            if block_mode
+            else f"Histology families for {scope.site_group_label}:\n"
+        )
+        choice = self.agent.structured(
+            HistologyFamilyChoice,
+            state.messages
+            + [
+                HumanMessage(
+                    "Variables to extract:\n"
+                    + variable_group_prompt_json(state.requested_variables)
+                ),
+                HumanMessage(heading + json.dumps(choices)),
+                HumanMessage(HISTOLOGY_BLOCK_PROMPT if block_mode else HISTOLOGY_FAMILY_PROMPT),
+            ],
+        )
+        # Unknown keys are dropped. Keys that were all unknown mean nothing
+        # offered fits, which is none of these.
+        chosen = [key for key in dict.fromkeys(key.strip() for key in choice.families) if key in choices]
+        choice = choice.model_copy(update={
+            "families": chosen,
+            "none_of_these": not chosen and (choice.none_of_these or bool(choice.families)),
+        })
+        return {"histology_blocks" if block_mode else "histology_families": choice}
+
+    def route_histology_families(
+        self, state: ExtractorState
+    ) -> Literal["choose_histology_families", "choose_histology_code"] | list[Send]:
+        answer = state.histology_blocks or state.histology_families
+        if answer.families:
+            return "choose_histology_code"
+        if state.histology_blocks is None and answer.none_of_these:
+            return "choose_histology_families"
+        # The notes don't document a histology, or not even a block fits.
+        return self._histology_sends(state, None, {})
+
+    def choose_histology_code(self, state: ExtractorState) -> Command[Literal["variable_branch"]]:
+        """Choose one code/behavior pair from the chosen families or blocks."""
+        scope = self._histology_variable(state).histology_scope
+        if state.histology_blocks is not None:
+            source, chosen = scope.block_codes, state.histology_blocks.families
+        else:
+            source, chosen = scope.family_codes, state.histology_families.families
+        offered = dict(sorted(
+            (pair, description) for key in chosen for pair, description in source[key].items()
+        ))
+        output = self.agent.structured(
+            HistologyCodeOutput,
+            state.messages
+            + [
+                HumanMessage(
+                    "Variables to extract:\n"
+                    + variable_group_prompt_json(state.requested_variables)
+                ),
+                HumanMessage("Histology code/behavior pairs offered:\n" + json.dumps(offered)),
+                HumanMessage(HISTOLOGY_CODE_PROMPT),
+            ],
+        )
+        return Command(goto=self._histology_sends(state, output, offered))
+
+    def _histology_sends(
+        self, state: ExtractorState, output: HistologyCodeOutput | None, offered: dict[str, str]
+    ) -> list[Send]:
+        """Send 522, and 523 when requested, to validation with the code step's pair.
+
+        With no code step (``output`` None) both get no value. Every other
+        requested variable gets its usual individual branch.
+        """
+        histology = self._histology_variable(state)
+        answer = state.histology_blocks or state.histology_families
+        pair = (output.pair or "").strip() if output is not None else ""
+        errors = (
+            [f"The chosen pair {pair!r} isn't one of the offered code/behavior pairs."]
+            if pair and pair not in offered
+            else []
+        )
+        code, _, behavior = pair.partition("/") if _PAIR.fullmatch(pair) else (pair, "", "")
+        values = {histology.item_id: code or None, BEHAVIOR_ITEM: behavior or None}
+        paired = [
+            variable for variable in state.requested_variables.variables
+            if variable.item_id in (histology.item_id, BEHAVIOR_ITEM)
+        ]
+        # Each variable may only take a value the offered pairs give it: 522 a
+        # code, with its pairs' descriptions, and 523 a behavior.
+        behavior_codes = next(
+            (variable.valid_codes for variable in paired if variable.item_id == BEHAVIOR_ITEM), None
+        )
+        behavior_codes = behavior_codes if isinstance(behavior_codes, dict) else {}
+        offered_values: dict[int, dict[str, str]] = {histology.item_id: {}, BEHAVIOR_ITEM: {}}
+        for offered_pair, description in offered.items():
+            offered_code, _, offered_behavior = offered_pair.partition("/")
+            codes = offered_values[histology.item_id]
+            codes[offered_code] = f"{codes[offered_code]}; {description}" if offered_code in codes else description
+            offered_values[BEHAVIOR_ITEM].setdefault(
+                offered_behavior, str(behavior_codes.get(offered_behavior, ""))
+            )
+
+        candidates = {
+            item_id: VariableOutput(
+                item_id=item_id,
+                value=value,
+                explanation=output.explanation if output is not None else answer.reasoning,
+                most_important_note=output.most_important_note if output is not None else None,
+                spans=output.spans if output is not None else [],
+                presence_confidence=output.presence_confidence if output is not None else answer.presence_confidence,
+            )
+            for item_id, value in values.items()
+        }
+        group_context = VariableGroupOutput(
+            variables=[candidates[variable.item_id] for variable in paired]
+        )
+        sends = [
             Send(
                 "variable_branch",
                 VariableBranchState(
-                    task=VariableExtractionTask(variable=variable, extraction_mode="individual"),
+                    task=VariableExtractionTask(
+                        variable=variable,
+                        extraction_mode="group",
+                        candidate=candidates[variable.item_id],
+                        validation_errors=list(errors),
+                        extraction_attempts=1,
+                        offered_values=offered_values[variable.item_id] if offered else None,
+                    ),
                     notes=state.notes or [],
                     messages=list(state.messages),
+                    group_context=group_context,
                     max_extraction_attempts=state.max_extraction_attempts,
                 ),
             )
-            for variable in variables
+            for variable in paired
+        ]
+        paired_ids = {variable.item_id for variable in paired}
+        return sends + [
+            self._individual_branch(state, variable)
+            for variable in state.requested_variables.variables
+            if variable.item_id not in paired_ids
         ]
 
     def extract_group_values(self, state: ExtractorState) -> Command[Literal["variable_branch"]]:
@@ -131,7 +309,7 @@ class ExtractorAgent(BaseAgent):
             + [
                 HumanMessage(
                     "Variables to extract:\n"
-                    + state.requested_variables.model_dump_json()
+                    + variable_group_prompt_json(state.requested_variables)
                 ),
                 HumanMessage(EXTRACT_GROUP_VALUES_PROMPT),
             ],
@@ -200,7 +378,49 @@ class ExtractorAgent(BaseAgent):
             for variable in state.requested_variables.variables
         ]
 
+        histology = self._histology_variable(state)
+        answer = state.histology_blocks or state.histology_families
+        if histology is not None and answer is not None:
+            ordered_results = [
+                result.model_copy(update={"histology": self._histology_selection(state, histology, results_by_id)})
+                if result.item_id == histology.item_id
+                else result
+                for result in ordered_results
+            ]
+
         return {"extracted_values": ValidatedVariableGroupOutput(variables=ordered_results)}
+
+    @staticmethod
+    def _histology_selection(
+        state: ExtractorState,
+        histology: VariableInfo,
+        results_by_id: dict[int, ValidatedVariableOutput],
+    ) -> HistologySelection:
+        """Record how the two steps reached the 522 result.
+
+        Whether the pair is on the site's list is read from the final values, so a
+        repaired value is judged as finally coded.
+        """
+        scope = histology.histology_scope
+        code = getattr(results_by_id.get(histology.item_id), "value", None)
+        behavior = getattr(results_by_id.get(BEHAVIOR_ITEM), "value", None)
+        if code is None:
+            listed = None
+        elif behavior is not None:
+            listed = scope.listed(f"{code}/{behavior}")
+        else:
+            listed = any(
+                pair.startswith(f"{code}/") for codes in scope.family_codes.values() for pair in codes
+            )
+        blocks = state.histology_blocks
+        return HistologySelection(
+            families=state.histology_families.families if blocks is None and state.histology_families else [],
+            blocks=blocks.families if blocks is not None else [],
+            reasoning="\n".join(
+                answer.reasoning for answer in (state.histology_families, blocks) if answer is not None
+            ),
+            listed=listed,
+        )
 
 
     # Variable branch
@@ -217,7 +437,7 @@ class ExtractorAgent(BaseAgent):
             VariableOutput,
             state.messages
             + [
-                HumanMessage("Variable to extract:\n" + state.task.variable.model_dump_json()),
+                HumanMessage("Variable to extract:\n" + variable_prompt_json(state.task.variable)),
                 HumanMessage(EXTRACT_VARIABLE_VALUE_PROMPT),
             ],
         )
@@ -248,6 +468,11 @@ class ExtractorAgent(BaseAgent):
                     candidate,
                 )
             )
+            offered = state.task.offered_values
+            if offered is not None and candidate.value is not None and candidate.value not in offered:
+                errors.append(
+                    f"Value {candidate.value!r} isn't one of the codes the histology code step offered."
+                )
             if candidate.value is None and candidate.spans:
                 errors.append("Supporting text spans must be empty when no value is returned.")
             elif candidate.value is not None and not candidate.spans:
@@ -324,7 +549,7 @@ class ExtractorAgent(BaseAgent):
 
     def repair_invalid_extraction(self, state: VariableBranchState) -> dict:
         repair_context = {
-            "variable": state.task.variable.model_dump(),
+            "variable": variable_prompt_dict(state.task.variable, state.task.offered_values),
             "invalid_candidate": (
                 state.task.candidate.model_dump()
                 if state.task.candidate is not None
@@ -406,6 +631,17 @@ class ExtractorAgent(BaseAgent):
             destinations=("variable_branch",),
             retry_policy=self.retry_policy,
         )
+        workflow.add_node(
+            "choose_histology_families",
+            self.choose_histology_families,
+            retry_policy=self.retry_policy,
+        )
+        workflow.add_node(
+            "choose_histology_code",
+            self.choose_histology_code,
+            destinations=("variable_branch",),
+            retry_policy=self.retry_policy,
+        )
         # variable_branch is a subgraph; its own LLM nodes carry the retry policy.
         workflow.add_node("variable_branch", variable_branch)
         workflow.add_node("merge_variable_results", self.merge_variable_results)
@@ -415,7 +651,12 @@ class ExtractorAgent(BaseAgent):
         workflow.add_conditional_edges(
             "load_notes",
             self.variables_to_extract,
-            ["extract_group_values", "variable_branch"],
+            ["extract_group_values", "choose_histology_families", "variable_branch"],
+        )
+        workflow.add_conditional_edges(
+            "choose_histology_families",
+            self.route_histology_families,
+            ["choose_histology_families", "choose_histology_code", "variable_branch"],
         )
         workflow.add_edge("variable_branch", "merge_variable_results")
         workflow.add_edge("merge_variable_results", END)

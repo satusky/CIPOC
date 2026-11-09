@@ -72,6 +72,35 @@ class MorphologyBlock(BaseModel):
     label: str = Field(description="The block's ICD-O-3 heading, e.g. 'Adenomas and adenocarcinomas'.")
 
 
+class HistologyScope(BaseModel):
+    """What the extractor's two histology steps offer for one case.
+
+    Built from the scoping dictionary by ``build_histology_scope``, so the
+    extractor never reads the file. It's far too large for a prompt, so prompts
+    render the variable that carries it through ``prompt_variable``, which
+    leaves it out.
+    """
+
+    site_group: str = Field(description="Key of the Site/Histology Validation List group for the coded Primary Site.")
+    site_group_label: str = Field(description="The group's title on the list, e.g. 'BREAST'.")
+    families: dict[str, str] = Field(
+        description="The family step's choices: each 3-digit family's label and its members' abbreviated terms.",
+    )
+    family_codes: dict[str, dict[str, str]] = Field(
+        description="Each family's code/behavior pairs with their v25 descriptions, for the code step.",
+    )
+    blocks: dict[str, str] = Field(
+        description="The fallback's choices: each ICD-O-3 morphology block's heading, keyed by its 3-digit range.",
+    )
+    block_codes: dict[str, dict[str, str]] = Field(
+        description="Each block's v25 code/behavior pairs with their descriptions, for the fallback's code step.",
+    )
+
+    def listed(self, pair: str) -> bool:
+        """Whether the site group lists the code/behavior pair, like '8500/3'."""
+        return any(pair in codes for codes in self.family_codes.values())
+
+
 class ScopingDictionary(BaseModel):
     """The scoping-only site dictionary.
 

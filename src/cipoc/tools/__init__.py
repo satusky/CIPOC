@@ -6,6 +6,10 @@ from .extraction import (
     lookup_variable_info,
     build_variable_group,
     histology_pairs,
+    prompt_variable,
+    variable_prompt_json,
+    variable_prompt_dict,
+    variable_group_prompt_json,
     resolve_evidence_text,
 )
 from .orchestration import (
@@ -55,6 +59,7 @@ from .scoping import (
     histology_pair_listed,
     histology_block_listing,
     check_histology_pairs,
+    build_histology_scope,
 )
 from .coding_context import (
     RuleStore,
@@ -74,6 +79,10 @@ __all__ = [
     "lookup_variable_info",
     "build_variable_group",
     "histology_pairs",
+    "prompt_variable",
+    "variable_prompt_json",
+    "variable_prompt_dict",
+    "variable_group_prompt_json",
     "resolve_evidence_text",
     "load_variable_groups",
     "load_stages",
@@ -117,6 +126,7 @@ __all__ = [
     "histology_pair_listed",
     "histology_block_listing",
     "check_histology_pairs",
+    "build_histology_scope",
     "RuleStore",
     "load_rule_store",
     "applicable_sources",

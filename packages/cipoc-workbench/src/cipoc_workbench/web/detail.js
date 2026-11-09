@@ -538,6 +538,16 @@ function variableDetail(itemId) {
     body.append(section("Explanation",
       h("p", { style: "margin:0", text: extraction.explanation || "—" })));
 
+    const choice = extraction.histology;
+    if (choice) {
+      body.append(section("Histology steps", kv([
+        ["families", (choice.families || []).length ? choice.families.join(", ") : null],
+        ["ICD-O-3 blocks", (choice.blocks || []).length ? choice.blocks.join(", ") : null],
+        ["on site's list", choice.listed == null ? null : choice.listed ? "yes" : "no"],
+        ["reasoning", choice.reasoning || null],
+      ])));
+    }
+
     if ((extraction.validation_errors || []).length) {
       body.append(section("Validation errors",
         h("ul", { class: "errors" }, extraction.validation_errors.map((e) => h("li", { text: e })))));

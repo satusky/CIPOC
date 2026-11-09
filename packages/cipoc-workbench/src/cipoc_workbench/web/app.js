@@ -332,7 +332,16 @@ function normalizeRunResult(result) {
     text(value.status, "variable result.status");
     texts(value, ["value", "reason", "stopped_by"], "variable result");
     idArrays(value, ["blocking_item_ids"], "variable result");
-    if (value.extraction != null) evidence(object(value.extraction, "extraction"), "extraction");
+    if (value.extraction != null) {
+      const extraction = object(value.extraction, "extraction");
+      evidence(extraction, "extraction");
+      /* Histology (522) from the two-step extraction, in 1.3 artifacts. */
+      if (extraction.histology != null) {
+        const choice = object(extraction.histology, "extraction.histology");
+        optionalArrays(choice, ["families", "blocks"], "extraction.histology");
+        texts(choice, ["reasoning"], "extraction.histology");
+      }
+    }
   }
   for (const note of records(result.corpus.note_corpus, "corpus.note_corpus")) {
     identifier(note.note_id, "note.note_id");

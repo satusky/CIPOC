@@ -7,6 +7,7 @@ from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
 from cipoc.models import NoteDigest, VariableGroupInfo
+from cipoc.tools import variable_group_prompt_json
 from cipoc.utils import CipocConfig, run_with_progress
 from cipoc.prompts.note_retriever import NOTE_RETRIEVER_SYSTEM_PROMPT, SELECT_NOTES_PROMPT
 
@@ -46,7 +47,7 @@ class NoteRetrieverAgent(BaseAgent):
         """Seed the conversation with the shared persona + the requested variables (the cacheable prefix)."""
         return {"messages": [
             SystemMessage(NOTE_RETRIEVER_SYSTEM_PROMPT),
-            HumanMessage("Variables to extract:\n" + state.requested_variables.model_dump_json()),
+            HumanMessage("Variables to extract:\n" + variable_group_prompt_json(state.requested_variables)),
         ]}
 
     def identify_relevant_notes(self, state: RetrieverState) -> dict:

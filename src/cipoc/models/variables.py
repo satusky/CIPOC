@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field, ConfigDict, field_validator, model_valida
 
 from .base import ConfidenceLevel, confidence_field
 from .notes import TextSpan, CancerStatus
+from .scoping import HistologyScope
 
 
 class VariableInfo(BaseModel):
@@ -18,6 +19,7 @@ class VariableInfo(BaseModel):
     format: str | None = Field(default=None, description="Format for coded value as defined by the data dictionary and/or instructions.")
     valid_codes: str | dict | list[dict] | None = Field(default=None, description="Valid codes from the data dictionary, optionally scoped by gross primary site.")
     coding_instructions: str | None = Field(default=None, description="Coding instructions from the NAACCR data dictionary, when present.")
+    histology_scope: HistologyScope | None = Field(default=None, description="Histology (522) only: the site group's families and the ICD-O-3 block fallback for the two-step extraction. Prompts never show it; see prompt_variable.")
     model_config = ConfigDict(protected_namespaces=())
 
 
@@ -103,11 +105,37 @@ class VariableGroupOutput(BaseModel):
     variables: list[VariableOutput] = Field(description="List of coded values for each variable in group with explanations and confidence level.")
 
 
+class HistologyFamilyChoice(BaseModel):
+    """ Structured output of the histology family step, over the site's families or the ICD-O-3 blocks """
+    families: list[str] = Field(description="Keys of every offered choice that could hold the tumor's histology, exactly as offered. Choose more than one when the notes describe a mixed histology or leave the choice uncertain. Return an empty list when none fits or the notes don't document a histology.")
+    none_of_these: bool = Field(description="True when the notes document a histology that none of the offered choices fits; false when a choice fits or the notes don't document a histology.")
+    reasoning: str = Field(description="Reasoning for the choice, citing the histology the notes describe.")
+    presence_confidence: ConfidenceLevel = confidence_field()
+
+
+class HistologyCodeOutput(BaseModel):
+    """ Structured output of the histology code step """
+    pair: str | None = Field(description="The chosen code/behavior pair exactly as offered, like '8500/3'. It codes both Histologic Type (522) and Behavior (523). Return `None` if no offered pair is supported by the notes.")
+    explanation: str = Field(description=VariableOutput.model_fields["explanation"].description)
+    most_important_note: int | str | None = Field(description=VariableOutput.model_fields["most_important_note"].description)
+    spans: list[TextSpan] = Field(description=VariableOutput.model_fields["spans"].description)
+    presence_confidence: ConfidenceLevel = confidence_field()
+
+
+class HistologySelection(BaseModel):
+    """How the two histology steps reached a Histology (522) result."""
+    families: list[str] = Field(default_factory=list, description="The site group's families the code step chose from. Empty when the ICD-O-3 block fallback ran or nothing was chosen.")
+    blocks: list[str] = Field(default_factory=list, description="The ICD-O-3 morphology blocks the fallback's code step chose from, when the site's families didn't fit.")
+    reasoning: str = Field(description="The family step's reasoning, followed by the fallback's when it ran.")
+    listed: bool | None = Field(default=None, description="Whether the coded pair is on the site group's list. None when no histology was coded.")
+
+
 class ValidatedVariableOutput(VariableOutput):
     """A VariableOutput carrying the pipeline's validation verdict."""
     is_valid: bool = Field(description="Whether the emitted result passed validation; False means it exhausted its repair attempts still failing.")
     validation_errors: list[str] = Field(default_factory=list)
     extraction_attempts: int = 0
+    histology: HistologySelection | None = Field(default=None, description="Histology (522) from the two-step extraction: the families or blocks chosen, the reasoning, and whether the pair is on the site's list.")
 
 
 class ValidatedVariableGroupOutput(VariableGroupOutput):

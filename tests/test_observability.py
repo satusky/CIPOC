@@ -1419,6 +1419,8 @@ class LLMNodeInvocationInvariantTests(unittest.TestCase):
             "get_cancer_mentions": NoteScannerAgent.get_cancer_mentions,
             "identify_relevant_notes": NoteRetrieverAgent.identify_relevant_notes,
             "extract_group_values": ExtractorAgent.extract_group_values,
+            "choose_histology_families": ExtractorAgent.choose_histology_families,
+            "choose_histology_code": ExtractorAgent.choose_histology_code,
             "extract_individual_value": ExtractorAgent.extract_individual_value,
             "repair_invalid_extraction": ExtractorAgent.repair_invalid_extraction,
         }

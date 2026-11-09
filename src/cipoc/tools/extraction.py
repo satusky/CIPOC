@@ -432,3 +432,45 @@ def build_variable_group(
         item_info.append(variable)
 
     return VariableGroupInfo(variables=item_info)
+
+
+# What a scoped Histology (522) shows in prompts in place of its code list. The
+# full list alone is about 33k tokens; the family and code steps offer the part
+# that fits the case.
+HISTOLOGY_STEPS_NOTE = (
+    "Chosen through the histology family and code steps; the full code list isn't shown."
+)
+_PROMPT_EXCLUDE = {"histology_scope"}
+
+
+def prompt_variable(variable: VariableInfo, offered: dict[str, str] | None = None) -> VariableInfo:
+    """The variable as prompts show it, without its histology scope.
+
+    A variable with a histology scope shows ``offered``, the codes the code step
+    offered, as its valid codes, or a note when nothing has been offered yet. Any
+    other variable is returned unchanged, so it renders as it always has.
+    """
+    if variable.histology_scope is None:
+        return variable
+    return variable.model_copy(update={
+        "histology_scope": None,
+        "valid_codes": dict(offered) if offered else HISTOLOGY_STEPS_NOTE,
+    })
+
+
+def variable_prompt_json(variable: VariableInfo, offered: dict[str, str] | None = None) -> str:
+    """``prompt_variable`` serialized for a prompt."""
+    return prompt_variable(variable, offered).model_dump_json(exclude=_PROMPT_EXCLUDE)
+
+
+def variable_prompt_dict(variable: VariableInfo, offered: dict[str, str] | None = None) -> dict:
+    """``prompt_variable`` as a dict, for prompts that embed it in a larger object."""
+    return prompt_variable(variable, offered).model_dump(exclude=_PROMPT_EXCLUDE)
+
+
+def variable_group_prompt_json(group: VariableGroupInfo) -> str:
+    """The group serialized for a prompt, each variable through ``prompt_variable``."""
+    shown = group.model_copy(
+        update={"variables": [prompt_variable(variable) for variable in group.variables]}
+    )
+    return shown.model_dump_json(exclude={"variables": {"__all__": _PROMPT_EXCLUDE}})

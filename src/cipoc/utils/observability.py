@@ -69,6 +69,8 @@ _LLM_AGENT_BY_NODE = {
     "get_cancer_mentions": "note_scanner",
     "identify_relevant_notes": "note_retriever",
     "extract_group_values": "extractor",
+    "choose_histology_families": "extractor",
+    "choose_histology_code": "extractor",
     "extract_individual_value": "extractor",
     "repair_invalid_extraction": "extractor",
 }
@@ -1120,6 +1122,7 @@ class ObservabilityCollector:
         if event.node in {
             "extract_group_values", "detect_concepts", "summarize_note",
             "get_cancer_mentions", "identify_relevant_notes",
+            "choose_histology_families", "choose_histology_code",
         }:
             return 1
         if event.node not in {

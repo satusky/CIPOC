@@ -472,6 +472,29 @@ test("candidate gross sites show as OR in the facts rail and applicability check
   assert.throws(() => vm.runInContext("indexState(bad)", context), /case_facts.candidate_gross_sites must be an array/);
 });
 
+test("the histology steps show on the variable, stay optional, and must be well formed", () => {
+  const { context } = loadWorkbench();
+  const result = canonicalResult("1.3");
+  result.case.variable_results[400].extraction.histology = {
+    families: [], blocks: ["809-811"], reasoning: "No breast family fits.", listed: false,
+  };
+  const original = JSON.stringify(result);
+  context.result = result;
+  vm.runInContext("indexState(result)", context);
+  const view = vm.runInContext("variableDetail(400).textContent", context);
+  // No families row: the fallback chose blocks.
+  assert.match(view, /Histology stepsICD-O-3 blocks809-811on site's listnoreasoningNo breast family fits\./);
+  assert.equal(JSON.stringify(result), original);
+
+  context.result = canonicalResult("1.3");
+  vm.runInContext("indexState(result)", context);
+  assert.doesNotMatch(vm.runInContext("variableDetail(400).textContent", context), /Histology steps/);
+
+  context.bad = canonicalResult("1.3");
+  context.bad.case.variable_results[400].extraction.histology = { families: "850", reasoning: "x" };
+  assert.throws(() => vm.runInContext("indexState(bad)", context), /extraction.histology.families must be an array/);
+});
+
 test("alphanumeric note IDs remain strings and use lexical tie-breaking", () => {
   const { context } = loadWorkbench();
   context.result = canonicalResult();

@@ -44,3 +44,31 @@ REPAIR_VARIABLE_VALUE_PROMPT = """Repair the invalid extraction for the single t
 - If only `most_important_note` is invalid, correct that identifier without changing a supported value or valid spans. For value or evidence errors, reconsider the clinical evidence and coding constraints.
 - Do not repeat a value identified as invalid and do not invent a code. Return null if no defensible valid value can be determined.
 """
+
+
+HISTOLOGY_FAMILY_PROMPT = """Choose the histology families for Histologic Type (522) and Behavior (523).
+
+The site group's families follow, each keyed by its 3 digits, with its label and the abbreviated terms of the histologies it holds.
+- Choose every family that could hold the tumor's histology as the notes describe it. Choose more than one when the notes describe a mixed histology or leave it uncertain between families. The next step offers the codes of the families you choose.
+- Return the keys exactly as offered.
+- If the notes document a histology that no family fits, return no families and set `none_of_these` to true. A broader list follows.
+- If the notes don't document the tumor's histology, return no families and set `none_of_these` to false.
+"""
+
+
+HISTOLOGY_BLOCK_PROMPT = """None of the site's families fit, so choose from the ICD-O-3 morphology blocks instead.
+
+The blocks follow, each keyed by the range of 3-digit histology codes it covers, with its heading.
+- Choose every block that could hold the tumor's histology as the notes describe it. The next step offers the codes of the blocks you choose.
+- Return the keys exactly as offered.
+- If no block fits, or the notes don't document the tumor's histology, return no blocks. Set `none_of_these` to true only when the notes document a histology that no block fits.
+"""
+
+
+HISTOLOGY_CODE_PROMPT = """Choose one code/behavior pair for Histologic Type (522) and Behavior (523).
+
+The offered pairs follow, each with its full description. A pair's 4 digits code Histologic Type (522) and its last digit codes Behavior (523).
+- Return one pair exactly as offered, like `8500/3`. Never return a pair that isn't offered.
+- Choose the most specific pair the evidence directly supports, histology and behavior together, unless the coding instructions give a different priority. Treat NOS pairs as the least specific.
+- Return null if no offered pair is supported by the notes.
+"""
