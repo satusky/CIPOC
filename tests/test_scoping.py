@@ -2,6 +2,7 @@ import copy
 import json
 import unittest
 from pathlib import Path
+from unittest import mock
 from typing import get_args
 
 from cipoc.models import CaseFacts, GrossSite
@@ -12,7 +13,9 @@ from cipoc.tools import (
     load_scoping_dictionary,
     matching_schemas,
     parse_scoping_dictionary,
+    primary_site_tissue,
     scoped_codes,
+    scoped_item_codes,
 )
 
 
@@ -289,6 +292,72 @@ class ScopedCodesTests(unittest.TestCase):
         matched = matching_schemas(self.scoping, lung("2000-06-15"))
         self.assertEqual(matched, [])
         self.assertIsNone(scoped_codes(self.scoping, matched, 820))
+
+
+class PrimarySiteTissueTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.scoping = load_scoping_dictionary(FIXTURE)
+
+    def tissue(self, **facts):
+        return primary_site_tissue(self.scoping, CaseFacts(**facts))
+
+    def test_a_coded_primary_picks_its_tissue_over_the_gross_site(self):
+        for code, tissue in (("C504", "breast"), ("c34.1", "lung"), ("C181", "appendix"), ("C209", "rectum")):
+            with self.subTest(code=code):
+                self.assertEqual(self.tissue(primary_site=code, gross_primary_site="ovary"), tissue)
+
+    def test_unknown_malformed_or_unlisted_primaries_pick_none(self):
+        for code in ("C809", "C80.9", "C34", "C3491", "unknown", " ", "C999"):
+            with self.subTest(code=code):
+                self.assertIsNone(self.tissue(primary_site=code, gross_primary_site="breast"))
+
+    def test_the_gross_site_counts_only_as_a_tissue_name(self):
+        self.assertEqual(self.tissue(gross_primary_site="unknown_primary_site"), "unknown_primary_site")
+        self.assertEqual(self.tissue(gross_primary_site="breast"), "breast")
+        for gross_site in ("unspecified", "left breast", "Breast", None):
+            with self.subTest(gross_site=gross_site):
+                self.assertIsNone(self.tissue(gross_primary_site=gross_site))
+        self.assertIsNone(primary_site_tissue(self.scoping, None))
+
+
+class ScopedItemCodesTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.scoping = load_scoping_dictionary(FIXTURE)
+
+    def test_primary_site_takes_one_tissues_codes(self):
+        scoped = scoped_item_codes(self.scoping, CaseFacts(gross_primary_site="breast"), [400])
+        self.assertEqual(scoped, {400: self.scoping.tissues["breast"].codes[400]})
+        # C809 isn't added to a tissue's codes.
+        self.assertNotIn("C809", scoped[400])
+
+    def test_histology_is_never_scoped(self):
+        for facts in (CaseFacts(primary_site="C504"), CaseFacts(gross_primary_site="breast"), None):
+            with self.subTest(facts=facts):
+                self.assertNotIn(522, scoped_item_codes(self.scoping, facts, [522]))
+
+    def test_other_items_take_the_schema_match(self):
+        facts = CaseFacts(primary_site="C349", date_of_diagnosis="20200115", histology="8070")
+        scoped = scoped_item_codes(self.scoping, facts, [400, 410, 522, 764, 3843])
+
+        self.assertEqual(set(scoped), {400, 764, 3843})
+        lung = self.scoping.schemas["eod/lung"].codes
+        self.assertEqual(scoped[764], lung[764].codes)
+        self.assertEqual(scoped[3843], lung[3843].codes)
+
+    def test_items_left_unscoped_are_left_out(self):
+        self.assertEqual(scoped_item_codes(self.scoping, None, [400, 522, 764, 3843]), {})
+        self.assertEqual(
+            scoped_item_codes(self.scoping, CaseFacts(primary_site="C809", date_of_diagnosis="2000"), [400, 820]),
+            {},
+        )
+
+    def test_schemas_are_matched_once_per_call(self):
+        with mock.patch("cipoc.tools.scoping.matching_schemas", wraps=matching_schemas) as matched:
+            scoped_item_codes(self.scoping, CaseFacts(gross_primary_site="breast"), [400, 522, 764, 1182, 3843])
+            scoped_item_codes(self.scoping, CaseFacts(gross_primary_site="breast"), [400, 522])
+        self.assertEqual(matched.call_count, 1)
 
 
 if __name__ == "__main__":

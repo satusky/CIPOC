@@ -6,8 +6,10 @@ from typing import TYPE_CHECKING
 
 from cipoc.models import VariableInfo, VariableGroupInfo, VariableOutput
 
+from .scoping import scoped_item_codes
+
 if TYPE_CHECKING:
-    from cipoc.models import CaseFacts
+    from cipoc.models import CaseFacts, ScopingDictionary
 
 
 _ENTRY_FIELD_MAP = {
@@ -306,69 +308,12 @@ def _entry_codes(entry: dict | None):
     return _MISSING
 
 
-def _overlay_site_codes(item_entry: dict | None, site_entry: dict | None) -> dict | None:
-    site_codes = _entry_codes(site_entry)
-    if site_codes is _MISSING:
+def _overlay_site_codes(item_entry: dict | None, site_codes: dict | None) -> dict | None:
+    if site_codes is None:
         return item_entry
     merged = dict(item_entry or {})
     merged["allowed_codes"] = site_codes
     return merged
-
-
-def resolve_site_key(case_facts: "CaseFacts | None", site_dictionary: dict) -> str | None:
-    """Resolve case facts to a top-level key present in the site dictionary."""
-    if case_facts is None:
-        return None
-
-    raw_primary_site = (case_facts.primary_site or "").strip().upper()
-    primary_site = raw_primary_site.replace(".", "")
-    if re.fullmatch(r"C[0-9]{2}\.?[0-9]", raw_primary_site) and primary_site < "C809":
-        for key, entries in site_dictionary.items():
-            site_codes = _entry_codes(entries.get("400"))
-            if site_codes is not _MISSING:
-                site_codes = _normalize_code_descriptions(site_codes)
-            if isinstance(site_codes, dict) and _domain_contains(_parse_code_domain(list(site_codes)), primary_site):
-                return key
-        # An informative coded primary outranks conflicting gross-site inference,
-        # even when only base metadata is available for that primary.
-        return None
-
-    if case_facts.primary_site:
-        # An explicit unknown or malformed primary must not be narrowed by gross site.
-        return None
-
-    if case_facts.gross_primary_site:
-        gross_site = " ".join(
-            re.sub(r"[^a-z0-9]+", " ", case_facts.gross_primary_site.casefold()).split()
-        )
-        matches = [
-            key
-            for key in site_dictionary
-            if " ".join(key.casefold().replace("_", " ").split()) in gross_site
-        ]
-        if matches:
-            return max(matches, key=len)
-
-    return None
-
-
-def tissue_site_codes(site_dictionary: dict | None) -> dict[str, frozenset[str]]:
-    """Map each tissue key in the site dictionary to its Primary Site (400) codes.
-
-    Codes are upper-cased without the dot, so 'C50.4' and 'C504' agree. A key with
-    no 400 codes is left out, so it reads as an unknown tissue.
-    """
-    table: dict[str, frozenset[str]] = {}
-    for tissue, entries in (site_dictionary or {}).items():
-        site_codes = _entry_codes((entries or {}).get("400"))
-        if site_codes is _MISSING:
-            continue
-        site_codes = _normalize_code_descriptions(site_codes)
-        if isinstance(site_codes, dict) and site_codes:
-            table[tissue] = frozenset(
-                code.strip().upper().replace(".", "") for code in site_codes
-            )
-    return table
 
 
 def _variable_info(item_id: int, item_entry: dict | None) -> VariableInfo:
@@ -414,7 +359,7 @@ def lookup_variable_info(
     item_id: int,
     data_dictionary: dict,
     *,
-    site_dictionary: dict | None = None,
+    site_dictionary: "ScopingDictionary | None" = None,
     case_facts: "CaseFacts | None" = None,
 ) -> VariableInfo:
     """Look up NAACCR variable metadata by item ID from a loaded data dictionary.
@@ -425,9 +370,9 @@ def lookup_variable_info(
     Args:
         item_id: NAACCR item ID number to look up.
         data_dictionary: NAACCR data dictionary from ``load_data_dictionary``.
-        site_dictionary: Optional loaded tissue-keyed dictionary whose code
-            descriptions override the NAACCR entry.
-        case_facts: Facts used to select a tissue from the site dictionary.
+        site_dictionary: Optional scoping dictionary whose codes for the case
+            replace the NAACCR entry's.
+        case_facts: Facts that pick the tissue and staging schemas.
 
     Returns:
         Variable metadata. Unknown item IDs raise ValueError.
@@ -436,9 +381,8 @@ def lookup_variable_info(
     if not item_entry:
         raise ValueError(f"No entry exists in the data dictionary for item {item_id}.")
     if site_dictionary is not None:
-        site = resolve_site_key(case_facts, site_dictionary)
-        site_entry = site_dictionary.get(site, {}).get(str(item_id)) if site else None
-        item_entry = _overlay_site_codes(item_entry, site_entry)
+        scoped = scoped_item_codes(site_dictionary, case_facts, [item_id])
+        item_entry = _overlay_site_codes(item_entry, scoped.get(item_id))
 
     return _variable_info(item_id, item_entry)
 
@@ -448,22 +392,26 @@ def build_variable_group(
     data_dictionary: dict,
     *,
     case_facts: "CaseFacts | None" = None,
-    site_dictionary: dict | None = None,
+    site_dictionary: "ScopingDictionary | None" = None,
 ) -> VariableGroupInfo:
-    """Build NAACCR variable metadata with optional tissue-specific code tables."""
+    """Build NAACCR variable metadata, with codes scoped to the case when a
+    scoping dictionary is given."""
     if isinstance(item_ids, int):
         item_ids = [item_ids]
 
-    site_dictionary = site_dictionary or {}
-    site = resolve_site_key(case_facts, site_dictionary)
+    item_ids = sorted(set(item_ids))
+    scoped = (
+        scoped_item_codes(site_dictionary, case_facts, item_ids)
+        if site_dictionary is not None
+        else {}
+    )
 
     item_info = []
-    for item_id in sorted(set(item_ids)):
+    for item_id in item_ids:
         item_entry = data_dictionary.get(str(item_id))
         if not item_entry:
             raise ValueError(f"No entry exists in the data dictionary for item {item_id}.")
-        site_entry = site_dictionary.get(site, {}).get(str(item_id)) if site else None
-        item_entry = _overlay_site_codes(item_entry, site_entry)
+        item_entry = _overlay_site_codes(item_entry, scoped.get(item_id))
         variable = _variable_info(item_id, item_entry)
         VariableValueValidator().preflight(variable)
         item_info.append(variable)

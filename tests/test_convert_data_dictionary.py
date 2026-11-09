@@ -70,21 +70,9 @@ class ConvertDataDictionaryTests(unittest.TestCase):
             },
         )
 
-    def test_converts_the_complete_tissue_dictionary(self):
-        with open("documents/cipoc_data_dictionary.json", "r") as source_file:
-            source = json.load(source_file)
-
-        converted = convert_dictionary(source)
-
-        self.assertEqual(set(converted), set(source))
-        self.assertEqual(
-            sum(len(items) for items in converted.values()),
-            sum(len(items) for items in source.values()),
-        )
-        laterality = converted["breast"]["410"]
-        self.assertEqual(laterality["item_name"], "Laterality")
-        self.assertIsInstance(laterality["allowed_codes"], list)
-        self.assertEqual(laterality["allowed_codes"][0]["code"], "0")
+    def test_rejects_a_dictionary_keyed_by_tissue(self):
+        with self.assertRaisesRegex(ValueError, "flat dictionary"):
+            convert_dictionary({"breast": {"410": {"Code Descriptions": {"0": "No"}}}})
 
     def test_complete_flat_dictionary_is_converted(self):
         with open(

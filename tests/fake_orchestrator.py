@@ -54,14 +54,29 @@ from cipoc.utils.utils import CipocConfig
 REPO_ROOT = Path(__file__).resolve().parents[1]
 NOTE_BUNDLE = REPO_ROOT / "tests" / "fixtures" / "note_bundle.json"
 VARIABLE_GROUPS = REPO_ROOT / "config" / "variable_groups.json"
+SCOPING_DICTIONARY = REPO_ROOT / "tests" / "fixtures" / "scoping_dictionary.json"
 # Primary Site codes per tissue, in the form ``tissue_site_codes`` builds from the
-# site dictionary, for the tissues the tests restrict or infer.
+# scoping dictionary, for the tissues the tests restrict or infer.
 TISSUE_CODES = {
     "breast": frozenset({"C500", "C501", "C502", "C503", "C504", "C505", "C506", "C508", "C509"}),
     "lung": frozenset({"C340", "C341", "C342", "C343", "C348", "C349"}),
     "ovary": frozenset({"C569"}),
     "small_intestine": frozenset({"C170", "C171", "C172", "C173", "C178", "C179"}),
 }
+
+
+def primary_site_codes() -> dict[str, str]:
+    """Item 400's codes as the scoping fixture's tissues hold them.
+
+    A synthetic NAACCR dictionary needs exactly these for the orchestrator's
+    coverage check to accept the fixture.
+    """
+    scoping = json.loads(SCOPING_DICTIONARY.read_text())
+    return {
+        code: description
+        for tissue in scoping["tissues"].values()
+        for code, description in tissue["codes"]["400"].items()
+    }
 
 
 def load_notes() -> list[ClinicalNote]:

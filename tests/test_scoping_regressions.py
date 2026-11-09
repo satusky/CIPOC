@@ -33,9 +33,16 @@ from cipoc.tools.orchestration import (
     site_applies,
     stage_is_ready,
 )
-from cipoc.tools.extraction import tissue_site_codes
+from cipoc.tools.scoping import parse_scoping_dictionary, tissue_site_codes
 from cipoc.utils.progress.events import field
-from tests.fake_orchestrator import TISSUE_CODES, Outcome, Script, build_fake_orchestrator, graph_input
+from tests.fake_orchestrator import (
+    SCOPING_DICTIONARY,
+    TISSUE_CODES,
+    Outcome,
+    Script,
+    build_fake_orchestrator,
+    graph_input,
+)
 
 
 VARIABLE_GROUPS = Path(__file__).resolve().parents[1] / "config" / "variable_groups.json"
@@ -311,25 +318,20 @@ class ApplicabilityRegressionTests(unittest.TestCase):
 
 class TissueCodeTableTests(unittest.TestCase):
     def test_table_holds_each_tissues_primary_site_codes(self):
-        site_dictionary = {
-            "breast": {
-                "400": {"allowed_codes": [
-                    {"code": "C50.0", "description": "Nipple"},
-                    {"code": "c504", "description": "Upper-outer quadrant of breast"},
-                ]},
-                "522": {"allowed_codes": [{"code": "8500", "description": "Duct carcinoma"}]},
-            },
-            "small_intestine": {"400": {"Code Descriptions": {"C171": "Jejunum"}}},
-            "liver": {"522": {"allowed_codes": []}},
-            "lung": {"400": {"allowed_codes": []}},
+        raw = json.loads(SCOPING_DICTIONARY.read_text())
+        table = tissue_site_codes(parse_scoping_dictionary(raw))
+        self.assertEqual(set(table), set(raw["tissues"]))
+        for tissue, codes in TISSUE_CODES.items():
+            self.assertEqual(table[tissue], codes)
+
+        raw["tissues"]["breast"]["codes"]["400"] = {
+            "C50.0": "Nipple", "c504": "Upper-outer quadrant of breast",
         }
-        table = tissue_site_codes(site_dictionary)
-        self.assertEqual(table, {
-            "breast": frozenset({"C500", "C504"}),
-            "small_intestine": frozenset({"C171"}),
-        })
+        raw["tissues"]["lung"]["codes"] = {}
+        table = tissue_site_codes(parse_scoping_dictionary(raw))
+        self.assertEqual(table["breast"], frozenset({"C500", "C504"}))
+        self.assertNotIn("lung", table)
         self.assertEqual(tissue_site_codes(None), {})
-        self.assertEqual(tissue_site_codes({}), {})
 
         breast = SiteApplicability(gross_primary_sites=["breast"])
         self.assertTrue(site_applies(breast, CaseFacts(primary_site="C50.4"), tissue_codes=table))

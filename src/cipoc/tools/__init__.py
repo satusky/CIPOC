@@ -5,8 +5,6 @@ from .extraction import (
     load_data_dictionary,
     lookup_variable_info,
     build_variable_group,
-    resolve_site_key,
-    tissue_site_codes,
     resolve_evidence_text,
 )
 from .orchestration import (
@@ -43,8 +41,11 @@ from .scoping import (
     load_scoping_dictionary,
     parse_scoping_dictionary,
     check_primary_site_coverage,
+    tissue_site_codes,
+    primary_site_tissue,
     matching_schemas,
     scoped_codes,
+    scoped_item_codes,
 )
 from .coding_context import (
     RuleStore,
@@ -63,8 +64,6 @@ __all__ = [
     "load_data_dictionary",
     "lookup_variable_info",
     "build_variable_group",
-    "resolve_site_key",
-    "tissue_site_codes",
     "resolve_evidence_text",
     "load_variable_groups",
     "load_stages",
@@ -95,8 +94,11 @@ __all__ = [
     "load_scoping_dictionary",
     "parse_scoping_dictionary",
     "check_primary_site_coverage",
+    "tissue_site_codes",
+    "primary_site_tissue",
     "matching_schemas",
     "scoped_codes",
+    "scoped_item_codes",
     "RuleStore",
     "load_rule_store",
     "applicable_sources",

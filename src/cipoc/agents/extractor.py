@@ -29,7 +29,7 @@ from cipoc.prompts import (
     EXTRACT_VARIABLE_VALUE_PROMPT,
     REPAIR_VARIABLE_VALUE_PROMPT,
 )
-from cipoc.tools import VariableValueValidator, build_variable_group, load_data_dictionary, resolve_evidence_text
+from cipoc.tools import VariableValueValidator, build_variable_group, load_data_dictionary, load_scoping_dictionary, resolve_evidence_text
 from cipoc.utils import CipocConfig, run_with_progress
 
 from .base import BaseAgent
@@ -452,17 +452,15 @@ if __name__ == "__main__":
     # agent.draw(path="src/cipoc/agents/visualization/extractor.png")
 
     # Case facts matching tests/fixtures/note_bundle.json (left breast, dx 2025);
-    # scopes valid codes from the tissue-keyed data dictionary. The gross site is
-    # what note characterization yields; primary_site stays unset because item
-    # 400 is one of the variables being extracted here.
+    # scopes valid codes from the scoping dictionary. The gross site is what note
+    # characterization yields; primary_site stays unset because item 400 is one
+    # of the variables being extracted here.
     facts = CaseFacts(gross_primary_site="breast", date_of_diagnosis="2025-02-24", sex="female")
-    with open(agent._config.documents().site_data_dictionary_path, "r") as f:
-        site_dictionary = json.load(f)
     variable_group = build_variable_group(
         [400, 410, 522],  # Primary Site, Laterality, Histology
         data_dictionary=load_data_dictionary(agent._config.documents().data_dictionary_path),
         case_facts=facts,
-        site_dictionary=site_dictionary,
+        site_dictionary=load_scoping_dictionary(agent._config.documents().site_data_dictionary_path),
     )
 
     note_path = Path(__file__).resolve().parents[3] / "tests" / "fixtures" / "note_bundle.json"

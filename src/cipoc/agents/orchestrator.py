@@ -9,7 +9,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from operator import add
-from typing import Any, Callable, Mapping
+from typing import Any, Callable, Mapping, get_args
 from typing_extensions import Annotated, Literal
 from pydantic import BaseModel, Field, model_validator
 
@@ -20,7 +20,7 @@ from langgraph.graph.message import add_messages
 from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
-from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_data_dictionary, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, resolve_site_key, tissue_site_codes, checkpoint_one_stop_reason, checkpoint_two_stop_reason, stop_pending_results
+from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_data_dictionary, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, not_found_results, to_case_results, build_report, load_scoping_dictionary, check_primary_site_coverage, lookup_variable_info, tissue_site_codes, checkpoint_one_stop_reason, checkpoint_two_stop_reason, stop_pending_results
 from cipoc.utils import CipocConfig, ObservabilityCollector, run_graph_stream
 from cipoc.utils.progress.events import ProgressEvent
 from cipoc.utils.progress.runner import validate_graph_concurrency
@@ -52,7 +52,9 @@ from cipoc.models import (
     ProcessedClinicalNote,
     CancerStatus,
     ExtractionStop,
+    GrossSite,
     ReportabilityStop,
+    ScopingDictionary,
     confidence_field,
 )
 
@@ -62,6 +64,7 @@ from .note_scanner import NoteScannerAgent, ScannerState
 from .note_retriever import NoteRetrieverAgent, RetrieverInput
 
 ORCHESTRATOR_SYSTEM_PROMPT = ""
+_GROSS_SITES = frozenset(get_args(GrossSite))
 
 def index_notes(note_corpus: dict[int | str, ProcessedClinicalNote]) -> dict[int | str, str | None]:
     return {note_id: processed_note.summary for note_id, processed_note in note_corpus.items()}
@@ -222,7 +225,7 @@ class OrchestratorAgent(BaseAgent):
         self._stages = load_stages(variable_groups_path)
         self._target_group_hierarchy = load_group_hierarchy(variable_groups_path)
         # Config groups carry only item_id/name; the NAACCR dictionary supplies
-        # metadata and the tissue-keyed dictionary supplies case-scoped codes.
+        # metadata and the scoping dictionary supplies case-scoped codes.
         self._data_dictionary_path = self._config.documents().data_dictionary_path
         self._site_data_dictionary_path = self._config.documents().site_data_dictionary_path
 
@@ -235,17 +238,21 @@ class OrchestratorAgent(BaseAgent):
         return load_data_dictionary(getattr(self, "_data_dictionary_path", None))
 
     @cached_property
-    def _site_dictionary(self) -> dict | None:
-        """The tissue-keyed site dictionary, read once per agent on first use.
+    def _site_dictionary(self) -> ScopingDictionary | None:
+        """The scoping dictionary, read once per agent on first use.
 
         Deferred rather than read here so that a missing file still fails the run
         that needs it, not construction; ``run()`` digests the same file first.
+        Its tissues must cover exactly the NAACCR dictionary's Primary Site codes.
         """
         path = getattr(self, "_site_data_dictionary_path", None)
         if path is None:
             return None
-        with open(path, "r") as file:
-            return json.load(file)
+        scoping = load_scoping_dictionary(path)
+        check_primary_site_coverage(
+            scoping, lookup_variable_info(400, self._data_dictionary).valid_codes or {}
+        )
+        return scoping
 
     @cached_property
     def _tissue_codes(self) -> dict[str, frozenset[str]]:
@@ -355,32 +362,24 @@ class OrchestratorAgent(BaseAgent):
         stop_reason = checkpoint_one_stop_reason(state.case_facts, state.note_corpus)
         case_facts = state.case_facts
         if case_facts is None or (not case_facts.primary_site and not case_facts.gross_primary_site):
-            site_dictionary = self._site_dictionary or {}
             for status in ("current", "recent", "historical"):
                 affected_tissues = (descriptors.affected_tissues or {}).get(
                     status, set()
                 )
                 if isinstance(affected_tissues, str):
                     affected_tissues = [affected_tissues]
+                # A saved name outside the vocabulary, from an old artifact or a
+                # test double, names no tissue.
                 tissues = {
-                    tissue.strip()
+                    tissue.strip() if tissue.strip() in _GROSS_SITES else "unspecified"
                     for tissue in affected_tissues
                     if tissue.strip()
                 }
                 if not tissues:
                     continue
-                if site_dictionary:
-                    resolved_sites = {
-                        resolve_site_key(
-                            CaseFacts(gross_primary_site=tissue), site_dictionary
-                        )
-                        for tissue in tissues
-                    }
-                else:
-                    resolved_sites = tissues
-                if len(resolved_sites) == 1 and None not in resolved_sites:
+                if len(tissues) == 1 and "unspecified" not in tissues:
                     case_facts = (case_facts or CaseFacts()).model_copy(
-                        update={"gross_primary_site": resolved_sites.pop()}
+                        update={"gross_primary_site": tissues.pop()}
                     )
                 break
         update = {

@@ -51,7 +51,9 @@ transforms-python/
 ```
 
 Both data dictionaries are gitignored, so a fresh clone of this repository
-doesn't contain them. Copy them from a machine that has them.
+doesn't contain them. Copy them from a machine that has them. The site data
+dictionary must be the scoping file that canonical-naaccr generates; runs fail
+on the older tissue-keyed file.
 
 ### The `cipoc` package
 

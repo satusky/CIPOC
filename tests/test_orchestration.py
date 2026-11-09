@@ -25,7 +25,14 @@ from cipoc.models import (
 from cipoc.tools import build_corpus_descriptors, load_variable_groups, site_applies
 from cipoc.utils.progress.events import normalize
 
-from tests.fake_orchestrator import TISSUE_CODES, build_fake_orchestrator, graph_input, load_notes
+from tests.fake_orchestrator import (
+    SCOPING_DICTIONARY,
+    TISSUE_CODES,
+    build_fake_orchestrator,
+    graph_input,
+    load_notes,
+    primary_site_codes,
+)
 
 
 VARIABLE_GROUPS = Path(__file__).resolve().parents[1] / "config" / "variable_groups.json"
@@ -34,9 +41,6 @@ BASE_DICTIONARY = (
     / "documents"
     / "manuals"
     / "naaccr_data_dictionary_v25.json"
-)
-SITE_DICTIONARY = (
-    Path(__file__).resolve().parents[1] / "documents" / "cipoc_data_dictionary.json"
 )
 
 
@@ -82,34 +86,43 @@ class CorpusCharacterizationTests(unittest.TestCase):
                     confidence=ConfidenceLevel.HIGH,
                     evidence=[TextSpan(note_id=1, text="Left breast core biopsy.")],
                     status="current",
-                    affected_tissue="left breast",
+                    affected_tissue="breast",
                     metastasis=False,
                 )
             ],
             cancer_status={"current"},
         )
-        self.breast_note = self.note.model_copy(
+        self.breast_note = self.note.model_copy(update={"note_id": 2})
+        self.free_text_note = self.note.model_copy(
             update={
-                "note_id": 2,
+                "note_id": 3,
                 "cancer_mentions": [
                     self.note.cancer_mentions[0].model_copy(
-                        update={"affected_tissue": "breast"}
+                        update={"affected_tissue": "left breast"}
                     )
                 ],
             }
         )
 
-    def agent(self):
+    def agent(self, base_dictionary=None):
+        if base_dictionary is None:
+            directory = TemporaryDirectory()
+            self.addCleanup(directory.cleanup)
+            base_dictionary = Path(directory.name) / "base.json"
+            base_dictionary.write_text(json.dumps({"400": {
+                "item_name": "Primary Site", "item_length": 4,
+                "allowed_codes": primary_site_codes(),
+            }}))
         agent = object.__new__(OrchestratorAgent)
-        agent._data_dictionary_path = BASE_DICTIONARY
-        agent._site_data_dictionary_path = SITE_DICTIONARY
+        agent._data_dictionary_path = base_dictionary
+        agent._site_data_dictionary_path = SCOPING_DICTIONARY
         return agent
 
     def test_affected_tissue_is_kept_as_a_complete_name(self):
-        descriptors = build_corpus_descriptors({1: self.note, 2: self.breast_note})
+        descriptors = build_corpus_descriptors({1: self.note, 3: self.free_text_note})
 
         self.assertEqual(
-            descriptors.affected_tissues, {"current": {"left breast", "breast"}}
+            descriptors.affected_tissues, {"current": {"breast", "left breast"}}
         )
 
     def test_characterization_sets_gross_primary_site_before_planning(self):
@@ -126,6 +139,22 @@ class CorpusCharacterizationTests(unittest.TestCase):
 
         self.assertEqual(update["case_facts"].gross_primary_site, "breast")
 
+    def test_a_name_outside_the_vocabulary_counts_as_unspecified(self):
+        for corpus in ({3: self.free_text_note}, {1: self.note, 3: self.free_text_note}):
+            with self.subTest(notes=list(corpus)):
+                update = self.agent().characterize_corpus(CaseState(note_corpus=corpus))
+
+                self.assertIsNone(update["case_facts"])
+
+    def test_characterization_does_not_need_the_site_dictionary(self):
+        agent = object.__new__(OrchestratorAgent)
+        agent._site_data_dictionary_path = None
+        state = CaseState(note_corpus={1: self.note})
+
+        update = agent.characterize_corpus(state)
+
+        self.assertEqual(update["case_facts"].gross_primary_site, "breast")
+
     @patch("cipoc.agents.orchestrator.build_corpus_descriptors")
     def test_scalar_affected_tissue_is_not_split_into_characters(self, descriptors):
         descriptors.return_value = SimpleNamespace(
@@ -138,8 +167,10 @@ class CorpusCharacterizationTests(unittest.TestCase):
         self.assertEqual(update["case_facts"].gross_primary_site, "breast")
 
     def test_initial_group_uses_breast_codes_after_characterization(self):
+        if not BASE_DICTIONARY.exists():
+            self.skipTest(f"{BASE_DICTIONARY} not present")
         state = CaseState(note_corpus={1: self.note, 2: self.breast_note})
-        agent = self.agent()
+        agent = self.agent(BASE_DICTIONARY)
         facts = agent.characterize_corpus(state)["case_facts"]
         initial_group = load_variable_groups(VARIABLE_GROUPS)[0]
 
@@ -159,9 +190,9 @@ class CorpusCharacterizationTests(unittest.TestCase):
         site_path = Path(directory.name) / "site.json"
         base_path.write_text(json.dumps({"400": {
             "item_name": "Primary Site", "item_length": 4,
-            "allowed_codes": {"C504": "Breast", "C349": "Lung"},
+            "allowed_codes": primary_site_codes(),
         }}))
-        site_path.write_text(json.dumps({"breast": {"400": {"allowed_codes": {"C504": "Breast"}}}}))
+        site_path.write_text(SCOPING_DICTIONARY.read_text())
         agent = object.__new__(OrchestratorAgent)
         agent._data_dictionary_path = base_path
         agent._site_data_dictionary_path = site_path
@@ -177,7 +208,7 @@ class CorpusCharacterizationTests(unittest.TestCase):
             reads = [call for call in opened.call_args_list if Path(call.args[0]) == path]
             self.assertEqual(len(reads), 1, path.name)
         self.assertEqual(facts.gross_primary_site, "breast")
-        self.assertEqual(scoped.variables[0].valid_codes, {"C504": "Breast"})
+        self.assertEqual(set(scoped.variables[0].valid_codes), TISSUE_CODES["breast"])
 
 
 class OrchestratorRunTests(unittest.TestCase):

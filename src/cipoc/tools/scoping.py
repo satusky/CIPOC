@@ -1,4 +1,4 @@
-"""Load and check the scoping-only site dictionary, and match cases to its schemas."""
+"""Load and check the scoping-only site dictionary, and scope a case's codes by it."""
 
 import json
 import re
@@ -10,6 +10,7 @@ from cipoc.models import CaseFacts, GrossSite, ScopingDictionary
 
 
 PRIMARY_SITE_ITEM = 400
+HISTOLOGY_ITEM = 522
 _GENERATOR = "`python -m canonical_naaccr.cipoc_scoping` in canonical-naaccr"
 _TISSUES = frozenset(get_args(GrossSite)) - {"unspecified"}
 # The select keys the generator writes. CIPOC doesn't extract the discriminators
@@ -19,6 +20,8 @@ SELECT_KEYS = (
     "discriminator_1", "discriminator_2", "ssf25",
 )
 _SITE_CODE = re.compile(r"C[0-9]{3}")
+# A coded Primary Site as site_applies accepts it: upper case, with or without the dot.
+_CODED_PRIMARY = re.compile(r"C[0-9]{2}\.?[0-9]")
 # NAACCR's YYYYMMDD or ISO YYYY-MM-DD, either one possibly cut to the year or month.
 # Day 00 is NAACCR's unknown day.
 _DIAGNOSIS_DATE = re.compile(r"([0-9]{4})(?:(-?)(0[1-9]|1[0-2])(?:\2(0[0-9]|[12][0-9]|3[01]))?)?")
@@ -160,6 +163,47 @@ def check_primary_site_coverage(
         )
 
 
+def tissue_site_codes(scoping: ScopingDictionary | None) -> dict[str, frozenset[str]]:
+    """Map each tissue to its Primary Site (400) codes, normalized like ``C504``.
+
+    A tissue with no 400 codes is left out, so ``site_applies`` reads it as unknown.
+    """
+    table: dict[str, frozenset[str]] = {}
+    for tissue, entry in (scoping.tissues if scoping else {}).items():
+        codes = entry.codes.get(PRIMARY_SITE_ITEM)
+        if codes:
+            table[tissue] = frozenset(_normalize_code(code) for code in codes)
+    return table
+
+
+def primary_site_tissue(scoping: ScopingDictionary, facts: CaseFacts | None) -> str | None:
+    """The tissue whose codes scope Primary Site, or None to leave it unscoped.
+
+    A coded primary picks the tissue that holds it, outranking the gross site.
+    C809 or a malformed coded primary picks none and, as in ``site_applies``,
+    also stops the gross-site fallback. Otherwise the gross site counts only if
+    it's a tissue in the file, so "unspecified" and names outside the
+    vocabulary never narrow.
+    """
+    if facts is None:
+        return None
+    if facts.primary_site:
+        coded = facts.primary_site.strip().upper()
+        code = coded.replace(".", "")
+        if not _CODED_PRIMARY.fullmatch(coded) or code == "C809":
+            return None
+        return next(
+            (
+                tissue
+                for tissue, entry in scoping.tissues.items()
+                if any(_normalize_code(site) == code for site in entry.codes.get(PRIMARY_SITE_ITEM, {}))
+            ),
+            None,
+        )
+    gross_site = facts.gross_primary_site
+    return gross_site if gross_site in scoping.tissues else None
+
+
 def _diagnosis_year(value: str | None) -> int | None:
     match = _DIAGNOSIS_DATE.fullmatch((value or "").strip())
     if match is None or int(match.group(1)) == 0:
@@ -259,3 +303,29 @@ def scoped_codes(
                 return None
             merged.setdefault(code, description)
     return merged or None
+
+
+def scoped_item_codes(
+    scoping: ScopingDictionary, facts: CaseFacts | None, item_ids: Iterable[int]
+) -> dict[int, dict[str, str]]:
+    """The codes that replace NAACCR's for each of the items the case narrows.
+
+    Primary Site (400) takes its tissue's codes (``primary_site_tissue``).
+    Histology (522) isn't narrowed. Every other item takes ``scoped_codes`` over
+    the schemas the case matches. Items left out keep NAACCR's codes.
+    """
+    scoped: dict[int, dict[str, str]] = {}
+    schema_keys: list[str] | None = None
+    for item_id in item_ids:
+        if item_id == PRIMARY_SITE_ITEM:
+            tissue = primary_site_tissue(scoping, facts)
+            codes = scoping.tissues[tissue].codes.get(PRIMARY_SITE_ITEM) if tissue else None
+        elif item_id == HISTOLOGY_ITEM:
+            codes = None
+        else:
+            if schema_keys is None:
+                schema_keys = matching_schemas(scoping, facts)
+            codes = scoped_codes(scoping, schema_keys, item_id)
+        if codes:
+            scoped[item_id] = dict(codes)
+    return scoped

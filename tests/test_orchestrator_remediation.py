@@ -46,7 +46,7 @@ from cipoc.models import (
 from cipoc.models.observability import ObservabilityIssue
 from cipoc.utils import ObservabilityCollector
 
-from tests.fake_orchestrator import Outcome, Script, build_fake_orchestrator
+from tests.fake_orchestrator import SCOPING_DICTIONARY, Outcome, Script, build_fake_orchestrator, primary_site_codes
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -239,20 +239,15 @@ class OrchestratorRemediationTests(unittest.TestCase):
         directory = Path(self.enterContext(tempfile.TemporaryDirectory()))
         base = {
             "400": {"item_name": "Primary Site", "item_length": 4,
-                    "allowed_codes": {"C504": "Breast", "C349": "Lung", "C693": "Choroid"}},
+                    "allowed_codes": primary_site_codes()},
             "410": {"item_name": "Laterality", "item_length": 1,
                     "allowed_codes": {"0": "Base only", "1": "Breast", "2": "Lung"}},
-        }
-        site = {
-            "breast": {"400": {"allowed_codes": {"C504": "Breast"}},
-                       "410": {"allowed_codes": {"1": "Breast"}}},
-            "lung": {"400": {"allowed_codes": {"C349": "Lung"}},
-                     "410": {"allowed_codes": {"2": "Lung"}}},
+            "3843": {"item_name": "Grade Clinical", "item_length": 1,
+                     "allowed_codes": {"1": "Base G1", "9": "Base unknown"}},
         }
         agent._data_dictionary_path = directory / "base.json"
-        agent._site_data_dictionary_path = directory / "site.json"
+        agent._site_data_dictionary_path = SCOPING_DICTIONARY
         agent._data_dictionary_path.write_text(json.dumps(base), encoding="utf-8")
-        agent._site_data_dictionary_path.write_text(json.dumps(site), encoding="utf-8")
         # Restore the real scoping method stubbed by the dashboard fixture.
         del agent._scope_group
 
@@ -376,20 +371,25 @@ class OrchestratorRemediationTests(unittest.TestCase):
 
     def test_coded_primary_beats_breast_mentions_in_characterization_scope_and_planning(self):
         agent = _agent(groups=[
-            _group(), _group("laterality", (410,), stage="dependent"),
+            _group(item_ids=(400, 390, 522)), _group("grade", (3843,), stage="dependent"),
             _group("breast-only", (420,), stage="dependent",
                    applies_to=SiteApplicability(gross_primary_sites=["breast"])),
         ])
         self._dictionaries(agent)
-        agent._extractor._script.outcomes[410] = Outcome(value="2")
+        agent._extractor._script.outcomes[3843] = Outcome(value="2")
         with patch.object(agent._extractor, "run", wraps=agent._extractor.run) as extract:
-            result = agent.run([_note().model_dump()], {400: "C349"}, progress=False)
+            result = agent.run(
+                [_note().model_dump()], {400: "C349", 390: "20200115", 522: "8070"}, progress=False,
+            )
         self.assertEqual(result.case.case_facts.primary_site, "C349")
         self.assertIsNone(result.case.case_facts.gross_primary_site)
         self.assertEqual(result.corpus.note_corpus_descriptors.affected_tissues, {"current": {"breast"}})
         self.assertEqual(result.case.variable_results[420].status, VariableStatus.NOT_APPLICABLE)
         extract.assert_called_once()
-        self.assertEqual(extract.call_args.args[0].requested_variables.variables[0].valid_codes, {"2": "Lung"})
+        # Grade takes the EOD lung schema's codes, not breast's Nottingham grades.
+        grade = extract.call_args.args[0].requested_variables.variables[0].valid_codes
+        self.assertEqual(set(grade), {"1", "2", "3", "4", "9"})
+        self.assertEqual(grade["1"], "G1: Well differentiated")
 
     def test_unresolved_current_tissue_does_not_narrow_or_fall_back_to_history(self):
         model = _ScannerModel(tissues={"note-A": [
@@ -403,22 +403,25 @@ class OrchestratorRemediationTests(unittest.TestCase):
         self.assertIsNone(result.case.case_facts.gross_primary_site)
         self.assertEqual(
             set(extract.call_args.args[0].requested_variables.variables[0].valid_codes),
-            {"C504", "C349", "C693"},
+            set(primary_site_codes()),
         )
         self.assertEqual(result.corpus.note_corpus_descriptors.affected_tissues["current"],
                          {"breast", "unspecified"})
 
-    def test_known_primary_without_site_dictionary_never_falls_back_to_gross_breast(self):
+    def test_coded_primary_scopes_by_its_own_tissue_never_the_gross_breast(self):
         agent = _agent()
         self._dictionaries(agent)
+        eye = {code for code in primary_site_codes() if code.startswith("C69")}
         # A later coded primary can coexist with an earlier gross-site inference.
         for primary in ("C693", "C69.3"):
             with self.subTest(primary=primary):
                 scoped = agent._scope_group(
-                    _group(item_ids=(410,)),
+                    _group(item_ids=(400, 410)),
                     CaseFacts(primary_site=primary, gross_primary_site="breast"),
                 )
-                self.assertEqual(scoped.variables[0].valid_codes,
+                site, laterality = scoped.variables
+                self.assertEqual(set(site.valid_codes), eye)
+                self.assertEqual(laterality.valid_codes,
                                  {"0": "Base only", "1": "Breast", "2": "Lung"})
 
     def test_fingerprint_projects_before_serialization_and_ignores_auth_only_changes(self):
