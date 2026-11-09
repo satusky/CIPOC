@@ -8,7 +8,14 @@ from typing import get_args
 from cipoc.models import CaseFacts, GrossSite
 from cipoc.tools import (
     build_variable_group,
+    check_histology_pairs,
     check_primary_site_coverage,
+    histology_block_listing,
+    histology_code_listing,
+    histology_family_listing,
+    histology_pair_listed,
+    histology_pairs,
+    histology_site_group,
     load_data_dictionary,
     load_scoping_dictionary,
     matching_schemas,
@@ -70,14 +77,16 @@ class ScopingDictionaryLoadTests(unittest.TestCase):
 
     def test_sections_from_a_newer_generator_still_load(self):
         newer = copy.deepcopy(self.raw)
-        newer["blocks"] = {"800-800": {"name": "Neoplasms, NOS"}}
+        newer["algorithms"] = {"eod": {"years": "2018-"}}
         newer["tissues"]["breast"]["notes"] = "added later"
         newer["schemas"]["cs/breast"]["ssf"] = {"3836": "2880"}
+        newer["histology"]["breast"]["notes"] = "added later"
 
         scoping = parse_scoping_dictionary(newer)
 
         self.assertEqual(list(scoping.tissues), TISSUES)
         self.assertEqual(list(scoping.schemas), list(self.raw["schemas"]))
+        self.assertEqual(list(scoping.histology), list(self.raw["histology"]))
 
     def test_schemas_select_only_on_keys_the_matcher_reads(self):
         unknown_key = copy.deepcopy(self.raw)
@@ -101,6 +110,84 @@ class ScopingDictionaryLoadTests(unittest.TestCase):
         del stale["schemas"]
         with self.assertRaisesRegex(ValueError, "schemas"):
             parse_scoping_dictionary(stale)
+
+    def test_a_file_without_histology_or_blocks_names_the_section(self):
+        for sections in (["histology"], ["blocks"], ["histology", "blocks"]):
+            with self.subTest(sections=sections):
+                stale = copy.deepcopy(self.raw)
+                for section in sections:
+                    del stale[section]
+                with self.assertRaisesRegex(
+                    ValueError, f"no {' or '.join(sections)} section.*canonical_naaccr.cipoc_scoping"
+                ):
+                    parse_scoping_dictionary(stale)
+
+
+class HistologyLoadTests(unittest.TestCase):
+    def setUp(self):
+        self.raw = json.loads(FIXTURE.read_text())
+
+    def test_fixture_keeps_every_group_and_block(self):
+        scoping = load_scoping_dictionary(FIXTURE)
+
+        self.assertEqual(len(scoping.histology), 82)
+        self.assertEqual(len(scoping.blocks), 49)
+        self.assertEqual(scoping.histology["breast"].sites, "C500-C506,C508-C509")
+        self.assertEqual(scoping.blocks["814-838"].label, "Adenomas and adenocarcinomas")
+        # The trimmed fixture keeps the families of only a few groups.
+        self.assertEqual(sum(1 for group in scoping.histology.values() if not group.families), 76)
+
+    def test_a_code_in_two_groups_names_both(self):
+        overlapping = copy.deepcopy(self.raw)
+        overlapping["histology"]["breast"]["sites"] = "C500-C506,C508-C509,C649"
+        with self.assertRaisesRegex(ValueError, "C649 in breast and kidney"):
+            parse_scoping_dictionary(overlapping)
+
+    def test_every_primary_site_code_needs_a_group(self):
+        uncovered = copy.deepcopy(self.raw)
+        uncovered["histology"]["breast"]["sites"] = "C500-C504"
+        with self.assertRaisesRegex(ValueError, r"in no histology group: \['C505', 'C506', 'C508', 'C509'\]"):
+            parse_scoping_dictionary(uncovered)
+
+    def test_unknown_primary_needs_a_group(self):
+        missing = copy.deepcopy(self.raw)
+        missing["histology"]["unknown"]["sites"] = "C809"
+        missing["tissues"]["unknown_primary_site"]["codes"]["400"] = {}
+        with self.assertRaisesRegex(ValueError, "No histology group holds C809"):
+            parse_scoping_dictionary(missing)
+
+    def test_sites_must_parse_like_a_schema_site(self):
+        unparseable = copy.deepcopy(self.raw)
+        unparseable["histology"]["breast"]["sites"] = "C50.0-C50.9 (breast)"
+        with self.assertRaisesRegex(ValueError, r"Histology group breast: Unsupported site value.*canonical_naaccr"):
+            parse_scoping_dictionary(unparseable)
+
+    def test_families_and_pairs_must_be_well_formed(self):
+        families = self.raw["histology"]["breast"]["families"]
+        for family, pair, message in (
+            ("85", "8500/3", "group breast has family '85', which isn't 3 digits"),
+            ("850", "85003", r"group breast family 850 holds \['85003'\]"),
+            ("850", "8520/3", r"group breast family 850 holds \['8520/3'\]"),
+        ):
+            with self.subTest(family=family, pair=pair):
+                malformed = copy.deepcopy(self.raw)
+                malformed["histology"]["breast"]["families"] = {
+                    family: {"label": "DUCT CARCINOMA", "codes": {pair: families["850"]["codes"]["8500/3"]}},
+                }
+                with self.assertRaisesRegex(ValueError, message):
+                    parse_scoping_dictionary(malformed)
+
+    def test_blocks_must_be_ranges_that_dont_overlap(self):
+        for blocks, message in (
+            ({"814-838": {"label": "Adenomas"}, "838-842": {"label": "Adnexal"}}, "blocks 814-838 and 838-842 overlap"),
+            ({"8140-8389": {"label": "Adenomas"}}, "block '8140-8389' isn't a 3-digit prefix or range"),
+            ({"838-814": {"label": "Adenomas"}}, "block '838-814' isn't a 3-digit prefix or range"),
+        ):
+            with self.subTest(blocks=blocks):
+                malformed = copy.deepcopy(self.raw)
+                malformed["blocks"] = blocks
+                with self.assertRaisesRegex(ValueError, message):
+                    parse_scoping_dictionary(malformed)
 
 
 class PrimarySiteCoverageTests(unittest.TestCase):
@@ -404,6 +491,141 @@ class ScopedItemCodesTests(unittest.TestCase):
             scoped_item_codes(self.scoping, CaseFacts(gross_primary_site="breast"), [400, 522, 764, 1182, 3843])
             scoped_item_codes(self.scoping, CaseFacts(gross_primary_site="breast"), [400, 522])
         self.assertEqual(matched.call_count, 1)
+
+
+class HistologyScopeTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.scoping = load_scoping_dictionary(FIXTURE)
+
+    def test_a_coded_primary_picks_its_site_group(self):
+        for code, group in (("C50.4", "breast"), ("C504", "breast"), ("c34.9", "lung_and_bronchus"), ("C649", "kidney")):
+            with self.subTest(code=code):
+                self.assertEqual(histology_site_group(self.scoping, code), group)
+
+    def test_an_uncoded_malformed_or_unknown_primary_gets_the_unknown_group(self):
+        # NOT_FOUND and ERROR leave the primary uncoded; C507 isn't an ICD-O-3 code.
+        for code in (None, "", "C50", "breast", "C809", "C80.9", "C507"):
+            with self.subTest(code=code):
+                self.assertEqual(histology_site_group(self.scoping, code), "unknown")
+
+    def test_breast_reaches_angiosarcoma_and_malignant_phyllodes(self):
+        group = histology_site_group(self.scoping, "C50.4")
+        families = histology_family_listing(self.scoping, group)
+
+        self.assertIn("912", families)
+        self.assertIn("902", families)
+        self.assertEqual(histology_code_listing(self.scoping, group, ["912"]), {"9120/3": "Hemangiosarcoma; Angiosarcoma"})
+        self.assertIn("9020/3", histology_code_listing(self.scoping, group, ["902"]))
+
+    def test_the_family_listing_shows_the_lists_terms(self):
+        families = histology_family_listing(self.scoping, "breast")
+
+        self.assertEqual(len(families), 63)
+        self.assertEqual(
+            families["852"],
+            "LOBULAR AND OTHER DUCTAL CA.: Lobular carcinoma in situ; Lobular carcinoma, NOS; "
+            "Infiltrating ductular carcinoma; Intraductal and lobular in situ carcinoma; "
+            "Infiltrating duct and lobular carcinoma; Infiltr. duct mixed with other types of carcinoma; "
+            "Infiltrating lobular mixed with other types of carc.; Polymorphous low grade adenocarcinoma",
+        )
+        self.assertEqual(histology_family_listing(self.scoping, "stomach"), {})
+
+    def test_the_code_listing_shows_v25_descriptions(self):
+        codes = histology_code_listing(self.scoping, "breast", ["850"])
+
+        self.assertTrue(codes["8500/3"].startswith("Infiltrating duct carcinoma, NOS; Invasive breast carcinoma"))
+        self.assertNotIn("Invasive carcinoma of no special type", codes.values())
+
+    def test_two_families_give_the_union_of_their_codes(self):
+        duct = histology_code_listing(self.scoping, "breast", ["850"])
+        lobular = histology_code_listing(self.scoping, "breast", ["852"])
+
+        both = histology_code_listing(self.scoping, "breast", ["852", "850", "852"])
+
+        self.assertEqual(both, {**duct, **lobular})
+        self.assertEqual(list(both), sorted(both))
+
+    def test_an_unknown_family_or_no_family_raises(self):
+        with self.assertRaisesRegex(ValueError, r"breast has no families \['999'\]"):
+            histology_code_listing(self.scoping, "breast", ["850", "999"])
+        with self.assertRaisesRegex(ValueError, "at least one"):
+            histology_code_listing(self.scoping, "breast", [])
+
+    def test_whether_a_pair_is_on_the_groups_list(self):
+        self.assertTrue(histology_pair_listed(self.scoping, "breast", "8500/3"))
+        self.assertTrue(histology_pair_listed(self.scoping, "breast", " 9120/3 "))
+        # Renal cell carcinoma and glioblastoma are on other sites' lists.
+        for pair in ("8500/1", "8312/3", "9440/3", "8500", ""):
+            with self.subTest(pair=pair):
+                self.assertFalse(histology_pair_listed(self.scoping, "breast", pair))
+        self.assertFalse(histology_pair_listed(self.scoping, "stomach", "8140/3"))
+
+
+class HistologyFallbackTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.scoping = load_scoping_dictionary(FIXTURE)
+
+    def test_pairs_are_grouped_by_block_in_block_order(self):
+        pairs = {"9993/3": "Myelodysplastic syndrome", "8500/3": "Duct carcinoma", "8140/3": "Adenocarcinoma, NOS",
+                 "8000/3": "Neoplasm, malignant", "8141/3": "Scirrhous adenocarcinoma"}
+
+        blocks = histology_block_listing(self.scoping, pairs)
+
+        self.assertEqual(list(blocks), ["800", "814-838", "850-854", "998-999"])
+        self.assertEqual(blocks["814-838"], {"8140/3": "Adenocarcinoma, NOS", "8141/3": "Scirrhous adenocarcinoma"})
+
+    def test_a_pair_in_no_block_or_malformed_raises(self):
+        with self.assertRaisesRegex(ValueError, r"7999/3 is in morphology blocks \[\]"):
+            histology_block_listing(self.scoping, {"7999/3": "Not a neoplasm"})
+        with self.assertRaisesRegex(ValueError, "'8500' isn't a code/behavior pair"):
+            histology_block_listing(self.scoping, {"8500": "Duct carcinoma"})
+
+    def test_histology_pairs_are_read_uncollapsed(self):
+        dictionary = {"522": {"item_length": 4, "allowed_codes": {"8500/2": "Intraductal", "8500/3": "Duct"}}}
+        self.assertEqual(histology_pairs(dictionary), {"8500/2": "Intraductal", "8500/3": "Duct"})
+        for broken in ({}, {"522": {"allowed_codes": {"8500": "Duct"}}}):
+            with self.subTest(broken=broken):
+                with self.assertRaisesRegex(ValueError, "item 522 has no code/behavior pairs"):
+                    histology_pairs(broken)
+
+    def test_listed_pairs_must_be_item_522_pairs_in_a_block(self):
+        pairs = {
+            pair
+            for group in self.scoping.histology.values()
+            for family in group.families.values()
+            for pair in family.codes
+        }
+        check_histology_pairs(self.scoping, pairs)
+        with self.assertRaisesRegex(ValueError, r"aren't in item 522: \['8500/3'\]"):
+            check_histology_pairs(self.scoping, pairs - {"8500/3"})
+        with self.assertRaisesRegex(ValueError, "7999/3 is in morphology blocks"):
+            check_histology_pairs(self.scoping, pairs | {"7999/3"})
+
+
+class RealHistologyPairsTests(unittest.TestCase):
+    """The fixture offers only v25 pairs, and every v25 pair has a block."""
+
+    @classmethod
+    def setUpClass(cls):
+        if not BASE_DICTIONARY.exists():
+            raise unittest.SkipTest(f"{BASE_DICTIONARY} not present")
+        cls.pairs = histology_pairs(load_data_dictionary(BASE_DICTIONARY))
+        cls.scoping = load_scoping_dictionary(FIXTURE)
+
+    def test_only_v25_pairs_are_offered(self):
+        self.assertEqual(len(self.pairs), 1143)
+        check_histology_pairs(self.scoping, self.pairs)
+        # On the list for stomach, pancreas and lymph nodes, but not in v25.
+        self.assertNotIn("8157/3", self.pairs)
+
+    def test_the_fallback_offers_every_v25_pair_once(self):
+        blocks = histology_block_listing(self.scoping, self.pairs)
+
+        self.assertEqual(sum(len(codes) for codes in blocks.values()), len(self.pairs))
+        self.assertEqual(max(blocks, key=lambda key: len(blocks[key])), "814-838")
+        self.assertEqual(blocks["850-854"]["8500/3"], self.pairs["8500/3"])
 
 
 if __name__ == "__main__":

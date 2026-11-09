@@ -13,6 +13,8 @@ PRIMARY_SITE_ITEM = 400
 HISTOLOGY_ITEM = 522
 UNKNOWN_PRIMARY_SITE = "C809"
 _GENERATOR = "`python -m canonical_naaccr.cipoc_scoping` in canonical-naaccr"
+# The sections CIPOC reads, each added by a later version of the generator.
+_SECTIONS = ("sources", "tissues", "schemas", "histology", "blocks")
 _TISSUES = frozenset(get_args(GrossSite)) - {"unspecified"}
 # The select keys the generator writes. CIPOC doesn't extract the discriminators
 # (3926, 3927) or CS Site-Specific Factor 25 (2879), so those always match.
@@ -23,6 +25,9 @@ SELECT_KEYS = (
 _SITE_CODE = re.compile(r"C[0-9]{3}")
 # A coded Primary Site as site_applies accepts it: upper case, with or without the dot.
 _CODED_PRIMARY = re.compile(r"C[0-9]{2}\.?[0-9]")
+_FAMILY = re.compile(r"[0-9]{3}")
+_PAIR = re.compile(r"[0-9]{4}/[0-9]")
+_BLOCK = re.compile(r"([0-9]{3})(?:-([0-9]{3}))?")
 # NAACCR's YYYYMMDD or ISO YYYY-MM-DD, either one possibly cut to the year or month.
 # Day 00 is NAACCR's unknown day.
 _DIAGNOSIS_DATE = re.compile(r"([0-9]{4})(?:(-?)(0[1-9]|1[0-2])(?:\2(0[0-9]|[12][0-9]|3[01]))?)?")
@@ -71,6 +76,28 @@ def _select_ranges(key: str, value: str) -> tuple[tuple, ...]:
     return tuple(ranges)
 
 
+def _all_site_codes(scoping: ScopingDictionary) -> set[str]:
+    return {
+        _normalize_code(code)
+        for entry in scoping.tissues.values()
+        for code in entry.codes.get(PRIMARY_SITE_ITEM, {})
+    }
+
+
+def _in_sites(code: str, sites: str) -> bool:
+    return any(low <= code <= high for low, high in _select_ranges("site", sites))
+
+
+def _block_range(key: str) -> tuple[int, int]:
+    match = _BLOCK.fullmatch(key)
+    if match is None or int(match.group(2) or match.group(1)) < int(match.group(1)):
+        raise ValueError(
+            f"Morphology block {key!r} isn't a 3-digit prefix or range like '814-838'. "
+            f"Regenerate the file with {_GENERATOR}."
+        )
+    return int(match.group(1)), int(match.group(2) or match.group(1))
+
+
 def _check_schemas(scoping: ScopingDictionary) -> None:
     for key, schema in scoping.schemas.items():
         for row in schema.select:
@@ -95,19 +122,73 @@ def _check_schemas(scoping: ScopingDictionary) -> None:
                 )
 
 
+def _check_histology(scoping: ScopingDictionary) -> None:
+    codes = _all_site_codes(scoping)
+    owner: dict[str, str] = {}
+    duplicates: list[str] = []
+    for key, group in scoping.histology.items():
+        try:
+            covered = sorted(code for code in codes if _in_sites(code, group.sites))
+        except ValueError as error:
+            raise ValueError(
+                f"Histology group {key}: {error} Regenerate the file with {_GENERATOR}."
+            ) from None
+        for code in covered:
+            if code in owner:
+                duplicates.append(f"{code} in {owner[code]} and {key}")
+            else:
+                owner[code] = key
+        for number, family in group.families.items():
+            if not _FAMILY.fullmatch(number):
+                raise ValueError(f"Histology group {key} has family {number!r}, which isn't 3 digits.")
+            malformed = [pair for pair in family.codes if not (_PAIR.fullmatch(pair) and pair.startswith(number))]
+            if malformed:
+                raise ValueError(
+                    f"Histology group {key} family {number} holds {malformed}, "
+                    f"which aren't code/behavior pairs starting with {number}."
+                )
+    if duplicates:
+        raise ValueError(
+            f"Primary Site codes are in more than one histology group: {'; '.join(duplicates)}."
+        )
+    uncovered = sorted(codes - set(owner))
+    if uncovered:
+        raise ValueError(f"Primary Site codes are in no histology group: {uncovered}.")
+    if UNKNOWN_PRIMARY_SITE not in owner:
+        raise ValueError(f"No histology group holds {UNKNOWN_PRIMARY_SITE}, the unknown primary.")
+
+
+def _check_blocks(scoping: ScopingDictionary) -> None:
+    ranges = sorted((*_block_range(key), key) for key in scoping.blocks)
+    for (_, high, key), (low, _, later) in zip(ranges, ranges[1:]):
+        if low <= high:
+            raise ValueError(f"Morphology blocks {key} and {later} overlap.")
+
+
 def parse_scoping_dictionary(data: Mapping[str, Any]) -> ScopingDictionary:
-    """Validate a parsed scoping dictionary and check its tissue table and schemas.
+    """Validate a parsed scoping dictionary and check its tissue table, schemas,
+    histology site groups and morphology blocks.
 
     The tissue keys must equal ``GrossSite`` minus "unspecified", and no Primary
     Site code may be in two tissues. Every schema's select keys must be ones the
     matcher reads, with values it can parse, and every override's source must be
-    in ``sources``. Coverage of item 400 is checked separately by
-    ``check_primary_site_coverage``, since it needs the NAACCR dictionary.
+    in ``sources``. The histology site groups must hold each of the tissues'
+    Primary Site codes exactly once, C809 included, and their families' pairs
+    must start with the family's 3 digits. Morphology blocks mustn't overlap.
+    Coverage of item 400, and of item 522's pairs, is checked separately
+    (``check_primary_site_coverage``, ``check_histology_pairs``), since it needs
+    the NAACCR dictionary.
     """
     if _is_old_format(data):
         raise ValueError(
             "The site dictionary is in the old tissue-keyed format. "
             f"Regenerate it as a scoping dictionary with {_GENERATOR}."
+        )
+    missing_sections = [section for section in _SECTIONS if section not in data]
+    if missing_sections:
+        raise ValueError(
+            f"The site dictionary has no {' or '.join(missing_sections)} section, so it's "
+            f"from an older build. Regenerate it with {_GENERATOR}."
         )
     scoping = ScopingDictionary.model_validate(data)
 
@@ -135,6 +216,8 @@ def parse_scoping_dictionary(data: Mapping[str, Any]) -> ScopingDictionary:
             f"Primary Site codes are in more than one tissue: {'; '.join(duplicates)}."
         )
     _check_schemas(scoping)
+    _check_histology(scoping)
+    _check_blocks(scoping)
     return scoping
 
 
@@ -364,3 +447,105 @@ def scoped_item_codes(
         if codes:
             scoped[item_id] = dict(codes)
     return scoped
+
+
+def histology_site_group(scoping: ScopingDictionary, primary_site: str | None) -> str:
+    """The key of the histology site group for a coded Primary Site.
+
+    A Primary Site that isn't coded (NOT_FOUND and ERROR leave it None), is
+    malformed, or isn't one of the tissues' codes gets the group that holds C809,
+    the unknown primary.
+    """
+    coded = (primary_site or "").strip().upper()
+    code = coded.replace(".", "")
+    if not _CODED_PRIMARY.fullmatch(coded) or code not in _all_site_codes(scoping):
+        code = UNKNOWN_PRIMARY_SITE
+    for key, group in scoping.histology.items():
+        if _in_sites(code, group.sites):
+            return key
+    raise ValueError(f"No histology group holds {code}.")
+
+
+def histology_family_listing(scoping: ScopingDictionary, group: str) -> dict[str, str]:
+    """The site group's families for the family step, keyed by their 3 digits.
+
+    Each is the list's label and its members' abbreviated terms, since the
+    labels alone are terse. The full v25 descriptions wait for the code step.
+    """
+    listing: dict[str, str] = {}
+    for number, family in scoping.histology[group].families.items():
+        terms = dict.fromkeys(code.term for code in family.codes.values())
+        listing[number] = f"{family.label}: {'; '.join(terms)}"
+    return listing
+
+
+def histology_code_listing(
+    scoping: ScopingDictionary, group: str, families: Iterable[str]
+) -> dict[str, str]:
+    """The chosen families' code/behavior pairs with their v25 descriptions, in code order.
+
+    Several families give the union of their pairs. A family the group doesn't
+    have raises, and so does choosing none, which the fallback handles instead.
+    """
+    site_group = scoping.histology[group]
+    chosen = list(dict.fromkeys(families))
+    if not chosen:
+        raise ValueError("Choose at least one histology family.")
+    unknown = [number for number in chosen if number not in site_group.families]
+    if unknown:
+        raise ValueError(f"Histology group {group} has no families {unknown}.")
+    return dict(sorted(
+        (pair, code.description)
+        for number in chosen
+        for pair, code in site_group.families[number].codes.items()
+    ))
+
+
+def histology_pair_listed(scoping: ScopingDictionary, group: str, pair: str) -> bool:
+    """Whether the site group lists the code/behavior pair, like '8500/3'."""
+    pair = pair.strip()
+    family = scoping.histology[group].families.get(pair[:3])
+    return family is not None and pair in family.codes
+
+
+def histology_block_listing(
+    scoping: ScopingDictionary, pairs: Mapping[str, str]
+) -> dict[str, dict[str, str]]:
+    """Every pair grouped by ICD-O-3 morphology block, for the fallback.
+
+    ``pairs`` maps item 522's code/behavior pairs to their descriptions
+    (``histology_pairs``). Blocks keep the file's order, and one no pair falls
+    in is left out. A malformed pair, or one not in exactly one block, raises.
+    """
+    ranges = [(key, *_block_range(key)) for key in scoping.blocks]
+    grouped: dict[str, dict[str, str]] = {key: {} for key in scoping.blocks}
+    for pair, description in sorted(pairs.items()):
+        if not _PAIR.fullmatch(pair):
+            raise ValueError(f"{pair!r} isn't a code/behavior pair like '8500/3'.")
+        holding = [key for key, low, high in ranges if low <= int(pair[:3]) <= high]
+        if len(holding) != 1:
+            raise ValueError(f"{pair} is in morphology blocks {holding}, not exactly one.")
+        grouped[holding[0]][pair] = description
+    return {key: codes for key, codes in grouped.items() if codes}
+
+
+def check_histology_pairs(scoping: ScopingDictionary, pairs: Iterable[str]) -> None:
+    """Fail unless every pair the site groups list is one of item 522's pairs, and
+    each of item 522's pairs is in exactly one morphology block.
+
+    Offering only item 522's pairs keeps every offered value valid; the list has
+    pairs v25 doesn't, which the generator drops.
+    """
+    pairs = set(pairs)
+    unlisted = sorted(
+        {
+            pair
+            for group in scoping.histology.values()
+            for family in group.families.values()
+            for pair in family.codes
+        }
+        - pairs
+    )
+    if unlisted:
+        raise ValueError(f"Histology groups list pairs that aren't in item 522: {unlisted}.")
+    histology_block_listing(scoping, dict.fromkeys(pairs, ""))

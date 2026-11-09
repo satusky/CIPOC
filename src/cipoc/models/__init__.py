@@ -83,6 +83,10 @@ from .scoping import (
     TissueCodes,
     CodeOverride,
     StagingSchema,
+    HistologyCode,
+    HistologyFamily,
+    HistologySiteGroup,
+    MorphologyBlock,
     ScopingDictionary,
 )
 
@@ -162,6 +166,10 @@ __all__ = [
     "TissueCodes",
     "CodeOverride",
     "StagingSchema",
+    "HistologyCode",
+    "HistologyFamily",
+    "HistologySiteGroup",
+    "MorphologyBlock",
     "ScopingDictionary",
     "OrchestratorConfigFingerprint",
     "OrchestratorRunCorpus",

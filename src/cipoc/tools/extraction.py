@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from cipoc.models import VariableInfo, VariableGroupInfo, VariableOutput
 
-from .scoping import scoped_item_codes
+from .scoping import HISTOLOGY_ITEM, scoped_item_codes
 
 if TYPE_CHECKING:
     from cipoc.models import CaseFacts, ScopingDictionary
@@ -353,6 +353,21 @@ def load_data_dictionary(data_dictionary_path: str | Path | None) -> dict:
     if "items" in data_dictionary:
         data_dictionary = {str(item["item_number"]): item for item in data_dictionary["items"]}
     return data_dictionary
+
+
+def histology_pairs(data_dictionary: dict) -> dict[str, str]:
+    """Histology (522)'s code/behavior pairs and descriptions, uncollapsed.
+
+    The NAACCR entry lists each 4-digit code once per behavior ('8500/2',
+    '8500/3'). Validation collapses them to the stored 4 digits, but histology
+    scoping offers pairs, since one pair codes both 522 and Behavior (523).
+    """
+    codes = _normalize_code_descriptions(_entry_codes(data_dictionary.get(str(HISTOLOGY_ITEM))))
+    if not isinstance(codes, dict) or not codes or not all(_MORPHOLOGY_KEY.fullmatch(code) for code in codes):
+        raise ValueError(
+            f"The data dictionary's item {HISTOLOGY_ITEM} has no code/behavior pairs like '8500/3'."
+        )
+    return dict(codes)
 
 
 def lookup_variable_info(

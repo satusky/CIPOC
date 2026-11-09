@@ -5,6 +5,7 @@ from .extraction import (
     load_data_dictionary,
     lookup_variable_info,
     build_variable_group,
+    histology_pairs,
     resolve_evidence_text,
 )
 from .orchestration import (
@@ -48,6 +49,12 @@ from .scoping import (
     matching_schemas,
     scoped_codes,
     scoped_item_codes,
+    histology_site_group,
+    histology_family_listing,
+    histology_code_listing,
+    histology_pair_listed,
+    histology_block_listing,
+    check_histology_pairs,
 )
 from .coding_context import (
     RuleStore,
@@ -66,6 +73,7 @@ __all__ = [
     "load_data_dictionary",
     "lookup_variable_info",
     "build_variable_group",
+    "histology_pairs",
     "resolve_evidence_text",
     "load_variable_groups",
     "load_stages",
@@ -103,6 +111,12 @@ __all__ = [
     "matching_schemas",
     "scoped_codes",
     "scoped_item_codes",
+    "histology_site_group",
+    "histology_family_listing",
+    "histology_code_listing",
+    "histology_pair_listed",
+    "histology_block_listing",
+    "check_histology_pairs",
     "RuleStore",
     "load_rule_store",
     "applicable_sources",
