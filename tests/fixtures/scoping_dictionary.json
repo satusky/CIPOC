@@ -1,6 +1,9 @@
 {
   "sources": {
-    "eod": "eod_public 3.3"
+    "cs": "cs 02.05.50",
+    "tnm": "tnm 2.1",
+    "eod": "eod_public 3.3",
+    "cipoc_lvi": "CIPOC's old site dictionary (1182), for schemas with no LVI input, carried over until the LVI codes are settled"
   },
   "tissues": {
     "lip": {
@@ -750,6 +753,1306 @@
       "codes": {
         "400": {
           "C809": "Unknown primary site"
+        }
+      }
+    }
+  },
+  "schemas": {
+    "cs/breast": {
+      "select": [
+        {
+          "site": "C500-C506,C508-C509",
+          "hist": "8000-9136,9141-9582,9700-9701",
+          "year_dx": "2004-2015"
+        }
+      ],
+      "codes": {
+        "820": {
+          "source": "cs",
+          "table": "nodes_pos_fab",
+          "codes": {
+            "00": "All nodes examined negative.",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+          }
+        },
+        "830": {
+          "source": "cs",
+          "table": "nodes_exam_gpa",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in patient record"
+          }
+        },
+        "1182": {
+          "source": "cs",
+          "table": "lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        }
+      }
+    },
+    "cs/lung": {
+      "select": [
+        {
+          "site": "C340-C343,C348-C349",
+          "hist": "8000-9136,9141-9582,9700-9701",
+          "year_dx": "2004-2015"
+        }
+      ],
+      "codes": {
+        "820": {
+          "source": "cs",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative.",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+          }
+        },
+        "830": {
+          "source": "cs",
+          "table": "nodes_exam_gpa",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in patient record"
+          }
+        },
+        "1182": {
+          "source": "cs",
+          "table": "lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        }
+      }
+    },
+    "cs/peritoneum_female_gen": {
+      "select": [
+        {
+          "site": "C481-C482,C488",
+          "hist": "8000-8576,8590-8671,8930-8934,8940-9110",
+          "year_dx": "2004-2015",
+          "ssf25": "002"
+        }
+      ],
+      "codes": {
+        "820": {
+          "source": "cs",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative.",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+          }
+        },
+        "830": {
+          "source": "cs",
+          "table": "nodes_exam_gpa",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in patient record"
+          }
+        },
+        "1182": {
+          "source": "cs",
+          "table": "lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        }
+      }
+    },
+    "tnm/breast": {
+      "select": [
+        {
+          "site": "C500-C506,C508-C509",
+          "hist": "8000-9136,9141-9582,9700-9701",
+          "year_dx": "2016-2017"
+        }
+      ],
+      "codes": {
+        "820": {
+          "source": "tnm",
+          "table": "nodes_pos_fab",
+          "codes": {
+            "00": "All nodes examined negative.",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+          }
+        },
+        "1182": {
+          "source": "cipoc_lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        }
+      }
+    },
+    "tnm/lung": {
+      "select": [
+        {
+          "site": "C340-C343,C348-C349",
+          "hist": "8000-9136,9141-9582,9700-9701",
+          "year_dx": "2016-2017"
+        }
+      ],
+      "codes": {
+        "820": {
+          "source": "tnm",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative.",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+          }
+        },
+        "1182": {
+          "source": "cipoc_lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        }
+      }
+    },
+    "tnm/peritoneum_female_gen": {
+      "select": [
+        {
+          "site": "C481-C482,C488",
+          "hist": "8000-8576,8590-8671,8930-8934,8940-9110",
+          "year_dx": "2016-2017",
+          "sex_at_birth": "2"
+        }
+      ],
+      "codes": {
+        "820": {
+          "source": "tnm",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative.",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+          }
+        }
+      }
+    },
+    "eod/breast": {
+      "select": [
+        {
+          "site": "C500-C506, C508-C509",
+          "hist": "8000-8700, 8982-8983",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C501-C506, C508-C509",
+          "hist": "8720-8790",
+          "year_dx": "2018-"
+        }
+      ],
+      "codes": {
+        "756": {
+          "source": "eod",
+          "table": "tumor_size_summary_breast_14624",
+          "codes": {
+            "000": "No mass/tumor found",
+            "001": "1 mm or described as less than 1 mm",
+            "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+            "989": "989 millimeters or larger",
+            "990": "Microscopic focus or foci only and no size of focus is given",
+            "998": "Alternate descriptions of tumor size for specific sites:\n\nFamilial/multiple polyposis:\n- Rectosigmoid and rectum (C19.9, C20.9)\n- Colon (C18.0, C18.2-C18.9)\n\nIf no size is documented:\nCircumferential:\n- Esophagus (C15.0-C15.5, C15.8-C15.9)\n\nDiffuse; widespread: 3/4s or more; linitis plastica:\n- Stomach and Esophagus GE Junction (C16.0-C16.6, C16.8-C16.9)\n\nDiffuse, entire lung or NOS:\n- Lung and main stem bronchus (C34.0-C34.3, C34.8-C34.9)\n\nDiffuse:\n- Breast (C50.0-C50.6, C50.8-C50.9)",
+            "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+          }
+        },
+        "764": {
+          "source": "eod",
+          "table": "ss2018_breast_69079",
+          "codes": {
+            "0": "**In situ, intraepithelial, noninvasive** \n- In situ: noninfiltrating; intraepithelial\n- Intraductal WITHOUT infiltration\n- Lobular neoplasia, grade 3 (LIN 3)\n- Paget disease, in situ",
+            "1": "**Localized only (localized, NOS)**\n- Confined to breast tissue and fat including nipple and/or areola\n- Paget disease WITH or WITHOUT underlying tumor",
+            "2": "**Regional by direct extension only**\n- Attachment or fixation to pectoral muscle(s) or underlying tumor\n- Chest wall\n- Deep fixation\n- Extensive skin involvement WITH or WITHOUT dermal lymphatic filtration\n  + Edema of skin\n  + En cuirasse\n  + Erythema\n  + Inflammation of skin\n  + Lenticular nodule(s)\n  + Peau d'orange (\"pigskin\")\n  + Satellite nodules\n  + Skin edema\n  + Ulceration of skin of breast\n- Inflammatory carcinoma, NOS\n- Intercostal or serratus anterior muscle(s)\n- Ipsilateral rib(s) (contiguous extension only, for discontiguous extension, see code 7)\n- Local infiltration of dermal lymphatics adjacent to primary tumor involving skin by direct extension\n- Pectoral fascia or muscle(s)\n- Subcutaneous tissue \n- Skin infiltration of primary breast including skin of nipple and/or areola",
+            "3": "**Regional lymph node(s) involved only**\n- Axillary, NOS (ipsilateral)\n  + Level I (low-axilla) (low) (superficial), NOS [adjacent to tail of breast]\n     * Anterior (pectoral)\n     * Lateral (brachial)\n     * Posterior (subscapular)\n  + Level II (mid-axilla) (central), NOS\n     * Interpectoral (Rotter's)\n  + Level III (high) (deep), NOS\n     * Apical (subclavian)\n     * Axillary vein\n- Fixed/matted axillary (level I and II) (ipsilateral) \n- Infraclavicular (subclavicular) (ipsilateral)\n- Internal mammary (parasternal) (ipsilateral) \n- Intramammary (ipsilateral)\n- Regional lymph node(s), NOS\n   + Lymph node(s), NOS",
+            "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+            "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n   + Adrenal (suprarenal) gland\n   + Bone, including contralateral ribs\n   + Contralateral (opposite) breast-if stated as metastatic\n   + Ipsilateral rib(s) (discontiguous extension only, see code 2 for contiguous extension)\n   + Lung\n   + Ovary\n   + Satellite nodule(s) in skin other than primary breast\n   + Skin over\n      * Axilla\n      * Contralateral (opposite) breast\n      * Sternum\n      * Upper abdomen\n- Distant lymph node(s), NOS\n  + Axillary (contralateral or bilateral)\n  + Cervical, NOS\n  + Fixed/matted axillary (level I and II) (contralateral or bilateral) \n  + Infraclavicular (subclavicular) (contralateral or bilateral)\n  + Internal mammary (parasternal) (contralateral or bilateral)\n  + Intramammary (parasternal) (contralateral or bilateral)\n  + Supraclavicular (transverse cervical) (ipsilateral, contralateral or bilateral)\n- Distant metastasis, NOS\n  + Carcinomatosis\n  + Distant metastasis WITH or WITHOUT distant lymph node(s)",
+            "9": "Unknown if extension or metastasis"
+          }
+        },
+        "820": {
+          "source": "eod",
+          "table": "nodes_pos_fab",
+          "codes": {
+            "00": "All nodes examined negative",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+          }
+        },
+        "830": {
+          "source": "eod",
+          "table": "nodes_exam_76029",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+          }
+        },
+        "1182": {
+          "source": "cipoc_lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        },
+        "3843": {
+          "source": "eod",
+          "table": "grade_clinical_91491",
+          "codes": {
+            "1": "G1: Low combined histologic grade (favorable), SBR score of 3-5 points\n\nStated as Nottingham/Scarff Bloom-Richardson Grade 1",
+            "2": "G2: Intermediate combined histologic grade (moderately favorable); SBR score of 6-7 points\n\nStated as Nottingham/Scarff Bloom-Richardson Grade 2",
+            "3": "G3: High combined histologic grade (unfavorable); SBR score of 8-9 points\n\nStated as Nottingham/Scarff Bloom-Richardson Grade 3",
+            "L": "Nuclear Grade I (Low) (in situ only)",
+            "M": "Nuclear Grade II (interMediate) (in situ only)",
+            "H": "Nuclear Grade III (High) (in situ only)",
+            "A": "Well differentiated",
+            "B": "Moderately differentiated",
+            "C": "Poorly differentiated",
+            "D": "Undifferentiated, anaplastic",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        },
+        "3844": {
+          "source": "eod",
+          "table": "grade_pathological_47031",
+          "codes": {
+            "1": "G1: Low combined histologic grade (favorable), SBR score of 3-5 points\n\nStated as Nottingham/Scarff Bloom-Richardson Grade 1",
+            "2": "G2: Intermediate combined histologic grade (moderately favorable); SBR score of 6-7 points\n\nStated as Nottingham/Scarff Bloom-Richardson Grade 2",
+            "3": "G3: High combined histologic grade (unfavorable); SBR score of 8-9 points\n\nStated as Nottingham/Scarff Bloom-Richardson Grade 3",
+            "L": "Nuclear Grade I (Low) (in situ only)",
+            "M": "Nuclear Grade II (interMediate) (in situ only)",
+            "H": "Nuclear Grade III (High) (in situ only)",
+            "A": "Well differentiated",
+            "B": "Moderately differentiated",
+            "C": "Poorly differentiated",
+            "D": "Undifferentiated, anaplastic",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        }
+      }
+    },
+    "eod/colon_rectum": {
+      "select": [
+        {
+          "site": "C180,C182-C189,C199,C209",
+          "hist": "8000-8149, 8154, 8160-8231, 8243-8248, 8250-8682, 8690-8700, 8720-8790",
+          "year_dx": "2018-"
+        }
+      ],
+      "codes": {
+        "756": {
+          "source": "eod",
+          "table": "tumor_size_summary_full_15510",
+          "codes": {
+            "000": "No mass/tumor found",
+            "001": "1 mm or described as less than 1 mm",
+            "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+            "989": "989 millimeters or larger",
+            "990": "Microscopic focus or foci only and no size of focus is given",
+            "998": "Alternate descriptions of tumor size for specific sites:\n\nFamilial/multiple polyposis:\n- Rectosigmoid and rectum (C19.9, C20.9)\n- Colon (C18.0, C18.2-C18.9)\n\nIf no size is documented:\nCircumferential:\n- Esophagus (C15.0-C15.5, C15.8-C15.9)\n\nDiffuse; widespread: 3/4s or more; linitis plastica:\n- Stomach and Esophagus GE Junction (C16.0-C16.6, C16.8-C16.9)\n\nDiffuse, entire lung or NOS:\n- Lung and main stem bronchus (C34.0-C34.3, C34.8-C34.9)\n\nDiffuse:\n- Breast (C50.0-C50.6, C50.8-C50.9)",
+            "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+          }
+        },
+        "764": {
+          "source": "eod",
+          "table": "ss2018_colon_and_rectum_including_net_40538",
+          "codes": {
+            "0": "**In situ, intraepithelial, noninvasive**",
+            "1": "**Localized only (localized, NOS)**\n\nAll sites (C180, C182-C189)\n- Confined to colon, rectum, rectosigmoid, NOS\n- Confined to polyp (head, stalk, NOS)\n- Extension through wall, NOS\n- Intraluminal extension to colon and/or anal canal/anus (rectum only)\n- Invasion of\n  + Intramucosal, NOS\n  + Lamina propria\n  + Mucosa, NOS\n  + Muscularis mucosae\n  + Muscularis, NOS\n  + Muscularis propria\n     + Rectum (C209): WITH or WITHOUT intraluminal extension to colon and/or anal canal/anus\n - Perimuscular tissue invaded\n - Submucosa (superficial invasion)\n- Subserosal tissue/(sub)serosal fat invaded\n- Transmural, NOS\n- Wall, NOS\n\nPeritonealized or non-peritonealized: Invasion into pericolorectal tissues and/or pericolonic adipose tissue ONLY\n*(do not apply these instructions to structures listed under ALL SITES)*\n * Non-peritonealized site or segment of colon (*see Note 6*) or UNKNOWN if peritonealized\n * Includes invasion of pericolic or perirectal fat tissues\n * For peritonealized sites or segments, see code 2)",
+            "2": "**Regional by direct extension only**\n\nAll sites (C180, C182-C189)\n+ Abdominal wall**\n+ Adherent to other organs or structures clinically with no microscopic examination\n+ Adjacent (connective) tissue(s), NOS\n+ Fat, NOS\n+ Mesentery (including mesenteric fat, mesocolon)\n+ Mesothelium\n+ Retroperitoneum (excluding fat)\n+ Serosa\n+ Small intestine\n+ Tumor found in adhesion(s) if microscopic examination performed\n+ Tunica serosa\n+ Visceral peritoneum\n\nCecum (C180)\n+ Greater omentum\n\nAscending colon (C182)\n+ Kidney, right\n+ Liver, right lobe\n+ Retroperitoneal fat\n+ Ureter, right\n\nTransverse colon and flexures (C183, C184, C185)\n+ Bile ducts\n+ Gallbladder\n+ Gastrocolic ligament\n+ Greater omentum \n+ Kidney\n+ Liver\n+ Pancreas\n+ Spleen\n+ Stomach\n\nDescending colon (C186)\n+ Kidney, left\n+ Pelvic wall\n+ Retroperitoneal fat\n+ Spleen\n+ Ureter, left\n\nSigmoid colon (C187)\n+ Pelvic wall \n \nRectosigmoid (C199)\n+ Cul de sac (rectouterine pouch)\n+ Pelvic wall\n+ Small intestine\n\nRectum (C209)\n+ Anus\n+ Bladder (males only)\n+ Cul de sac (rectouterine pouch)\n+ Ductus deferens\n+ Pelvic wall\n+ Prostate\n+ Rectovaginal septum\n+ Rectovesical fat (males only)\n+ Seminal vesicle(s)\n+ Skeletal muscles of pelvic floor\n+ Vagina\n\nPeritonealized or non-peritonealized: Invasion into pericolorectal tissues and/or pericolonic adipose tissue ONLY \n*(do not apply these instructions to structures listed under ALL SITES, or the specific subsites)*\n * Peritonealized site or segment of colon (*see Note 6*) or stated as peritonealized in pathology report\n * Includes invasion of pericolic or perirectal fat tissues\n * For non-peritonealized sites or segments, or UNKNOWN if peritonealized, see code 1) (*see Note 7*)",
+            "3": "**Regional lymph node(s) involved only**\n\nAll sites (C180, C182-C189)\n+ Colic, NOS\n+ Epicolic (adjacent to bowel wall)\n+ Mesenteric, NOS\n+ Mesocolic, NOS\n+ Paracolic\n+ Pericolic\n+ Tumor deposits (TD) in the subserosa, mesentery, mesorectal  or nonperitonealized pericolic or perirectal tissues WITHOUT regional nodal metastasis\n+ Regional lymph node(s), NOS\n   * Lymph node(s), NOS\n\nCecum (C180) \n+ Cecal, NOS\n   * Anterior cecal (prececal)\n   * Posterior cecal (retrocecal)\n+ Colic (right)\n+ Ileocolic\n+ Periappendiceal\n\nAscending colon (C182)\n+ Colic (middle-right branch, right)\n+ Ileocolic\n\nHepatic flexure (C183)\n+ Colic (middle, right)\n+ Ileocolic\n\nTransverse colon (C184)\n+ Colic (middle)\n\nSplenic flexure (C185)\n+ Colic (left, middle)\n+ Mesenteric (inferior)\n\nDescending colon (C186)\n+ Colic (left)\n+ Mesenteric (inferior)\n+ Sigmoid\n\nSigmoid colon (C187)\n+ Colic (left)\n+ Mesenteric (inferior)\n+ Rectal (superior) (hemorrhoidal)\n+ Rectosigmoid\n+ Sigmoid (sigmoidal) (sigmoid mesenteric)\n+ Superior rectal (hemorrhoidal)\n\nRectosigmoid (C199)\n+ Hemorrhoidal (middle, superior)\n+ Mesenteric (inferior)\n+ Mesorectal\n+ Pericolic\n+ Perirectal\n+ Rectal (middle, superior) \n+ Sigmoid (mesenteric)\n\nRectum (C209)\n+ Hemorrhoidal (middle, superior)\n+ Iliac (hypogastric, internal, obturator) (see code 7 for common, external, NOS)\n+ Mesenteric (inferior)\n+ Mesorectal\n+ Perirectal\n+ Rectal (inferior)\n+ Sacral, NOS\n   * Lateral sacral (laterosacral)\n   * Middle sacral (promontorial) (Gerota's node)\n   * Presacral\n+ Sigmoidal (sigmoid mesenteric)",
+            "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+            "7": "**Distant site(s)/lymph node(s) involved**\n\nDistant site(s) (including further contiguous extension)\n\nAll sites (C180, C182-C189)\n+ Adrenal (suprarenal) gland\n+ Bladder\n+ Diaphragm\n+ Fallopian tube\n+ Fistula to skin\n+ Gallbladder\n+ Other segment(s) of colon via serosa\n+ Ovary(ies)\n + Uterus\n\nCecum (C180)\n+ Kidney, right\n+ Liver\n+ Ureter, right\n\nTransverse colon and flexures (C183-C185)\n+ Ureter\n\nSigmoid colon (C187)\n+ Cul de sac (rectouterine pouch)\n+ Ureter\n\nRectosigmoid (C199)\n+ Bladder\n+ Colon via serosa\n+ Fallopian tube\n+ Ovary\n+ Prostate\n+ Skeletal muscles of pelvic floor\n+ Ureter\n+ Vagina\n\nRectum (C209)\n+ Bladder (for females only)\n+ Bone(s) of pelvis \n+ Cervix\n+ Perineum, perianal skin\n+ Sacral plexus\n+ Sacrum\n+ Ureter\n+ Urethra\n+ Uterus\n\nDistant lymph node(s), NOS\n+ Colon\n  * Iliac (common, external, hypogastric, internal, obturator, NOS)\n  * Inferior mesenteric (cecum, ascending colon, hepatic flexure, transverse colon)\n  * Para-aortic\n  * Retroperitoneal \n  * Superior mesenteric\n + Rectosigmoid\n   * Hemorrhoidal, inferior (rectosigmoid)\n   * Iliac (common, external, hypogastric, internal, obturator, NOS)\n   * Rectal, inferior \n   * Superior mesenteric\n+ Rectum\n   * Colic (left) (rectum)\n   * Iliac (common, external, NOS) (see code 3 for hypogastric, internal, obturator)\n   * Superior mesenteric\n\nDistant metastasis, NOS \n+ Carcinomatosis\n+ Peritoneal surface metastasis (peritoneum)\n+ Distant metastasis WITH or WITHOUT distant lymph node(s)",
+            "9": "Unknown if extension or metastasis"
+          }
+        },
+        "820": {
+          "source": "eod",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+          }
+        },
+        "830": {
+          "source": "eod",
+          "table": "nodes_exam_76029",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+          }
+        },
+        "1182": {
+          "source": "cipoc_lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        },
+        "3843": {
+          "source": "eod",
+          "table": "grade_clinical_73056",
+          "codes": {
+            "1": "G1: Well differentiated",
+            "2": "G2: Moderately differentiated",
+            "3": "G3: Poorly differentiated",
+            "4": "G4: Undifferentiated ",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        },
+        "3844": {
+          "source": "eod",
+          "table": "grade_pathological_31963",
+          "codes": {
+            "1": "G1: Well differentiated",
+            "2": "G2: Moderately differentiated",
+            "3": "G3: Poorly differentiated",
+            "4": "G4: Undifferentiated ",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        }
+      }
+    },
+    "eod/corpus_carcinoma": {
+      "select": [
+        {
+          "site": "C540-C543,C548-C549,C559",
+          "hist": "8000-8700, 8720-8790, 8950, 8980, 9111",
+          "year_dx": "2018-"
+        }
+      ],
+      "codes": {
+        "756": {
+          "source": "eod",
+          "table": "tumor_size_summary_63115",
+          "codes": {
+            "000": "No mass/tumor found",
+            "001": "1 mm or described as less than 1 mm",
+            "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+            "989": "989 millimeters or larger",
+            "990": "Microscopic focus or foci only and no size of focus is given",
+            "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+          }
+        },
+        "764": {
+          "source": "eod",
+          "table": "ss2018_corpus_carcinoma_and_carcinosarcoma_28794",
+          "codes": {
+            "0": "**In situ, intraepithelial, noninvasive, preinvasive** \nEndometrial intraepithelial carcinoma (EIC) (8380/2)\nSerous endometrial intraepithelial carcinoma (SEIC) (8441/2)",
+            "1": "**Localized only (localized, NOS)**\n* Confined to endometrium (glandular or stromal)\n* Invasion of myometrium (inner half, outer half, NOS)\n  + WITHOUT or UNKNOWN involvement of endocervix\n\nConfined to corpus, NOS\nLocalized, NOS\n\nFIGO Stage I (IA, IB, I NOS)",
+            "2": "**Regional by direct extension only**\n\n* Adnexa (direct extension or metastasis)\n* Bladder wall\n* Bladder, NOS excluding mucosa (see code 7 for mucosa)\n* Cervix (glandular or stromal)\n* Cervix uteri, NOS, but not beyond uterus\n* Endocervix (glandular or stromal)\n* Extension beyond uterus, within pelvis, NOS\n* Fallopian tube(s)\n* \"Frozen pelvis\" (clinically described)\n* Ligament(s) (broad, ovarian, round, suspensory)\n* Myometrium WITH involvement of endocervix\n* Ovary(ies)\n* Parametrium\n* Parietal serosa of pelvic wall\n* Pelvic wall(s)\n* Rectal wall\n* Rectum, NOS excluding mucosa (see code 7 for mucosa)\n* Serosa\n* Tunica serosa (visceral peritoneum of corpus, serosa covering the corpus)\n* Ureter\n* Vagina\n* Visceral peritoneum of pelvic organs excluding serosa of corpus \n* Vulva\n\nMalignant cells in peritoneal cytology\n\nFIGO Stage II \nFIGO Stage III (IIIA, IIIB, III NOS)",
+            "3": "**Regional lymph node(s) involved only**\n- Para-aortic, NOS\n  + Aortic\n  + Lateral aortic/lateral lumbar\n  + Periaortic\n- Pelvic, NOS\n  + Iliac, NOS\n     + Common\n     + External\n     + Internal (hypogastric) (obturator)\n   + Paracervical\n   + Parametrial\n   + Sacral, NOS\n      + Lateral (laterosacral)\n      + Middle (promontorial) (Gerota's node)\n      + Presacral\n      + Uterosacral\n\n\n\n- Regional lymph node(s), NOS\n  + Lymph node(s), NOS\n\nFIGO Stage IIIC (IIIC1, IIIC2, IIIC NOS)\n* Localized tumor WITH regional lymph node involvement",
+            "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+            "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n  + Abdominal serosa (visceral or parietal peritoneum of abdomen)\n  + Abdominal structures (other, NOS)\n  + Abdominal tissue (infiltration)\n  + Bladder mucosa (excluding bullous edema)\n  + Bone\n  + Bowel mucosa\n  + Cul de sac (rectouterine pouch or Pouch of Douglas)\n  + Intraperitoneal disease\n  + Liver\n  + Lung\n  + Rectum mucosa (excluding bullous edema)\n  + Sigmoid colon\n  + Small intestine\n- Distant lymph node(s), NOS\n  + Femoral\n  + Inguinal, NOS\n     + Inguinofemoral (groin)\n     + Node of Cloquet or Rosenmuller (highest deep inguinal)\n     + Superficial inguinal (femoral)\n- Distant metastasis, NOS\n  + Carcinomatosis\n  + Distant metastasis WITH or WITHOUT distant lymph node(s)\n\nFIGO Stage IV (IVA, IVB, IV NOS)",
+            "9": "Unknown if extension or metastasis"
+          }
+        },
+        "820": {
+          "source": "eod",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+          }
+        },
+        "830": {
+          "source": "eod",
+          "table": "nodes_exam_76029",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+          }
+        },
+        "1182": {
+          "source": "cipoc_lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        },
+        "3836": {
+          "source": "eod",
+          "table": "figo_stage_corpus_carcinoma_and_carcinosarcoma_69186",
+          "codes": {
+            "1": "FIGO Stage I ",
+            "1A": "FIGO Stage IA ",
+            "1B": "FIGO Stage IB ",
+            "2": "FIGO Stage II ",
+            "3": "FIGO Stage III",
+            "3A": "FIGO Stage IIIA",
+            "3B": "FIGO Stage IIIB",
+            "3C": "FIGO Stage IIIC",
+            "3C1": "FIGO Stage IIIC1",
+            "3C2": "FIGO Stage IIIC2",
+            "4": "FIGO Stage IV ",
+            "4A": "FIGO Stage IVA",
+            "4B": "FIGO Stage IVB",
+            "97": "Carcinoma in situ (intraepithelial, noninvasive, preinvasive)",
+            "98": "Not applicable:  Information not collected for this case\n(If this item is required by your standard setter, use of code 98 will result in an edit error.)",
+            "99": "Not documented in medical record\nFIGO stage not assessed or unknown if assessed"
+          }
+        },
+        "3843": {
+          "source": "eod",
+          "table": "grade_clinical_83264",
+          "codes": {
+            "1": "G1\nFIGO Grade 1\nG1: Well differentiated",
+            "2": "G2\nFIGO Grade 2\nG2: Moderately differentiated",
+            "3": "G3\nFIGO Grade 3\nG3: Poorly differentiated or undifferentiated",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        },
+        "3844": {
+          "source": "eod",
+          "table": "grade_pathological_4783",
+          "codes": {
+            "1": "G1\nFIGO Grade 1\nG1: Well differentiated",
+            "2": "G2\nFIGO Grade 2\nG2: Moderately differentiated",
+            "3": "G3\nFIGO Grade 3\nG3: Poorly differentiated or undifferentiated",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        }
+      }
+    },
+    "eod/hemeretic": {
+      "select": [
+        {
+          "site": "C000-C440, C442-C689, C691-C694, C698-C699, C739-C749, C750, C754-C759, C760-C809",
+          "hist": "9591",
+          "year_dx": "2018-",
+          "discriminator_1": "1,2"
+        },
+        {
+          "site": "C700-C729, C751-C753",
+          "hist": "9591",
+          "behavior": "3",
+          "year_dx": "2018-",
+          "discriminator_1": "1,2"
+        },
+        {
+          "site": "C000-C699, C739-C750, C754-C809",
+          "hist": "9724, 9727, 9740-9742, 9749, 9762-9809, 9811-9820, 9831-9920, 9931-9993",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C700-C729, C751-C753",
+          "hist": "9724, 9727, 9740-9742, 9762-9765, 9767-9809, 9811-9820, 9831-9920, 9931-9993",
+          "behavior": "3",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C700-C729, C751-C753",
+          "hist": "9749, 9766",
+          "behavior": "3",
+          "year_dx": "2018-2022"
+        },
+        {
+          "site": "C000-C699, C739-C750, C754-C809",
+          "hist": "9751, 9755-9759",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C000-C440, C442-C689, C691-C694, C698-C699, C739-C750, C754-C809",
+          "hist": "9930",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C700-C729, C751-C753",
+          "hist": "9930",
+          "behavior": "3",
+          "year_dx": "2018-"
+        }
+      ],
+      "codes": {
+        "756": {
+          "source": "eod",
+          "table": "tumor_size_summary_dna_13275",
+          "codes": {
+            "999": "Not applicable"
+          }
+        },
+        "764": {
+          "source": "eod",
+          "table": "ss2018_hemeretic_3793",
+          "codes": {
+            "1": "**Localized only**\n- Localized disease\n- (Single/solitary/unifocal/isolated)\n- See Notes 4 and 5",
+            "7": "**Distant site(s)/lymph node(s) involved**\n- Systemic disease\n- See Note 6",
+            "9": "Unknown if extension or metastasis"
+          }
+        },
+        "820": {
+          "source": "eod",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+          }
+        },
+        "830": {
+          "source": "eod",
+          "table": "nodes_exam_76029",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+          }
+        },
+        "1182": {
+          "source": "cipoc_lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        },
+        "3843": {
+          "source": "eod",
+          "table": "grade_clinical_18316",
+          "codes": {
+            "8": "Not applicable"
+          }
+        },
+        "3844": {
+          "source": "eod",
+          "table": "grade_pathological_73388",
+          "codes": {
+            "8": "Not applicable"
+          }
+        }
+      }
+    },
+    "eod/lung": {
+      "select": [
+        {
+          "site": "C340-C343,C348-C349",
+          "hist": "8000-8700, 8720-8790, 8972,8980",
+          "year_dx": "2018-2024"
+        }
+      ],
+      "codes": {
+        "756": {
+          "source": "eod",
+          "table": "tumor_size_summary_full_31213",
+          "codes": {
+            "000": "No mass/tumor found",
+            "001": "1 mm or described as less than 1 mm",
+            "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+            "989": "989 millimeters or larger",
+            "990": "Microscopic focus or foci only and no size of focus is given",
+            "998": "Alternate descriptions of tumor size for specific sites:\n\nFamilial/multiple polyposis:\n- Rectosigmoid and rectum (C19.9, C20.9)\n- Colon (C18.0, C18.2-C18.9)\n\nIf no size is documented:\nCircumferential:\n- Esophagus (C15.0-C15.5, C15.8-C15.9)\n\nDiffuse; widespread: 3/4s or more; linitis plastica:\n- Stomach and Esophagus GE Junction (C16.0-C16.6, C16.8-C16.9)\n\nDiffuse, entire lung or NOS:\n- Lung and main stem bronchus (C34.0-C34.3, C34.8-C34.9)\n\nDiffuse:\n- Breast (C50.0-C50.6, C50.8-C50.9)",
+            "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+          }
+        },
+        "764": {
+          "source": "eod",
+          "table": "ss2018_lung_41334",
+          "codes": {
+            "0": "**In situ, intraepithelial, noninvasive** \n- Adenocarcinoma in situ (AIS): adenocarcinoma with pure lepidic pattern, less than or equal to 3 cm in greatest dimension\n- Squamous cell carcinoma in situ (SCIS)",
+            "1": "**Localized only (localized, NOS)**\n- Adjacent ipsilateral lobe\n- Confined to carina, NOS\n- Confined to hilus\n- Confined to lung, NOS\n- Main stem bronchus, NOS (without involvement of the carina)\n  + Including extension from other part of lung\n- Minimally invasive adenocarcinoma\n  + Adenocarcinoma tumor WITH predominantly lepidic pattern (AIS) measuring less than or equal to 3 cm in greatest dimension\n     * WITH invasive component measuring less than or equal to 5 mm in greatest dimension\n- Superficial tumor, WITH invasive component limited to bronchial wall\n  + WITH or WITHOUT proximal extension to main stem bronchus",
+            "2": "**Regional by direct extension only**\n- Atelectasis/obstructive pneumonitis\n    + Extends to hilar region, involving part or all of lung\n- Blood vessel(s) (major)\n    + Aorta\n    + Azygos vein\n    + Pulmonary artery or vein\n    + Superior vena cava (SVC syndrome)\n- Brachial plexus\n- Carina from lung\n- Chest wall (thoracic wall) \n- Compression of esophagus or trachea not specified as direct extension\n- Diaphragm (separate lesion-see code 7)\n- Esophagus\n- Mediastinum, extrapulmonary or NOS\n- Nerve(s)\n    + Cervical sympathetic (Horner's syndrome)\n    + Recurrent laryngeal (vocal cord paralysis)\n    + Vagus\n- Pancoast tumor (superior sulcus syndrome), NOS\n- Parietal pericardium\n- Parietal pleura (PL3)\n- Pericardium, NOS\n- Phrenic nerve\n- Pleura, NOS\n- Pulmonary ligament\n- Separate tumor nodule(s) in the same lobe as the primary\n- Visceral pleura invasion (PL1, PL2, or NOS)\n- Trachea",
+            "3": "**Regional lymph node(s) involved only**\n- IPSILATERAL nodes only\n  + Bronchial\n     - Peri/parabronchial\n  + Carinal (tracheobronchial) (tracheal bifurcation)\n  + Hilar (bronchopulmonary) (proximal lobar) (pulmonary root) \n  + Intrapulmonary \n     * Interlobar\n     * Lobar\n     * Segmental\n     * Subsegmental\n  + Mediastinal, NOS\n     * Anterior\n     * Aortic (above diaphragm), NOS\n        - Peri/para-aortic, NOS\n          + Ascending aorta (phrenic)\n        - Subaortic (aortic-pulmonary window)\n     * Inferior mediastinal \n        - Paraesophageal\n        - Pulmonary ligament\n         - Subcarinal\n    * Periesophageal \n    * Pericardial\n    * Posterior (tracheoesophageal)\n    * Precarinal\n    * Pretracheal, NOS\n    * Superior mediastinal\n       - Paratracheal (left, right, upper, low, NOS)\n         - Azygos (lower paratracheal)\n       - Prevascular\n       - Retrotracheal\n  + Regional lymph node(s), NOS\n    * Lymph node(s), NOS",
+            "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+            "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n  + Abdominal organs\n  + Adjacent rib\n  + Contralateral lung/main stem bronchus\n  + Heart\n  + Inferior vena cava\n  + Neural foramina\n  + Pericardial nodules or pleural effusion (malignant) (ipsilateral, contralateral, bilateral, NOS)\n  + Pleural tumor foci or nodules on ipsilateral lung (separate from direct extension) or contralateral lung\n  + Rib\n  + Separate tumor nodule(s) in contralateral lung\n  + Separate tumor nodule(s) in a different ipsilateral lobe \n  + Skeletal muscle\n  + Skin of chest\n  + Sternum\n  + Vertebra(e) (vertebral body)\n  + Visceral pericardium \n- Distant lymph node(s), NOS\n  + IPSILATERAL or CONTRALATERAL\n    * Low cervical\n    * Proximal root\n    * Scalene (inferior deep cervical)\n    * Sternal notch\n    * Supraclavicular (transverse cervical)\n  + CONTRALATERAL/BILATERAL nodes\n    * Bronchial\n      - Peri/parabronchial\n    * Carinal\n    * Hilar (bronchopulmonary) (proximal lobar) (pulmonary root) \n      - Intrapulmonary \n        - Interlobar\n        - Lobar\n        - Segmental \n        - Subsegmental\n    - Superior mediastinal\n       + Paratracheal (left, right, upper, low, NOS)\n         - Azygos (lower paratracheal)\n         \n- Distant metastasis, NOS\n  + Carcinomatosis \n  + Distant metastasis WITH or WITHOUT distant lymph node(s)",
+            "9": "Unknown if extension or metastasis"
+          }
+        },
+        "820": {
+          "source": "eod",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+          }
+        },
+        "830": {
+          "source": "eod",
+          "table": "nodes_exam_76029",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+          }
+        },
+        "1182": {
+          "source": "cipoc_lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        },
+        "3843": {
+          "source": "eod",
+          "table": "grade_clinical_73056",
+          "codes": {
+            "1": "G1: Well differentiated",
+            "2": "G2: Moderately differentiated",
+            "3": "G3: Poorly differentiated",
+            "4": "G4: Undifferentiated ",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        },
+        "3844": {
+          "source": "eod",
+          "table": "grade_pathological_31963",
+          "codes": {
+            "1": "G1: Well differentiated",
+            "2": "G2: Moderately differentiated",
+            "3": "G3: Poorly differentiated",
+            "4": "G4: Undifferentiated ",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        }
+      }
+    },
+    "eod/lung_v9_2025": {
+      "select": [
+        {
+          "site": "C340-C343,C348-C349",
+          "hist": "8000-8700, 8720-8790, 8972,8980, 8982",
+          "year_dx": "2025-"
+        }
+      ],
+      "codes": {
+        "756": {
+          "source": "eod",
+          "table": "tumor_size_summary_full_31213",
+          "codes": {
+            "000": "No mass/tumor found",
+            "001": "1 mm or described as less than 1 mm",
+            "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+            "989": "989 millimeters or larger",
+            "990": "Microscopic focus or foci only and no size of focus is given",
+            "998": "Alternate descriptions of tumor size for specific sites:\n\nFamilial/multiple polyposis:\n- Rectosigmoid and rectum (C19.9, C20.9)\n- Colon (C18.0, C18.2-C18.9)\n\nIf no size is documented:\nCircumferential:\n- Esophagus (C15.0-C15.5, C15.8-C15.9)\n\nDiffuse; widespread: 3/4s or more; linitis plastica:\n- Stomach and Esophagus GE Junction (C16.0-C16.6, C16.8-C16.9)\n\nDiffuse, entire lung or NOS:\n- Lung and main stem bronchus (C34.0-C34.3, C34.8-C34.9)\n\nDiffuse:\n- Breast (C50.0-C50.6, C50.8-C50.9)",
+            "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+          }
+        },
+        "764": {
+          "source": "eod",
+          "table": "ss2018_lung_41334",
+          "codes": {
+            "0": "**In situ, intraepithelial, noninvasive** \n- Adenocarcinoma in situ (AIS): adenocarcinoma with pure lepidic pattern, less than or equal to 3 cm in greatest dimension\n- Squamous cell carcinoma in situ (SCIS)",
+            "1": "**Localized only (localized, NOS)**\n- Adjacent ipsilateral lobe\n- Confined to carina, NOS\n- Confined to hilus\n- Confined to lung, NOS\n- Main stem bronchus, NOS (without involvement of the carina)\n  + Including extension from other part of lung\n- Minimally invasive adenocarcinoma\n  + Adenocarcinoma tumor WITH predominantly lepidic pattern (AIS) measuring less than or equal to 3 cm in greatest dimension\n     * WITH invasive component measuring less than or equal to 5 mm in greatest dimension\n- Superficial tumor, WITH invasive component limited to bronchial wall\n  + WITH or WITHOUT proximal extension to main stem bronchus",
+            "2": "**Regional by direct extension only**\n- Atelectasis/obstructive pneumonitis\n    + Extends to hilar region, involving part or all of lung\n- Blood vessel(s) (major)\n    + Aorta\n    + Azygos vein\n    + Pulmonary artery or vein\n    + Superior vena cava (SVC syndrome)\n- Brachial plexus\n- Carina from lung\n- Chest wall (thoracic wall) \n- Compression of esophagus or trachea not specified as direct extension\n- Diaphragm (separate lesion-see code 7)\n- Esophagus\n- Mediastinum, extrapulmonary or NOS\n- Nerve(s)\n    + Cervical sympathetic (Horner's syndrome)\n    + Recurrent laryngeal (vocal cord paralysis)\n    + Vagus\n- Pancoast tumor (superior sulcus syndrome), NOS\n- Parietal pericardium\n- Parietal pleura (PL3)\n- Pericardium, NOS\n- Phrenic nerve\n- Pleura, NOS\n- Pulmonary ligament\n- Separate tumor nodule(s) in the same lobe as the primary\n- Visceral pleura invasion (PL1, PL2, or NOS)\n- Trachea",
+            "3": "**Regional lymph node(s) involved only**\n- IPSILATERAL nodes only\n  + Bronchial\n     - Peri/parabronchial\n  + Carinal (tracheobronchial) (tracheal bifurcation)\n  + Hilar (bronchopulmonary) (proximal lobar) (pulmonary root) \n  + Intrapulmonary \n     * Interlobar\n     * Lobar\n     * Segmental\n     * Subsegmental\n  + Mediastinal, NOS\n     * Anterior\n     * Aortic (above diaphragm), NOS\n        - Peri/para-aortic, NOS\n          + Ascending aorta (phrenic)\n        - Subaortic (aortic-pulmonary window)\n     * Inferior mediastinal \n        - Paraesophageal\n        - Pulmonary ligament\n         - Subcarinal\n    * Periesophageal \n    * Pericardial\n    * Posterior (tracheoesophageal)\n    * Precarinal\n    * Pretracheal, NOS\n    * Superior mediastinal\n       - Paratracheal (left, right, upper, low, NOS)\n         - Azygos (lower paratracheal)\n       - Prevascular\n       - Retrotracheal\n  + Regional lymph node(s), NOS\n    * Lymph node(s), NOS",
+            "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+            "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n  + Abdominal organs\n  + Adjacent rib\n  + Contralateral lung/main stem bronchus\n  + Heart\n  + Inferior vena cava\n  + Neural foramina\n  + Pericardial nodules or pleural effusion (malignant) (ipsilateral, contralateral, bilateral, NOS)\n  + Pleural tumor foci or nodules on ipsilateral lung (separate from direct extension) or contralateral lung\n  + Rib\n  + Separate tumor nodule(s) in contralateral lung\n  + Separate tumor nodule(s) in a different ipsilateral lobe \n  + Skeletal muscle\n  + Skin of chest\n  + Sternum\n  + Vertebra(e) (vertebral body)\n  + Visceral pericardium \n- Distant lymph node(s), NOS\n  + IPSILATERAL or CONTRALATERAL\n    * Low cervical\n    * Proximal root\n    * Scalene (inferior deep cervical)\n    * Sternal notch\n    * Supraclavicular (transverse cervical)\n  + CONTRALATERAL/BILATERAL nodes\n    * Bronchial\n      - Peri/parabronchial\n    * Carinal\n    * Hilar (bronchopulmonary) (proximal lobar) (pulmonary root) \n      - Intrapulmonary \n        - Interlobar\n        - Lobar\n        - Segmental \n        - Subsegmental\n    - Superior mediastinal\n       + Paratracheal (left, right, upper, low, NOS)\n         - Azygos (lower paratracheal)\n         \n- Distant metastasis, NOS\n  + Carcinomatosis \n  + Distant metastasis WITH or WITHOUT distant lymph node(s)",
+            "9": "Unknown if extension or metastasis"
+          }
+        },
+        "820": {
+          "source": "eod",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+          }
+        },
+        "830": {
+          "source": "eod",
+          "table": "nodes_exam_76029",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+          }
+        },
+        "1182": {
+          "source": "cipoc_lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        },
+        "3843": {
+          "source": "eod",
+          "table": "grade_clinical_73056",
+          "codes": {
+            "1": "G1: Well differentiated",
+            "2": "G2: Moderately differentiated",
+            "3": "G3: Poorly differentiated",
+            "4": "G4: Undifferentiated ",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        },
+        "3844": {
+          "source": "eod",
+          "table": "grade_pathological_31963",
+          "codes": {
+            "1": "G1: Well differentiated",
+            "2": "G2: Moderately differentiated",
+            "3": "G3: Poorly differentiated",
+            "4": "G4: Undifferentiated ",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        }
+      }
+    },
+    "eod/lymphoma": {
+      "select": [
+        {
+          "site": "C000-C424,C470-C509,C511-C608,C619-C631,C637-C689, C691-C694, C698-C699, C739-C749, C760-C809",
+          "hist": "9590,9596-9663,9673-9699,9702-9719,9725-9726,9735,9737-9738",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C440, C442-C449, C510, C609, C632",
+          "hist": "9590,9596,9650-9663,9673-9679,9687-9699, 9702-9705,9714-9717,9725, 9735, 9737-9738",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C700-C729, C751-C753",
+          "hist": "9590,9596-9663,9673-9679,9687-9689, 9691-9698,9716-9718,9725-9726,9735,9737-9738",
+          "behavior": "3",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C700-C729, C751-C753",
+          "hist": "9690, 9719",
+          "behavior": "3",
+          "year_dx": "2018-2022"
+        },
+        {
+          "site": "C750, C754-C759",
+          "hist": "9590, 9596-9663, 9673-9699, 9702-9719, 9725-9726, 9735, 9737-9738",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C000-C440, C442-C689, C691-C694, C698-C699, C739-C749, C750, C754-C759, C760-C809",
+          "hist": "9591",
+          "year_dx": "2018-",
+          "discriminator_1": "3,9"
+        },
+        {
+          "site": "C700-C729, C751-C753",
+          "hist": "9591",
+          "behavior": "3",
+          "year_dx": "2018-",
+          "discriminator_1": "3,9"
+        },
+        {
+          "site": "C000-C440, C442-C689, C691-C694, C698-C699, C739-C749, C750, C754-C759, C760-C809",
+          "hist": "9826-9827",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C700-C729, C751-C753",
+          "hist": "9826-9827",
+          "behavior": "3",
+          "year_dx": "2018-"
+        }
+      ],
+      "codes": {
+        "756": {
+          "source": "eod",
+          "table": "tumor_size_summary_dna_13275",
+          "codes": {
+            "999": "Not applicable"
+          }
+        },
+        "764": {
+          "source": "eod",
+          "table": "ss2018_lymphoma_27031",
+          "codes": {
+            "1": "**Localized only**\n\nNodal Lymphomas\n- Single lymph node region involved\n\n - Involvement of multiple nodal chains in the SAME lymph node region\n\nExtranodal Lymphomas\n- Single extralymphatic site \n   + WITHOUT nodal involvement (see code 2 for WITH nodal involvement)\n\n- Multifocal involvement of one extralymphatic organ/site (EXCEPT multifocal lung involvement or any liver involvement, see code 7)\n  + WITHOUT nodal involvement (see code 7 for WITH nodal involvement)",
+            "2": "**Regional by direct extension only**\n\nBulky disease present\n\nNodal Lymphomas\n- Two or more lymph node regions involved SAME side of diaphragm\n- Contiguous extension between extralymphatic sites and regional nodes \n  + WITH or WITHOUT involvement of other nodal regions on SAME side of diaphragm\n\nExtranodal Lymphomas\n- Localized involvement of a single extralymphatic organ/site \n  + WITH involvement of its regional lymph node(s) OR\n  + WITH involvement of other lymph node(s) on the SAME side of the diaphragm",
+            "7": "**Distant site(s)/lymph node(s) involved**\n- Distant involvement\n  + Diffuse or disseminated involvement of ONE OR MORE extralymphatic organ(s)/site(s) WITH or WITHOUT nodal involvement\n  + Involvement of isolated extralymphatic organ in absence of involvement of adjacent lymph nodes, but in conjunction with disease in distant sites\n  + Involvement of lymph node regions on BOTH sides of the diaphragm WITH or WITHOUT spleen involvement\n  + Involvement of lymph node regions ABOVE the diaphragm WITH spleen involvement\n  + Multifocal involvement of one extralymphatic organ/site WITH nodal involvement\n  + Noncontiguous extralymphatic organ involvement in conjunction with nodal disease (two or more sites involved)\n\n- Distant metastasis, NOS\n  + Blood/peripheral blood\n  + Bone marrow\n  + Cerebrospinal fluid (CSF)\n  + Liver\n  + Lung (other than by direct extension in code 2)",
+            "9": "Unknown if extension or metastasis"
+          }
+        },
+        "820": {
+          "source": "eod",
+          "table": "nodes_pos_dna_91511",
+          "codes": {
+            "99": "Not applicable"
+          }
+        },
+        "830": {
+          "source": "eod",
+          "table": "nodes_exam_dna_95635",
+          "codes": {
+            "99": "Not applicable"
+          }
+        },
+        "1182": {
+          "source": "cipoc_lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        },
+        "3843": {
+          "source": "eod",
+          "table": "grade_clinical_18316",
+          "codes": {
+            "8": "Not applicable"
+          }
+        },
+        "3844": {
+          "source": "eod",
+          "table": "grade_pathological_73388",
+          "codes": {
+            "8": "Not applicable"
+          }
+        }
+      }
+    },
+    "eod/net_colon_and_rectum_v9_2024": {
+      "select": [
+        {
+          "site": "C180,C182-C189, C199, C209",
+          "hist": "8150-8153,8155-8156,8158,8240-8242,8249,8683",
+          "year_dx": "2024-"
+        }
+      ],
+      "codes": {
+        "756": {
+          "source": "eod",
+          "table": "tumor_size_summary_full_31213",
+          "codes": {
+            "000": "No mass/tumor found",
+            "001": "1 mm or described as less than 1 mm",
+            "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+            "989": "989 millimeters or larger",
+            "990": "Microscopic focus or foci only and no size of focus is given",
+            "998": "Alternate descriptions of tumor size for specific sites:\n\nFamilial/multiple polyposis:\n- Rectosigmoid and rectum (C19.9, C20.9)\n- Colon (C18.0, C18.2-C18.9)\n\nIf no size is documented:\nCircumferential:\n- Esophagus (C15.0-C15.5, C15.8-C15.9)\n\nDiffuse; widespread: 3/4s or more; linitis plastica:\n- Stomach and Esophagus GE Junction (C16.0-C16.6, C16.8-C16.9)\n\nDiffuse, entire lung or NOS:\n- Lung and main stem bronchus (C34.0-C34.3, C34.8-C34.9)\n\nDiffuse:\n- Breast (C50.0-C50.6, C50.8-C50.9)",
+            "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+          }
+        },
+        "764": {
+          "source": "eod",
+          "table": "ss2018_colon_and_rectum_including_net_40538",
+          "codes": {
+            "0": "**In situ, intraepithelial, noninvasive**",
+            "1": "**Localized only (localized, NOS)**\n\nAll sites (C180, C182-C189)\n- Confined to colon, rectum, rectosigmoid, NOS\n- Confined to polyp (head, stalk, NOS)\n- Extension through wall, NOS\n- Intraluminal extension to colon and/or anal canal/anus (rectum only)\n- Invasion of\n  + Intramucosal, NOS\n  + Lamina propria\n  + Mucosa, NOS\n  + Muscularis mucosae\n  + Muscularis, NOS\n  + Muscularis propria\n     + Rectum (C209): WITH or WITHOUT intraluminal extension to colon and/or anal canal/anus\n - Perimuscular tissue invaded\n - Submucosa (superficial invasion)\n- Subserosal tissue/(sub)serosal fat invaded\n- Transmural, NOS\n- Wall, NOS\n\nPeritonealized or non-peritonealized: Invasion into pericolorectal tissues and/or pericolonic adipose tissue ONLY\n*(do not apply these instructions to structures listed under ALL SITES)*\n * Non-peritonealized site or segment of colon (*see Note 6*) or UNKNOWN if peritonealized\n * Includes invasion of pericolic or perirectal fat tissues\n * For peritonealized sites or segments, see code 2)",
+            "2": "**Regional by direct extension only**\n\nAll sites (C180, C182-C189)\n+ Abdominal wall**\n+ Adherent to other organs or structures clinically with no microscopic examination\n+ Adjacent (connective) tissue(s), NOS\n+ Fat, NOS\n+ Mesentery (including mesenteric fat, mesocolon)\n+ Mesothelium\n+ Retroperitoneum (excluding fat)\n+ Serosa\n+ Small intestine\n+ Tumor found in adhesion(s) if microscopic examination performed\n+ Tunica serosa\n+ Visceral peritoneum\n\nCecum (C180)\n+ Greater omentum\n\nAscending colon (C182)\n+ Kidney, right\n+ Liver, right lobe\n+ Retroperitoneal fat\n+ Ureter, right\n\nTransverse colon and flexures (C183, C184, C185)\n+ Bile ducts\n+ Gallbladder\n+ Gastrocolic ligament\n+ Greater omentum \n+ Kidney\n+ Liver\n+ Pancreas\n+ Spleen\n+ Stomach\n\nDescending colon (C186)\n+ Kidney, left\n+ Pelvic wall\n+ Retroperitoneal fat\n+ Spleen\n+ Ureter, left\n\nSigmoid colon (C187)\n+ Pelvic wall \n \nRectosigmoid (C199)\n+ Cul de sac (rectouterine pouch)\n+ Pelvic wall\n+ Small intestine\n\nRectum (C209)\n+ Anus\n+ Bladder (males only)\n+ Cul de sac (rectouterine pouch)\n+ Ductus deferens\n+ Pelvic wall\n+ Prostate\n+ Rectovaginal septum\n+ Rectovesical fat (males only)\n+ Seminal vesicle(s)\n+ Skeletal muscles of pelvic floor\n+ Vagina\n\nPeritonealized or non-peritonealized: Invasion into pericolorectal tissues and/or pericolonic adipose tissue ONLY \n*(do not apply these instructions to structures listed under ALL SITES, or the specific subsites)*\n * Peritonealized site or segment of colon (*see Note 6*) or stated as peritonealized in pathology report\n * Includes invasion of pericolic or perirectal fat tissues\n * For non-peritonealized sites or segments, or UNKNOWN if peritonealized, see code 1) (*see Note 7*)",
+            "3": "**Regional lymph node(s) involved only**\n\nAll sites (C180, C182-C189)\n+ Colic, NOS\n+ Epicolic (adjacent to bowel wall)\n+ Mesenteric, NOS\n+ Mesocolic, NOS\n+ Paracolic\n+ Pericolic\n+ Tumor deposits (TD) in the subserosa, mesentery, mesorectal  or nonperitonealized pericolic or perirectal tissues WITHOUT regional nodal metastasis\n+ Regional lymph node(s), NOS\n   * Lymph node(s), NOS\n\nCecum (C180) \n+ Cecal, NOS\n   * Anterior cecal (prececal)\n   * Posterior cecal (retrocecal)\n+ Colic (right)\n+ Ileocolic\n+ Periappendiceal\n\nAscending colon (C182)\n+ Colic (middle-right branch, right)\n+ Ileocolic\n\nHepatic flexure (C183)\n+ Colic (middle, right)\n+ Ileocolic\n\nTransverse colon (C184)\n+ Colic (middle)\n\nSplenic flexure (C185)\n+ Colic (left, middle)\n+ Mesenteric (inferior)\n\nDescending colon (C186)\n+ Colic (left)\n+ Mesenteric (inferior)\n+ Sigmoid\n\nSigmoid colon (C187)\n+ Colic (left)\n+ Mesenteric (inferior)\n+ Rectal (superior) (hemorrhoidal)\n+ Rectosigmoid\n+ Sigmoid (sigmoidal) (sigmoid mesenteric)\n+ Superior rectal (hemorrhoidal)\n\nRectosigmoid (C199)\n+ Hemorrhoidal (middle, superior)\n+ Mesenteric (inferior)\n+ Mesorectal\n+ Pericolic\n+ Perirectal\n+ Rectal (middle, superior) \n+ Sigmoid (mesenteric)\n\nRectum (C209)\n+ Hemorrhoidal (middle, superior)\n+ Iliac (hypogastric, internal, obturator) (see code 7 for common, external, NOS)\n+ Mesenteric (inferior)\n+ Mesorectal\n+ Perirectal\n+ Rectal (inferior)\n+ Sacral, NOS\n   * Lateral sacral (laterosacral)\n   * Middle sacral (promontorial) (Gerota's node)\n   * Presacral\n+ Sigmoidal (sigmoid mesenteric)",
+            "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+            "7": "**Distant site(s)/lymph node(s) involved**\n\nDistant site(s) (including further contiguous extension)\n\nAll sites (C180, C182-C189)\n+ Adrenal (suprarenal) gland\n+ Bladder\n+ Diaphragm\n+ Fallopian tube\n+ Fistula to skin\n+ Gallbladder\n+ Other segment(s) of colon via serosa\n+ Ovary(ies)\n + Uterus\n\nCecum (C180)\n+ Kidney, right\n+ Liver\n+ Ureter, right\n\nTransverse colon and flexures (C183-C185)\n+ Ureter\n\nSigmoid colon (C187)\n+ Cul de sac (rectouterine pouch)\n+ Ureter\n\nRectosigmoid (C199)\n+ Bladder\n+ Colon via serosa\n+ Fallopian tube\n+ Ovary\n+ Prostate\n+ Skeletal muscles of pelvic floor\n+ Ureter\n+ Vagina\n\nRectum (C209)\n+ Bladder (for females only)\n+ Bone(s) of pelvis \n+ Cervix\n+ Perineum, perianal skin\n+ Sacral plexus\n+ Sacrum\n+ Ureter\n+ Urethra\n+ Uterus\n\nDistant lymph node(s), NOS\n+ Colon\n  * Iliac (common, external, hypogastric, internal, obturator, NOS)\n  * Inferior mesenteric (cecum, ascending colon, hepatic flexure, transverse colon)\n  * Para-aortic\n  * Retroperitoneal \n  * Superior mesenteric\n + Rectosigmoid\n   * Hemorrhoidal, inferior (rectosigmoid)\n   * Iliac (common, external, hypogastric, internal, obturator, NOS)\n   * Rectal, inferior \n   * Superior mesenteric\n+ Rectum\n   * Colic (left) (rectum)\n   * Iliac (common, external, NOS) (see code 3 for hypogastric, internal, obturator)\n   * Superior mesenteric\n\nDistant metastasis, NOS \n+ Carcinomatosis\n+ Peritoneal surface metastasis (peritoneum)\n+ Distant metastasis WITH or WITHOUT distant lymph node(s)",
+            "9": "Unknown if extension or metastasis"
+          }
+        },
+        "820": {
+          "source": "eod",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+          }
+        },
+        "830": {
+          "source": "eod",
+          "table": "nodes_exam_76029",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+          }
+        },
+        "1182": {
+          "source": "cipoc_lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        },
+        "3843": {
+          "source": "eod",
+          "table": "grade_clinical_26768",
+          "codes": {
+            "1": "G1: Mitotic count (per 2mm2) less than 2 AND \n        Ki-67 index (%) less than 3\n\nStated as WHO Grade 1",
+            "2": "G2: Mitotic count (per 2mm2) equal 2-20 OR\n        Ki-67 index (%) equal 3-20\n\nStated as WHO Grade 2",
+            "3": "G3: Mitotic count (per 2mm2) greater than 20 OR \n    Ki-67 index (%) greater than 20\n\nStated as WHO Grade 3",
+            "A": "Well differentiated",
+            "B": "Moderately differentiated",
+            "C": "Poorly differentiated",
+            "D": "Undifferentiated, anaplastic",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        },
+        "3844": {
+          "source": "eod",
+          "table": "grade_pathological_26086",
+          "codes": {
+            "1": "G1: Mitotic count (per 2mm2) less than 2 AND \n        Ki-67 index (%) less than 3\n\nStated as WHO Grade 1",
+            "2": "G2: Mitotic count (per 2mm2) equal 2-20 OR\n        Ki-67 index (%) equal 3-20\n\nStated as WHO Grade 2",
+            "3": "G3: Mitotic count (per 2mm2) greater than 20 OR \n        Ki-67 index (%) greater than 20\n\nStated as WHO Grade 3",
+            "A": "Well differentiated",
+            "B": "Moderately differentiated",
+            "C": "Poorly differentiated",
+            "D": "Undifferentiated, anaplastic",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        }
+      }
+    },
+    "eod/net_colon_rectum": {
+      "select": [
+        {
+          "site": "C180,C182-C189, C199, C209",
+          "hist": "8150-8153,8155-8156,8158,8240-8242,8249,8683",
+          "year_dx": "2018-2023"
+        }
+      ],
+      "codes": {
+        "756": {
+          "source": "eod",
+          "table": "tumor_size_summary_full_31213",
+          "codes": {
+            "000": "No mass/tumor found",
+            "001": "1 mm or described as less than 1 mm",
+            "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+            "989": "989 millimeters or larger",
+            "990": "Microscopic focus or foci only and no size of focus is given",
+            "998": "Alternate descriptions of tumor size for specific sites:\n\nFamilial/multiple polyposis:\n- Rectosigmoid and rectum (C19.9, C20.9)\n- Colon (C18.0, C18.2-C18.9)\n\nIf no size is documented:\nCircumferential:\n- Esophagus (C15.0-C15.5, C15.8-C15.9)\n\nDiffuse; widespread: 3/4s or more; linitis plastica:\n- Stomach and Esophagus GE Junction (C16.0-C16.6, C16.8-C16.9)\n\nDiffuse, entire lung or NOS:\n- Lung and main stem bronchus (C34.0-C34.3, C34.8-C34.9)\n\nDiffuse:\n- Breast (C50.0-C50.6, C50.8-C50.9)",
+            "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+          }
+        },
+        "764": {
+          "source": "eod",
+          "table": "ss2018_colon_and_rectum_including_net_40538",
+          "codes": {
+            "0": "**In situ, intraepithelial, noninvasive**",
+            "1": "**Localized only (localized, NOS)**\n\nAll sites (C180, C182-C189)\n- Confined to colon, rectum, rectosigmoid, NOS\n- Confined to polyp (head, stalk, NOS)\n- Extension through wall, NOS\n- Intraluminal extension to colon and/or anal canal/anus (rectum only)\n- Invasion of\n  + Intramucosal, NOS\n  + Lamina propria\n  + Mucosa, NOS\n  + Muscularis mucosae\n  + Muscularis, NOS\n  + Muscularis propria\n     + Rectum (C209): WITH or WITHOUT intraluminal extension to colon and/or anal canal/anus\n - Perimuscular tissue invaded\n - Submucosa (superficial invasion)\n- Subserosal tissue/(sub)serosal fat invaded\n- Transmural, NOS\n- Wall, NOS\n\nPeritonealized or non-peritonealized: Invasion into pericolorectal tissues and/or pericolonic adipose tissue ONLY\n*(do not apply these instructions to structures listed under ALL SITES)*\n * Non-peritonealized site or segment of colon (*see Note 6*) or UNKNOWN if peritonealized\n * Includes invasion of pericolic or perirectal fat tissues\n * For peritonealized sites or segments, see code 2)",
+            "2": "**Regional by direct extension only**\n\nAll sites (C180, C182-C189)\n+ Abdominal wall**\n+ Adherent to other organs or structures clinically with no microscopic examination\n+ Adjacent (connective) tissue(s), NOS\n+ Fat, NOS\n+ Mesentery (including mesenteric fat, mesocolon)\n+ Mesothelium\n+ Retroperitoneum (excluding fat)\n+ Serosa\n+ Small intestine\n+ Tumor found in adhesion(s) if microscopic examination performed\n+ Tunica serosa\n+ Visceral peritoneum\n\nCecum (C180)\n+ Greater omentum\n\nAscending colon (C182)\n+ Kidney, right\n+ Liver, right lobe\n+ Retroperitoneal fat\n+ Ureter, right\n\nTransverse colon and flexures (C183, C184, C185)\n+ Bile ducts\n+ Gallbladder\n+ Gastrocolic ligament\n+ Greater omentum \n+ Kidney\n+ Liver\n+ Pancreas\n+ Spleen\n+ Stomach\n\nDescending colon (C186)\n+ Kidney, left\n+ Pelvic wall\n+ Retroperitoneal fat\n+ Spleen\n+ Ureter, left\n\nSigmoid colon (C187)\n+ Pelvic wall \n \nRectosigmoid (C199)\n+ Cul de sac (rectouterine pouch)\n+ Pelvic wall\n+ Small intestine\n\nRectum (C209)\n+ Anus\n+ Bladder (males only)\n+ Cul de sac (rectouterine pouch)\n+ Ductus deferens\n+ Pelvic wall\n+ Prostate\n+ Rectovaginal septum\n+ Rectovesical fat (males only)\n+ Seminal vesicle(s)\n+ Skeletal muscles of pelvic floor\n+ Vagina\n\nPeritonealized or non-peritonealized: Invasion into pericolorectal tissues and/or pericolonic adipose tissue ONLY \n*(do not apply these instructions to structures listed under ALL SITES, or the specific subsites)*\n * Peritonealized site or segment of colon (*see Note 6*) or stated as peritonealized in pathology report\n * Includes invasion of pericolic or perirectal fat tissues\n * For non-peritonealized sites or segments, or UNKNOWN if peritonealized, see code 1) (*see Note 7*)",
+            "3": "**Regional lymph node(s) involved only**\n\nAll sites (C180, C182-C189)\n+ Colic, NOS\n+ Epicolic (adjacent to bowel wall)\n+ Mesenteric, NOS\n+ Mesocolic, NOS\n+ Paracolic\n+ Pericolic\n+ Tumor deposits (TD) in the subserosa, mesentery, mesorectal  or nonperitonealized pericolic or perirectal tissues WITHOUT regional nodal metastasis\n+ Regional lymph node(s), NOS\n   * Lymph node(s), NOS\n\nCecum (C180) \n+ Cecal, NOS\n   * Anterior cecal (prececal)\n   * Posterior cecal (retrocecal)\n+ Colic (right)\n+ Ileocolic\n+ Periappendiceal\n\nAscending colon (C182)\n+ Colic (middle-right branch, right)\n+ Ileocolic\n\nHepatic flexure (C183)\n+ Colic (middle, right)\n+ Ileocolic\n\nTransverse colon (C184)\n+ Colic (middle)\n\nSplenic flexure (C185)\n+ Colic (left, middle)\n+ Mesenteric (inferior)\n\nDescending colon (C186)\n+ Colic (left)\n+ Mesenteric (inferior)\n+ Sigmoid\n\nSigmoid colon (C187)\n+ Colic (left)\n+ Mesenteric (inferior)\n+ Rectal (superior) (hemorrhoidal)\n+ Rectosigmoid\n+ Sigmoid (sigmoidal) (sigmoid mesenteric)\n+ Superior rectal (hemorrhoidal)\n\nRectosigmoid (C199)\n+ Hemorrhoidal (middle, superior)\n+ Mesenteric (inferior)\n+ Mesorectal\n+ Pericolic\n+ Perirectal\n+ Rectal (middle, superior) \n+ Sigmoid (mesenteric)\n\nRectum (C209)\n+ Hemorrhoidal (middle, superior)\n+ Iliac (hypogastric, internal, obturator) (see code 7 for common, external, NOS)\n+ Mesenteric (inferior)\n+ Mesorectal\n+ Perirectal\n+ Rectal (inferior)\n+ Sacral, NOS\n   * Lateral sacral (laterosacral)\n   * Middle sacral (promontorial) (Gerota's node)\n   * Presacral\n+ Sigmoidal (sigmoid mesenteric)",
+            "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+            "7": "**Distant site(s)/lymph node(s) involved**\n\nDistant site(s) (including further contiguous extension)\n\nAll sites (C180, C182-C189)\n+ Adrenal (suprarenal) gland\n+ Bladder\n+ Diaphragm\n+ Fallopian tube\n+ Fistula to skin\n+ Gallbladder\n+ Other segment(s) of colon via serosa\n+ Ovary(ies)\n + Uterus\n\nCecum (C180)\n+ Kidney, right\n+ Liver\n+ Ureter, right\n\nTransverse colon and flexures (C183-C185)\n+ Ureter\n\nSigmoid colon (C187)\n+ Cul de sac (rectouterine pouch)\n+ Ureter\n\nRectosigmoid (C199)\n+ Bladder\n+ Colon via serosa\n+ Fallopian tube\n+ Ovary\n+ Prostate\n+ Skeletal muscles of pelvic floor\n+ Ureter\n+ Vagina\n\nRectum (C209)\n+ Bladder (for females only)\n+ Bone(s) of pelvis \n+ Cervix\n+ Perineum, perianal skin\n+ Sacral plexus\n+ Sacrum\n+ Ureter\n+ Urethra\n+ Uterus\n\nDistant lymph node(s), NOS\n+ Colon\n  * Iliac (common, external, hypogastric, internal, obturator, NOS)\n  * Inferior mesenteric (cecum, ascending colon, hepatic flexure, transverse colon)\n  * Para-aortic\n  * Retroperitoneal \n  * Superior mesenteric\n + Rectosigmoid\n   * Hemorrhoidal, inferior (rectosigmoid)\n   * Iliac (common, external, hypogastric, internal, obturator, NOS)\n   * Rectal, inferior \n   * Superior mesenteric\n+ Rectum\n   * Colic (left) (rectum)\n   * Iliac (common, external, NOS) (see code 3 for hypogastric, internal, obturator)\n   * Superior mesenteric\n\nDistant metastasis, NOS \n+ Carcinomatosis\n+ Peritoneal surface metastasis (peritoneum)\n+ Distant metastasis WITH or WITHOUT distant lymph node(s)",
+            "9": "Unknown if extension or metastasis"
+          }
+        },
+        "820": {
+          "source": "eod",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+          }
+        },
+        "830": {
+          "source": "eod",
+          "table": "nodes_exam_76029",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+          }
+        },
+        "1182": {
+          "source": "cipoc_lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        },
+        "3843": {
+          "source": "eod",
+          "table": "grade_clinical_26768",
+          "codes": {
+            "1": "G1: Mitotic count (per 2mm2) less than 2 AND \n        Ki-67 index (%) less than 3\n\nStated as WHO Grade 1",
+            "2": "G2: Mitotic count (per 2mm2) equal 2-20 OR\n        Ki-67 index (%) equal 3-20\n\nStated as WHO Grade 2",
+            "3": "G3: Mitotic count (per 2mm2) greater than 20 OR \n    Ki-67 index (%) greater than 20\n\nStated as WHO Grade 3",
+            "A": "Well differentiated",
+            "B": "Moderately differentiated",
+            "C": "Poorly differentiated",
+            "D": "Undifferentiated, anaplastic",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        },
+        "3844": {
+          "source": "eod",
+          "table": "grade_pathological_26086",
+          "codes": {
+            "1": "G1: Mitotic count (per 2mm2) less than 2 AND \n        Ki-67 index (%) less than 3\n\nStated as WHO Grade 1",
+            "2": "G2: Mitotic count (per 2mm2) equal 2-20 OR\n        Ki-67 index (%) equal 3-20\n\nStated as WHO Grade 2",
+            "3": "G3: Mitotic count (per 2mm2) greater than 20 OR \n        Ki-67 index (%) greater than 20\n\nStated as WHO Grade 3",
+            "A": "Well differentiated",
+            "B": "Moderately differentiated",
+            "C": "Poorly differentiated",
+            "D": "Undifferentiated, anaplastic",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        }
+      }
+    },
+    "eod/primary_peritoneal_carcinoma": {
+      "select": [
+        {
+          "site": "C481, C482, C488",
+          "hist": "8000-8700, 8720-8790, 8806, 8822, 8930-8931, 8933, 8950, 8960, 8980, 9000, 9050, 9052, 9060, 9070-9071, 9073, 9080, 9085, 9090-9091, 9100, 9110-9111",
+          "year_dx": "2018-",
+          "sex_at_birth": "2"
+        }
+      ],
+      "codes": {
+        "756": {
+          "source": "eod",
+          "table": "tumor_size_summary_63115",
+          "codes": {
+            "000": "No mass/tumor found",
+            "001": "1 mm or described as less than 1 mm",
+            "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+            "989": "989 millimeters or larger",
+            "990": "Microscopic focus or foci only and no size of focus is given",
+            "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+          }
+        },
+        "764": {
+          "source": "eod",
+          "table": "ss2018_ovary_fallopian_tube_and_peritoneal_carcinoma_21678",
+          "codes": {
+            "0": "**In situ: noninvasive, intraepithelial** \n- Limited to ovarian mucosa\n- Preinvasive\n- Serous tubal intraepithelial carcinoma (STIC) (8441/2)",
+            "1": "**Localized only (localized, NOS)**\n\nLimited to one or both ovaries WITH capsule intact\nLimited to one or both ovaries WITH or WITHOUT surgical spill\n\nLimited to one or both ovaries WITHOUT or UNKNOWN\n* Tumor on ovarian surface\n* Malignant cells in ascites or peritoneal washings\n\nConfined to ovary, NOS\nLocalized, NOS \n\nLocalized primary peritoneal cancer\n  + (Primary sites C481, C482, C488)\n\nFIGO Stage I (IA, IB, IC1, I NOS)",
+            "2": "**Regional by direct extension only**\n\nLimited to one or both ovaries WITH\n* Tumor on ovarian surface\n* Malignant cells in ascites or peritoneal washings\n* Pelvic extension, NOS (below pelvic brim)\n\nExtension to and/or discontinuous metastasis to any of the following\n* Adnexa\n* Adjacent (pelvic) peritoneum\n* Bladder\n* Bladder serosa\n* Corpus uteri\n* Cul de sac (rectouterine pouch)\n* Fallopian tube(s)\n* Ligament(s) (broad, ovarian, round, suspensory)\n* Mesosalpinx (Mesovarium)\n* Parametrium\n* Pelvic wall\n* Rectosigmoid\n* Rectum\n* Sigmoid colon (including sigmoid mesentery)\n* Ureter (pelvic portion)\n * Uterus, NOS\n\nFIGO Stage IC2, IC3\nFIGO Stage II (IIA, IIB, II NOS)",
+            "3": "**Regional lymph node(s) involved only**\n\n- Intrabdominal \n- Para-aortic, NOS\n  + Aortic\n  + Lateral aortic/lateral lumbar\n  + Periaortic\n- Pelvic, NOS\n  + Iliac, NOS\n     + Common\n     + External\n     + Internal (hypogastric) (obturator)\n   + Paracervical\n   + Parametrial\n   + Sacral, NOS\n      + Lateral (laterosacral)\n      + Middle (promontorial) (Gerota's node)\n      + Presacral\n      + Uterosacral\n- Retroperitoneal, NOS\n- Subdiaphragmatic (primary peritoneal carcinoma)\n- Regional lymph node(s), NOS\n  + Lymph node(s), NOS\n\nFIGO Stage IIIA1 (IIA1i, IIIA1ii, IIIA1 NOS)\n* Localized tumor WITH regional lymph node involvement",
+            "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+            "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n  * Abdominal mesentery\n  * Diaphragm\n  * Gallbladder\n  * Intestine, large (except rectum, rectosigmoid and sigmoid colon, see code 2)\n  * Kidneys\n  * Liver (capsular or parenchymal involvement)\n  * Omentum (infracolic, NOS)\n  * Pancreas\n  * Pericolic gutter\n  * Peritoneum, NOS\n  * Peritoneal implants beyond pelvis\n  * Pleural effusion with positive cytology\n  * Small intestine\n  * Spleen (capsular or parenchymal involvement)\n  * Stomach\n  * Ureters (outside pelvis)\n- Distant lymph node(s), NOS\n   + Inguinal, NOS\n      + Inguinofemoral (groin)\n      + Node of Cloquet or Rosenmuller (highest deep inguinal)\n      + Superficial inguinal (femoral)\n- Distant metastasis, NOS\n  * Carcinomatosis (involvement of multiple parenchymal organs)\n    + WITH or WITHOUT distant lymph node(s) OR pleural effusion\n  * Distant metastasis WITH or WITHOUT distant lymph node(s)\n\nFIGO Stage III (IIIA, IIIA2, IIIB, IIIC, III NOS)\nFIGO Stage IV (IVA, IVB, IV NOS)",
+            "9": "Unknown if extension or metastasis"
+          }
+        },
+        "820": {
+          "source": "eod",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+          }
+        },
+        "830": {
+          "source": "eod",
+          "table": "nodes_exam_76029",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+          }
+        },
+        "3836": {
+          "source": "eod",
+          "table": "figo_stage_30513",
+          "codes": {
+            "1": "FIGO Stage I ",
+            "1A": "FIGO Stage IA ",
+            "1B": "FIGO Stage IB ",
+            "1C": "FIGO Stage IC ",
+            "1C1": "FIGO Stage IC1",
+            "1C2": "FIGO Stage IC2",
+            "1C3": "FIGO Stage IC3",
+            "2": "FIGO Stage II ",
+            "2A": "FIGO Stage IIA ",
+            "2B": "FIGO Stage IIB",
+            "3": "FIGO Stage III",
+            "3A": "FIGO Stage IIIA",
+            "3A1": "FIGO Stage IIIA1",
+            "3A11": "FIGO Stage IIIA1i",
+            "3A12": "FIGO Stage IIIA1ii",
+            "3A2": "FIGO Stage IIIA2",
+            "3B": "FIGO Stage IIIB",
+            "3C": "FIGO Stage IIIC",
+            "4": "FIGO Stage IV ",
+            "4A": "FIGO Stage IVA",
+            "4B": "FIGO Stage IVB",
+            "97": "Carcinoma in situ (intraepithelial, noninvasive, preinvasive)",
+            "98": "Not applicable:  Information not collected for this case\n(If this item is required by your standard setter, use of code 98 will result in an edit error.)",
+            "99": "Not documented in medical record\nFIGO stage not assessed or unknown if assessed"
+          }
+        },
+        "3843": {
+          "source": "eod",
+          "table": "grade_clinical_69174",
+          "codes": {
+            "1": "G1: Well differentiated",
+            "2": "G2: Moderately differentiated",
+            "3": "G3: Poorly differentiated, undifferentiated  ",
+            "B": "GB: Borderline Tumor",
+            "L": "Low grade",
+            "H": "High grade",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        },
+        "3844": {
+          "source": "eod",
+          "table": "grade_pathological_42127",
+          "codes": {
+            "1": "G1: Well differentiated",
+            "2": "G2: Moderately differentiated",
+            "3": "G3: Poorly differentiated, undifferentiated  ",
+            "B": "GB: Borderline Tumor",
+            "L": "Low grade",
+            "H": "High grade",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
         }
       }
     }

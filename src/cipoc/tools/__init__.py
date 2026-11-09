@@ -43,6 +43,8 @@ from .scoping import (
     load_scoping_dictionary,
     parse_scoping_dictionary,
     check_primary_site_coverage,
+    matching_schemas,
+    scoped_codes,
 )
 from .coding_context import (
     RuleStore,
@@ -93,6 +95,8 @@ __all__ = [
     "load_scoping_dictionary",
     "parse_scoping_dictionary",
     "check_primary_site_coverage",
+    "matching_schemas",
+    "scoped_codes",
     "RuleStore",
     "load_rule_store",
     "applicable_sources",

@@ -81,6 +81,8 @@ from .observability import (
 
 from .scoping import (
     TissueCodes,
+    CodeOverride,
+    StagingSchema,
     ScopingDictionary,
 )
 
@@ -158,6 +160,8 @@ __all__ = [
     "VariableAttempt",
     "RunObservability",
     "TissueCodes",
+    "CodeOverride",
+    "StagingSchema",
     "ScopingDictionary",
     "OrchestratorConfigFingerprint",
     "OrchestratorRunCorpus",
