@@ -472,6 +472,31 @@ test("candidate gross sites show as OR in the facts rail and applicability check
   assert.throws(() => vm.runInContext("indexState(bad)", context), /case_facts.candidate_gross_sites must be an array/);
 });
 
+test("candidate histology families show as OR in the facts rail and applicability check, and stay optional", () => {
+  const { context, document } = loadWorkbench();
+  const result = canonicalResult("1.3");
+  result.inputs.target_variables[0].applies_to = { histology_families: ["967"] };
+  result.case.case_facts = { candidate_histology_families: ["967", "968"] };
+  context.result = result;
+  vm.runInContext("indexState(result)", context);
+  vm.runInContext("renderChrome()", context);
+  assert.match(document.querySelector("#facts").textContent, /candidate histology families967 or 968/);
+  assert.match(vm.runInContext("groupDetail('diagnosis').textContent", context),
+    /histology=unknown, candidate_histology_families=967 or 968/);
+
+  for (const facts of [{ histology: "8500" }, { candidate_histology_families: [] }]) {
+    const { context, document } = loadWorkbench();
+    context.result = canonicalResult("1.3");
+    context.result.case.case_facts = facts;
+    vm.runInContext("indexState(result)", context);
+    vm.runInContext("renderChrome()", context);
+    assert.doesNotMatch(document.querySelector("#facts").textContent, /candidate histology families/);
+  }
+  context.bad = canonicalResult("1.3");
+  context.bad.case.case_facts = { candidate_histology_families: "967" };
+  assert.throws(() => vm.runInContext("indexState(bad)", context), /case_facts.candidate_histology_families must be an array/);
+});
+
 test("the histology steps show on the variable, stay optional, and must be well formed", () => {
   const { context } = loadWorkbench();
   const result = canonicalResult("1.3");

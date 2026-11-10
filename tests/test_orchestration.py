@@ -14,6 +14,7 @@ from cipoc.models import (
     CaseFacts,
     CaseVariableResult,
     ConfidenceLevel,
+    HistologySelection,
     OrchestratorRunError,
     OrchestratorRunResult,
     ProcessedClinicalNote,
@@ -25,7 +26,7 @@ from cipoc.models import (
     VariableOutput,
     VariableStatus,
 )
-from cipoc.tools import build_corpus_descriptors, build_report, candidate_gross_sites, load_variable_groups, site_applies
+from cipoc.tools import build_corpus_descriptors, build_report, candidate_gross_sites, derive_case_facts, load_variable_groups, site_applies
 from cipoc.utils.progress.events import normalize
 
 from tests.fake_orchestrator import (
@@ -33,6 +34,7 @@ from tests.fake_orchestrator import (
     TISSUE_CODES,
     build_fake_orchestrator,
     graph_input,
+    histology_pair_codes,
     load_notes,
     primary_site_codes,
 )
@@ -115,6 +117,9 @@ class CorpusCharacterizationTests(unittest.TestCase):
             base_dictionary.write_text(json.dumps({"400": {
                 "item_name": "Primary Site", "item_length": 4,
                 "allowed_codes": primary_site_codes(),
+            }, "522": {
+                "item_name": "Histologic Type ICD-O-3", "item_length": 4,
+                "allowed_codes": histology_pair_codes(),
             }}))
         agent = object.__new__(OrchestratorAgent)
         agent._data_dictionary_path = base_dictionary
@@ -248,6 +253,9 @@ class CorpusCharacterizationTests(unittest.TestCase):
         base_path.write_text(json.dumps({"400": {
             "item_name": "Primary Site", "item_length": 4,
             "allowed_codes": primary_site_codes(),
+        }, "522": {
+            "item_name": "Histologic Type ICD-O-3", "item_length": 4,
+            "allowed_codes": histology_pair_codes(),
         }}))
         site_path.write_text(SCOPING_DICTIONARY.read_text())
         agent = object.__new__(OrchestratorAgent)
@@ -268,6 +276,60 @@ class CorpusCharacterizationTests(unittest.TestCase):
         self.assertEqual(set(scoped.variables[0].valid_codes), TISSUE_CODES["breast"] | {"C809"})
 
 
+class HistologyScopeWiringTests(unittest.TestCase):
+    def agent(self, pairs=None):
+        directory = TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        base_path = Path(directory.name) / "base.json"
+        base_path.write_text(json.dumps({
+            "400": {"item_name": "Primary Site", "item_length": 4, "allowed_codes": primary_site_codes()},
+            "522": {"item_name": "Histologic Type ICD-O-3", "item_length": 4,
+                    "allowed_codes": histology_pair_codes() if pairs is None else pairs},
+            "523": {"item_name": "Behavior Code ICD-O-3", "item_length": 1,
+                    "allowed_codes": {"0": "Benign", "1": "Borderline", "2": "In situ", "3": "Malignant"}},
+        }))
+        agent = object.__new__(OrchestratorAgent)
+        agent._data_dictionary_path = base_path
+        agent._site_data_dictionary_path = SCOPING_DICTIONARY
+        return agent
+
+    def scoped(self, agent, facts):
+        group = TargetGroup(
+            group_id="histologic_type_and_behavior", stage="histology", extract_as_group=True,
+            variables=[VariableInfo(item_id=522), VariableInfo(item_id=523)],
+        )
+        return {variable.item_id: variable for variable in agent._scope_group(group, facts).variables}
+
+    def test_a_coded_breast_site_scopes_histology_to_the_breast_list(self):
+        agent = self.agent()
+        for primary in ("C504", "C50.4"):
+            with self.subTest(primary=primary):
+                variables = self.scoped(agent, CaseFacts(primary_site=primary))
+                scope = variables[522].histology_scope
+                self.assertEqual(scope.site_group, "breast")
+                reachable = {pair for codes in scope.family_codes.values() for pair in codes}
+                # The old breast list missed angiosarcoma and malignant phyllodes.
+                self.assertTrue({"9120/3", "9020/3"} <= reachable)
+                self.assertIsNone(variables[523].histology_scope)
+
+    def test_an_uncoded_site_scopes_histology_to_the_unknown_primary_list(self):
+        agent = self.agent()
+        for facts in (None, CaseFacts(), CaseFacts(gross_primary_site="breast")):
+            with self.subTest(facts=facts):
+                self.assertEqual(self.scoped(agent, facts)[522].histology_scope.site_group, "unknown")
+
+    def test_without_a_site_dictionary_histology_has_no_scope(self):
+        agent = self.agent()
+        agent._site_data_dictionary_path = None
+        self.assertIsNone(self.scoped(agent, CaseFacts(primary_site="C504"))[522].histology_scope)
+
+    def test_the_site_lists_must_only_offer_the_dictionarys_histology_pairs(self):
+        pairs = histology_pair_codes()
+        del pairs["9120/3"]
+        with self.assertRaisesRegex(ValueError, "9120/3"):
+            self.agent(pairs)._site_dictionary
+
+
 def _extracted(item_id, value, confidence=ConfidenceLevel.HIGH):
     return CaseVariableResult(
         item_id=item_id, status=VariableStatus.EXTRACTED, value=value,
@@ -276,6 +338,45 @@ def _extracted(item_id, value, confidence=ConfidenceLevel.HIGH):
             spans=[], presence_confidence=confidence, is_valid=True,
         ),
     )
+
+
+def _histology(value, *, families=(), blocks=(), listed=None, status=VariableStatus.EXTRACTED, confidence=ConfidenceLevel.HIGH):
+    """A 522 result as the two histology steps leave it."""
+    return CaseVariableResult(
+        item_id=522, status=status, value=value,
+        extraction=ValidatedVariableOutput(
+            item_id=522, value=value, explanation="Coded.", most_important_note=1 if value else None,
+            spans=[], presence_confidence=confidence, is_valid=True,
+            histology=HistologySelection(
+                families=list(families), blocks=list(blocks), reasoning="Chosen.", listed=listed,
+            ),
+        ),
+    )
+
+
+class HistologyFamilyFactsTests(unittest.TestCase):
+    def test_chosen_families_reach_the_case_facts(self):
+        facts = derive_case_facts(CaseFacts(), {522: _histology("8500", families=["850", "852"], listed=True)})
+        self.assertEqual((facts.histology, facts.candidate_histology_families), ("8500", ["850", "852"]))
+
+    def test_families_from_a_not_found_histology_still_count(self):
+        result = _histology(None, families=["967", "968"], status=VariableStatus.NOT_FOUND)
+        facts = derive_case_facts(None, {522: result})
+        self.assertEqual((facts.histology, facts.candidate_histology_families), (None, ["967", "968"]))
+
+    def test_block_fallback_and_known_candidates_add_nothing(self):
+        before = CaseFacts(histology="9120")
+        self.assertIs(derive_case_facts(before, {522: _histology("9120", blocks=["912-916"], listed=False)}), before)
+        known = CaseFacts(candidate_histology_families=["850"])
+        self.assertIs(derive_case_facts(known, {522: _histology(None, families=["967"], status=VariableStatus.NOT_FOUND)}), known)
+
+    def test_old_case_facts_without_candidate_families_load(self):
+        facts = CaseFacts.model_validate({"primary_site": "C504", "histology": "8500"})
+        self.assertEqual(facts.candidate_histology_families, [])
+        restored = CaseFacts.model_validate_json(
+            CaseFacts(candidate_histology_families=["967"]).model_dump_json()
+        )
+        self.assertEqual(restored.candidate_histology_families, ["967"])
 
 
 class BuildReportTests(unittest.TestCase):
@@ -316,6 +417,35 @@ class BuildReportTests(unittest.TestCase):
             [(400, ReviewFlagType.MULTIPLE_CANDIDATE_SITES)],
         )
         self.assertEqual(self.flags(results, CaseFacts(candidate_gross_sites=["breast"])), [])
+
+    def test_histology_off_the_sites_list_is_flagged(self):
+        results = {
+            522: _histology("9120", blocks=["912-916"], listed=False),
+            523: _extracted(523, "3"),
+        }
+        report = build_report(results)
+        self.assertEqual(
+            [(flag.item_id, flag.flag_type) for flag in report.flags],
+            [(522, ReviewFlagType.UNLISTED_SITE_HISTOLOGY)],
+        )
+        self.assertIn("9120/3", report.flags[0].detail)
+
+    def test_listed_or_uncoded_histology_raises_no_histology_flag(self):
+        for result in (
+            _histology("8500", families=["850"], listed=True),
+            _histology("8500", families=["850"], listed=None),
+            _histology(None, families=["850"], listed=False, status=VariableStatus.NOT_FOUND),
+            _extracted(522, "8500"),
+        ):
+            with self.subTest(result=result):
+                self.assertEqual(self.flags({522: result}, None), [])
+
+    def test_histology_flag_follows_its_own_result_flag(self):
+        results = {522: _histology("9120", blocks=["912-916"], listed=False, confidence=ConfidenceLevel.LOW)}
+        self.assertEqual(
+            self.flags(results, None),
+            [(522, ReviewFlagType.LOW_CONFIDENCE), (522, ReviewFlagType.UNLISTED_SITE_HISTOLOGY)],
+        )
 
 
 class OrchestratorRunTests(unittest.TestCase):

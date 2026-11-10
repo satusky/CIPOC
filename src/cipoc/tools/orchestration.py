@@ -39,7 +39,7 @@ from cipoc.models import (
 )
 from cipoc.models.case import TERMINAL_VARIABLE_STATUSES
 from .coding_context import ranges_overlap, site_in_ranges
-from .scoping import PRIMARY_SITE_ITEM, gross_site_candidates
+from .scoping import BEHAVIOR_ITEM, HISTOLOGY_ITEM, PRIMARY_SITE_ITEM, gross_site_candidates
 
 
 def _concept_present(corpus: NoteCorpusDescriptors, concept: str) -> bool:
@@ -450,9 +450,10 @@ def site_applies(
     primary outranks gross-site inference, including when they conflict. An
     explicit unknown/malformed primary also suppresses gross-site fallback.
     Candidate gross sites are OR: a restriction matches if any candidate does.
-    Histology families are 3-digit prefixes of a coded histology, and gross
-    primary sites are ``GrossSite`` tissues other than "unspecified"; anything
-    else raises here, not during historical artifact parsing.
+    Histology families are 3-digit prefixes of a coded histology. When histology
+    isn't coded, the candidate histology families stand in for it, again as OR.
+    Gross primary sites are ``GrossSite`` tissues other than "unspecified";
+    anything else raises here, not during historical artifact parsing.
 
     ``tissue_codes`` gives each tissue's Primary Site codes (``tissue_site_codes``).
     A tissue missing from it is unknown, so it never excludes.
@@ -481,6 +482,20 @@ def site_applies(
     ):
         primary_site = ""
     histology = (facts.histology or "").strip() if facts else ""
+    # The families the histology could be in: a coded histology's own, or else
+    # the candidates. As with Primary Site, a malformed coded histology is unknown
+    # and stops the fallback, and so does a malformed candidate.
+    if re.fullmatch(r"[0-9]{4}", histology):
+        histology_families: set[str] | None = {histology[:3]}
+    elif histology:
+        histology_families = None
+    else:
+        candidate_families = list(facts.candidate_histology_families) if facts else []
+        histology_families = (
+            set(candidate_families)
+            if candidate_families and all(re.fullmatch(r"[0-9]{3}", family) for family in candidate_families)
+            else None
+        )
 
     def matches_sites(ranges: list[str] | None) -> bool | None:
         if ranges is None:
@@ -520,8 +535,8 @@ def site_applies(
                 alternatives.append(matches_sites(restriction.primary_sites))
             if restriction.histology_families:
                 alternatives.append(
-                    histology[:3] in restriction.histology_families
-                    if re.fullmatch(r"[0-9]{4}", histology) else None
+                    bool(histology_families & set(restriction.histology_families))
+                    if histology_families is not None else None
                 )
         if not alternatives:
             return True
@@ -746,14 +761,23 @@ def derive_case_facts(
     never clobbered by a later extraction. ``value`` is non-None only for
     extracted/structured-data results, so no status check is needed. Returns the
     original ``facts`` object unchanged when nothing new was learned.
+
+    The histology families the extractor's family step chose fill
+    ``candidate_histology_families`` the same way, from the 522 result's
+    extraction, even when it ended NOT_FOUND. The block fallback chooses no
+    families, so it adds none.
     """
-    updates: dict[str, str] = {}
+    updates: dict[str, str | list[str]] = {}
     for item_id, field in ITEM_ID_TO_CASE_FACT.items():
         result = results.get(item_id)
         if result is None or result.value is None:
             continue
         if getattr(facts, field, None) is None:
             updates[field] = result.value
+    histology = results.get(HISTOLOGY_ITEM)
+    selection = histology.extraction.histology if histology and histology.extraction else None
+    if selection is not None and selection.families and not (facts and facts.candidate_histology_families):
+        updates["candidate_histology_families"] = list(selection.families)
     if not updates:
         return facts
     base = facts.model_dump() if facts is not None else {}
@@ -867,7 +891,9 @@ def build_report(
     not-found, not-applicable, blocked) raise no result flag. Separately, more
     than one candidate gross site flags Primary Site (400), after any result
     flag of its own and whether or not 400 was requested, since a run should
-    cover one tumor. Ordered by item ID.
+    cover one tumor. A coded histology the extractor found off the coded site's
+    list flags Histology (522) after its own result flag, since SEER requires
+    review of those combinations. Ordered by item ID.
     """
     candidates = case_facts.candidate_gross_sites if case_facts is not None else []
     multiple_sites = len(candidates) > 1
@@ -887,4 +913,21 @@ def build_report(
                     "a run should cover one tumor."
                 ),
             ))
+        if item_id == HISTOLOGY_ITEM and _unlisted_histology(result):
+            behavior = results.get(BEHAVIOR_ITEM)
+            pair = f"{result.value}/{behavior.value}" if behavior and behavior.value else result.value
+            flags.append(ReviewFlag(
+                item_id=item_id,
+                flag_type=ReviewFlagType.UNLISTED_SITE_HISTOLOGY,
+                detail=(
+                    f"Histology {pair} isn't on the coded site's SEER Site/Histology "
+                    "Validation List; SEER requires review of combinations off the list."
+                ),
+            ))
     return CaseReport(flags=flags)
+
+
+def _unlisted_histology(result: CaseVariableResult | None) -> bool:
+    """Whether a coded 522 is a pair the extractor recorded as off the site's list."""
+    selection = result.extraction.histology if result and result.extraction else None
+    return selection is not None and result.value is not None and selection.listed is False

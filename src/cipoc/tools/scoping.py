@@ -11,6 +11,7 @@ from cipoc.models import CaseFacts, GrossSite, HistologyScope, ScopingDictionary
 
 PRIMARY_SITE_ITEM = 400
 HISTOLOGY_ITEM = 522
+BEHAVIOR_ITEM = 523
 UNKNOWN_PRIMARY_SITE = "C809"
 _GENERATOR = "`python -m canonical_naaccr.cipoc_scoping` in canonical-naaccr"
 # The sections CIPOC reads, each added by a later version of the generator.
@@ -350,6 +351,14 @@ def _case_values(scoping: ScopingDictionary, facts: CaseFacts | None) -> dict[st
     histology = (facts.histology or "").strip()
     if re.match(r"[0-9]{4}", histology):
         values["hist"] = frozenset({int(histology[:4])})
+    elif not histology and facts.candidate_histology_families:
+        # The candidate families stand in for an uncoded histology, as OR, so it
+        # could be any code under them. A malformed one leaves it unknown.
+        families = facts.candidate_histology_families
+        if all(_FAMILY.fullmatch(family) for family in families):
+            values["hist"] = frozenset(
+                int(family) * 10 + digit for family in families for digit in range(10)
+            )
 
     behavior = (facts.behavior or "").strip()
     suffix = re.search(r"/([0-9])", histology)
@@ -389,8 +398,9 @@ def matching_schemas(scoping: ScopingDictionary, facts: CaseFacts | None) -> lis
     A known fact filters and an unknown one matches anything. The site is the
     coded Primary Site, or else every code of the candidate tissues, which
     matches a row whose sites overlap any of them. Histology is the coded
-    morphology's 4 digits, behavior comes from the behavior fact or the
-    histology's ``/n`` suffix, and the year is parsed from the date of diagnosis.
+    morphology's 4 digits, or else every code under the candidate histology
+    families. Behavior comes from the behavior fact or the histology's ``/n``
+    suffix, and the year is parsed from the date of diagnosis.
     """
     values = _case_values(scoping, facts)
     return [

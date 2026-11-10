@@ -366,7 +366,9 @@ function groupDetail(groupId) {
       ", gross_primary_site=" + (facts.gross_primary_site || "unknown") +
       ((facts.candidate_gross_sites || []).length
         ? ", candidate_gross_sites=" + facts.candidate_gross_sites.join(" or ") : "") +
-      ", histology=" + (facts.histology || "unknown")));
+      ", histology=" + (facts.histology || "unknown") +
+      ((facts.candidate_histology_families || []).length
+        ? ", candidate_histology_families=" + facts.candidate_histology_families.join(" or ") : "")));
   } else {
     checks.append(checkRow(true, "site applicability — unrestricted", null));
   }

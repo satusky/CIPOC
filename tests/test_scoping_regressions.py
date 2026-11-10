@@ -167,6 +167,25 @@ class ApplicabilityRegressionTests(unittest.TestCase):
                     site_applies(families, CaseFacts(histology=histology)), expected
                 )
 
+    def test_candidate_histology_families_stand_in_for_an_uncoded_histology(self):
+        melanoma = SiteApplicability(histology_families=["872"])
+        for facts, expected in (
+            ({"histology": "8720"}, True),
+            ({"candidate_histology_families": ["872"]}, True),
+            # Candidates are OR.
+            ({"candidate_histology_families": ["850", "872"]}, True),
+            ({"candidate_histology_families": ["850"]}, False),
+            # A coded histology outranks the candidates.
+            ({"histology": "8500", "candidate_histology_families": ["872"]}, False),
+            ({"histology": "8720", "candidate_histology_families": ["850"]}, True),
+            # Neither, a malformed candidate, or a malformed coded histology is unknown.
+            ({}, True),
+            ({"candidate_histology_families": ["850", "87"]}, True),
+            ({"histology": "8720/3", "candidate_histology_families": ["850"]}, True),
+        ):
+            with self.subTest(**facts):
+                self.assertEqual(site_applies(melanoma, CaseFacts(**facts)), expected)
+
     def test_family_labels_and_other_non_codes_fail_config_load(self):
         for family in ("melanoma", "MELANOMA", "87", "8720", " 872", "87x", "\uff18\uff17\uff12"):
             config = json.dumps({"groups": [{

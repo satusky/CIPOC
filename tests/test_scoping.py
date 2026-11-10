@@ -306,6 +306,22 @@ class SchemaMatchingTests(unittest.TestCase):
             self.match(CaseFacts(**facts)),
         )
 
+    def test_candidate_histology_families_stand_in_for_an_uncoded_histology(self):
+        breast = {"primary_site": "C504", "date_of_diagnosis": "2020-06-15"}
+        everything = self.match(CaseFacts(**breast))
+        self.assertEqual(everything, ["eod/breast", "eod/hemeretic", "eod/lymphoma"])
+        for facts, expected in (
+            # Lymphoma families steer an uncoded histology to the lymphoma schema.
+            ({"candidate_histology_families": ["967", "968"]}, ["eod/lymphoma"]),
+            ({"candidate_histology_families": ["850"]}, ["eod/breast"]),
+            # A coded histology outranks the candidates.
+            ({"histology": "8500", "candidate_histology_families": ["967"]}, ["eod/breast"]),
+            # A malformed candidate leaves the histology unknown.
+            ({"candidate_histology_families": ["96"]}, everything),
+        ):
+            with self.subTest(**facts):
+                self.assertEqual(self.match(CaseFacts(**breast, **facts)), expected)
+
     def test_c809_is_a_site_code_not_an_unknown_site(self):
         self.assertEqual(
             self.match(CaseFacts(primary_site="C80.9", histology="8500", date_of_diagnosis="2020-06-15")),

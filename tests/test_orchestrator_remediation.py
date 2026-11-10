@@ -32,6 +32,7 @@ from cipoc.models import (
     ClinicalNote,
     CONCEPT_DESCRIPTIONS,
     ExtractionStop,
+    HistologySelection,
     OrchestratorRunError,
     OrchestratorRunFailure,
     OrchestratorRunResult,
@@ -47,7 +48,7 @@ from cipoc.models import (
 from cipoc.models.observability import ObservabilityIssue
 from cipoc.utils import ObservabilityCollector
 
-from tests.fake_orchestrator import SCOPING_DICTIONARY, Outcome, Script, build_fake_orchestrator, primary_site_codes
+from tests.fake_orchestrator import SCOPING_DICTIONARY, Outcome, Script, build_fake_orchestrator, histology_pair_codes, primary_site_codes
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -245,6 +246,10 @@ class OrchestratorRemediationTests(unittest.TestCase):
                     "allowed_codes": {"0": "Base only", "1": "Breast", "2": "Lung"}},
             "3843": {"item_name": "Grade Clinical", "item_length": 1,
                      "allowed_codes": {"1": "Base G1", "9": "Base unknown"}},
+            "522": {"item_name": "Histologic Type ICD-O-3", "item_length": 4,
+                    "allowed_codes": histology_pair_codes()},
+            "523": {"item_name": "Behavior Code ICD-O-3", "item_length": 1,
+                    "allowed_codes": {"0": "Benign", "1": "Borderline", "2": "In situ", "3": "Malignant"}},
         }
         agent._data_dictionary_path = directory / "base.json"
         agent._site_data_dictionary_path = SCOPING_DICTIONARY
@@ -428,6 +433,52 @@ class OrchestratorRemediationTests(unittest.TestCase):
             if flag.flag_type == ReviewFlagType.MULTIPLE_CANDIDATE_SITES
         ]
         self.assertEqual([flag.item_id for flag in site_flags], [400])
+
+    def _histology_run(self, histology_outcome):
+        agent = _agent(
+            groups=[
+                _group(item_ids=(400,)),
+                _group("histology", (522, 523), stage="histology", extract_as_group=True),
+            ],
+            outcomes={400: Outcome(value="C504"), 522: histology_outcome, 523: Outcome(value="3")},
+        )
+        self._dictionaries(agent)
+        with patch.object(agent._extractor, "run", wraps=agent._extractor.run) as extract:
+            result = agent.run([_note().model_dump()], progress=False)
+        histology_input = extract.call_args_list[-1].args[0]
+        scope = {variable.item_id: variable for variable in histology_input.requested_variables.variables}[522].histology_scope
+        return result, scope
+
+    def test_histology_off_the_sites_list_is_flagged_and_its_scope_stays_out_of_the_artifact(self):
+        result, scope = self._histology_run(Outcome(value="9120", histology=HistologySelection(
+            blocks=["912-916"], reasoning="Angiosarcoma; no breast family fit.", listed=False,
+        )))
+        # The coded breast site picked the breast list for the histology steps.
+        self.assertEqual(scope.site_group, "breast")
+        self.assertIn("9120/3", {pair for codes in scope.family_codes.values() for pair in codes})
+
+        artifact = result.model_dump_json()
+        restored = OrchestratorRunResult.model_validate_json(artifact)
+        self.assertEqual(
+            [(flag.item_id, flag.flag_type) for flag in restored.case.report.flags],
+            [(522, ReviewFlagType.UNLISTED_SITE_HISTOLOGY)],
+        )
+        self.assertIn("9120/3", restored.case.report.flags[0].detail)
+        # The block fallback chooses no families.
+        self.assertEqual(restored.case.case_facts.candidate_histology_families, [])
+        self.assertEqual(restored.case.variable_results[522].extraction.histology.blocks, ["912-916"])
+        # The scope's lists are for the extractor only, never the saved run. The
+        # saved config groups carry an empty scope field.
+        for key in ("family_codes", "block_codes", '"histology_scope":{'):
+            self.assertNotIn(key, artifact)
+
+    def test_histology_on_the_sites_list_sets_candidate_families_and_no_flag(self):
+        result, _ = self._histology_run(Outcome(value="8500", histology=HistologySelection(
+            families=["850"], reasoning="Invasive ductal carcinoma.", listed=True,
+        )))
+        restored = OrchestratorRunResult.model_validate_json(result.model_dump_json())
+        self.assertEqual(restored.case.report.flags, [])
+        self.assertEqual(restored.case.case_facts.candidate_histology_families, ["850"])
 
     def test_current_benign_meningioma_does_not_narrow_to_a_historical_breast_cancer(self):
         model = _ScannerModel(tissues={"note-A": [

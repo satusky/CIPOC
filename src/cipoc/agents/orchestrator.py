@@ -20,7 +20,8 @@ from langgraph.graph.message import add_messages
 from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
-from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_data_dictionary, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, candidate_gross_sites, not_found_results, to_case_results, build_report, load_scoping_dictionary, check_primary_site_coverage, lookup_variable_info, tissue_site_codes, checkpoint_one_stop_reason, checkpoint_two_stop_reason, stop_pending_results
+from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_data_dictionary, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, candidate_gross_sites, not_found_results, to_case_results, build_report, load_scoping_dictionary, check_primary_site_coverage, check_histology_pairs, histology_pairs, build_histology_scope, lookup_variable_info, tissue_site_codes, checkpoint_one_stop_reason, checkpoint_two_stop_reason, stop_pending_results
+from cipoc.tools.scoping import HISTOLOGY_ITEM
 from cipoc.utils import CipocConfig, ObservabilityCollector, run_graph_stream
 from cipoc.utils.progress.events import ProgressEvent
 from cipoc.utils.progress.runner import validate_graph_concurrency
@@ -241,7 +242,9 @@ class OrchestratorAgent(BaseAgent):
 
         Deferred rather than read here so that a missing file still fails the run
         that needs it, not construction; ``run()`` digests the same file first.
-        Its tissues must cover exactly the NAACCR dictionary's Primary Site codes.
+        Its tissues must cover exactly the NAACCR dictionary's Primary Site codes,
+        and its histology lists may only offer the NAACCR dictionary's histology
+        pairs.
         """
         path = getattr(self, "_site_data_dictionary_path", None)
         if path is None:
@@ -250,12 +253,18 @@ class OrchestratorAgent(BaseAgent):
         check_primary_site_coverage(
             scoping, lookup_variable_info(400, self._data_dictionary).valid_codes or {}
         )
+        check_histology_pairs(scoping, self._histology_pairs)
         return scoping
 
     @cached_property
     def _tissue_codes(self) -> dict[str, frozenset[str]]:
         """Each tissue's Primary Site codes, which ``site_applies`` narrows by."""
         return tissue_site_codes(self._site_dictionary)
+
+    @cached_property
+    def _histology_pairs(self) -> dict[str, str]:
+        """Histology (522)'s code/behavior pairs and descriptions, for the block fallback."""
+        return histology_pairs(self._data_dictionary)
 
     # --- Graph wiring (compiled once per instance) ---
     def _wire_graph(self, workflow: StateGraph) -> None:
@@ -413,7 +422,9 @@ class OrchestratorAgent(BaseAgent):
         ``build_variable_group`` returns a plain ``VariableGroupInfo`` (no gating),
         so its enriched variables are merged back onto the pending ``TargetGroup``
         by item ID; the original ordering is kept. Missing or unusable dictionary
-        metadata fails explicitly before the group makes model calls.
+        metadata fails explicitly before the group makes model calls. With a
+        site dictionary, Histology (522) also gets its ``histology_scope`` for the
+        coded Primary Site, or the unknown primary's when none is coded.
         """
         enriched = build_variable_group(
             [variable.item_id for variable in group.variables],
@@ -422,6 +433,17 @@ class OrchestratorAgent(BaseAgent):
             site_dictionary=self._site_dictionary,
         )
         enriched_by_id = {variable.item_id: variable for variable in enriched.variables}
+        histology = enriched_by_id.get(HISTOLOGY_ITEM)
+        if histology is not None and self._site_dictionary is not None:
+            # Histology is chosen in two steps from the coded site's list, so it
+            # carries that list and the block fallback instead of narrowed codes.
+            enriched_by_id[HISTOLOGY_ITEM] = histology.model_copy(update={
+                "histology_scope": build_histology_scope(
+                    self._site_dictionary,
+                    case_facts.primary_site if case_facts else None,
+                    self._histology_pairs,
+                ),
+            })
         return group.model_copy(
             update={
                 "variables": [

@@ -59,6 +59,7 @@ class CaseFacts(BaseModel):
     gross_primary_site: str | None = Field(default=None, description="GrossSite tissue of the primary from note characterization, e.g. 'breast'. Set only when there's exactly one candidate tissue. Coarser than primary_site and available before topography coding; used for scoping when primary_site is unknown.")
     candidate_gross_sites: list[str] = Field(default_factory=list, description="GrossSite tissues the notes point to, used as OR for scoping when primary_site is unknown. Empty when the notes name no tissue or any mention's tissue is 'unspecified'.")
     histology: str | None = Field(default=None, description="ICD-O-3 morphology code, when known.")
+    candidate_histology_families: list[str] = Field(default_factory=list, description="3-digit histology families chosen in the extractor's family step, used as OR for scoping when histology isn't coded. Empty when the block fallback ran or no family was chosen.")
     behavior: str | None = Field(default=None, description="ICD-O-3 behavior code, when known.")
     sex: str | None = Field(default=None, description="Patient sex, when known.")
     date_of_diagnosis: str | None = Field(default=None, description="Date of diagnosis as recorded; parse leniently for comparisons.")

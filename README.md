@@ -54,7 +54,9 @@ initialize → scan_notes → note_branch ×notes → characterize_corpus → ch
 - **Retrieve:** a fixed `NoteFilter` narrows the notes, then
   `NoteRetrieverAgent` picks the relevant ones from their digests.
 - **Extract:** `ExtractorAgent` codes the group's variables and validates each
-  value against the data dictionary, retrying invalid answers.
+  value against the data dictionary, retrying invalid answers. Histology and
+  behavior take two steps instead: choose families from the coded site's list,
+  then one code/behavior pair from them.
 - **Loop and finalize:** newly coded facts, such as primary site, feed the next
   planning pass. When nothing is left, `finalize_case` builds the `Case` with
   per-variable results and a review report.
@@ -77,16 +79,25 @@ NAACCR codes.
   Tissues are the `GrossSite` names, mostly one per ICD-O-3 topography group,
   and each Primary Site code is in exactly one. C809, a malformed coded
   primary, and any `"unspecified"` tissue don't narrow.
+- **Histology (522) and Behavior (523):** chosen from the SEER Site/Histology
+  Validation List's group for the coded Primary Site, or the unknown primary's
+  group when 400 isn't coded. The extractor first picks one or more of the
+  group's 3-digit families, shown with the list's short terms, then one
+  code/behavior pair from them, shown with its v25 description. Only v25 pairs
+  are offered. If no family fits, it picks again from the 49 ICD-O-3 morphology
+  blocks, and a pair off the site's list raises an `unlisted_site_histology`
+  review flag. The chosen families become `candidate_histology_families`, which
+  stand in for an uncoded histology in group applicability and schema matching.
 - **Dependent items**, such as grade, summary stage and LVI: the codes of the
   CS, TNM or EOD staging schemas the case matches on site, histology, behavior,
   diagnosis year and sex. An unknown fact matches every schema. Several matches
   combine their codes. If they describe a code differently, or nothing matches,
   the item keeps NAACCR's codes.
-- **Histology (522)** isn't narrowed by site.
 
 The orchestrator checks the file the first time it reads it. The old
-tissue-keyed format is rejected, and the tissues must cover item 400's NAACCR
-codes exactly.
+tissue-keyed format and builds without the histology sections are rejected. The
+tissues must cover item 400's NAACCR codes exactly, and the site groups may only
+list item 522's pairs.
 
 Validation checks values against the supplied code lists. It doesn't enforce
 every site- or year-specific coding rule, and the reference data has a known

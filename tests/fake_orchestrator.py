@@ -40,6 +40,7 @@ from cipoc.models import (
     ClinicalNote,
     ConceptWithEvidence,
     ConfidenceLevel,
+    HistologySelection,
     ProcessedClinicalNote,
     TextSpan,
     ValidatedVariableGroupOutput,
@@ -79,6 +80,21 @@ def primary_site_codes() -> dict[str, str]:
     }
 
 
+def histology_pair_codes() -> dict[str, str]:
+    """Item 522's code/behavior pairs as the scoping fixture's site groups list them.
+
+    A synthetic NAACCR dictionary needs these for the orchestrator's check that
+    the site groups only offer the dictionary's pairs.
+    """
+    scoping = json.loads(SCOPING_DICTIONARY.read_text())
+    return {
+        pair: code["description"]
+        for group in scoping["histology"].values()
+        for family in group["families"].values()
+        for pair, code in family["codes"].items()
+    }
+
+
 def load_notes() -> list[ClinicalNote]:
     with open(NOTE_BUNDLE, "r") as f:
         return [ClinicalNote(**note) for note in json.load(f)]
@@ -96,6 +112,9 @@ class Outcome:
     repairs: int = 0
     # True when the repair budget is exhausted while still invalid (-> ERROR).
     exhausted: bool = False
+    # How the real extractor's two histology steps reached a 522 result. The
+    # fake doesn't run the steps; it attaches this to the finished result.
+    histology: HistologySelection | None = None
 
 
 @dataclass
@@ -398,6 +417,7 @@ class FakeExtractor:
                     is_valid=state.task.is_valid,
                     validation_errors=list(state.task.validation_errors),
                     extraction_attempts=state.task.extraction_attempts,
+                    histology=self._script.outcome(state.task.variable.item_id).histology,
                 )
             ]
         }

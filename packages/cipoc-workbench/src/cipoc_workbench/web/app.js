@@ -361,7 +361,7 @@ function normalizeRunResult(result) {
   if (result.case.case_facts != null) {
     const facts = object(result.case.case_facts, "case_facts");
     texts(facts, ["primary_site", "gross_primary_site", "histology", "behavior", "sex", "date_of_diagnosis"], "case_facts");
-    optionalArrays(facts, ["candidate_gross_sites"], "case_facts");
+    optionalArrays(facts, ["candidate_gross_sites", "candidate_histology_families"], "case_facts");
   }
   texts(result.case, ["fatal_blocker"], "case");
   if (result.case.reportability_stop != null) {
@@ -861,8 +861,9 @@ function renderChrome() {
   }
 
   const facts = App.case.case_facts || {};
-  const order = ["primary_site", "gross_primary_site", "candidate_gross_sites", "histology", "behavior", "sex",
-    "date_of_diagnosis"];
+  const order = ["primary_site", "gross_primary_site", "candidate_gross_sites", "histology",
+    "candidate_histology_families", "behavior", "sex", "date_of_diagnosis"];
+  const candidateKeys = ["candidate_gross_sites", "candidate_histology_families"];
   const rail = clear($("#facts"));
   rail.append(h("span", { class: "faint", style: "font-size:11px;text-transform:uppercase;letter-spacing:.08em" },
     "Case facts"));
@@ -877,9 +878,9 @@ function renderChrome() {
   }));
   for (const key of order) {
     let value = facts[key];
-    /* Candidate tissues are OR, and only artifacts that set them show the row. */
+    /* Candidate tissues and histology families are OR, and only artifacts that set them show the row. */
     if (Array.isArray(value)) value = value.join(" or ");
-    if (key === "candidate_gross_sites" && !value) continue;
+    if (candidateKeys.includes(key) && !value) continue;
     rail.append(h("span", { class: "fact" + (value ? "" : " unset") },
       h("span", { class: "k", text: key.replace(/_/g, " ") }),
       h("span", { class: "v", text: value == null || value === "" ? "unknown" : String(value) })

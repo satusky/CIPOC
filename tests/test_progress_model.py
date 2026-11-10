@@ -309,6 +309,26 @@ class ProgressModelTests(unittest.TestCase):
                 model.ingest(ProgressEvent(kind="values", namespace=(), payload=values), 1.0)
                 self.assertEqual(model.snapshot().groups[0].annotation, expected)
 
+    def test_site_verdict_treats_candidate_histology_families_as_or(self):
+        group = TargetGroup(
+            group_id="lymphoma_only",
+            variables=[{"item_id": 3836}],
+            applies_to={"histology_families": ["967"]},
+        )
+        for facts, expected in (
+            ({"candidate_histology_families": ["850", "852"]}, "site:967 ✗"),
+            ({"candidate_histology_families": ["850", "967"]}, "site:967 ✓"),
+            ({"histology": "8500", "candidate_histology_families": ["967"]}, "site:967 ✗"),
+        ):
+            with self.subTest(**facts):
+                model = ProgressModel("Orchestrator", 0.0, target_groups=[group])
+                values = {
+                    "note_corpus_descriptors": NoteCorpusDescriptors(unique_flags=set()),
+                    "case_facts": CaseFacts(**facts),
+                }
+                model.ingest(ProgressEvent(kind="values", namespace=(), payload=values), 1.0)
+                self.assertEqual(model.snapshot().groups[0].annotation, expected)
+
     def test_standalone_extractor_projects_both_output_shapes(self):
         graph_input = {
             "requested_variables": {
