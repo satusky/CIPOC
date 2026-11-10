@@ -100,9 +100,8 @@ NAACCR codes.
 
 The orchestrator checks the file the first time it reads it. The old
 tissue-keyed format and builds without the histology or algorithm sections are
-rejected. The
-tissues must cover item 400's NAACCR codes exactly, and the site groups may only
-list item 522's pairs.
+rejected. The tissues must cover item 400's NAACCR codes exactly, and the site
+groups may only list item 522's pairs.
 
 Validation checks values against the supplied code lists. It doesn't enforce
 every site- or year-specific coding rule, and the reference data has a known
