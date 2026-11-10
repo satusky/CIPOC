@@ -4,7 +4,7 @@ import json
 import re
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Sequence, get_args
+from typing import Any, Collection, Iterable, Mapping, Sequence, get_args
 
 from cipoc.models import CaseFacts, GrossSite, HistologyScope, ScopingDictionary
 
@@ -15,7 +15,8 @@ BEHAVIOR_ITEM = 523
 UNKNOWN_PRIMARY_SITE = "C809"
 _GENERATOR = "`python -m canonical_naaccr.cipoc_scoping` in canonical-naaccr"
 # The sections CIPOC reads, each added by a later version of the generator.
-_SECTIONS = ("sources", "tissues", "schemas", "histology", "blocks")
+_SECTIONS = ("sources", "tissues", "schemas", "histology", "blocks", "algorithms")
+_ALGORITHMS = ("cs", "tnm", "eod")
 _TISSUES = frozenset(get_args(GrossSite)) - {"unspecified"}
 # The select keys the generator writes. CIPOC doesn't extract the discriminators
 # (3926, 3927) or CS Site-Specific Factor 25 (2879), so those always match.
@@ -28,6 +29,7 @@ _SITE_CODE = re.compile(r"C[0-9]{3}")
 _CODED_PRIMARY = re.compile(r"C[0-9]{2}\.?[0-9]")
 _FAMILY = re.compile(r"[0-9]{3}")
 _PAIR = re.compile(r"[0-9]{4}/[0-9]")
+_HISTOLOGY_CODE = re.compile(r"[0-9]{4}")
 _BLOCK = re.compile(r"([0-9]{3})(?:-([0-9]{3}))?")
 # NAACCR's YYYYMMDD or ISO YYYY-MM-DD, either one possibly cut to the year or month.
 # Day 00 is NAACCR's unknown day.
@@ -77,6 +79,19 @@ def _select_ranges(key: str, value: str) -> tuple[tuple, ...]:
     return tuple(ranges)
 
 
+@lru_cache(maxsize=None)
+def _histology_codes(value: str) -> frozenset[int]:
+    """Parse an algorithm's accepted histology: comma-separated 4-digit codes and ``low-high`` runs."""
+    codes: set[int] = set()
+    for token in value.split(","):
+        low, dash, high = (part.strip() for part in token.partition("-"))
+        high = high if dash else low
+        if not (_HISTOLOGY_CODE.fullmatch(low) and _HISTOLOGY_CODE.fullmatch(high)) or low > high:
+            raise ValueError(f"Unsupported histology code or range {token!r}.")
+        codes.update(range(int(low), int(high) + 1))
+    return frozenset(codes)
+
+
 def _all_site_codes(scoping: ScopingDictionary) -> set[str]:
     return {
         _normalize_code(code)
@@ -121,6 +136,28 @@ def _check_schemas(scoping: ScopingDictionary) -> None:
                     f"Schema {key} item {item_id} names source {override.source!r}, which isn't in sources. "
                     f"Regenerate the file with {_GENERATOR}."
                 )
+
+
+def _check_algorithms(scoping: ScopingDictionary) -> None:
+    if sorted(scoping.algorithms) != sorted(_ALGORITHMS):
+        raise ValueError(
+            f"The site dictionary's algorithms are {sorted(scoping.algorithms)}, not {list(_ALGORITHMS)}. "
+            f"Regenerate the file with {_GENERATOR}."
+        )
+    spans = []
+    for key, algorithm in scoping.algorithms.items():
+        try:
+            years = _select_ranges("year_dx", algorithm.years)
+            if any(high is not None and high < low for low, high in years):
+                raise ValueError(f"Unsupported year_dx value {algorithm.years!r}.")
+            _histology_codes(algorithm.histology)
+        except ValueError as error:
+            raise ValueError(f"Algorithm {key}: {error} Regenerate the file with {_GENERATOR}.") from None
+        spans += [(low, high, key) for low, high in years]
+    spans.sort(key=lambda span: span[0])
+    for (_, high, key), (low, _, later) in zip(spans, spans[1:]):
+        if high is None or low <= high:
+            raise ValueError(f"Algorithms {key} and {later} cover overlapping diagnosis years.")
 
 
 def _check_histology(scoping: ScopingDictionary) -> None:
@@ -168,7 +205,7 @@ def _check_blocks(scoping: ScopingDictionary) -> None:
 
 def parse_scoping_dictionary(data: Mapping[str, Any]) -> ScopingDictionary:
     """Validate a parsed scoping dictionary and check its tissue table, schemas,
-    histology site groups and morphology blocks.
+    histology site groups, morphology blocks and staging algorithms.
 
     The tissue keys must equal ``GrossSite`` minus "unspecified", and no Primary
     Site code may be in two tissues. Every schema's select keys must be ones the
@@ -176,6 +213,8 @@ def parse_scoping_dictionary(data: Mapping[str, Any]) -> ScopingDictionary:
     in ``sources``. The histology site groups must hold each of the tissues'
     Primary Site codes exactly once, C809 included, and their families' pairs
     must start with the family's 3 digits. Morphology blocks mustn't overlap.
+    The algorithms must be cs, tnm and eod, with diagnosis years that don't
+    overlap and histology codes that parse.
     Coverage of item 400, and of item 522's pairs, is checked separately
     (``check_primary_site_coverage``, ``check_histology_pairs``), since it needs
     the NAACCR dictionary.
@@ -219,6 +258,7 @@ def parse_scoping_dictionary(data: Mapping[str, Any]) -> ScopingDictionary:
     _check_schemas(scoping)
     _check_histology(scoping)
     _check_blocks(scoping)
+    _check_algorithms(scoping)
     return scoping
 
 
@@ -459,6 +499,37 @@ def scoped_item_codes(
     return scoped
 
 
+def diagnosis_algorithm(scoping: ScopingDictionary, date_of_diagnosis: str | None) -> str | None:
+    """The staging algorithm (cs, tnm or eod) whose years hold the diagnosis year.
+
+    ``date_of_diagnosis`` is parsed as ``matching_schemas`` parses it, so a bare
+    year works too. An unknown year, or one before CS's first (2004), has none.
+    """
+    year = _diagnosis_year(date_of_diagnosis)
+    if year is None:
+        return None
+    for key, algorithm in scoping.algorithms.items():
+        if any(
+            low <= year and (high is None or year <= high)
+            for low, high in _select_ranges("year_dx", algorithm.years)
+        ):
+            return key
+    return None
+
+
+def accepted_histology_codes(
+    scoping: ScopingDictionary, date_of_diagnosis: str | None
+) -> frozenset[int] | None:
+    """The 4-digit histology codes the diagnosis year's algorithm accepts, or None
+    to accept every code when there's no algorithm (``diagnosis_algorithm``)."""
+    algorithm = diagnosis_algorithm(scoping, date_of_diagnosis)
+    return None if algorithm is None else _histology_codes(scoping.algorithms[algorithm].histology)
+
+
+def _accepted(pair: str, accepted: Collection[int] | None) -> bool:
+    return accepted is None or int(pair[:4]) in accepted
+
+
 def histology_site_group(scoping: ScopingDictionary, primary_site: str | None) -> str:
     """The key of the histology site group for a coded Primary Site.
 
@@ -476,26 +547,38 @@ def histology_site_group(scoping: ScopingDictionary, primary_site: str | None) -
     raise ValueError(f"No histology group holds {code}.")
 
 
-def histology_family_listing(scoping: ScopingDictionary, group: str) -> dict[str, str]:
+def histology_family_listing(
+    scoping: ScopingDictionary, group: str, *, accepted: Collection[int] | None = None
+) -> dict[str, str]:
     """The site group's families for the family step, keyed by their 3 digits.
 
     Each is the list's label and its members' abbreviated terms, since the
     labels alone are terse. The full v25 descriptions wait for the code step.
+    With ``accepted`` (``accepted_histology_codes``), only the terms of accepted
+    codes are shown, and a family left with none is dropped.
     """
     listing: dict[str, str] = {}
     for number, family in scoping.histology[group].families.items():
-        terms = dict.fromkeys(code.term for code in family.codes.values())
-        listing[number] = f"{family.label}: {'; '.join(terms)}"
+        terms = dict.fromkeys(
+            code.term for pair, code in family.codes.items() if _accepted(pair, accepted)
+        )
+        if terms:
+            listing[number] = f"{family.label}: {'; '.join(terms)}"
     return listing
 
 
 def histology_code_listing(
-    scoping: ScopingDictionary, group: str, families: Iterable[str]
+    scoping: ScopingDictionary,
+    group: str,
+    families: Iterable[str],
+    *,
+    accepted: Collection[int] | None = None,
 ) -> dict[str, str]:
     """The chosen families' code/behavior pairs with their v25 descriptions, in code order.
 
-    Several families give the union of their pairs. A family the group doesn't
-    have raises, and so does choosing none, which the fallback handles instead.
+    Several families give the union of their pairs, keeping only accepted codes
+    when ``accepted`` is given. A family the group doesn't have raises, and so
+    does choosing none, which the fallback handles instead.
     """
     site_group = scoping.histology[group]
     chosen = list(dict.fromkeys(families))
@@ -508,6 +591,7 @@ def histology_code_listing(
         (pair, code.description)
         for number in chosen
         for pair, code in site_group.families[number].codes.items()
+        if _accepted(pair, accepted)
     ))
 
 
@@ -519,13 +603,17 @@ def histology_pair_listed(scoping: ScopingDictionary, group: str, pair: str) -> 
 
 
 def histology_block_listing(
-    scoping: ScopingDictionary, pairs: Mapping[str, str]
+    scoping: ScopingDictionary,
+    pairs: Mapping[str, str],
+    *,
+    accepted: Collection[int] | None = None,
 ) -> dict[str, dict[str, str]]:
     """Every pair grouped by ICD-O-3 morphology block, for the fallback.
 
     ``pairs`` maps item 522's code/behavior pairs to their descriptions
-    (``histology_pairs``). Blocks keep the file's order, and one no pair falls
-    in is left out. A malformed pair, or one not in exactly one block, raises.
+    (``histology_pairs``). With ``accepted``, only pairs whose code it holds are
+    kept. Blocks keep the file's order, and one no kept pair falls in is left
+    out. A malformed pair, or one not in exactly one block, raises.
     """
     ranges = [(key, *_block_range(key)) for key in scoping.blocks]
     grouped: dict[str, dict[str, str]] = {key: {} for key in scoping.blocks}
@@ -535,7 +623,8 @@ def histology_block_listing(
         holding = [key for key, low, high in ranges if low <= int(pair[:3]) <= high]
         if len(holding) != 1:
             raise ValueError(f"{pair} is in morphology blocks {holding}, not exactly one.")
-        grouped[holding[0]][pair] = description
+        if _accepted(pair, accepted):
+            grouped[holding[0]][pair] = description
     return {key: codes for key, codes in grouped.items() if codes}
 
 
@@ -562,7 +651,10 @@ def check_histology_pairs(scoping: ScopingDictionary, pairs: Iterable[str]) -> N
 
 
 def build_histology_scope(
-    scoping: ScopingDictionary, primary_site: str | None, pairs: Mapping[str, str]
+    scoping: ScopingDictionary,
+    primary_site: str | None,
+    pairs: Mapping[str, str],
+    date_of_diagnosis: str | None = None,
 ) -> HistologyScope:
     """Everything the extractor's histology steps offer for a coded Primary Site.
 
@@ -570,17 +662,25 @@ def build_histology_scope(
     their v25 descriptions for the code step, plus every one of ``pairs``
     (``histology_pairs``) grouped by ICD-O-3 block for the fallback. An uncoded
     Primary Site gets the unknown primary's group (``histology_site_group``).
+
+    Both paths offer only the codes the diagnosis year's algorithm accepts
+    (``accepted_histology_codes``), dropping families and blocks left empty; a
+    group left with no families goes straight to the blocks. An unknown year,
+    or one before 2004, offers every code. Codes are kept or dropped whole, so
+    whether an offered code is on the site's list doesn't change.
     """
+    accepted = accepted_histology_codes(scoping, date_of_diagnosis)
     group = histology_site_group(scoping, primary_site)
     site_group = scoping.histology[group]
-    block_codes = histology_block_listing(scoping, pairs)
+    families = histology_family_listing(scoping, group, accepted=accepted)
+    block_codes = histology_block_listing(scoping, pairs, accepted=accepted)
     return HistologyScope(
         site_group=group,
         site_group_label=site_group.label,
-        families=histology_family_listing(scoping, group),
+        families=families,
         family_codes={
-            number: histology_code_listing(scoping, group, [number])
-            for number in site_group.families
+            number: histology_code_listing(scoping, group, [number], accepted=accepted)
+            for number in families
         },
         blocks={key: scoping.blocks[key].label for key in block_codes},
         block_codes=block_codes,

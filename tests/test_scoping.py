@@ -7,9 +7,12 @@ from typing import get_args
 
 from cipoc.models import CaseFacts, GrossSite
 from cipoc.tools import (
+    accepted_histology_codes,
+    build_histology_scope,
     build_variable_group,
     check_histology_pairs,
     check_primary_site_coverage,
+    diagnosis_algorithm,
     histology_block_listing,
     histology_code_listing,
     histology_family_listing,
@@ -35,6 +38,16 @@ TISSUES = [name for name in get_args(GrossSite) if name != "unspecified"]
 
 def fixture_codes(scoping) -> list[str]:
     return [code for entry in scoping.tissues.values() for code in entry.codes[400]]
+
+
+def fixture_pairs(scoping) -> dict[str, str]:
+    """Item 522's pairs as far as the fixture's site groups list them."""
+    return {
+        pair: code.description
+        for group in scoping.histology.values()
+        for family in group.families.values()
+        for pair, code in family.codes.items()
+    }
 
 
 class ScopingDictionaryLoadTests(unittest.TestCase):
@@ -77,7 +90,10 @@ class ScopingDictionaryLoadTests(unittest.TestCase):
 
     def test_sections_from_a_newer_generator_still_load(self):
         newer = copy.deepcopy(self.raw)
-        newer["algorithms"] = {"eod": {"years": "2018-"}}
+        # items is read from C25 on.
+        self.assertIn("items", newer)
+        newer["discriminators"] = {"eod/lung": {}}
+        newer["algorithms"]["eod"]["notes"] = "added later"
         newer["tissues"]["breast"]["notes"] = "added later"
         newer["schemas"]["cs/breast"]["ssf"] = {"3836": "2880"}
         newer["histology"]["breast"]["notes"] = "added later"
@@ -111,8 +127,8 @@ class ScopingDictionaryLoadTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "schemas"):
             parse_scoping_dictionary(stale)
 
-    def test_a_file_without_histology_or_blocks_names_the_section(self):
-        for sections in (["histology"], ["blocks"], ["histology", "blocks"]):
+    def test_a_file_without_a_later_section_names_it(self):
+        for sections in (["histology"], ["blocks"], ["histology", "blocks"], ["algorithms"]):
             with self.subTest(sections=sections):
                 stale = copy.deepcopy(self.raw)
                 for section in sections:
@@ -121,6 +137,53 @@ class ScopingDictionaryLoadTests(unittest.TestCase):
                     ValueError, f"no {' or '.join(sections)} section.*canonical_naaccr.cipoc_scoping"
                 ):
                     parse_scoping_dictionary(stale)
+
+
+class AlgorithmLoadTests(unittest.TestCase):
+    def setUp(self):
+        self.raw = json.loads(FIXTURE.read_text())
+
+    def test_fixture_has_the_three_algorithms(self):
+        scoping = load_scoping_dictionary(FIXTURE)
+
+        self.assertEqual(
+            {key: algorithm.years for key, algorithm in scoping.algorithms.items()},
+            {"cs": "2004-2015", "tnm": "2016-2017", "eod": "2018-"},
+        )
+
+    def test_the_algorithms_must_be_cs_tnm_and_eod(self):
+        missing = copy.deepcopy(self.raw)
+        del missing["algorithms"]["tnm"]
+        extra = copy.deepcopy(self.raw)
+        extra["algorithms"]["ajcc"] = {"years": "2018-", "histology": "8000"}
+        for broken in (missing, extra):
+            with self.subTest(algorithms=sorted(broken["algorithms"])):
+                with self.assertRaisesRegex(ValueError, r"algorithms are .*not \['cs', 'tnm', 'eod'\].*canonical_naaccr"):
+                    parse_scoping_dictionary(broken)
+
+    def test_algorithm_years_must_parse_and_not_overlap(self):
+        for algorithm, years, message in (
+            ("cs", "2004 onward", "Algorithm cs: Unsupported year_dx value '2004 onward'"),
+            ("cs", "2015-2004", "Algorithm cs: Unsupported year_dx value '2015-2004'"),
+            ("tnm", "2015-2017", "cs and tnm cover overlapping diagnosis years"),
+            ("eod", "2017-", "tnm and eod cover overlapping diagnosis years"),
+            ("cs", "2004-", "cs and tnm cover overlapping diagnosis years"),
+        ):
+            with self.subTest(algorithm=algorithm, years=years):
+                broken = copy.deepcopy(self.raw)
+                broken["algorithms"][algorithm]["years"] = years
+                with self.assertRaisesRegex(ValueError, message):
+                    parse_scoping_dictionary(broken)
+
+    def test_algorithm_histology_must_be_4_digit_codes_and_runs(self):
+        for histology in ("800-8005", "8005-8000", "8000,,8010", "8000-", "", "8000/3"):
+            with self.subTest(histology=histology):
+                broken = copy.deepcopy(self.raw)
+                broken["algorithms"]["cs"]["histology"] = histology
+                with self.assertRaisesRegex(
+                    ValueError, "Algorithm cs: Unsupported histology code or range.*canonical_naaccr"
+                ):
+                    parse_scoping_dictionary(broken)
 
 
 class HistologyLoadTests(unittest.TestCase):
@@ -620,6 +683,108 @@ class HistologyFallbackTests(unittest.TestCase):
             check_histology_pairs(self.scoping, pairs | {"7999/3"})
 
 
+class DiagnosisYearHistologyTests(unittest.TestCase):
+    """The diagnosis year's algorithm limits the histology codes offered."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.scoping = load_scoping_dictionary(FIXTURE)
+        cls.pairs = fixture_pairs(cls.scoping)
+
+    def scope(self, primary_site, date_of_diagnosis):
+        return build_histology_scope(self.scoping, primary_site, self.pairs, date_of_diagnosis)
+
+    @staticmethod
+    def family_pairs(scope):
+        return {pair for codes in scope.family_codes.values() for pair in codes}
+
+    @staticmethod
+    def block_pairs(scope):
+        return {pair for codes in scope.block_codes.values() for pair in codes}
+
+    def test_the_diagnosis_year_picks_the_algorithm(self):
+        for date, algorithm in (
+            ("20120315", "cs"), ("2012-03-15", "cs"), ("2012", "cs"), ("2004", "cs"), ("2015", "cs"),
+            ("2016", "tnm"), ("20171231", "tnm"),
+            ("2018", "eod"), ("20200101", "eod"),
+            ("2000", None), ("20031231", None), (None, None), ("", None), ("0000", None), ("March 2012", None),
+        ):
+            with self.subTest(date=date):
+                self.assertEqual(diagnosis_algorithm(self.scoping, date), algorithm)
+
+    def test_each_algorithm_rejects_its_own_codes(self):
+        cs = accepted_histology_codes(self.scoping, "2012")
+        tnm = accepted_histology_codes(self.scoping, "2016")
+        eod = accepted_histology_codes(self.scoping, "2020")
+
+        self.assertNotIn(8023, cs)
+        self.assertTrue({9654, 9661}.isdisjoint(eod))
+        self.assertIn(8023, eod)
+        self.assertTrue(8500 in cs and 8500 in tnm and 8500 in eod)
+        for date in (None, "2000"):
+            with self.subTest(date=date):
+                self.assertIsNone(accepted_histology_codes(self.scoping, date))
+
+    def test_a_2012_case_isnt_offered_codes_cs_rejects(self):
+        every = self.scope("C504", None)
+        cs = self.scope("C504", "20120315")
+
+        rejected = {"8509/2", "8509/3", "8519/2"}
+        self.assertTrue(rejected <= self.family_pairs(every))
+        self.assertTrue(rejected.isdisjoint(self.family_pairs(cs)))
+        self.assertNotIn("Solid papillary carcinoma with invasion", cs.families["850"])
+        self.assertIn("Solid papillary carcinoma with invasion", every.families["850"])
+        # The fallback drops them too, along with codes off breast's list such as
+        # NUT carcinoma.
+        self.assertIn("8023/3", self.block_pairs(every))
+        self.assertTrue((rejected | {"8023/3"}).isdisjoint(self.block_pairs(cs)))
+        self.assertIn("8500/3", self.family_pairs(cs))
+
+    def test_a_2020_case_isnt_offered_codes_eod_rejects(self):
+        for primary in ("C504", None):
+            with self.subTest(primary=primary):
+                every = self.scope(primary, None)
+                eod = self.scope(primary, "2020")
+                self.assertTrue({"9654/3", "9661/3"} <= self.family_pairs(every))
+                self.assertTrue({"9654/3", "9661/3"}.isdisjoint(self.family_pairs(eod) | self.block_pairs(eod)))
+                self.assertIn("8023/3", self.block_pairs(eod))
+
+    def test_an_unknown_or_pre_2004_year_offers_every_code(self):
+        every = self.scope("C504", None)
+        self.assertEqual(len(self.block_pairs(every)), len(self.pairs))
+        for date in ("", "2000", "19991231", "unknown"):
+            with self.subTest(date=date):
+                self.assertEqual(self.scope("C504", date), every)
+
+    def test_a_family_left_without_codes_is_dropped(self):
+        # Lung's malignant PEComa family has only 8714/3, which CS and TNM reject.
+        for date in ("2012", "2016"):
+            with self.subTest(date=date):
+                scope = self.scope("C349", date)
+                self.assertNotIn("871", scope.families)
+                self.assertNotIn("871", scope.family_codes)
+        self.assertEqual(self.scope("C349", "2020").family_codes["871"], {"8714/3": self.pairs["8714/3"]})
+
+    def test_a_group_left_without_families_offers_only_blocks(self):
+        # A CS that accepted only NUT carcinoma, which breast doesn't list.
+        raw = json.loads(FIXTURE.read_text())
+        raw["algorithms"]["cs"]["histology"] = "8023"
+        scoping = parse_scoping_dictionary(raw)
+
+        scope = build_histology_scope(scoping, "C504", self.pairs, "2012")
+
+        self.assertEqual((scope.families, scope.family_codes), ({}, {}))
+        self.assertEqual(scope.block_codes, {"801-804": {"8023/3": self.pairs["8023/3"]}})
+        self.assertEqual(list(scope.blocks), ["801-804"])
+
+    def test_whether_an_offered_code_is_listed_doesnt_change(self):
+        every = self.scope("C504", None)
+        cs = self.scope("C504", "2012")
+        for pair in self.family_pairs(cs) | self.block_pairs(cs):
+            self.assertEqual(cs.listed(pair), every.listed(pair), pair)
+        self.assertTrue(cs.listed("8500/3"))
+
+
 class RealHistologyPairsTests(unittest.TestCase):
     """The fixture offers only v25 pairs, and every v25 pair has a block."""
 
@@ -635,6 +800,12 @@ class RealHistologyPairsTests(unittest.TestCase):
         check_histology_pairs(self.scoping, self.pairs)
         # On the list for stomach, pancreas and lymph nodes, but not in v25.
         self.assertNotIn("8157/3", self.pairs)
+
+    def test_each_algorithm_rejects_the_designs_count_of_v25_codes(self):
+        codes = {int(pair[:4]) for pair in self.pairs}
+        for date, rejected in (("2012", 60), ("2016", 77), ("2020", 17)):
+            with self.subTest(date=date):
+                self.assertEqual(len(codes - accepted_histology_codes(self.scoping, date)), rejected)
 
     def test_the_fallback_offers_every_v25_pair_once(self):
         blocks = histology_block_listing(self.scoping, self.pairs)

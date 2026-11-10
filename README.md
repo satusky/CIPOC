@@ -84,10 +84,14 @@ NAACCR codes.
   group when 400 isn't coded. The extractor first picks one or more of the
   group's 3-digit families, shown with the list's short terms, then one
   code/behavior pair from them, shown with its v25 description. Only v25 pairs
-  are offered. If no family fits, it picks again from the 49 ICD-O-3 morphology
-  blocks, and a pair off the site's list raises an `unlisted_site_histology`
-  review flag. The chosen families become `candidate_histology_families`, which
-  stand in for an uncoded histology in group applicability and schema matching.
+  are offered, and once Date of Diagnosis (390) is coded, only codes the year's
+  staging algorithm accepts: CS for 2004–2015, TNM for 2016–2017 and EOD from
+  2018. An unknown year, or one before 2004, offers every v25 code. A family
+  left empty is dropped. If no family fits, it picks again from the 49 ICD-O-3
+  morphology blocks, and a pair off the site's list raises an
+  `unlisted_site_histology` review flag. The chosen families become
+  `candidate_histology_families`, which stand in for an uncoded histology in
+  group applicability and schema matching.
 - **Dependent items**, such as grade, summary stage and LVI: the codes of the
   CS, TNM or EOD staging schemas the case matches on site, histology, behavior,
   diagnosis year and sex. An unknown fact matches every schema. Several matches
@@ -95,7 +99,8 @@ NAACCR codes.
   the item keeps NAACCR's codes.
 
 The orchestrator checks the file the first time it reads it. The old
-tissue-keyed format and builds without the histology sections are rejected. The
+tissue-keyed format and builds without the histology or algorithm sections are
+rejected. The
 tissues must cover item 400's NAACCR codes exactly, and the site groups may only
 list item 522's pairs.
 

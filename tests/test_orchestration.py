@@ -312,6 +312,16 @@ class HistologyScopeWiringTests(unittest.TestCase):
                 self.assertTrue({"9120/3", "9020/3"} <= reachable)
                 self.assertIsNone(variables[523].histology_scope)
 
+    def test_the_diagnosis_year_limits_the_histology_offered(self):
+        agent = self.agent()
+        offered = {}
+        for date in (None, "20120315"):
+            scope = self.scoped(agent, CaseFacts(primary_site="C504", date_of_diagnosis=date))[522].histology_scope
+            offered[date] = {pair for codes in (*scope.family_codes.values(), *scope.block_codes.values()) for pair in codes}
+        # CS (2004-2015) rejects solid papillary carcinoma and NUT carcinoma.
+        self.assertTrue({"8509/3", "8023/3"} <= offered[None])
+        self.assertTrue({"8509/3", "8023/3"}.isdisjoint(offered["20120315"]))
+
     def test_an_uncoded_site_scopes_histology_to_the_unknown_primary_list(self):
         agent = self.agent()
         for facts in (None, CaseFacts(), CaseFacts(gross_primary_site="breast")):

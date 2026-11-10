@@ -83,6 +83,7 @@ from .observability import (
 )
 
 from .scoping import (
+    StagingAlgorithm,
     TissueCodes,
     CodeOverride,
     StagingSchema,
@@ -170,6 +171,7 @@ __all__ = [
     "ObservabilityIssue",
     "VariableAttempt",
     "RunObservability",
+    "StagingAlgorithm",
     "TissueCodes",
     "CodeOverride",
     "StagingSchema",

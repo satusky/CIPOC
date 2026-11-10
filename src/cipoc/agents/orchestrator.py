@@ -424,7 +424,8 @@ class OrchestratorAgent(BaseAgent):
         by item ID; the original ordering is kept. Missing or unusable dictionary
         metadata fails explicitly before the group makes model calls. With a
         site dictionary, Histology (522) also gets its ``histology_scope`` for the
-        coded Primary Site, or the unknown primary's when none is coded.
+        coded Primary Site, or the unknown primary's when none is coded, limited
+        to the codes the diagnosis year's algorithm accepts.
         """
         enriched = build_variable_group(
             [variable.item_id for variable in group.variables],
@@ -442,6 +443,7 @@ class OrchestratorAgent(BaseAgent):
                     self._site_dictionary,
                     case_facts.primary_site if case_facts else None,
                     self._histology_pairs,
+                    case_facts.date_of_diagnosis if case_facts else None,
                 ),
             })
         return group.model_copy(

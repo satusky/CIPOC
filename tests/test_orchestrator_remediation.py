@@ -240,6 +240,8 @@ class OrchestratorRemediationTests(unittest.TestCase):
     def _dictionaries(self, agent):
         directory = Path(self.enterContext(tempfile.TemporaryDirectory()))
         base = {
+            "390": {"item_name": "Date of Diagnosis", "item_length": 8,
+                    "item_data_type": "date", "format": "YYYYMMDD"},
             "400": {"item_name": "Primary Site", "item_length": 4,
                     "allowed_codes": primary_site_codes()},
             "410": {"item_name": "Laterality", "item_length": 1,
@@ -434,13 +436,16 @@ class OrchestratorRemediationTests(unittest.TestCase):
         ]
         self.assertEqual([flag.item_id for flag in site_flags], [400])
 
-    def _histology_run(self, histology_outcome):
+    def _histology_run(self, histology_outcome, date_of_diagnosis=None):
+        outcomes = {400: Outcome(value="C504"), 522: histology_outcome, 523: Outcome(value="3")}
+        if date_of_diagnosis is not None:
+            outcomes[390] = Outcome(value=date_of_diagnosis)
         agent = _agent(
             groups=[
-                _group(item_ids=(400,)),
+                _group(item_ids=(400,) if date_of_diagnosis is None else (390, 400)),
                 _group("histology", (522, 523), stage="histology", extract_as_group=True),
             ],
-            outcomes={400: Outcome(value="C504"), 522: histology_outcome, 523: Outcome(value="3")},
+            outcomes=outcomes,
         )
         self._dictionaries(agent)
         with patch.object(agent._extractor, "run", wraps=agent._extractor.run) as extract:
@@ -471,6 +476,22 @@ class OrchestratorRemediationTests(unittest.TestCase):
         # saved config groups carry an empty scope field.
         for key in ("family_codes", "block_codes", '"histology_scope":{'):
             self.assertNotIn(key, artifact)
+
+    def test_a_2012_diagnosis_offers_only_the_histology_cs_accepts(self):
+        def offered(scope):
+            return {pair for codes in (*scope.family_codes.values(), *scope.block_codes.values()) for pair in codes}
+
+        selection = HistologySelection(families=["850"], reasoning="Invasive ductal carcinoma.", listed=True)
+        _, unknown_year = self._histology_run(Outcome(value="8500", histology=selection))
+        result, cs = self._histology_run(Outcome(value="8500", histology=selection), date_of_diagnosis="20120315")
+
+        # 390 is coded in the initial stage, before the histology group is scoped.
+        self.assertEqual(result.case.case_facts.date_of_diagnosis, "20120315")
+        self.assertEqual(cs.site_group, "breast")
+        # CS (2004-2015) rejects solid papillary carcinoma and NUT carcinoma.
+        self.assertTrue({"8509/3", "8023/3"} <= offered(unknown_year))
+        self.assertTrue({"8509/3", "8023/3"}.isdisjoint(offered(cs)))
+        self.assertIn("8500/3", offered(cs))
 
     def test_histology_on_the_sites_list_sets_candidate_families_and_no_flag(self):
         result, _ = self._histology_run(Outcome(value="8500", histology=HistologySelection(
