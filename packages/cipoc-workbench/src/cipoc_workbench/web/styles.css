@@ -778,6 +778,11 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 .legend-swatch.hollow,
 .pill.hollow { --wash: 0%; }
 
+/* A result no group requested, such as a CS Site-Specific Factor extracted in
+   place of a requested item. Only the outline's style changes: colour and fill
+   stay the lens's, so the reading is the same as any other bubble's. */
+.bubble[data-unrequested] { border-style: dashed; }
+
 /* A pass-through wrapper, not a box. */
 .bub-label { display: contents; }
 /* --text-dim, not --text-faint: on the `low` wash faint measures 3.76 and

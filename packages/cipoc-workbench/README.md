@@ -272,6 +272,26 @@ with `stopped_by: "not_reportable"` and no reason of their own. The facts rail
 shows a plain "not reportable" chip, not the red fatal one, with the reason in
 its tooltip, and the stopped variables read "Not reportable". Artifacts without these fields render as before.
 
+A 1.3 result can include items no group requested. For a 2004–2017 diagnosis,
+the runtime extracts a CS Site-Specific Factor in place of a requested item the
+year predates, such as CS SSF2 (2890) for FIGO Stage (3836). It records the
+substitution in `case.ssf_equivalents`, keyed by the SSF's item ID, and keys the
+SSF's result by that ID too.
+- The SSF shows in the group it was extracted with, as `2890 · CS SSF2 · FIGO
+  Stage`. Its bubble has a dashed outline, and its table row a "not requested" chip.
+- Its dossier has an "In place of" section linking the requested items it
+  replaced and naming the candidate schemas.
+- Each replaced item, which ends not applicable, gets a "Replaced by" section
+  and a "replaced by 2890" chip.
+- A result with no record, or a record naming no known group, goes in an "Other
+  results" group after the last wave, so nothing in `variable_results` is hidden.
+- These results count in the variable total, the status legend, group roll-ups
+  and accuracy like any other. A "N not requested" chip says how many there are,
+  and filtering on "not requested" finds them.
+- Feedback attaches to them by their own item ID.
+
+Artifacts with only requested results render as before.
+
 ### Backend Interface
 
 `build_app(state_path=None)` does not read or fall back to the bundled example.

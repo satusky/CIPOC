@@ -72,6 +72,43 @@ class WorkbenchServerTests(unittest.IsolatedAsyncioTestCase):
                 if version == "1.1":
                     self.assertIsNone(restored["observability"]["llm_usage_summary"])
 
+    async def test_unrequested_ssf_results_are_served_unchanged_and_take_feedback(self):
+        # Synthetic: the bundled example's identity with an SSF (2890) extracted in
+        # place of 3836 and a result (2879) no group requested.
+        artifact = json.loads((EXAMPLE_DIR / "case_state.json").read_text())
+        artifact["schema_version"] = "1.3"
+        artifact["case"]["variable_results"].update({
+            "3836": {"item_id": 3836, "status": "not_applicable", "value": None, "blocking_item_ids": [],
+                     "reason": "Not collected for 2012 diagnoses: FIGO Stage (3836) applies from 2018; "
+                               "CS SSF2 (2890, FIGO Stage) holds it for this year."},
+            "2890": {"item_id": 2890, "status": "structured_data", "value": "300", "reason": None,
+                     "blocking_item_ids": []},
+            "2879": {"item_id": 2879, "status": "structured_data", "value": "010", "reason": None,
+                     "blocking_item_ids": []},
+        })
+        artifact["case"]["ssf_equivalents"] = {"2890": {
+            "item_id": 2890, "label": "CS SSF2", "name": "FIGO Stage", "replaces": [3836],
+            "schemas": ["cs/ovary"], "group_id": "ovary_only",
+        }}
+        run_id = artifact["run"]["run_id"]
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "run.json"
+            original = json.dumps(artifact).encode()
+            path.write_bytes(original)
+            app = build_app(state_path=path, feedback_dir=Path(directory) / "reviews")
+            self.assertEqual(await self.request(app, "/case_state.json"), (200, original))
+            for entity_id in ("2890", "2879"):
+                status, body = await self.request(
+                    app, f"/api/runs/{run_id}/feedback/variable?entity_id={entity_id}",
+                    method="PUT", payload={"note": "Review " + entity_id})
+                self.assertEqual(status, 200)
+                self.assertEqual(json.loads(body)["id"], entity_id)
+            status, body = await self.request(app, f"/api/runs/{run_id}/feedback")
+            self.assertEqual(status, 200)
+            variables = json.loads(body)["annotations"]["variable"]
+            self.assertEqual({key: record["note"] for key, record in variables.items()},
+                             {"2890": "Review 2890", "2879": "Review 2879"})
+
     async def test_feedback_keeps_string_note_ids_distinct(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "feedback.json"

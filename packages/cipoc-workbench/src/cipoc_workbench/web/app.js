@@ -91,8 +91,11 @@ const App = {
   groups: [],               // TargetGroup[], in configured order
   groupById: new Map(),
   results: new Map(),       // item_id (number) -> CaseVariableResult
-  variables: [],            // flattened {item_id, name, group_id, result}
+  variables: [],            // flattened {item_id, name, group_id, result, requested, ssf?}
   groupOfItem: new Map(),
+  ssfEquivalents: new Map(), // SSF item_id -> case.ssf_equivalents record
+  replacedBy: new Map(),     // requested item_id -> the SSF records standing in for it
+  unrequestedKeys: new Map(), // unrequested item_id -> its telemetry key
   exchanges: {},
   noteSelections: {},       // note_selection, keyed group:<id>
   attempts: {},
@@ -343,6 +346,23 @@ function normalizeRunResult(result) {
       }
     }
   }
+  /* CS Site-Specific Factors extracted in place of requested items, in 1.3
+     artifacts. Each keys its own result, which no group requested. */
+  if (result.case.ssf_equivalents != null) {
+    for (const [key, record] of Object.entries(object(result.case.ssf_equivalents, "case.ssf_equivalents"))) {
+      object(record, "ssf_equivalents entry");
+      if (!Number.isSafeInteger(record.item_id) || String(record.item_id) !== key) {
+        throw new Error("An SSF equivalent needs an integer item_id matching its key.");
+      }
+      text(record.label, "ssf_equivalents.label");
+      text(record.name, "ssf_equivalents.name");
+      for (const itemId of array(record.replaces, "ssf_equivalents.replaces")) {
+        if (!Number.isSafeInteger(itemId)) throw new Error("ssf_equivalents.replaces must list integer item IDs.");
+      }
+      optionalArrays(record, ["schemas"], "ssf_equivalents");
+      texts(record, ["group_id"], "ssf_equivalents");
+    }
+  }
   for (const note of records(result.corpus.note_corpus, "corpus.note_corpus")) {
     identifier(note.note_id, "note.note_id");
     texts(note, ["content", "date", "note_type", "summary"], "note");
@@ -441,6 +461,7 @@ function buildRunState(raw) {
         group_id: group.group_id,
         group_name: group.name,
         result: next.results.get(variable.item_id) || { item_id: variable.item_id, status: "pending" },
+        requested: true,
       });
     }
   }
@@ -448,7 +469,93 @@ function buildRunState(raw) {
   next.exchanges = next.observability.llm_exchanges || {};
   next.noteSelections = next.case.note_selection || {};
   next.attempts = next.observability.variable_attempts || {};
+  indexUnrequested(next);
   return next;
+}
+
+/* The id and name of the group holding results no requested group lists. */
+const OTHER_RESULTS_ID = "not-requested";
+const OTHER_RESULTS_NAME = "Other results";
+
+/* Results for items no group requested. A CS Site-Specific Factor extracted in
+ * place of a requested item (case.ssf_equivalents, 1.3) joins the group it was
+ * extracted with, under the SSF's label and the schemas' name for it. Anything
+ * else, with no record or a record naming no known group, goes in one "Other
+ * results" group appended after the configured ones, so nothing in
+ * variable_results is left unshown. `App.groups` gains that group only when it
+ * has members, and `inputs` is never modified: an artifact with only requested
+ * results indexes exactly as before. */
+function indexUnrequested(next) {
+  next.ssfEquivalents = new Map(
+    Object.values(next.case.ssf_equivalents || {}).map((record) => [record.item_id, record]));
+  next.replacedBy = new Map();
+  for (const record of next.ssfEquivalents.values()) {
+    for (const itemId of record.replaces) {
+      next.replacedBy.set(itemId, [...(next.replacedBy.get(itemId) || []), record]);
+    }
+  }
+  next.unrequestedKeys = new Map();
+
+  const requested = new Set(next.groupOfItem.keys());
+  const unrequested = [...new Set([...next.results.keys(), ...next.ssfEquivalents.keys()])]
+    .filter((itemId) => !requested.has(itemId))
+    .sort((a, b) => a - b);
+  if (!unrequested.length) return;
+
+  let otherId = OTHER_RESULTS_ID;
+  while (next.groupById.has(otherId)) otherId += "_";
+  const other = [];
+  for (const itemId of unrequested) {
+    const ssf = next.ssfEquivalents.get(itemId) || null;
+    const group = ssf && ssf.group_id != null ? next.groupById.get(ssf.group_id) : null;
+    const entry = {
+      item_id: itemId,
+      name: ssf ? ssf.label + " · " + ssf.name : "Item " + itemId,
+      group_id: group ? group.group_id : otherId,
+      group_name: group ? group.name : OTHER_RESULTS_NAME,
+      result: next.results.get(itemId) || { item_id: itemId, status: "pending" },
+      requested: false,
+      ssf,
+    };
+    next.groupOfItem.set(itemId, entry.group_id);
+    next.variables.push(entry);
+    if (!group) other.push(entry);
+  }
+  if (other.length) {
+    const group = {
+      group_id: otherId, name: OTHER_RESULTS_NAME, synthetic: true,
+      variables: other.map((entry) => ({ item_id: entry.item_id, name: entry.name })),
+    };
+    next.groups = [...next.groups, group];
+    next.groupById.set(otherId, group);
+  }
+
+  /* Telemetry keys a variable by the group it was extracted with. That's the
+     SSF record's group, but a result outside any known group can only be found
+     by its item ID. */
+  const recorded = [...Object.keys(next.attempts), ...Object.keys(next.exchanges)];
+  for (const itemId of unrequested) {
+    const suffix = "/variable:" + itemId;
+    const expected = "group:" + next.groupOfItem.get(itemId) + suffix;
+    const key = recorded.includes(expected) ? expected : recorded.find((k) => k.endsWith(suffix));
+    if (key) next.unrequestedKeys.set(itemId, key);
+  }
+}
+
+const isUnrequested = (entry) => entry.requested === false;
+const groupEntries = (groupId) => App.variables.filter((v) => v.group_id === groupId);
+
+/* "3836 FIGO Stage": a requested item by its configured name. */
+function requestedLabel(itemId) {
+  const entry = App.variables.find((v) => v.item_id === itemId && !isUnrequested(v));
+  return entry ? itemId + " " + entry.name : String(itemId);
+}
+
+/* How an unrequested result came to be in the run, in one line. */
+function unrequestedNote(entry) {
+  if (!entry.ssf) return "Not requested; no record says why this result is in the run.";
+  return "Not requested; extracted in place of " +
+    entry.ssf.replaces.map(requestedLabel).join(" and ") + ".";
 }
 
 function indexState(raw) { Object.assign(App, buildRunState(raw)); }
@@ -457,7 +564,8 @@ function indexState(raw) { Object.assign(App, buildRunState(raw)); }
 const exchangesFor = (key) => App.exchanges[key] || [];
 const noteExchanges = (noteId) => exchangesFor("note:" + noteId);
 const groupExchanges = (groupId) => exchangesFor("group:" + groupId);
-const variableKey = (itemId) => "group:" + App.groupOfItem.get(itemId) + "/variable:" + itemId;
+const variableKey = (itemId) => (App.unrequestedKeys && App.unrequestedKeys.get(itemId)) ||
+  "group:" + App.groupOfItem.get(itemId) + "/variable:" + itemId;
 const variableExchanges = (itemId) => exchangesFor(variableKey(itemId));
 const variableAttempts = (itemId) => App.attempts[variableKey(itemId)] || [];
 const noteSelection = (groupId) => App.noteSelections["group:" + groupId] || null;
@@ -549,9 +657,9 @@ function variablesCitingNote(noteId) {
  * the exclusion reason is read off the variables the orchestrator stamped.
  */
 function groupState(group) {
-  const items = (group.variables || []).map(
-    (v) => App.results.get(v.item_id) || { status: "pending" }
-  );
+  /* Every result shown in the group, so an SSF extracted in place of the
+     group's only requested item keeps the group from reading as excluded. */
+  const items = groupEntries(group.group_id).map((v) => v.result);
   const counts = {};
   for (const r of items) counts[r.status] = (counts[r.status] || 0) + 1;
 
@@ -592,7 +700,10 @@ const STAGE_ORDER = ["initial", "histology", "discriminator", "dependent"];
 
 function waves() {
   const stages = new Map();
+  const unstaged = [];
   for (const group of App.groups) {
+    /* The "Other results" group isn't a configured stage, so it follows every wave. */
+    if (group.synthetic) { unstaged.push(group); continue; }
     const stage = group.stage || "initial";
     const gated = stage === "dependent" && (group.depends_on || []).length > 0;
     if (!stages.has(stage)) stages.set(stage, { groups: [], gated: [] });
@@ -610,10 +721,12 @@ function waves() {
     if (groups.length) list.push({ label: stage, groups });
     if (gated.length) list.push({ label: stage + " · after prerequisites", groups: gated });
   }
-  return list.map((wave, position) => ({
+  const numbered = list.map((wave, position) => ({
     title: "wave " + (position + 1) + " · " + wave.label,
     groups: wave.groups,
   }));
+  if (unstaged.length) numbered.push({ title: "not requested", groups: unstaged });
+  return numbered;
 }
 
 /* ---------------------------------------------------------------- tooltip */
@@ -829,6 +942,14 @@ function renderChrome() {
     h("span", { class: flags ? "chip warn" : "chip" },
       flags ? flags + " review flag" + (flags === 1 ? "" : "s") : "no review flags")
   );
+  /* The variable count includes results no group requested, such as an SSF
+     extracted in place of a requested item; this says how many. */
+  const unrequested = App.variables.filter(isUnrequested).length;
+  if (unrequested) {
+    $("#case-summary").append(h("span", { class: "chip",
+      title: "Results for items no group requested, such as CS Site-Specific Factors extracted in place of requested items",
+      text: unrequested + " not requested" }));
+  }
   if (App.run.run_id) {
     $("#run-source").textContent = App.runSource + " | " + App.run.run_id;
     $("#run-source").title = $("#run-source").textContent;

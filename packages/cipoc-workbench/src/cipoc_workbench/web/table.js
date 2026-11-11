@@ -50,6 +50,7 @@ function filteredVariables() {
     v.group_name.toLowerCase().includes(q) ||
     v.result.status.includes(q) ||
     (v.result.value || "").toLowerCase().includes(q) ||
+    (isUnrequested(v) && "not requested".includes(q)) ||
     (hasTruth() && verdictFor(v).verdict.includes(q)) ||
     (hasTruth() && (verdictFor(v).expected || "").toLowerCase().includes(q)));
 }
@@ -120,6 +121,19 @@ function bodyRow(entry) {
       const level = (r.extraction || {}).presence_confidence;
       if (!CONFIDENCE_LEVELS.includes(level)) return h("td", {});
       return h("td", {}, pill("c-" + level, r, level));
+    }
+    /* An SSF extracted in place of a requested item, and the item it replaced,
+       each point at the other. The name column still sorts on the name alone. */
+    if (column.key === "name" && (isUnrequested(entry) || App.replacedBy.has(entry.item_id))) {
+      return h("td", {}, entry.name,
+        isUnrequested(entry)
+          ? h("span", { class: "chip", style: "margin-left:6px", title: unrequestedNote(entry), text: "not requested" })
+          : null,
+        (App.replacedBy.get(entry.item_id) || []).map((record) => h("span", {
+          class: "chip", style: "margin-left:6px",
+          title: "Extracted in place of this item: " + record.label + " · " + record.name,
+          text: "replaced by " + record.item_id,
+        })));
     }
     const value = column.get(entry);
     const cell = h("td", { class: column.cls || null, text: value === 0 ? "0" : String(value || "") });

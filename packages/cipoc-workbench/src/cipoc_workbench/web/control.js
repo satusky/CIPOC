@@ -33,6 +33,15 @@ function bubbleTooltip(entry) {
   }
   if (r.reason) rows.push(["reason", r.reason]);
   if ((e.validation_errors || []).length) rows.push(["invalid", e.validation_errors[0]]);
+  /* An SSF extracted in place of a requested item, and the item it replaced,
+     each name the other. */
+  if (isUnrequested(entry)) {
+    rows.push(["requested", entry.ssf
+      ? "no, in place of " + entry.ssf.replaces.map(requestedLabel).join(" and ") : "no"]);
+  }
+  for (const record of App.replacedBy.get(entry.item_id) || []) {
+    rows.push(["replaced by", record.item_id + " " + record.label + " · " + record.name]);
+  }
 
   const dl = h("dl", { class: "kv" });
   for (const [k, v] of rows) dl.append(h("dt", { text: k }), h("dd", { text: v }));
@@ -48,13 +57,18 @@ function bubble(entry) {
   const node = h("button", {
     type: "button",
     class: "bubble " + ind.cls + (ind.hollow ? " hollow" : ""),
+    /* `unrequested` draws the outline dashed (styles.css): a result no group
+       asked for, such as an SSF standing in for a requested item. The lens
+       still owns the colour and the fill. */
     dataset: { entity: "variable:" + entry.item_id,
-               annotated: isAnnotated("variable", entry.item_id) ? "1" : null },
+               annotated: isAnnotated("variable", entry.item_id) ? "1" : null,
+               unrequested: isUnrequested(entry) ? "1" : null },
     /* The spoken label states the same one reading the colour does, so the
        screen-reader pass tracks the lens instead of describing a fixed axis
        the sighted view may not be showing. */
     "aria-label": entry.item_id + " " + entry.name + " — " +
-      (value ? "value " + value : "no value") + " \u2014 " + lens.aria(ind.key),
+      (value ? "value " + value : "no value") + " \u2014 " + lens.aria(ind.key) +
+      (isUnrequested(entry) ? ", not requested" : ""),
     onclick: (ev) => { ev.stopPropagation(); select("variable", entry.item_id); },
   },
     /* Occupies the indicator column, which styles.css reserves whenever a glyph
@@ -138,11 +152,12 @@ function groupCard(group) {
   const state = groupState(group);
   const matcher = App.varFilter;
 
-  const entries = App.variables.filter((v) => v.group_id === group.group_id);
+  const entries = groupEntries(group.group_id);
   const visible = entries.filter((v) => passesLens(v) && (!matcher ||
     String(v.item_id).includes(matcher) ||
     v.name.toLowerCase().includes(matcher) ||
-    (v.result.value || "").toLowerCase().includes(matcher)));
+    (v.result.value || "").toLowerCase().includes(matcher) ||
+    (isUnrequested(v) && "not requested".includes(matcher))));
   if ((matcher || App.classFilter.size) && visible.length === 0) return null;
 
   const tags = h("div", { class: "group-tags" },

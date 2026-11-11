@@ -320,9 +320,32 @@ function checkRow(pass, label, observed) {
       observed ? h("div", { class: "observed", text: observed }) : null));
 }
 
+function variableRows(entries) {
+  return entries.map((v) => h("div", { class: "check-row" },
+    h("span", { class: "dot " + statusDot(v.result), style: "margin-top:5px" }),
+    h("div", {},
+      crossLink("variable", v.item_id, v.item_id + " " + v.name),
+      h("span", { class: "chip", style: "margin-left:6px", text: resultLabel(v.result) }),
+      v.result.value ? h("span", { class: "chip on", style: "margin-left:4px", text: v.result.value }) : null,
+      isUnrequested(v) ? h("span", { class: "chip", style: "margin-left:4px", text: "not requested" }) : null,
+      v.result.reason ? h("div", { class: "observed", text: v.result.reason }) : null)));
+}
+
+/* The "Other results" group isn't configured, so it has no gating, note
+   selection or calls of its own, and takes no group feedback. */
+function otherResultsDetail(group) {
+  const entries = groupEntries(group.group_id);
+  return h("div", {},
+    section("About", h("p", { style: "margin:0", text:
+      "Results for items no group requested and no SSF record places in a group. " +
+      "They're shown so nothing in the run's results is hidden; each variable takes feedback as usual." })),
+    section("Variables (" + entries.length + ")", variableRows(entries)));
+}
+
 function groupDetail(groupId) {
   const group = App.groupById.get(groupId);
   if (!group) return h("p", { class: "empty", text: "Unknown group " + groupId + "." });
+  if (group.synthetic) return otherResultsDetail(group);
 
   const state = groupState(group);
   const body = h("div", {});
@@ -464,15 +487,8 @@ function groupDetail(groupId) {
       h("p", { class: "faint", text: "No note-selection decisions recorded for this group." })));
   }
 
-  const variables = App.variables.filter((v) => v.group_id === group.group_id);
-  body.append(section("Variables (" + variables.length + ")",
-    variables.map((v) => h("div", { class: "check-row" },
-      h("span", { class: "dot " + statusDot(v.result), style: "margin-top:5px" }),
-      h("div", {},
-        crossLink("variable", v.item_id, v.item_id + " " + v.name),
-        h("span", { class: "chip", style: "margin-left:6px", text: resultLabel(v.result) }),
-        v.result.value ? h("span", { class: "chip on", style: "margin-left:4px", text: v.result.value }) : null,
-        v.result.reason ? h("div", { class: "observed", text: v.result.reason }) : null)))));
+  const variables = groupEntries(group.group_id);
+  body.append(section("Variables (" + variables.length + ")", variableRows(variables)));
 
   body.append(exchangeSection("Group-level calls", groupExchanges(group.group_id)));
   body.append(feedbackSection("group", groupId));
@@ -506,6 +522,30 @@ function variableDetail(itemId) {
           crossLink("variable", b, String(b))))
       : null],
   ])));
+
+  /* An SSF extracted in place of requested items (case.ssf_equivalents), and
+     each requested item it replaced, link to each other. A result with no
+     record says so rather than going unexplained. */
+  if (isUnrequested(entry)) {
+    body.append(entry.ssf
+      ? section("In place of", kv([
+          ["requested", h("span", { class: "pill-list" }, entry.ssf.replaces.map((itemId) =>
+            crossLink("variable", itemId, requestedLabel(itemId))))],
+          ["SSF", entry.ssf.label + " (" + entry.ssf.item_id + ")"],
+          ["name", entry.ssf.name],
+          ["schemas", (entry.ssf.schemas || []).join(", ") || null],
+        ]), h("p", { class: "faint", style: "margin:8px 0 0", text:
+          "Not requested: the diagnosis year predates the requested items, so the case's staging schemas' SSF was extracted instead." }))
+      : section("Not requested", h("p", { style: "margin:0", text: unrequestedNote(entry) })));
+  }
+  const replacedBy = App.replacedBy.get(id) || [];
+  if (replacedBy.length) {
+    body.append(section("Replaced by", kv(replacedBy.map((record) => [
+      record.label,
+      h("span", {}, crossLink("variable", record.item_id, record.item_id + " " + record.name),
+        (record.schemas || []).length ? " · " + record.schemas.join(", ") : ""),
+    ]))));
+  }
 
   /* Immediately after Outcome, so the recorded answer and the expected one read
      adjacently. Absent entirely when there is no reference file, and reduced to
