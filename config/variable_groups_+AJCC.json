@@ -164,11 +164,12 @@
           ]
         },
         {
-          "group_id": "ovary_only",
-          "name": "Ovary Only",
+          "group_id": "gynecologic_only",
+          "name": "Gynecologic Only",
           "extract_as_group": true,
           "applies_to": {
-            "gross_primary_sites": ["ovary"]
+            "gross_primary_sites": ["ovary", "uterus", "cervix_uteri", "vagina", "vulva", "placenta"],
+            "primary_sites": ["C481-C482", "C488", "C570"]
           },
           "variables": [
             { "item_id": 3836, "name": "FIGO Stage" }

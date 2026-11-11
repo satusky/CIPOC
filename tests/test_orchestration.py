@@ -828,7 +828,7 @@ class SsfEquivalentResultsTests(unittest.TestCase):
         )
 
     def test_a_schema_without_an_ssf_closes_the_item_by_year(self):
-        settled, equivalents = self.settle(self.facts("C569", "8441", "20080615"), group_ids=("ovary_only",))
+        settled, equivalents = self.settle(self.facts("C569", "8441", "20080615"), group_ids=("gynecologic_only",))
 
         self.assertEqual(equivalents, {})
         self.assertEqual(settled, {3836: CaseVariableResult(
@@ -837,7 +837,7 @@ class SsfEquivalentResultsTests(unittest.TestCase):
         )})
 
     def test_only_ready_groups_are_settled(self):
-        settled, _ = self.settle(self.facts("C569", "8441"), group_ids=("ovary_only",))
+        settled, _ = self.settle(self.facts("C569", "8441"), group_ids=("gynecologic_only",))
         self.assertEqual(sorted(settled), [2890, 3836])
         self.assertEqual(self.settle(self.facts("C569", "8441"), group_ids=("other",)), ({}, {}))
 
@@ -994,9 +994,9 @@ class SsfRunTests(unittest.TestCase):
         self.assertNotIn(3836, [variable.item_id for variable in sent])
         self.assertEqual(result.case.ssf_equivalents, {2890: SsfEquivalent(
             item_id=2890, label="CS SSF2", name="FIGO Stage", replaces=[3836],
-            schemas=["cs/ovary"], group_id="ovary_only",
+            schemas=["cs/ovary"], group_id="gynecologic_only",
         )})
-        self.assertEqual(result.case.note_selection["group:ovary_only"].requested_item_ids, [2890])
+        self.assertEqual(result.case.note_selection["group:gynecologic_only"].requested_item_ids, [2890])
         # It wasn't requested, so the run's inputs don't list it.
         self.assertNotIn(2890, [v.item_id for group in result.inputs.target_variables for v in group.variables])
 
