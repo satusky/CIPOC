@@ -26,12 +26,14 @@ from cipoc.models import (
     VariableOutput,
     VariableStatus,
 )
-from cipoc.tools import build_corpus_descriptors, build_report, candidate_gross_sites, derive_case_facts, load_variable_groups, site_applies
+from cipoc.tools import build_corpus_descriptors, build_report, candidate_gross_sites, derive_case_facts, load_scoping_dictionary, load_variable_groups, out_of_year_results, site_applies
 from cipoc.utils.progress.events import normalize
 
 from tests.fake_orchestrator import (
     SCOPING_DICTIONARY,
     TISSUE_CODES,
+    Outcome,
+    Script,
     build_fake_orchestrator,
     graph_input,
     histology_pair_codes,
@@ -387,6 +389,145 @@ class HistologyFamilyFactsTests(unittest.TestCase):
             CaseFacts(candidate_histology_families=["967"]).model_dump_json()
         )
         self.assertEqual(restored.candidate_histology_families, ["967"])
+
+
+class OutOfYearResultsTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.scoping = load_scoping_dictionary(SCOPING_DICTIONARY)
+        cls.groups = [
+            TargetGroup(group_id="initial", stage="initial", variables=[VariableInfo(item_id=390)]),
+            TargetGroup(group_id="site_specific_codes", stage="dependent", variables=[
+                VariableInfo(item_id=670, name="RX Hosp--Surg Prim Site 03-2022"),
+                VariableInfo(item_id=671, name="RX Hosp--Surg Prim Site 2023"),
+                VariableInfo(item_id=3843, name="Grade Clinical"),
+                VariableInfo(item_id=3844, name="Grade Pathological"),
+            ]),
+        ]
+
+    def closed(self, date, results=None):
+        if results is None:
+            results = {
+                390: CaseVariableResult(item_id=390, status=VariableStatus.STRUCTURED_DATA, value=date or "99999999"),
+                **{item_id: CaseVariableResult(item_id=item_id) for item_id in (670, 671, 3843, 3844)},
+            }
+        return out_of_year_results(self.groups, results, self.scoping, date)
+
+    def test_each_item_in_a_group_is_decided_on_its_own(self):
+        closed = self.closed("20150610")
+        self.assertEqual(sorted(closed), [671, 3843, 3844])
+        self.assertEqual(
+            closed[3843].reason, "Not collected for 2015 diagnoses: Grade Clinical (3843) applies from 2018."
+        )
+        self.assertTrue(all(result.status == VariableStatus.NOT_APPLICABLE for result in closed.values()))
+
+    def test_the_surgery_items_swap_in_2023(self):
+        self.assertEqual(sorted(self.closed("20220601")), [671])
+        closed = self.closed("20230601")
+        self.assertEqual(sorted(closed), [670])
+        self.assertEqual(
+            closed[670].reason,
+            "Not collected for 2023 diagnoses: RX Hosp--Surg Prim Site 03-2022 (670) applies through 2022.",
+        )
+
+    def test_an_unknown_year_or_no_site_dictionary_closes_nothing(self):
+        self.assertEqual(self.closed(None), {})
+        self.assertEqual(self.closed("2000"), {})
+        results = {item_id: CaseVariableResult(item_id=item_id) for item_id in (390, 670, 671, 3843, 3844)}
+        self.assertEqual(out_of_year_results(self.groups, results, None, "20150610"), {})
+
+    def test_terminal_results_are_left_alone(self):
+        results = {
+            390: CaseVariableResult(item_id=390, status=VariableStatus.STRUCTURED_DATA, value="20150610"),
+            670: CaseVariableResult(item_id=670),
+            671: CaseVariableResult(item_id=671, status=VariableStatus.NOT_APPLICABLE, reason="Not reportable."),
+            3843: CaseVariableResult(item_id=3843, status=VariableStatus.STRUCTURED_DATA, value="2"),
+            3844: CaseVariableResult(item_id=3844),
+        }
+        self.assertEqual(sorted(self.closed("20150610", results)), [3844])
+
+
+class ItemYearsRunTests(unittest.TestCase):
+    """Once 390 is coded, the items its year doesn't collect are never extracted."""
+
+    def run_case(self, outcomes, structured_data=None, groups=None):
+        agent = build_fake_orchestrator(Script(outcomes=outcomes))
+        if groups is not None:
+            agent._target_variables = groups
+            agent._target_group_hierarchy = []
+            agent._graph = agent._build_graph()
+        # The fake's _scope_group is a pass-through, so only planning reads it.
+        agent._site_dictionary = load_scoping_dictionary(SCOPING_DICTIONARY)
+        with patch.object(agent._extractor, "run", wraps=agent._extractor.run) as extract:
+            result = agent.run(
+                [note.model_dump(mode="json") for note in load_notes()],
+                structured_data=structured_data, progress=False,
+            )
+        extracted = {
+            variable.item_id
+            for call in extract.call_args_list
+            for variable in call.args[0].requested_variables.variables
+        }
+        return result.case.variable_results, extracted
+
+    def test_a_2015_diagnosis_closes_grade_and_extracts_the_rest(self):
+        results, extracted = self.run_case({390: Outcome(value="20150610")})
+
+        self.assertEqual(results[390].value, "20150610")
+        for item_id in (3843, 3844):
+            self.assertEqual(results[item_id].status, VariableStatus.NOT_APPLICABLE)
+            self.assertIn("Not collected for 2015 diagnoses", results[item_id].reason)
+        self.assertEqual(
+            results[3843].reason, "Not collected for 2015 diagnoses: Grade Clinical (3843) applies from 2018."
+        )
+        # Summary Stage 2018, Tumor Size Summary and Mets at DX start later too.
+        for item_id in (671, 764, 756, 1112, 682, 832):
+            self.assertEqual(results[item_id].status, VariableStatus.NOT_APPLICABLE, item_id)
+        self.assertTrue({671, 764, 756, 1112, 682, 832, 3843, 3844}.isdisjoint(extracted))
+        for item_id in (670, 1182, 820, 830, 3280, 522, 690):
+            self.assertEqual(results[item_id].status, VariableStatus.EXTRACTED, item_id)
+
+    def test_the_surgery_item_follows_the_diagnosis_year(self):
+        for date, closed, kept in (("20220601", 671, 670), ("20230601", 670, 671)):
+            with self.subTest(date=date):
+                results, extracted = self.run_case({390: Outcome(value=date)})
+                self.assertEqual(results[closed].status, VariableStatus.NOT_APPLICABLE)
+                self.assertNotIn(closed, extracted)
+                self.assertEqual(results[kept].status, VariableStatus.EXTRACTED)
+                self.assertIn(kept, extracted)
+
+    def test_an_uncoded_diagnosis_date_extracts_both(self):
+        results, extracted = self.run_case({390: Outcome(value=None)})
+
+        self.assertEqual(results[390].status, VariableStatus.NOT_FOUND)
+        self.assertTrue({670, 671, 3843, 3844} <= extracted)
+        self.assertEqual(
+            {results[item_id].status for item_id in (670, 671, 3843, 3844)}, {VariableStatus.EXTRACTED}
+        )
+
+    def test_a_structured_value_outside_its_years_is_kept(self):
+        results, extracted = self.run_case({}, structured_data={390: "20150610", 3843: "2"})
+
+        self.assertEqual((results[3843].status, results[3843].value), (VariableStatus.STRUCTURED_DATA, "2"))
+        self.assertEqual(results[3844].status, VariableStatus.NOT_APPLICABLE)
+        self.assertTrue({390, 3843, 3844}.isdisjoint(extracted))
+
+    def test_a_stage_left_with_nothing_to_extract_releases_the_next(self):
+        groups = [
+            TargetGroup(group_id="initial", stage="initial", variables=[VariableInfo(item_id=390)]),
+            TargetGroup(group_id="grade", stage="histology", variables=[
+                VariableInfo(item_id=3843, name="Grade Clinical"), VariableInfo(item_id=3844, name="Grade Pathological"),
+            ]),
+            TargetGroup(group_id="nodes", stage="dependent", variables=[VariableInfo(item_id=820)]),
+        ]
+        results, extracted = self.run_case({390: Outcome(value="20150610")}, groups=groups)
+
+        self.assertEqual(
+            {item_id: result.status for item_id, result in results.items()},
+            {390: VariableStatus.EXTRACTED, 3843: VariableStatus.NOT_APPLICABLE,
+             3844: VariableStatus.NOT_APPLICABLE, 820: VariableStatus.EXTRACTED},
+        )
+        self.assertEqual(extracted, {390, 820})
 
 
 class BuildReportTests(unittest.TestCase):

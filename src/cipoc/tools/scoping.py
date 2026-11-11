@@ -15,7 +15,7 @@ BEHAVIOR_ITEM = 523
 UNKNOWN_PRIMARY_SITE = "C809"
 _GENERATOR = "`python -m canonical_naaccr.cipoc_scoping` in canonical-naaccr"
 # The sections CIPOC reads, each added by a later version of the generator.
-_SECTIONS = ("sources", "tissues", "schemas", "histology", "blocks", "algorithms")
+_SECTIONS = ("sources", "tissues", "schemas", "histology", "blocks", "algorithms", "items")
 _ALGORITHMS = ("cs", "tnm", "eod")
 _TISSUES = frozenset(get_args(GrossSite)) - {"unspecified"}
 # The select keys the generator writes. CIPOC doesn't extract the discriminators
@@ -31,6 +31,8 @@ _FAMILY = re.compile(r"[0-9]{3}")
 _PAIR = re.compile(r"[0-9]{4}/[0-9]")
 _HISTOLOGY_CODE = re.compile(r"[0-9]{4}")
 _BLOCK = re.compile(r"([0-9]{3})(?:-([0-9]{3}))?")
+# An item's diagnosis years. Unlike a select's year_dx, either end may be open.
+_ITEM_YEARS = re.compile(r"([0-9]{4})?-([0-9]{4})?")
 # NAACCR's YYYYMMDD or ISO YYYY-MM-DD, either one possibly cut to the year or month.
 # Day 00 is NAACCR's unknown day.
 _DIAGNOSIS_DATE = re.compile(r"([0-9]{4})(?:(-?)(0[1-9]|1[0-2])(?:\2(0[0-9]|[12][0-9]|3[01]))?)?")
@@ -90,6 +92,18 @@ def _histology_codes(value: str) -> frozenset[int]:
             raise ValueError(f"Unsupported histology code or range {token!r}.")
         codes.update(range(int(low), int(high) + 1))
     return frozenset(codes)
+
+
+@lru_cache(maxsize=None)
+def _item_years(value: str) -> tuple[int | None, int | None]:
+    """Parse an item's years: ``YYYY-YYYY``, ``YYYY-``, ``-YYYY`` or ``-``, an empty end open."""
+    match = _ITEM_YEARS.fullmatch(value.strip())
+    if match is None:
+        raise ValueError(f"Unsupported item years {value!r}.")
+    first, last = (int(year) if year else None for year in match.groups())
+    if first is not None and last is not None and last < first:
+        raise ValueError(f"Item years {value!r} run backwards.")
+    return first, last
 
 
 def _all_site_codes(scoping: ScopingDictionary) -> set[str]:
@@ -160,6 +174,14 @@ def _check_algorithms(scoping: ScopingDictionary) -> None:
             raise ValueError(f"Algorithms {key} and {later} cover overlapping diagnosis years.")
 
 
+def _check_items(scoping: ScopingDictionary) -> None:
+    for item_id, entry in scoping.items.items():
+        try:
+            _item_years(entry.years)
+        except ValueError as error:
+            raise ValueError(f"Item {item_id}: {error} Regenerate the file with {_GENERATOR}.") from None
+
+
 def _check_histology(scoping: ScopingDictionary) -> None:
     codes = _all_site_codes(scoping)
     owner: dict[str, str] = {}
@@ -205,7 +227,7 @@ def _check_blocks(scoping: ScopingDictionary) -> None:
 
 def parse_scoping_dictionary(data: Mapping[str, Any]) -> ScopingDictionary:
     """Validate a parsed scoping dictionary and check its tissue table, schemas,
-    histology site groups, morphology blocks and staging algorithms.
+    histology site groups, morphology blocks, staging algorithms and item years.
 
     The tissue keys must equal ``GrossSite`` minus "unspecified", and no Primary
     Site code may be in two tissues. Every schema's select keys must be ones the
@@ -214,7 +236,8 @@ def parse_scoping_dictionary(data: Mapping[str, Any]) -> ScopingDictionary:
     Primary Site codes exactly once, C809 included, and their families' pairs
     must start with the family's 3 digits. Morphology blocks mustn't overlap.
     The algorithms must be cs, tnm and eod, with diagnosis years that don't
-    overlap and histology codes that parse.
+    overlap and histology codes that parse. Every item's years must parse and
+    run forwards.
     Coverage of item 400, and of item 522's pairs, is checked separately
     (``check_primary_site_coverage``, ``check_histology_pairs``), since it needs
     the NAACCR dictionary.
@@ -259,6 +282,7 @@ def parse_scoping_dictionary(data: Mapping[str, Any]) -> ScopingDictionary:
     _check_histology(scoping)
     _check_blocks(scoping)
     _check_algorithms(scoping)
+    _check_items(scoping)
     return scoping
 
 
@@ -524,6 +548,53 @@ def accepted_histology_codes(
     to accept every code when there's no algorithm (``diagnosis_algorithm``)."""
     algorithm = diagnosis_algorithm(scoping, date_of_diagnosis)
     return None if algorithm is None else _histology_codes(scoping.algorithms[algorithm].histology)
+
+
+def item_years(scoping: ScopingDictionary, item_id: int) -> tuple[int | None, int | None]:
+    """The first and last diagnosis year the item is collected for, None for an
+    open end. An item the file doesn't list is collected in every year."""
+    entry = scoping.items.get(item_id)
+    return (None, None) if entry is None else _item_years(entry.years)
+
+
+def item_applies_in_year(
+    scoping: ScopingDictionary, item_id: int, date_of_diagnosis: str | None
+) -> bool:
+    """Whether the item is collected for the diagnosis year (``item_years``).
+
+    As with the histology codes, an unknown year, or one before CS's first
+    (2004), has no staging algorithm (``diagnosis_algorithm``), so every item
+    applies: those years are out of scope, and some items' first years, such as
+    Histology's 2001, would otherwise close them.
+    """
+    if diagnosis_algorithm(scoping, date_of_diagnosis) is None:
+        return True
+    year = _diagnosis_year(date_of_diagnosis)
+    first, last = item_years(scoping, item_id)
+    return (first is None or first <= year) and (last is None or year <= last)
+
+
+def out_of_year_reason(
+    scoping: ScopingDictionary,
+    item_id: int,
+    date_of_diagnosis: str | None,
+    name: str | None = None,
+) -> str | None:
+    """Why the item isn't collected for the diagnosis year, or None when it is
+    (``item_applies_in_year``).
+
+    For example "Not collected for 2015 diagnoses: Grade Clinical (3843) applies
+    from 2018."
+    """
+    if item_applies_in_year(scoping, item_id, date_of_diagnosis):
+        return None
+    first, last = item_years(scoping, item_id)
+    if first is not None and last is not None:
+        span = f"from {first} through {last}"
+    else:
+        span = f"from {first}" if first is not None else f"through {last}"
+    label = f"{name} ({item_id})" if name else f"Item {item_id}"
+    return f"Not collected for {_diagnosis_year(date_of_diagnosis)} diagnoses: {label} applies {span}."
 
 
 def _accepted(pair: str, accepted: Collection[int] | None) -> bool:

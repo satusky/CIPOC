@@ -97,11 +97,17 @@ NAACCR codes.
   diagnosis year and sex. An unknown fact matches every schema. Several matches
   combine their codes. If they describe a code differently, or nothing matches,
   the item keeps NAACCR's codes.
+- **Items by year:** once Date of Diagnosis (390) is coded, each item still
+  pending whose years the file's `items` table excludes ends NOT_APPLICABLE,
+  with a reason naming both years, for example 3843 for a 2015 diagnosis or 670
+  for 2023. It's decided per item, so one group can extract 670 and close 671.
+  An unknown year, one before 2004, or an item the table doesn't list leaves
+  the item to be extracted.
 
 The orchestrator checks the file the first time it reads it. The old
-tissue-keyed format and builds without the histology or algorithm sections are
-rejected. The tissues must cover item 400's NAACCR codes exactly, and the site
-groups may only list item 522's pairs.
+tissue-keyed format and builds without the histology, algorithm or item-year
+sections are rejected. The tissues must cover item 400's NAACCR codes exactly,
+and the site groups may only list item 522's pairs.
 
 Validation checks values against the supplied code lists. It doesn't enforce
 every site- or year-specific coding rule, and the reference data has a known

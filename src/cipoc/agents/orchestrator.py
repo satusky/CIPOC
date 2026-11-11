@@ -20,7 +20,7 @@ from langgraph.graph.message import add_messages
 from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
-from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_data_dictionary, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, derive_case_facts, candidate_gross_sites, not_found_results, to_case_results, build_report, load_scoping_dictionary, check_primary_site_coverage, check_histology_pairs, histology_pairs, build_histology_scope, lookup_variable_info, tissue_site_codes, checkpoint_one_stop_reason, checkpoint_two_stop_reason, stop_pending_results
+from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_data_dictionary, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, out_of_year_results, derive_case_facts, candidate_gross_sites, not_found_results, to_case_results, build_report, load_scoping_dictionary, check_primary_site_coverage, check_histology_pairs, histology_pairs, build_histology_scope, lookup_variable_info, tissue_site_codes, checkpoint_one_stop_reason, checkpoint_two_stop_reason, stop_pending_results
 from cipoc.tools.scoping import HISTOLOGY_ITEM
 from cipoc.utils import CipocConfig, ObservabilityCollector, run_graph_stream
 from cipoc.utils.progress.events import ProgressEvent
@@ -465,6 +465,12 @@ class OrchestratorAgent(BaseAgent):
         through here, whether the histology stage closed by extraction, at plan
         time, or from structured data, so a case it shows isn't reportable stops
         before any later-stage group is planned.
+
+        Next, once Date of Diagnosis (390) gives a year, every PENDING item the
+        site dictionary doesn't collect for that year ends NOT_APPLICABLE. Like
+        the checkpoint, that goes back through check_state, so planning resumes
+        from the closed results: a closed item is never extracted, and a group
+        left with none pending is terminal and releases the next stage.
         """
         if state.reportability_stop is None:
             stop_reason = checkpoint_two_stop_reason(
@@ -477,6 +483,14 @@ class OrchestratorAgent(BaseAgent):
                         state.variable_results, ExtractionStop.NOT_REPORTABLE
                     ),
                 })
+        closed = out_of_year_results(
+            state.target_variables,
+            state.variable_results,
+            self._site_dictionary,
+            state.case_facts.date_of_diagnosis if state.case_facts else None,
+        )
+        if closed:
+            return Command(goto="check_state", update={"variable_results": closed})
         ready = eligible_groups(
             state.target_variables,
             state.variable_results,

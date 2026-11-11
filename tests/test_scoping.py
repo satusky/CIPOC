@@ -19,9 +19,12 @@ from cipoc.tools import (
     histology_pair_listed,
     histology_pairs,
     histology_site_group,
+    item_applies_in_year,
+    item_years,
     load_data_dictionary,
     load_scoping_dictionary,
     matching_schemas,
+    out_of_year_reason,
     parse_scoping_dictionary,
     gross_site_candidates,
     primary_site_tissues,
@@ -90,10 +93,9 @@ class ScopingDictionaryLoadTests(unittest.TestCase):
 
     def test_sections_from_a_newer_generator_still_load(self):
         newer = copy.deepcopy(self.raw)
-        # items is read from C25 on.
-        self.assertIn("items", newer)
         newer["discriminators"] = {"eod/lung": {}}
         newer["algorithms"]["eod"]["notes"] = "added later"
+        newer["items"]["670"]["replaced_by"] = "671"
         newer["tissues"]["breast"]["notes"] = "added later"
         newer["schemas"]["cs/breast"]["ssf"] = {"3836": "2880"}
         newer["histology"]["breast"]["notes"] = "added later"
@@ -128,7 +130,9 @@ class ScopingDictionaryLoadTests(unittest.TestCase):
             parse_scoping_dictionary(stale)
 
     def test_a_file_without_a_later_section_names_it(self):
-        for sections in (["histology"], ["blocks"], ["histology", "blocks"], ["algorithms"]):
+        for sections in (
+            ["histology"], ["blocks"], ["histology", "blocks"], ["algorithms"], ["items"], ["algorithms", "items"],
+        ):
             with self.subTest(sections=sections):
                 stale = copy.deepcopy(self.raw)
                 for section in sections:
@@ -783,6 +787,96 @@ class DiagnosisYearHistologyTests(unittest.TestCase):
         for pair in self.family_pairs(cs) | self.block_pairs(cs):
             self.assertEqual(cs.listed(pair), every.listed(pair), pair)
         self.assertTrue(cs.listed("8500/3"))
+
+
+class ItemYearsLoadTests(unittest.TestCase):
+    def setUp(self):
+        self.raw = json.loads(FIXTURE.read_text())
+
+    def test_fixture_has_each_items_years(self):
+        scoping = load_scoping_dictionary(FIXTURE)
+
+        self.assertEqual(len(scoping.items), 60)
+        self.assertEqual(
+            {item_id: scoping.items[item_id].years for item_id in (390, 670, 671, 2851)},
+            {390: "-", 670: "-2022", 671: "2023-", 2851: "2010-2015"},
+        )
+
+    def test_item_years_must_parse_and_run_forwards(self):
+        for years, message in (
+            ("2018", "Item 3843: Unsupported item years '2018'"),
+            ("2018 onward", "Item 3843: Unsupported item years '2018 onward'"),
+            ("18-", "Item 3843: Unsupported item years '18-'"),
+            ("", "Item 3843: Unsupported item years ''"),
+            ("2018-2010", "Item 3843: Item years '2018-2010' run backwards"),
+        ):
+            with self.subTest(years=years):
+                broken = copy.deepcopy(self.raw)
+                broken["items"]["3843"]["years"] = years
+                with self.assertRaisesRegex(ValueError, f"{message}.*canonical_naaccr"):
+                    parse_scoping_dictionary(broken)
+
+
+class ItemYearsTests(unittest.TestCase):
+    """Each item is collected only for the diagnosis years the site dictionary gives it."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.scoping = load_scoping_dictionary(FIXTURE)
+
+    def applies(self, item_id, date):
+        return item_applies_in_year(self.scoping, item_id, date)
+
+    def test_item_years_open_at_either_end(self):
+        self.assertEqual(item_years(self.scoping, 390), (None, None))
+        self.assertEqual(item_years(self.scoping, 670), (None, 2022))
+        self.assertEqual(item_years(self.scoping, 671), (2023, None))
+        self.assertEqual(item_years(self.scoping, 2851), (2010, 2015))
+
+    def test_grade_applies_from_2018(self):
+        self.assertFalse(self.applies(3843, "20151231"))
+        self.assertTrue(self.applies(3843, "20180101"))
+
+    def test_the_surgery_items_change_in_2023(self):
+        self.assertEqual((self.applies(670, "2022-06-01"), self.applies(671, "2022-06-01")), (True, False))
+        self.assertEqual((self.applies(670, "20230601"), self.applies(671, "20230601")), (False, True))
+
+    def test_lymphovascular_invasion_applies_from_2010(self):
+        self.assertFalse(self.applies(1182, "2008"))
+        self.assertTrue(self.applies(1182, "2010"))
+
+    def test_an_unknown_year_applies_every_item(self):
+        for date in (None, "", "0000", "March 2015", "20159999"):
+            with self.subTest(date=date):
+                self.assertTrue(all(self.applies(item_id, date) for item_id in (670, 671, 1182, 3843)))
+
+    def test_a_year_before_2004_applies_every_item(self):
+        # Histology (522) was first collected in 2001, but those years are out of
+        # scope, as they are for the histology codes offered.
+        for date in ("2000", "20031231"):
+            with self.subTest(date=date):
+                self.assertTrue(all(self.applies(item_id, date) for item_id in (522, 3280, 3843, 671)))
+
+    def test_an_item_the_file_doesnt_list_applies(self):
+        self.assertNotIn(441, self.scoping.items)
+        self.assertEqual(item_years(self.scoping, 441), (None, None))
+        self.assertTrue(self.applies(441, "2020"))
+
+    def test_the_reason_names_the_diagnosis_year_and_the_items_years(self):
+        self.assertEqual(
+            out_of_year_reason(self.scoping, 3843, "20150610", "Grade Clinical"),
+            "Not collected for 2015 diagnoses: Grade Clinical (3843) applies from 2018.",
+        )
+        self.assertEqual(
+            out_of_year_reason(self.scoping, 670, "20230115", "RX Hosp--Surg Prim Site 03-2022"),
+            "Not collected for 2023 diagnoses: RX Hosp--Surg Prim Site 03-2022 (670) applies through 2022.",
+        )
+        self.assertEqual(
+            out_of_year_reason(self.scoping, 2851, "2008"),
+            "Not collected for 2008 diagnoses: Item 2851 applies from 2010 through 2015.",
+        )
+        self.assertIsNone(out_of_year_reason(self.scoping, 3843, "2018", "Grade Clinical"))
+        self.assertIsNone(out_of_year_reason(self.scoping, 3843, None, "Grade Clinical"))
 
 
 class RealHistologyPairsTests(unittest.TestCase):

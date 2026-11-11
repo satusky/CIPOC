@@ -27,6 +27,7 @@ from cipoc.models import (
     ProcessedClinicalNote,
     ReviewFlag,
     ReviewFlagType,
+    ScopingDictionary,
     SiteApplicability,
     TargetGroup,
     ValidatedVariableGroupOutput,
@@ -39,7 +40,7 @@ from cipoc.models import (
 )
 from cipoc.models.case import TERMINAL_VARIABLE_STATUSES
 from .coding_context import ranges_overlap, site_in_ranges
-from .scoping import BEHAVIOR_ITEM, HISTOLOGY_ITEM, PRIMARY_SITE_ITEM, gross_site_candidates
+from .scoping import BEHAVIOR_ITEM, HISTOLOGY_ITEM, PRIMARY_SITE_ITEM, gross_site_candidates, out_of_year_reason
 
 
 def _concept_present(corpus: NoteCorpusDescriptors, concept: str) -> bool:
@@ -702,6 +703,37 @@ def resolve_leftovers(
                 blocking_item_ids=blockers if status == VariableStatus.BLOCKED else [],
             )
     return updates
+
+
+def out_of_year_results(
+    groups: Sequence[TargetGroup],
+    results: Mapping[int, CaseVariableResult],
+    scoping: ScopingDictionary | None,
+    date_of_diagnosis: str | None,
+) -> dict[int, CaseVariableResult]:
+    """NOT_APPLICABLE for every PENDING item the diagnosis year is outside of.
+
+    Decided per item, not per group, since a group can mix them: one holds both
+    surgery items, 670 (through 2022) and 671 (from 2023). The reason names the
+    year and the item's years (``out_of_year_reason``). Terminal results,
+    structured-data seeds among them, are left alone, and so is everything when
+    the year is unknown or there's no site dictionary. Returns only the changed
+    results, for the ``variable_results`` reducer.
+    """
+    if scoping is None:
+        return {}
+    closed: dict[int, CaseVariableResult] = {}
+    for group in groups:
+        for variable in group.variables:
+            result = results.get(variable.item_id)
+            if result is None or result.status != VariableStatus.PENDING:
+                continue
+            reason = out_of_year_reason(scoping, variable.item_id, date_of_diagnosis, variable.name)
+            if reason is not None:
+                closed[variable.item_id] = CaseVariableResult(
+                    item_id=variable.item_id, status=VariableStatus.NOT_APPLICABLE, reason=reason
+                )
+    return closed
 
 
 def _result_from_extraction(extraction: ValidatedVariableOutput) -> CaseVariableResult:
