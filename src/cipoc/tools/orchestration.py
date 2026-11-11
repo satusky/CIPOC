@@ -84,12 +84,15 @@ def load_variable_groups(path: str | Path) -> list[TargetGroup]:
     group is self-contained for gating. A group carrying only subgroups (no loose
     variables of its own) yields just those subgroups.
 
-    Only ``item_id`` and ``name`` are read per variable; richer data-dictionary
-    and case-scoped metadata is filled later by
+    Only ``item_id``, ``name`` and ``replaces`` are read per variable; richer
+    data-dictionary and case-scoped metadata is filled later by
     :func:`cipoc.tools.build_variable_group` once case facts are known.
+    ``replaces`` marks an older equivalent, such as Grade (440), with the items
+    in its group it stands in for (``TargetGroup.replaces``).
 
     A ``stage`` outside the file's ``stages`` list (see :func:`load_stages`)
-    fails here, at load.
+    fails here, at load, and so does a ``replaces`` naming the variable itself
+    or an item that isn't in its group.
     """
     with open(path, "r") as f:
         config = json.load(f)
@@ -108,9 +111,15 @@ def load_variable_groups(path: str | Path) -> list[TargetGroup]:
                 VariableInfo(item_id=variable["item_id"], name=variable.get("name"))
                 for variable in node.get("variables", [])
             ],
+            replaces={
+                variable["item_id"]: variable["replaces"]
+                for variable in node.get("variables", [])
+                if "replaces" in variable
+            },
         )
         site_applies(group.applies_to, None)
         _stage_index(group, stages)
+        _check_replaces(group)
         return group
 
     groups: list[TargetGroup] = []
@@ -128,6 +137,20 @@ def load_variable_groups(path: str | Path) -> list[TargetGroup]:
                     )
                 )
     return groups
+
+
+def _check_replaces(group: TargetGroup) -> None:
+    item_ids = group_item_ids(group)
+    for older, replaced in group.replaces.items():
+        if not replaced:
+            raise ValueError(f"Group {group.group_id!r}: item {older}'s 'replaces' is empty.")
+        if older in replaced:
+            raise ValueError(f"Group {group.group_id!r}: item {older} can't replace itself.")
+        missing = [item_id for item_id in replaced if item_id not in item_ids]
+        if missing:
+            raise ValueError(
+                f"Group {group.group_id!r}: item {older} replaces {missing}, which aren't in the group."
+            )
 
 
 def load_stages(path: str | Path) -> tuple[str, ...]:
@@ -715,20 +738,36 @@ def out_of_year_results(
 
     Decided per item, not per group, since a group can mix them: one holds both
     surgery items, 670 (through 2022) and 671 (from 2023). The reason names the
-    year and the item's years (``out_of_year_reason``). Terminal results,
+    year and the item's years (``out_of_year_reason``), and any equivalent that
+    is collected that year (``TargetGroup.replaces``): the older item for a
+    newer one, or the newer items for an older one. Terminal results,
     structured-data seeds among them, are left alone, and so is everything when
     the year is unknown or there's no site dictionary. Returns only the changed
     results, for the ``variable_results`` reducer.
     """
     if scoping is None:
         return {}
+    names = {variable.item_id: variable.name for group in groups for variable in group.variables}
+    replaces = {older: replaced for group in groups for older, replaced in group.replaces.items()}
     closed: dict[int, CaseVariableResult] = {}
     for group in groups:
         for variable in group.variables:
             result = results.get(variable.item_id)
             if result is None or result.status != VariableStatus.PENDING:
                 continue
-            reason = out_of_year_reason(scoping, variable.item_id, date_of_diagnosis, variable.name)
+            reason = out_of_year_reason(
+                scoping, variable.item_id, date_of_diagnosis, variable.name,
+                held_by=[
+                    (older, names[older])
+                    for older, replaced in replaces.items()
+                    if variable.item_id in replaced
+                ],
+                replaced_by=[
+                    (newer, names[newer])
+                    for newer in replaces.get(variable.item_id, [])
+                    if newer in names
+                ],
+            )
             if reason is not None:
                 closed[variable.item_id] = CaseVariableResult(
                     item_id=variable.item_id, status=VariableStatus.NOT_APPLICABLE, reason=reason

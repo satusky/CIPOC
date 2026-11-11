@@ -878,6 +878,37 @@ class ItemYearsTests(unittest.TestCase):
         self.assertIsNone(out_of_year_reason(self.scoping, 3843, "2018", "Grade Clinical"))
         self.assertIsNone(out_of_year_reason(self.scoping, 3843, None, "Grade Clinical"))
 
+    def test_the_reason_names_the_equivalents_collected_that_year(self):
+        grade = [(440, "Grade")]
+        self.assertEqual(
+            out_of_year_reason(self.scoping, 3843, "20150610", "Grade Clinical", held_by=grade),
+            "Not collected for 2015 diagnoses: Grade Clinical (3843) applies from 2018; Grade (440) holds it for this year.",
+        )
+        self.assertEqual(
+            out_of_year_reason(
+                self.scoping, 440, "20200610", "Grade",
+                replaced_by=[(3843, "Grade Clinical"), (3844, "Grade Pathological")],
+            ),
+            "Not collected for 2020 diagnoses: Grade (440) applies through 2017; "
+            "Grade Clinical (3843) and Grade Pathological (3844) replace it.",
+        )
+        # 2851 starts in 2010, so only 2850 holds Mets at DX-Bone for 2008.
+        self.assertEqual(
+            out_of_year_reason(
+                self.scoping, 1112, "2008", "Mets at DX-Bone",
+                held_by=[(2850, "CS Mets at DX"), (2851, "CS Mets at Dx-Bone")],
+            ),
+            "Not collected for 2008 diagnoses: Mets at DX-Bone (1112) applies from 2016; "
+            "CS Mets at DX (2850) holds it for this year.",
+        )
+        # No equivalent collected that year leaves the plain reason, and an
+        # item that is collected needs none.
+        self.assertEqual(
+            out_of_year_reason(self.scoping, 2851, "2008", held_by=[(1112, "Mets at DX-Bone")]),
+            "Not collected for 2008 diagnoses: Item 2851 applies from 2010 through 2015.",
+        )
+        self.assertIsNone(out_of_year_reason(self.scoping, 440, "2015", "Grade", replaced_by=[(3843, None)]))
+
 
 class RealHistologyPairsTests(unittest.TestCase):
     """The fixture offers only v25 pairs, and every v25 pair has a block."""

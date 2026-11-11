@@ -2,7 +2,7 @@ import json
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from unittest.mock import patch
+from unittest.mock import mock_open, patch
 from uuid import uuid4
 
 from langchain_core.callbacks import BaseCallbackHandler
@@ -477,14 +477,18 @@ class ItemYearsRunTests(unittest.TestCase):
         for item_id in (3843, 3844):
             self.assertEqual(results[item_id].status, VariableStatus.NOT_APPLICABLE)
             self.assertIn("Not collected for 2015 diagnoses", results[item_id].reason)
+        # The default config holds Grade (440) for the years before 3843.
         self.assertEqual(
-            results[3843].reason, "Not collected for 2015 diagnoses: Grade Clinical (3843) applies from 2018."
+            results[3843].reason,
+            "Not collected for 2015 diagnoses: Grade Clinical (3843) applies from 2018; "
+            "Grade (440) holds it for this year.",
         )
         # Summary Stage 2018, Tumor Size Summary and Mets at DX start later too.
         for item_id in (671, 764, 756, 1112, 682, 832):
             self.assertEqual(results[item_id].status, VariableStatus.NOT_APPLICABLE, item_id)
         self.assertTrue({671, 764, 756, 1112, 682, 832, 3843, 3844}.isdisjoint(extracted))
-        for item_id in (670, 1182, 820, 830, 3280, 522, 690):
+        # Their older equivalents are extracted in their place.
+        for item_id in (670, 1182, 820, 830, 3280, 522, 690, 440, 759, 2800, 2850, 2854):
             self.assertEqual(results[item_id].status, VariableStatus.EXTRACTED, item_id)
 
     def test_the_surgery_item_follows_the_diagnosis_year(self):
@@ -528,6 +532,210 @@ class ItemYearsRunTests(unittest.TestCase):
              3844: VariableStatus.NOT_APPLICABLE, 820: VariableStatus.EXTRACTED},
         )
         self.assertEqual(extracted, {390, 820})
+
+
+class OlderEquivalentConfigTests(unittest.TestCase):
+    """The older equivalents sit in the groups of the items they stand in for."""
+
+    MAPPING = {
+        "site_specific_codes": {440: [3843, 3844]},
+        "other": {759: [764], 2800: [756]},
+        "metastases": {
+            2850: [1112, 1113, 1114, 1115, 1116, 1117],
+            2851: [1112], 2852: [1113], 2853: [1115], 2854: [1116],
+        },
+    }
+
+    @staticmethod
+    def load(variables):
+        config = json.dumps({"groups": [{"group_id": "grade", "variables": variables}]})
+        with patch("cipoc.tools.orchestration.open", mock_open(read_data=config)):
+            return load_variable_groups("synthetic.json")
+
+    def test_the_default_config_maps_each_older_item_to_its_replacements(self):
+        replaces = {
+            group.group_id: group.replaces
+            for group in load_variable_groups(VARIABLE_GROUPS)
+            if group.replaces
+        }
+        self.assertEqual(replaces, self.MAPPING)
+
+    def test_the_older_items_carry_their_v25_names(self):
+        path = Path(__file__).resolve().parents[1] / "documents" / "manuals" / "naaccr_data_dictionary_v25.json"
+        if not path.exists():
+            raise unittest.SkipTest(f"{path} isn't present; it's gitignored reference data.")
+        dictionary = json.loads(path.read_text())
+        for group in load_variable_groups(VARIABLE_GROUPS):
+            for variable in group.variables:
+                if variable.item_id in group.replaces:
+                    with self.subTest(item_id=variable.item_id):
+                        self.assertEqual(variable.name, dictionary[str(variable.item_id)]["Data Item Name"])
+
+    def test_replaces_is_read_into_the_group(self):
+        group, = self.load([
+            {"item_id": 3843, "name": "Grade Clinical"},
+            {"item_id": 440, "name": "Grade", "replaces": [3843]},
+        ])
+        self.assertEqual(group.replaces, {440: [3843]})
+        self.assertEqual([variable.item_id for variable in group.variables], [3843, 440])
+
+    def test_replaces_must_name_other_items_in_the_group(self):
+        for replaces, message in (
+            ([], "is empty"),
+            ([440], "can't replace itself"),
+            ([3843, 3844], r"replaces \[3844\], which aren't in the group"),
+        ):
+            with self.subTest(replaces=replaces), self.assertRaisesRegex(ValueError, message):
+                self.load([
+                    {"item_id": 3843, "name": "Grade Clinical"},
+                    {"item_id": 440, "name": "Grade", "replaces": replaces},
+                ])
+
+
+class OlderEquivalentReasonTests(unittest.TestCase):
+    """Each reason names the equivalent that's collected that year, in both directions."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.scoping = load_scoping_dictionary(SCOPING_DICTIONARY)
+        cls.groups = [
+            group for group in load_variable_groups(VARIABLE_GROUPS)
+            if group.group_id in ("site_specific_codes", "other", "metastases", "lymph_node_removal")
+        ]
+
+    def reasons(self, date, groups=None):
+        groups = groups or self.groups
+        results = {
+            variable.item_id: CaseVariableResult(item_id=variable.item_id)
+            for group in groups for variable in group.variables
+        }
+        return {item_id: result.reason for item_id, result in out_of_year_results(groups, results, self.scoping, date).items()}
+
+    def test_a_newer_item_names_the_older_one_that_holds_it(self):
+        reasons = self.reasons("20150610")
+        self.assertEqual(
+            reasons[3844],
+            "Not collected for 2015 diagnoses: Grade Pathological (3844) applies from 2018; "
+            "Grade (440) holds it for this year.",
+        )
+        self.assertEqual(
+            reasons[764],
+            "Not collected for 2015 diagnoses: Summary Stage 2018 (764) applies from 2018; "
+            "SEER Summary Stage 2000 (759) holds it for this year.",
+        )
+        self.assertNotIn(440, reasons)
+
+    def test_an_older_item_names_the_newer_ones_that_replace_it(self):
+        reasons = self.reasons("20200610")
+        self.assertEqual(
+            reasons[440],
+            "Not collected for 2020 diagnoses: Grade (440) applies through 2017; "
+            "Grade Clinical (3843) and Grade Pathological (3844) replace it.",
+        )
+        self.assertEqual(
+            reasons[2800],
+            "Not collected for 2020 diagnoses: CS Tumor Size (2800) applies from 2003 through 2015; "
+            "Tumor Size Summary (756) replaces it.",
+        )
+        self.assertEqual(
+            reasons[2850],
+            "Not collected for 2020 diagnoses: CS Mets at DX (2850) applies from 2003 through 2015; "
+            "Mets at DX-Bone (1112), Mets at DX-Brain (1113), Mets at Dx-Distant LN (1114), "
+            "Mets at DX-Liver (1115), Mets at DX-Lung (1116) and Mets at DX-Other (1117) replace it.",
+        )
+
+    def test_only_equivalents_collected_that_year_are_named(self):
+        # CS Mets at Dx-Bone (2851) starts in 2010, CS Mets at DX (2850) in 2003.
+        self.assertEqual(
+            self.reasons("20120610")[1112],
+            "Not collected for 2012 diagnoses: Mets at DX-Bone (1112) applies from 2016; "
+            "CS Mets at DX (2850) and CS Mets at Dx-Bone (2851) hold it for this year.",
+        )
+        reasons = self.reasons("20080610")
+        self.assertEqual(
+            reasons[1112],
+            "Not collected for 2008 diagnoses: Mets at DX-Bone (1112) applies from 2016; "
+            "CS Mets at DX (2850) holds it for this year.",
+        )
+        self.assertEqual(
+            reasons[2851],
+            "Not collected for 2008 diagnoses: CS Mets at Dx-Bone (2851) applies from 2010 through 2015.",
+        )
+
+    def test_only_equivalents_requested_in_the_run_are_named(self):
+        grade = TargetGroup(
+            group_id="grade",
+            variables=[VariableInfo(item_id=3843, name="Grade Clinical"), VariableInfo(item_id=440, name="Grade")],
+            replaces={440: [3843, 3844]},
+        )
+        self.assertEqual(
+            self.reasons("20200610", [grade])[440],
+            "Not collected for 2020 diagnoses: Grade (440) applies through 2017; Grade Clinical (3843) replaces it.",
+        )
+
+    def test_an_item_without_an_equivalent_keeps_the_plain_reason(self):
+        self.assertEqual(
+            self.reasons("20150610")[682],
+            "Not collected for 2015 diagnoses: Date Regional Lymph Node Dissection (682) applies from 2018.",
+        )
+
+
+class OlderEquivalentRunTests(unittest.TestCase):
+    """End to end on the default config: each year extracts one of each pair."""
+
+    def run_case(self, date):
+        agent = build_fake_orchestrator(Script(outcomes={390: Outcome(value=date)}))
+        agent._site_dictionary = load_scoping_dictionary(SCOPING_DICTIONARY)
+        with patch.object(agent._extractor, "run", wraps=agent._extractor.run) as extract:
+            result = agent.run([note.model_dump(mode="json") for note in load_notes()], progress=False)
+        extracted = {
+            variable.item_id
+            for call in extract.call_args_list
+            for variable in call.args[0].requested_variables.variables
+        }
+        return result.case.variable_results, extracted
+
+    def assert_pair(self, results, extracted, closed, kept):
+        self.assertEqual(results[closed].status, VariableStatus.NOT_APPLICABLE, closed)
+        self.assertNotIn(closed, extracted)
+        self.assertEqual(results[kept].status, VariableStatus.EXTRACTED, kept)
+        self.assertIn(kept, extracted)
+
+    def test_2015_codes_grade_in_440(self):
+        results, extracted = self.run_case("20150610")
+        for item_id in (3843, 3844):
+            self.assert_pair(results, extracted, item_id, 440)
+            self.assertIn("Grade (440) holds it for this year.", results[item_id].reason)
+
+    def test_tumor_size_swaps_between_2014_and_2017(self):
+        results, extracted = self.run_case("20140610")
+        self.assert_pair(results, extracted, 756, 2800)
+        self.assertIn("CS Tumor Size (2800) holds it for this year.", results[756].reason)
+        results, extracted = self.run_case("20170610")
+        self.assert_pair(results, extracted, 2800, 756)
+        self.assertIn("Tumor Size Summary (756) replaces it.", results[2800].reason)
+
+    def test_2012_codes_summary_stage_in_759(self):
+        results, extracted = self.run_case("20120610")
+        self.assert_pair(results, extracted, 764, 759)
+        self.assertIn("SEER Summary Stage 2000 (759) holds it for this year.", results[764].reason)
+
+    def test_2012_codes_mets_in_the_cs_items(self):
+        results, extracted = self.run_case("20120610")
+        for item_id in (1112, 1113, 1114, 1115, 1116, 1117):
+            self.assertEqual(results[item_id].status, VariableStatus.NOT_APPLICABLE, item_id)
+            self.assertNotIn(item_id, extracted)
+        self.assertIn("CS Mets at DX (2850) holds it for this year.", results[1114].reason)
+        for item_id in (2850, 2851, 2852, 2853, 2854):
+            self.assertEqual(results[item_id].status, VariableStatus.EXTRACTED, item_id)
+            self.assertIn(item_id, extracted)
+
+    def test_an_unknown_year_extracts_current_and_older_items(self):
+        results, extracted = self.run_case(None)
+        self.assertEqual(results[390].status, VariableStatus.NOT_FOUND)
+        both = {3843, 3844, 440, 764, 759, 756, 2800, *range(1112, 1118), *range(2850, 2855)}
+        self.assertTrue(both <= extracted)
+        self.assertEqual({results[item_id].status for item_id in both}, {VariableStatus.EXTRACTED})
 
 
 class BuildReportTests(unittest.TestCase):

@@ -574,17 +574,32 @@ def item_applies_in_year(
     return (first is None or first <= year) and (last is None or year <= last)
 
 
+def _item_label(item_id: int, name: str | None) -> str:
+    return f"{name} ({item_id})" if name else f"Item {item_id}"
+
+
+def _join_labels(labels: Sequence[str]) -> str:
+    return labels[0] if len(labels) == 1 else f"{', '.join(labels[:-1])} and {labels[-1]}"
+
+
 def out_of_year_reason(
     scoping: ScopingDictionary,
     item_id: int,
     date_of_diagnosis: str | None,
     name: str | None = None,
+    *,
+    held_by: Sequence[tuple[int, str | None]] = (),
+    replaced_by: Sequence[tuple[int, str | None]] = (),
 ) -> str | None:
     """Why the item isn't collected for the diagnosis year, or None when it is
     (``item_applies_in_year``).
 
     For example "Not collected for 2015 diagnoses: Grade Clinical (3843) applies
-    from 2018."
+    from 2018." ``held_by`` lists the older equivalents that stand in for the
+    item, and ``replaced_by`` the newer items an older equivalent stands in for,
+    each as ``(item_id, name)``. The ones collected that year are named: "…;
+    Grade (440) holds it for this year." or "…; Grade Clinical (3843) and Grade
+    Pathological (3844) replace it."
     """
     if item_applies_in_year(scoping, item_id, date_of_diagnosis):
         return None
@@ -593,8 +608,22 @@ def out_of_year_reason(
         span = f"from {first} through {last}"
     else:
         span = f"from {first}" if first is not None else f"through {last}"
-    label = f"{name} ({item_id})" if name else f"Item {item_id}"
-    return f"Not collected for {_diagnosis_year(date_of_diagnosis)} diagnoses: {label} applies {span}."
+    reason = (
+        f"Not collected for {_diagnosis_year(date_of_diagnosis)} diagnoses: "
+        f"{_item_label(item_id, name)} applies {span}"
+    )
+    for equivalents, one, several in (
+        (held_by, "holds it for this year", "hold it for this year"),
+        (replaced_by, "replaces it", "replace it"),
+    ):
+        labels = [
+            _item_label(equivalent, equivalent_name)
+            for equivalent, equivalent_name in equivalents
+            if item_applies_in_year(scoping, equivalent, date_of_diagnosis)
+        ]
+        if labels:
+            reason += f"; {_join_labels(labels)} {one if len(labels) == 1 else several}"
+    return reason + "."
 
 
 def _accepted(pair: str, accepted: Collection[int] | None) -> bool:

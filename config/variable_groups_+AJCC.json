@@ -51,7 +51,12 @@
         { "item_id": 1114, "name": "Mets at Dx-Distant LN" },
         { "item_id": 1115, "name": "Mets at DX-Liver" },
         { "item_id": 1116, "name": "Mets at DX-Lung" },
-        { "item_id": 1117, "name": "Mets at DX-Other" }
+        { "item_id": 1117, "name": "Mets at DX-Other" },
+        { "item_id": 2850, "name": "CS Mets at DX", "replaces": [1112, 1113, 1114, 1115, 1116, 1117] },
+        { "item_id": 2851, "name": "CS Mets at Dx-Bone", "replaces": [1112] },
+        { "item_id": 2852, "name": "CS Mets at Dx-Brain", "replaces": [1113] },
+        { "item_id": 2853, "name": "CS Mets at Dx-Liver", "replaces": [1115] },
+        { "item_id": 2854, "name": "CS Mets at Dx-Lung", "replaces": [1116] }
       ]
     },
     {
@@ -79,7 +84,8 @@
         { "item_id": 670, "name": "RX Hosp--Surg Prim Site 03-2022" },
         { "item_id": 671, "name": "RX Hosp--Surg Prim Site 2023" },
         { "item_id": 3843, "name": "Grade Clinical" },
-        { "item_id": 3844, "name": "Grade Pathological" }
+        { "item_id": 3844, "name": "Grade Pathological" },
+        { "item_id": 440, "name": "Grade", "replaces": [3843, 3844] }
       ],
       "subgroups": [
         {
@@ -117,11 +123,13 @@
       "extract_as_group": false,
       "variables": [
         { "item_id": 764, "name": "Summary Stage 2018" },
+        { "item_id": 759, "name": "SEER Summary Stage 2000", "replaces": [764] },
         { "item_id": 820, "name": "Regional Nodes Positive" },
         { "item_id": 830, "name": "Regional Nodes Examined" },
         { "item_id": 1182, "name": "Lymphovascular Invasion" },
         { "item_id": 3280, "name": "RX Hosp--Palliative Proc" },
-        { "item_id": 756, "name": "Tumor Size Summary" }
+        { "item_id": 756, "name": "Tumor Size Summary" },
+        { "item_id": 2800, "name": "CS Tumor Size", "replaces": [756] }
       ]
     },
     {

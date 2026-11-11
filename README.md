@@ -102,7 +102,10 @@ NAACCR codes.
   with a reason naming both years, for example 3843 for a 2015 diagnosis or 670
   for 2023. It's decided per item, so one group can extract 670 and close 671.
   An unknown year, one before 2004, or an item the table doesn't list leaves
-  the item to be extracted.
+  the item to be extracted. The older items that held the same information
+  (Grade 440, SEER Summary Stage 2000 759, CS Tumor Size 2800 and CS Mets at DX
+  2850–2854) are requested next to their replacements, so each year extracts
+  one of each pair, and the closed item's reason names the other.
 
 The orchestrator checks the file the first time it reads it. The old
 tissue-keyed format and builds without the histology, algorithm or item-year
@@ -150,6 +153,9 @@ order: `["initial", "histology", "dependent"]` in the shipped files, and
 after the initial stage codes Primary Site, and before the dependent groups.
 Each stage waits until every group in the stages before it has finished, even
 ones that found nothing. A stage name that isn't in the list fails at load.
+An older equivalent lists the items it stands in for in its group, for example
+`{ "item_id": 440, "name": "Grade", "replaces": [3843, 3844] }`. They must be
+other items in the same group.
 
 `llm.max_concurrency` caps simultaneous calls to one model at one endpoint,
 across the whole process. The separate `run(max_concurrency=...)` setting limits

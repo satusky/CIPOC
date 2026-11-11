@@ -154,6 +154,22 @@ class VariableValueValidatorTests(unittest.TestCase):
                     ["ABC", "A199", "A991", "B199", "C200", "a200", "A20", "A0200", "Blank", ""],
                 )
 
+    def test_cs_ranges_marked_site_specific_keep_their_range(self):
+        # CS Tumor Size (2800) and CS Mets at DX (2850) declare ranges whose
+        # codes mean different things in each CS schema.
+        self.assert_values(
+            VariableInfo(item_id=2800, length=3, data_type="digits", format="Right justified, zero filled",
+                         allowable_values="000-999 (site-specific)"),
+            ["000", "024", "999"], ["24", "1000", "A24", "000-999"],
+        )
+        self.assert_values(
+            VariableInfo(item_id=2850, length=2, data_type="digits", format="Right justified, zero filled",
+                         allowable_values="00-99 (site-specific)"),
+            ["00", "40", "99"], ["0", "100"],
+        )
+        with self.assertRaisesRegex(ValueError, "metadata for item 1"):
+            self.validator.preflight(VariableInfo(item_id=1, data_type="digits", allowable_values="00-99 (see manual)"))
+
     def test_item_676_known_abbreviation_uses_only_explicit_source_domain(self):
         codes = {code: "Description" for code in ("00", "01", "02", "..", "90", "95", "96", "97", "98", "99")}
         variable = VariableInfo(item_id=676, length=2, data_type="digits",

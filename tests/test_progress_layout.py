@@ -95,6 +95,12 @@ def dashboard_snapshot():
     update(523, stage=Stage.DONE, status="extracted", value="3", confidence="max")
 
     terminal((764, 820, 830, 1182, 3280, 756), "not_found", confidence="low")
+    # A 2026 diagnosis closes the older equivalents as soon as 390 is coded.
+    terminal(
+        (440, 759, 2800, 2850, 2851, 2852, 2853, 2854),
+        "not_applicable",
+        detail="Not collected for 2026 diagnoses.",
+    )
     terminal(
         (832, 3836, 3838, 3839, 3840, 3841, 3842),
         "not_applicable",
@@ -232,8 +238,10 @@ class ProgressLayoutTests(unittest.TestCase):
         self.assertIn("1114", text)
         self.assertIn("validate·2", text)
 
-    def test_24_row_dashboard_keeps_all_top_level_groups_and_active_details(self):
-        rows = build_rows(self.snapshot, 100, 24, now=172.0)
+    def test_a_dashboard_tall_enough_keeps_all_top_level_groups_and_active_details(self):
+        # Metastases holds 11 items since the CS Mets items joined it, so every
+        # header fits beside it from 27 rows; at 24 the later groups scroll.
+        rows = build_rows(self.snapshot, 100, 27, now=172.0)
         text = "\n".join(render_lines(rows))
 
         for group in self.snapshot.groups:
@@ -243,6 +251,14 @@ class ProgressLayoutTests(unittest.TestCase):
         self.assertIn("▾ Metastases", text)
         self.assertIn("1114", text)
         self.assertIn("validate·2", text)
+        self.assertNotIn("below", text)
+
+    def test_a_24_row_dashboard_keeps_the_active_group_and_scrolls_the_rest(self):
+        text = "\n".join(render_lines(build_rows(self.snapshot, 100, 24, now=172.0)))
+
+        self.assertIn("▾ Metastases", text)
+        self.assertIn("validate·2", text)
+        self.assertIn("groups below", text)
 
     def test_final_report_prompt_is_live_layout_only(self):
         snapshot = replace(self.snapshot, finished=True, branches=())

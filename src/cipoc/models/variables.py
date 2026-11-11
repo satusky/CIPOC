@@ -80,6 +80,7 @@ class TargetGroup(VariableGroupInfo):
     gate: list[CorpusGate] | None = Field(default=None, description="Corpus conditions that must all hold for the group to be extracted. None or empty means ungated.")
     applies_to: SiteApplicability | None = Field(default=None, description="Site/histology restriction; None means the group applies to all cases.")
     note_filter: NoteFilter | None = Field(default=None, description="Deterministic note-level hard filter narrowing the group's candidate notes before retrieval; None means no per-note filtering.")
+    replaces: dict[int, list[int]] = Field(default_factory=dict, description="Older equivalents in the group, by item ID, each with the group's items it stands in for in the diagnosis years before they were collected, e.g. Grade (440) for 3843 and 3844. Read from a variable's `replaces` in the config.")
 
     def to_variable_group(self) -> VariableGroupInfo:
         """Project down to the plain extractor/snapshot view, dropping gating fields."""

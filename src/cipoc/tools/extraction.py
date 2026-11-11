@@ -188,6 +188,10 @@ class VariableValueValidator:
         ):
             return None
         tokens = [token.strip() for token in declaration.split(",")]
+        # The CS items, such as CS Tumor Size (2800, "000-999 (site-specific)"),
+        # note that their codes mean different things in each CS schema. The
+        # range before the note is still the domain.
+        tokens = [re.sub(r"\s*\(site-specific\)$", "", token, flags=re.IGNORECASE) for token in tokens]
         # These describe representation, not extra allowable literals. A broad
         # descriptor must never override an accompanying concrete code domain.
         descriptors = {"alphanumeric", "numeric", "digits", "free text", "text"}
