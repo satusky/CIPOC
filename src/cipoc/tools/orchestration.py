@@ -29,6 +29,7 @@ from cipoc.models import (
     ReviewFlagType,
     ScopingDictionary,
     SiteApplicability,
+    SsfEquivalent,
     TargetGroup,
     ValidatedVariableGroupOutput,
     ValidatedVariableOutput,
@@ -40,7 +41,17 @@ from cipoc.models import (
 )
 from cipoc.models.case import TERMINAL_VARIABLE_STATUSES
 from .coding_context import ranges_overlap, site_in_ranges
-from .scoping import BEHAVIOR_ITEM, HISTOLOGY_ITEM, PRIMARY_SITE_ITEM, gross_site_candidates, out_of_year_reason
+from .scoping import (
+    BEHAVIOR_ITEM,
+    HISTOLOGY_ITEM,
+    PRIMARY_SITE_ITEM,
+    gross_site_candidates,
+    item_applies_in_year,
+    out_of_year_reason,
+    ssf_equivalent,
+    ssf_items,
+    ssf_variable,
+)
 
 
 def _concept_present(corpus: NoteCorpusDescriptors, concept: str) -> bool:
@@ -728,6 +739,40 @@ def resolve_leftovers(
     return updates
 
 
+def _equivalent_names(
+    groups: Sequence[TargetGroup],
+) -> tuple[dict[int, str | None], dict[int, list[int]]]:
+    """Every grouped item's name, and each older equivalent's ``replaces``."""
+    names = {variable.item_id: variable.name for group in groups for variable in group.variables}
+    replaces = {older: replaced for group in groups for older, replaced in group.replaces.items()}
+    return names, replaces
+
+
+def _year_reason(
+    scoping: ScopingDictionary,
+    variable: VariableInfo,
+    date_of_diagnosis: str | None,
+    names: Mapping[int, str | None],
+    replaces: Mapping[int, list[int]],
+    **ssf,
+) -> str | None:
+    """``out_of_year_reason`` with the variable's fixed equivalents from the groups."""
+    return out_of_year_reason(
+        scoping, variable.item_id, date_of_diagnosis, variable.name,
+        held_by=[
+            (older, names[older])
+            for older, replaced in replaces.items()
+            if variable.item_id in replaced
+        ],
+        replaced_by=[
+            (newer, names[newer])
+            for newer in replaces.get(variable.item_id, [])
+            if newer in names
+        ],
+        **ssf,
+    )
+
+
 def out_of_year_results(
     groups: Sequence[TargetGroup],
     results: Mapping[int, CaseVariableResult],
@@ -744,35 +789,150 @@ def out_of_year_results(
     structured-data seeds among them, are left alone, and so is everything when
     the year is unknown or there's no site dictionary. Returns only the changed
     results, for the ``variable_results`` reducer.
+
+    In a CS or TNM year, an item some schema holds in a Site-Specific Factor
+    (``ssf_items``) is left PENDING: which SSF depends on the schema, and that
+    needs the site and histology, which a later stage may code. It's settled
+    when its group is planned (``ssf_equivalent_results``).
     """
     if scoping is None:
         return {}
-    names = {variable.item_id: variable.name for group in groups for variable in group.variables}
-    replaces = {older: replaced for group in groups for older, replaced in group.replaces.items()}
+    names, replaces = _equivalent_names(groups)
+    deferred = ssf_items(scoping, date_of_diagnosis)
     closed: dict[int, CaseVariableResult] = {}
     for group in groups:
         for variable in group.variables:
             result = results.get(variable.item_id)
-            if result is None or result.status != VariableStatus.PENDING:
+            if result is None or result.status != VariableStatus.PENDING or variable.item_id in deferred:
                 continue
-            reason = out_of_year_reason(
-                scoping, variable.item_id, date_of_diagnosis, variable.name,
-                held_by=[
-                    (older, names[older])
-                    for older, replaced in replaces.items()
-                    if variable.item_id in replaced
-                ],
-                replaced_by=[
-                    (newer, names[newer])
-                    for newer in replaces.get(variable.item_id, [])
-                    if newer in names
-                ],
-            )
+            reason = _year_reason(scoping, variable, date_of_diagnosis, names, replaces)
             if reason is not None:
                 closed[variable.item_id] = CaseVariableResult(
                     item_id=variable.item_id, status=VariableStatus.NOT_APPLICABLE, reason=reason
                 )
     return closed
+
+
+def with_ssf_equivalents(
+    groups: Sequence[TargetGroup],
+    equivalents: Mapping[int, SsfEquivalent],
+    scoping: ScopingDictionary | None,
+) -> list[TargetGroup]:
+    """The groups with each SSF equivalent added to the group it's extracted with.
+
+    The SSF joins as ``ssf_variable`` gives it, so planning, extraction and
+    stage release treat it as one of the group's variables. The configured
+    groups, and with them the run's inputs, never list it. An SSF the config
+    requests itself stays in its own group.
+    """
+    if not equivalents or scoping is None:
+        return list(groups)
+    configured = {variable.item_id for group in groups for variable in group.variables}
+    added: dict[str | None, list[VariableInfo]] = defaultdict(list)
+    for equivalent in equivalents.values():
+        if equivalent.item_id in configured:
+            continue
+        # The candidates agree on the SSF, so any of them describes it.
+        mapping = scoping.schemas[equivalent.schemas[0]].ssf[equivalent.replaces[0]]
+        added[equivalent.group_id].append(ssf_variable(mapping))
+    return [
+        group.model_copy(update={"variables": [*group.variables, *added[group.group_id]]})
+        if group.group_id in added else group
+        for group in groups
+    ]
+
+
+def ssf_equivalent_results(
+    ready: Sequence[TargetGroup],
+    groups: Sequence[TargetGroup],
+    results: Mapping[int, CaseVariableResult],
+    scoping: ScopingDictionary | None,
+    facts: CaseFacts | None,
+    equivalents: Mapping[int, SsfEquivalent],
+    structured_data: Mapping[int, str] | None = None,
+) -> tuple[dict[int, CaseVariableResult], dict[int, SsfEquivalent]]:
+    """Settle the items ``out_of_year_results`` left for their group's planning.
+
+    For each PENDING item in a ``ready`` group that some schema holds in a CS
+    Site-Specific Factor (``ssf_items``) and the year doesn't collect, by
+    ``ssf_equivalent`` over the case facts:
+
+    * substitute: the item ends NOT_APPLICABLE, its reason naming the SSF with
+      any fixed equivalent, and the SSF is recorded to be extracted with the
+      group (``with_ssf_equivalents``). Its result starts PENDING, or from the
+      caller's structured data, unless it already has one. Two items held in
+      one SSF, like Grade Clinical and Pathological, share it.
+    * disagree: the item ends BLOCKED, the reason saying what each candidate
+      schema holds it in. Nothing is extracted for it.
+    * none: the item ends NOT_APPLICABLE with the plain year reason.
+
+    ``groups`` supplies the items' names and fixed equivalents. Returns the
+    changed results and the new or updated SSF equivalents, each keyed by item.
+    """
+    date_of_diagnosis = facts.date_of_diagnosis if facts else None
+    deferred = ssf_items(scoping, date_of_diagnosis) if scoping is not None else frozenset()
+    if not deferred:
+        return {}, {}
+    names, replaces = _equivalent_names(groups)
+    updates: dict[int, CaseVariableResult] = {}
+    recorded: dict[int, SsfEquivalent] = {}
+    for group in ready:
+        for variable in group.variables:
+            item_id = variable.item_id
+            result = results.get(item_id)
+            if (
+                item_id not in deferred
+                or result is None
+                or result.status != VariableStatus.PENDING
+                or item_applies_in_year(scoping, item_id, date_of_diagnosis)
+            ):
+                continue
+            choice = ssf_equivalent(scoping, item_id, facts)
+            mapping = choice.mapping
+            existing = None
+            if mapping is not None:
+                existing = recorded.get(mapping.item)
+                if existing is None:
+                    existing = equivalents.get(mapping.item)
+            if choice.outcome == "substitute" and existing is not None and existing.name != mapping.name:
+                # Another requested item already holds this SSF number under a
+                # different name, so it can't stand in for both.
+                choice = choice.model_copy(update={
+                    "outcome": "disagree",
+                    "reason": f"{mapping.label} ({mapping.item}) already holds {existing.name}",
+                })
+            if choice.outcome == "substitute":
+                recorded[mapping.item] = (existing or SsfEquivalent(
+                    item_id=mapping.item, label=mapping.label, name=mapping.name,
+                    replaces=[], schemas=choice.schemas, group_id=group.group_id,
+                )).model_copy(update={"replaces": [*(existing.replaces if existing else []), item_id]})
+                updates[item_id] = CaseVariableResult(
+                    item_id=item_id, status=VariableStatus.NOT_APPLICABLE,
+                    reason=_year_reason(scoping, variable, date_of_diagnosis, names, replaces, ssf=mapping),
+                )
+                if mapping.item not in results and mapping.item not in updates:
+                    value = (structured_data or {}).get(mapping.item)
+                    updates[mapping.item] = (
+                        CaseVariableResult(item_id=mapping.item)
+                        if value is None else
+                        CaseVariableResult(
+                            item_id=mapping.item, status=VariableStatus.STRUCTURED_DATA, value=str(value)
+                        )
+                    )
+            elif choice.outcome == "disagree":
+                updates[item_id] = CaseVariableResult(
+                    item_id=item_id, status=VariableStatus.BLOCKED,
+                    reason=_year_reason(
+                        scoping, variable, date_of_diagnosis, names, replaces,
+                        ssf_disagreement=choice.reason,
+                    ),
+                )
+            else:
+                updates[item_id] = CaseVariableResult(
+                    item_id=item_id, status=VariableStatus.NOT_APPLICABLE,
+                    reason=_year_reason(scoping, variable, date_of_diagnosis, names, replaces),
+                )
+    return updates, recorded
 
 
 def _result_from_extraction(extraction: ValidatedVariableOutput) -> CaseVariableResult:

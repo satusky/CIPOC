@@ -106,6 +106,17 @@ NAACCR codes.
   (Grade 440, SEER Summary Stage 2000 759, CS Tumor Size 2800 and CS Mets at DX
   2850–2854) are requested next to their replacements, so each year extracts
   one of each pair, and the closed item's reason names the other.
+- **Site-Specific Factors:** before 2018, CS and TNM held FIGO Stage, Gleason
+  and some grades in a Site-Specific Factor (SSF) whose number depends on the
+  schema, so 2864 is FIGO Stage for vulva and Gleason Score for prostate. In
+  those years these items wait until their group is planned, once site and
+  histology are coded. If every candidate schema holds the item in the same
+  SSF, that SSF is extracted under the schema's own name, notes and codes, and
+  the item's reason names it. Codes CS kept only for converted data aren't
+  offered. The SSF's result has its own item number, and the case lists it in
+  `ssf_equivalents`. It isn't one of the run's requested items. If the
+  candidate schemas hold the item differently, it ends BLOCKED, with a reason
+  saying what each holds it in.
 
 The orchestrator checks the file the first time it reads it. The old
 tissue-keyed format and builds without the histology, algorithm or item-year

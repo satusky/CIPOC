@@ -438,6 +438,25 @@ def build_variable_group(
     return VariableGroupInfo(variables=item_info)
 
 
+def overlay_schema_variable(variable: VariableInfo, schema_variable: VariableInfo) -> VariableInfo:
+    """The NAACCR ``variable`` under a staging schema's own name, description and
+    codes, as ``ssf_variable`` gives them for a CS Site-Specific Factor.
+
+    The NAACCR entry keeps its type, length, format and allowable values. Its
+    coding instructions are dropped: for an SSF they only say the meaning differs
+    by schema, which the schema's own description replaces. The result is
+    checked like any other variable's metadata.
+    """
+    overlaid = variable.model_copy(update={
+        "name": schema_variable.name,
+        "description": schema_variable.description,
+        "valid_codes": schema_variable.valid_codes,
+        "coding_instructions": None,
+    })
+    VariableValueValidator().preflight(overlaid)
+    return overlaid
+
+
 # What a scoped Histology (522) shows in prompts in place of its code list. The
 # full list alone is about 33k tokens; the family and code steps offer the part
 # that fits the case.

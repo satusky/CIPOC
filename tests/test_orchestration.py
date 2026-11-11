@@ -14,11 +14,13 @@ from cipoc.models import (
     CaseFacts,
     CaseVariableResult,
     ConfidenceLevel,
+    ExtractionStop,
     HistologySelection,
     OrchestratorRunError,
     OrchestratorRunResult,
     ProcessedClinicalNote,
     ReviewFlagType,
+    SsfEquivalent,
     TargetGroup,
     TextSpan,
     ValidatedVariableOutput,
@@ -26,7 +28,7 @@ from cipoc.models import (
     VariableOutput,
     VariableStatus,
 )
-from cipoc.tools import build_corpus_descriptors, build_report, candidate_gross_sites, derive_case_facts, load_scoping_dictionary, load_variable_groups, out_of_year_results, site_applies
+from cipoc.tools import VariableValueValidator, build_corpus_descriptors, build_report, candidate_gross_sites, derive_case_facts, load_scoping_dictionary, load_variable_groups, out_of_year_results, site_applies, ssf_equivalent_results, ssf_offered_codes, ssf_variable, stop_pending_results, with_ssf_equivalents
 from cipoc.utils.progress.events import normalize
 
 from tests.fake_orchestrator import (
@@ -43,6 +45,11 @@ from tests.fake_orchestrator import (
 
 
 VARIABLE_GROUPS = Path(__file__).resolve().parents[1] / "config" / "variable_groups.json"
+# A coded lung adenocarcinoma. The fake extractor otherwise codes every item
+# "1", which leaves the site unknown, so every CS schema is a candidate and the
+# items CS held in a Site-Specific Factor end BLOCKED. CS lung holds grade in
+# no SSF, so its grade items show the fixed equivalents alone.
+LUNG = {400: Outcome(value="C341"), 522: Outcome(value="8140"), 523: Outcome(value="3")}
 BASE_DICTIONARY = (
     Path(__file__).resolve().parents[1]
     / "documents"
@@ -415,9 +422,11 @@ class OutOfYearResultsTests(unittest.TestCase):
 
     def test_each_item_in_a_group_is_decided_on_its_own(self):
         closed = self.closed("20150610")
-        self.assertEqual(sorted(closed), [671, 3843, 3844])
+        # CS held grade in a Site-Specific Factor for some schemas, so 3843 and
+        # 3844 wait for their group's planning (ssf_equivalent_results).
+        self.assertEqual(sorted(closed), [671])
         self.assertEqual(
-            closed[3843].reason, "Not collected for 2015 diagnoses: Grade Clinical (3843) applies from 2018."
+            closed[671].reason, "Not collected for 2015 diagnoses: RX Hosp--Surg Prim Site 2023 (671) applies from 2023."
         )
         self.assertTrue(all(result.status == VariableStatus.NOT_APPLICABLE for result in closed.values()))
 
@@ -438,20 +447,23 @@ class OutOfYearResultsTests(unittest.TestCase):
 
     def test_terminal_results_are_left_alone(self):
         results = {
-            390: CaseVariableResult(item_id=390, status=VariableStatus.STRUCTURED_DATA, value="20150610"),
-            670: CaseVariableResult(item_id=670),
+            390: CaseVariableResult(item_id=390, status=VariableStatus.STRUCTURED_DATA, value="20230601"),
+            670: CaseVariableResult(item_id=670, status=VariableStatus.STRUCTURED_DATA, value="00"),
             671: CaseVariableResult(item_id=671, status=VariableStatus.NOT_APPLICABLE, reason="Not reportable."),
             3843: CaseVariableResult(item_id=3843, status=VariableStatus.STRUCTURED_DATA, value="2"),
             3844: CaseVariableResult(item_id=3844),
         }
-        self.assertEqual(sorted(self.closed("20150610", results)), [3844])
+        # 670 ends in 2022, but a value already supplied is kept.
+        self.assertEqual(self.closed("20230601", results), {})
+        results[670] = CaseVariableResult(item_id=670)
+        self.assertEqual(sorted(self.closed("20230601", results)), [670])
 
 
 class ItemYearsRunTests(unittest.TestCase):
     """Once 390 is coded, the items its year doesn't collect are never extracted."""
 
     def run_case(self, outcomes, structured_data=None, groups=None):
-        agent = build_fake_orchestrator(Script(outcomes=outcomes))
+        agent = build_fake_orchestrator(Script(outcomes={**LUNG, **outcomes}))
         if groups is not None:
             agent._target_variables = groups
             agent._target_group_hierarchy = []
@@ -517,10 +529,13 @@ class ItemYearsRunTests(unittest.TestCase):
         self.assertTrue({390, 3843, 3844}.isdisjoint(extracted))
 
     def test_a_stage_left_with_nothing_to_extract_releases_the_next(self):
+        # Neither item has an equivalent, so both close as soon as 390 is coded.
+        # (Grade would wait for its group: CS breast held it in an SSF.)
         groups = [
             TargetGroup(group_id="initial", stage="initial", variables=[VariableInfo(item_id=390)]),
-            TargetGroup(group_id="grade", stage="histology", variables=[
-                VariableInfo(item_id=3843, name="Grade Clinical"), VariableInfo(item_id=3844, name="Grade Pathological"),
+            TargetGroup(group_id="dates", stage="histology", variables=[
+                VariableInfo(item_id=682, name="Date Regional Lymph Node Dissection"),
+                VariableInfo(item_id=832, name="Date of Sentinel Lymph Node Biopsy"),
             ]),
             TargetGroup(group_id="nodes", stage="dependent", variables=[VariableInfo(item_id=820)]),
         ]
@@ -528,8 +543,8 @@ class ItemYearsRunTests(unittest.TestCase):
 
         self.assertEqual(
             {item_id: result.status for item_id, result in results.items()},
-            {390: VariableStatus.EXTRACTED, 3843: VariableStatus.NOT_APPLICABLE,
-             3844: VariableStatus.NOT_APPLICABLE, 820: VariableStatus.EXTRACTED},
+            {390: VariableStatus.EXTRACTED, 682: VariableStatus.NOT_APPLICABLE,
+             832: VariableStatus.NOT_APPLICABLE, 820: VariableStatus.EXTRACTED},
         )
         self.assertEqual(extracted, {390, 820})
 
@@ -613,8 +628,18 @@ class OlderEquivalentReasonTests(unittest.TestCase):
 
     def test_a_newer_item_names_the_older_one_that_holds_it(self):
         reasons = self.reasons("20150610")
+        # Grade waits for its group's planning, since CS held it in an SSF for
+        # some schemas. CS lung didn't, so only Grade (440) holds it.
+        self.assertNotIn(3844, reasons)
+        lung = CaseFacts(primary_site="C341", histology="8140", behavior="3", date_of_diagnosis="20150610")
+        results = {
+            variable.item_id: CaseVariableResult(item_id=variable.item_id)
+            for group in self.groups for variable in group.variables
+        }
+        settled, equivalents = ssf_equivalent_results(self.groups, self.groups, results, self.scoping, lung, {})
+        self.assertEqual(equivalents, {})
         self.assertEqual(
-            reasons[3844],
+            settled[3844].reason,
             "Not collected for 2015 diagnoses: Grade Pathological (3844) applies from 2018; "
             "Grade (440) holds it for this year.",
         )
@@ -684,7 +709,7 @@ class OlderEquivalentRunTests(unittest.TestCase):
     """End to end on the default config: each year extracts one of each pair."""
 
     def run_case(self, date):
-        agent = build_fake_orchestrator(Script(outcomes={390: Outcome(value=date)}))
+        agent = build_fake_orchestrator(Script(outcomes={**LUNG, 390: Outcome(value=date)}))
         agent._site_dictionary = load_scoping_dictionary(SCOPING_DICTIONARY)
         with patch.object(agent._extractor, "run", wraps=agent._extractor.run) as extract:
             result = agent.run([note.model_dump(mode="json") for note in load_notes()], progress=False)
@@ -736,6 +761,308 @@ class OlderEquivalentRunTests(unittest.TestCase):
         both = {3843, 3844, 440, 764, 759, 756, 2800, *range(1112, 1118), *range(2850, 2855)}
         self.assertTrue(both <= extracted)
         self.assertEqual({results[item_id].status for item_id in both}, {VariableStatus.EXTRACTED})
+
+
+def _cases(primary_site, histology, date_of_diagnosis):
+    """Fake-extractor outcomes coding the case's site, histology and year."""
+    return {
+        390: Outcome(value=date_of_diagnosis), 400: Outcome(value=primary_site),
+        522: Outcome(value=histology), 523: Outcome(value="3"),
+    }
+
+
+class SsfEquivalentResultsTests(unittest.TestCase):
+    """At planning, each item CS held in an SSF is replaced, blocked or closed."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.scoping = load_scoping_dictionary(SCOPING_DICTIONARY)
+        cls.groups = load_variable_groups(VARIABLE_GROUPS)
+        cls.by_id = {group.group_id: group for group in cls.groups}
+
+    def settle(self, facts, group_ids=("site_specific_codes",), results=None, structured_data=None, equivalents=None):
+        if results is None:
+            results = {
+                variable.item_id: CaseVariableResult(item_id=variable.item_id)
+                for group in self.groups for variable in group.variables
+            }
+        ready = [self.by_id[group_id] for group_id in group_ids]
+        return ssf_equivalent_results(
+            ready, self.groups, results, self.scoping, facts, equivalents or {}, structured_data,
+        )
+
+    @staticmethod
+    def facts(primary_site, histology, date_of_diagnosis="20120615"):
+        return CaseFacts(primary_site=primary_site, histology=histology, behavior="3", date_of_diagnosis=date_of_diagnosis)
+
+    def test_both_grade_items_share_the_breast_grade_ssf(self):
+        settled, equivalents = self.settle(self.facts("C504", "8500"))
+
+        self.assertEqual(sorted(settled), [2861, 3843, 3844])
+        self.assertEqual(settled[2861], CaseVariableResult(item_id=2861))
+        for item_id, name in ((3843, "Grade Clinical"), (3844, "Grade Pathological")):
+            self.assertEqual(settled[item_id].status, VariableStatus.NOT_APPLICABLE)
+            self.assertEqual(
+                settled[item_id].reason,
+                f"Not collected for 2012 diagnoses: {name} ({item_id}) applies from 2018; Grade (440) and "
+                "CS SSF7 (2861, Nottingham or Bloom-Richardson (BR) Score/Grade) hold it for this year.",
+            )
+        self.assertEqual(equivalents, {2861: SsfEquivalent(
+            item_id=2861, label="CS SSF7", name="Nottingham or Bloom-Richardson (BR) Score/Grade",
+            replaces=[3843, 3844], schemas=["cs/breast"], group_id="site_specific_codes",
+        )})
+
+    def test_disagreeing_schemas_block_the_item(self):
+        settled, equivalents = self.settle(self.facts("C481", "8441"))
+
+        self.assertEqual(equivalents, {})
+        self.assertEqual(sorted(settled), [3843, 3844])
+        result = settled[3843]
+        self.assertEqual((result.status, result.blocking_item_ids), (VariableStatus.BLOCKED, []))
+        self.assertEqual(
+            result.reason,
+            "Not collected for 2012 diagnoses: Grade Clinical (3843) applies from 2018; Grade (440) holds it "
+            "for this year; the candidate schemas disagree on the CS Site-Specific Factor that holds it: "
+            "cs/peritoneum holds it in CS SSF1 (2880, Grade for Sarcomas); cs/peritoneum_female_gen holds "
+            "no SSF for it.",
+        )
+
+    def test_a_schema_without_an_ssf_closes_the_item_by_year(self):
+        settled, equivalents = self.settle(self.facts("C569", "8441", "20080615"), group_ids=("ovary_only",))
+
+        self.assertEqual(equivalents, {})
+        self.assertEqual(settled, {3836: CaseVariableResult(
+            item_id=3836, status=VariableStatus.NOT_APPLICABLE,
+            reason="Not collected for 2008 diagnoses: FIGO Stage (3836) applies from 2018.",
+        )})
+
+    def test_only_ready_groups_are_settled(self):
+        settled, _ = self.settle(self.facts("C569", "8441"), group_ids=("ovary_only",))
+        self.assertEqual(sorted(settled), [2890, 3836])
+        self.assertEqual(self.settle(self.facts("C569", "8441"), group_ids=("other",)), ({}, {}))
+
+    def test_an_eod_year_or_no_site_dictionary_settles_nothing(self):
+        self.assertEqual(self.settle(self.facts("C504", "8500", "20200615")), ({}, {}))
+        results = {3843: CaseVariableResult(item_id=3843)}
+        self.assertEqual(
+            ssf_equivalent_results(self.groups, self.groups, results, None, self.facts("C504", "8500"), {}),
+            ({}, {}),
+        )
+
+    def test_the_ssf_starts_from_structured_data_or_an_existing_result(self):
+        settled, _ = self.settle(self.facts("C504", "8500"), structured_data={2861: "050"})
+        self.assertEqual(
+            settled[2861], CaseVariableResult(item_id=2861, status=VariableStatus.STRUCTURED_DATA, value="050")
+        )
+        results = {
+            3843: CaseVariableResult(item_id=3843),
+            2861: CaseVariableResult(item_id=2861, status=VariableStatus.STRUCTURED_DATA, value="070"),
+        }
+        settled, equivalents = self.settle(self.facts("C504", "8500"), results=results)
+        self.assertEqual(sorted(settled), [3843])
+        self.assertEqual(equivalents[2861].replaces, [3843])
+
+    def test_the_ssf_joins_its_group_for_planning(self):
+        _, equivalents = self.settle(self.facts("C504", "8500"))
+        planned = with_ssf_equivalents(self.groups, equivalents, self.scoping)
+
+        grade = {group.group_id: group for group in planned}["site_specific_codes"]
+        self.assertEqual([variable.item_id for variable in grade.variables], [670, 671, 3843, 3844, 440, 2861])
+        self.assertEqual(grade.variables[-1], ssf_variable(self.scoping.schemas["cs/breast"].ssf[3843]))
+        others = [group for group in planned if group.group_id != "site_specific_codes"]
+        self.assertEqual(others, [group for group in self.groups if group.group_id != "site_specific_codes"])
+        # The configured groups are never changed.
+        self.assertNotIn(2861, [v.item_id for v in self.by_id["site_specific_codes"].variables])
+        self.assertEqual(with_ssf_equivalents(self.groups, {}, self.scoping), self.groups)
+        self.assertEqual(with_ssf_equivalents(self.groups, equivalents, None), self.groups)
+
+    def test_an_ssf_the_config_requests_stays_in_its_own_group(self):
+        requested = TargetGroup(group_id="ssfs", variables=[VariableInfo(item_id=2861, name="CS SSF7")])
+        _, equivalents = self.settle(self.facts("C504", "8500"))
+        planned = with_ssf_equivalents([*self.groups, requested], equivalents, self.scoping)
+        self.assertEqual(
+            [variable.item_id for variable in planned[[g.group_id for g in planned].index("site_specific_codes")].variables],
+            [670, 671, 3843, 3844, 440],
+        )
+
+    def test_a_reportability_stop_closes_a_pending_ssf(self):
+        results = {
+            3836: CaseVariableResult(item_id=3836, status=VariableStatus.NOT_APPLICABLE, reason="Replaced."),
+            2890: CaseVariableResult(item_id=2890),
+        }
+        self.assertEqual(sorted(stop_pending_results(results, ExtractionStop.NOT_REPORTABLE)), [2890])
+
+
+class SsfScopeTests(unittest.TestCase):
+    """A scoped SSF keeps its schema's name, notes and codes, with the NAACCR format."""
+
+    SSF_ENTRY = {
+        "Data Item Name": "CS Site-Specific Factor {n}", "Length": "3", "Data Type": "digits",
+        "Allowable Values": "000-999 (site-specific)", "Format": "Right justified, zero filled",
+        "Instructions for Coding": "The information recorded in CS Site-Specific Factor {n} differs for each anatomic site.",
+        "Code Descriptions": {},
+    }
+
+    def setUp(self):
+        directory = TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        base_path = Path(directory.name) / "base.json"
+        entries = {
+            "400": {"item_name": "Primary Site", "item_length": 4, "allowed_codes": primary_site_codes()},
+            "522": {"item_name": "Histologic Type ICD-O-3", "item_length": 4, "allowed_codes": histology_pair_codes()},
+        }
+        for item_id, n in ((2862, 8), (2890, 2)):
+            entries[str(item_id)] = {
+                key: value.format(n=n) if isinstance(value, str) else value for key, value in self.SSF_ENTRY.items()
+            }
+        base_path.write_text(json.dumps(entries))
+        self.agent = object.__new__(OrchestratorAgent)
+        self.agent._data_dictionary_path = base_path
+        self.agent._site_data_dictionary_path = SCOPING_DICTIONARY
+        self.scoping = load_scoping_dictionary(SCOPING_DICTIONARY)
+
+    def scoped(self, schema, item_id):
+        mapping = self.scoping.schemas[schema].ssf[item_id]
+        group = TargetGroup(group_id="ssf", variables=[ssf_variable(mapping)])
+        facts = CaseFacts(date_of_diagnosis="20120615")
+        return mapping, self.agent._scope_group(group, facts).variables[0]
+
+    def validate(self, variable, value):
+        candidate = VariableOutput(
+            item_id=variable.item_id, value=value, explanation="Synthetic.", most_important_note=1,
+            spans=[], presence_confidence=ConfidenceLevel.HIGH,
+        )
+        return VariableValueValidator().validate(variable, candidate)
+
+    def test_the_schemas_name_and_codes_replace_the_generic_ssf(self):
+        mapping, variable = self.scoped("cs/ovary", 3836)
+
+        self.assertEqual((variable.item_id, variable.name), (2890, "FIGO Stage"))
+        self.assertEqual(variable.description, mapping.definition.strip())
+        self.assertEqual(variable.valid_codes, ssf_offered_codes(mapping))
+        self.assertEqual((variable.length, variable.format), (3, "Right justified, zero filled"))
+        self.assertIsNone(variable.coding_instructions)
+        self.assertEqual(self.validate(variable, "310"), [])
+        self.assertEqual(self.validate(variable, "888"), ["Value is not one of the variable's allowable codes."])
+
+    def test_a_code_range_accepts_the_values_inside_it(self):
+        _, variable = self.scoped("cs/prostate", 3840)
+
+        self.assertEqual(variable.name, "Gleason's Score on Needle Core Biopsy/Transurethral Resection of Prostate (TURP)")
+        self.assertIn("002-010", variable.valid_codes)
+        for value in ("002", "007", "010", "999"):
+            with self.subTest(value=value):
+                self.assertEqual(self.validate(variable, value), [])
+        for value in ("011", "001"):
+            with self.subTest(value=value):
+                self.assertEqual(self.validate(variable, value), ["Value is not one of the variable's allowable codes."])
+
+
+class SsfRunTests(unittest.TestCase):
+    """End to end on the default config: an SSF stands in for the items CS held in one."""
+
+    def run_case(self, outcomes, structured_data=None):
+        agent = build_fake_orchestrator(Script(outcomes=outcomes))
+        agent._site_dictionary = load_scoping_dictionary(SCOPING_DICTIONARY)
+        with patch.object(agent._extractor, "run", wraps=agent._extractor.run) as extract:
+            result = agent.run(
+                [note.model_dump(mode="json") for note in load_notes()],
+                structured_data=structured_data, progress=False,
+            )
+        sent = [
+            variable
+            for call in extract.call_args_list
+            for variable in call.args[0].requested_variables.variables
+        ]
+        return result, sent
+
+    def test_a_2012_ovary_case_extracts_figo_stage_in_ssf2(self):
+        result, sent = self.run_case(_cases("C569", "8441", "20120615"))
+        results = result.case.variable_results
+
+        self.assertEqual(results[3836].status, VariableStatus.NOT_APPLICABLE)
+        self.assertEqual(
+            results[3836].reason,
+            "Not collected for 2012 diagnoses: FIGO Stage (3836) applies from 2018; "
+            "CS SSF2 (2890, FIGO Stage) holds it for this year.",
+        )
+        self.assertEqual(results[2890].status, VariableStatus.EXTRACTED)
+        offered = [variable for variable in sent if variable.item_id == 2890]
+        self.assertEqual(len(offered), 1)
+        cs_ovary = load_scoping_dictionary(SCOPING_DICTIONARY).schemas["cs/ovary"].ssf[3836]
+        self.assertEqual((offered[0].name, offered[0].valid_codes), ("FIGO Stage", ssf_offered_codes(cs_ovary)))
+        self.assertNotIn(3836, [variable.item_id for variable in sent])
+        self.assertEqual(result.case.ssf_equivalents, {2890: SsfEquivalent(
+            item_id=2890, label="CS SSF2", name="FIGO Stage", replaces=[3836],
+            schemas=["cs/ovary"], group_id="ovary_only",
+        )})
+        self.assertEqual(result.case.note_selection["group:ovary_only"].requested_item_ids, [2890])
+        # It wasn't requested, so the run's inputs don't list it.
+        self.assertNotIn(2890, [v.item_id for group in result.inputs.target_variables for v in group.variables])
+
+    def test_a_2012_breast_case_extracts_grade_once_in_ssf7(self):
+        result, sent = self.run_case(_cases("C504", "8500", "20120615"))
+        results = result.case.variable_results
+
+        for item_id in (3843, 3844):
+            self.assertEqual(results[item_id].status, VariableStatus.NOT_APPLICABLE)
+            self.assertIn("Grade (440) and CS SSF7 (2861, Nottingham", results[item_id].reason)
+        self.assertEqual([variable.item_id for variable in sent].count(2861), 1)
+        self.assertEqual((results[2861].status, results[440].status), (VariableStatus.EXTRACTED,) * 2)
+        self.assertEqual(result.case.ssf_equivalents[2861].replaces, [3843, 3844])
+
+    def test_a_2012_peritoneum_case_blocks_grade(self):
+        result, sent = self.run_case(_cases("C481", "8441", "20120615"))
+        results = result.case.variable_results
+
+        for item_id in (3843, 3844):
+            self.assertEqual(results[item_id].status, VariableStatus.BLOCKED)
+            self.assertIn("cs/peritoneum_female_gen holds no SSF for it", results[item_id].reason)
+            self.assertEqual(results[item_id].blocking_item_ids, [])
+        self.assertEqual(result.case.ssf_equivalents, {})
+        self.assertTrue({2880, 3843, 3844}.isdisjoint(variable.item_id for variable in sent))
+        self.assertEqual(results[440].status, VariableStatus.EXTRACTED)
+
+    def test_a_structured_ssf_is_used_and_not_extracted(self):
+        result, sent = self.run_case(_cases("C569", "8441", "20120615"), structured_data={2890: "310"})
+
+        self.assertEqual(
+            (result.case.variable_results[2890].status, result.case.variable_results[2890].value),
+            (VariableStatus.STRUCTURED_DATA, "310"),
+        )
+        self.assertNotIn(2890, [variable.item_id for variable in sent])
+        self.assertIn("CS SSF2 (2890, FIGO Stage)", result.case.variable_results[3836].reason)
+
+    def test_an_unknown_year_substitutes_nothing(self):
+        result, sent = self.run_case(_cases("C569", "8441", None))
+
+        self.assertEqual(result.case.ssf_equivalents, {})
+        self.assertEqual(result.case.variable_results[3836].status, VariableStatus.EXTRACTED)
+        self.assertNotIn(2890, result.case.variable_results)
+
+    def test_a_pending_ssf_keeps_the_run_open(self):
+        agent = build_fake_orchestrator()
+        results = {
+            3836: CaseVariableResult(item_id=3836, status=VariableStatus.NOT_APPLICABLE, reason="Replaced."),
+            2890: CaseVariableResult(item_id=2890),
+        }
+        state = CaseState(variable_results=results)
+        self.assertEqual(state.outstanding_item_ids, {2890})
+        self.assertEqual(agent.route_from_check(state), "plan_extraction")
+        done = CaseState(variable_results={**results, 2890: CaseVariableResult(
+            item_id=2890, status=VariableStatus.NOT_APPLICABLE, reason="Not reportable.",
+        )})
+        self.assertEqual(agent.route_from_check(done), "finalize_case")
+
+    def test_a_run_with_an_ssf_result_saves_and_reloads(self):
+        result, _ = self.run_case(_cases("C569", "8441", "20120615"))
+
+        restored = OrchestratorRunResult.model_validate_json(result.model_dump_json())
+
+        self.assertEqual(restored.case, result.case)
+        self.assertEqual(restored.inputs, result.inputs)
+        self.assertEqual(restored.case.variable_results[2890].status, VariableStatus.EXTRACTED)
+        self.assertEqual(restored.case.ssf_equivalents[2890].replaces, [3836])
 
 
 class BuildReportTests(unittest.TestCase):

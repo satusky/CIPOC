@@ -1002,6 +1002,91 @@
             "8": "Not Applicable",
             "9": "Unknown/Indeterminate/not mentioned in path report"
           }
+        },
+        "2800": {
+          "source": "cs",
+          "table": "size_aab",
+          "codes": {
+            "000": "No mass/tumor found",
+            "001-988": "001 - 988 millimeters (mm) \n(Code exact size in mm)",
+            "989": "989 mm or larger",
+            "990": "Microinvasion\nMicroscopic focus or foci only and no size given \nDescribed as \"less than 1 mm\"\n\nStated as T1mi  with no other information on tumor size",
+            "991": "Described as \"less than 1 centimeter (cm)\"\n\nStated as T1b  with no other information on tumor size",
+            "992": "Described as \"less than 2 cm,\" or \"greater than 1 cm,\" or \"between 1 cm and 2 cm\"\n\nStated as T1 [NOS] or T1c [NOS] with no other information on tumor size",
+            "993": "Described as \"less than 3 cm,\" or \"greater than 2 cm,\" or \"between 2 cm and 3 cm\"",
+            "994": "Described as \"less than 4 cm,\" or \"greater than 3 cm,\" or \"between 3 cm and 4 cm\"",
+            "995": "Described as \"less than 5 cm,\" or \"greater than 4 cm,\" or \"between 4 cm and 5 cm\"\n\nStated as T2 with no other information on tumor size",
+            "996": "Mammographic/xerographic diagnosis only, no size given; clinically not palpable",
+            "997": "Paget disease of nipple with no demonstrable tumor",
+            "998": "Diffuse",
+            "999": "Unknown; size not stated\nSize of tumor cannot be assessed\nNot documented in patient record"
+          }
+        },
+        "2850": {
+          "source": "cs",
+          "table": "mets_hau",
+          "codes": {
+            "00": "No distant metastasis",
+            "05": "No clinical or radiographic evidence of distant metastasis, but deposits of molecularly or  microscopically  detected tumor cells in circulating blood, bone marrow or other non-regional nodal tissue that are 0.2 millimeters (mm)  or less in a patient without symptoms or signs of metastasis",
+            "07": "Stated as M0(i+) with no other information on distant metastasis",
+            "10": "Distant lymph node(s):\n    Cervical, NOS\n    Contralateral/bilateral axillary and/or internal mammary\n    Other than above\n\nDistant lymph node(s), NOS",
+            "40": "Distant metastasis except distant lymph node(s) (code 10)\nCarcinomatosis",
+            "42": "Further contiguous extension:\n    Skin over:\n        Axilla\n        Contralateral (opposite) breast\n        Sternum\n        Upper abdomen",
+            "44": "Metastasis:\n    Adrenal (suprarenal) gland\n    Bone, other than adjacent rib\n    Contralateral (opposite) breast - if stated as metastatic\n    Lung\n    Ovary\n    Satellite nodule(s) in skin other than primary breast",
+            "50": " (40 - 44) + 10",
+            "60": "Distant metastasis, NOS\n\nStated as M1 with no other information on distant metastasis",
+            "99": "Unknown; distant metastasis not stated\nDistant metastasis cannot be assessed\nNot documented in patient record"
+          }
+        }
+      },
+      "ssf": {
+        "3843": {
+          "item": 2861,
+          "label": "CS SSF7",
+          "name": "Nottingham or Bloom-Richardson (BR) Score/Grade",
+          "years": "2010-2015",
+          "source": "cs",
+          "table": "ssf7_saa",
+          "definition": "**Note 1**:  AJCC recommends the Nottingham combined histologic grade (Elston-Ellis modification of the Scarff-Bloom-Richardson grading system).  Terms seen on pathology reports may include: Bloom-Richardson (BR), modified Bloom-Richardson, BR, BR grading, Scarff-Bloom-Richardson, SBR grading, , Elston-Ellis modification of Bloom-Richardson score, Nottingham modification of Bloom-Richardson score, Nottingham modification of Scarff-Bloom-Richardson, Nottingham-Tenovus grade, or Nottingham grade.\n\n**Note 2**:  Code the highest score prior to neoadjuvant treatment.\n\n**Note 3**:  Code the tumor grade using the following priority order: a). BR scores 3-9; b). BR grade (low, intermediate, high).\n\n**Note 4**:  BR score may be expressed as a range, 3-9.  The score is based on three morphologic features of \"invasive no-special-type\" breast cancers (degree of tubule formation/histologic grade, mitotic activity, nuclear pleomorphism/nuclear grade of tumor cells).  If a report describes any of the factors with words (low, intermediate, high) rather than numbers, do not attempt to translate these words into a score or number; use codes 110-130.\n\n**Note 5**:  If only a grade of 1 through 4 is given with no information on the score and it is unclear if it is a Nottingham or BR Grade, code 999.\n\n**Note 6**:  Code the highest score prior to neoadjuvant treatment if multiple scores are reported.  For examples, different scores may be reported on multiple pathology reports for the same primary cancer; different scores may be reported for multiple tumors assigned to the same primary cancer.",
+          "codes": {
+            "030": "Score of 3",
+            "040": "Score of 4",
+            "050": "Score of 5",
+            "060": "Score of 6",
+            "070": "Score of 7",
+            "080": "Score of 8",
+            "090": "Score of 9",
+            "110": "Low Grade, Bloom-Richardson (BR) grade 1, score not given",
+            "120": "Medium (Intermediate) Grade, BR grade 2, score not given",
+            "130": "High Grade, BR grade 3, score not given",
+            "988": "Not applicable: Information not collected for this case\n(If this information is required by your standard setter, use of code 988 may result in an edit error.)",
+            "998": "No histologic examination of primary site",
+            "999": "Neither BR grade nor BR score given\nUnknown or no information\nNot documented in patient record"
+          }
+        },
+        "3844": {
+          "item": 2861,
+          "label": "CS SSF7",
+          "name": "Nottingham or Bloom-Richardson (BR) Score/Grade",
+          "years": "2010-2015",
+          "source": "cs",
+          "table": "ssf7_saa",
+          "definition": "**Note 1**:  AJCC recommends the Nottingham combined histologic grade (Elston-Ellis modification of the Scarff-Bloom-Richardson grading system).  Terms seen on pathology reports may include: Bloom-Richardson (BR), modified Bloom-Richardson, BR, BR grading, Scarff-Bloom-Richardson, SBR grading, , Elston-Ellis modification of Bloom-Richardson score, Nottingham modification of Bloom-Richardson score, Nottingham modification of Scarff-Bloom-Richardson, Nottingham-Tenovus grade, or Nottingham grade.\n\n**Note 2**:  Code the highest score prior to neoadjuvant treatment.\n\n**Note 3**:  Code the tumor grade using the following priority order: a). BR scores 3-9; b). BR grade (low, intermediate, high).\n\n**Note 4**:  BR score may be expressed as a range, 3-9.  The score is based on three morphologic features of \"invasive no-special-type\" breast cancers (degree of tubule formation/histologic grade, mitotic activity, nuclear pleomorphism/nuclear grade of tumor cells).  If a report describes any of the factors with words (low, intermediate, high) rather than numbers, do not attempt to translate these words into a score or number; use codes 110-130.\n\n**Note 5**:  If only a grade of 1 through 4 is given with no information on the score and it is unclear if it is a Nottingham or BR Grade, code 999.\n\n**Note 6**:  Code the highest score prior to neoadjuvant treatment if multiple scores are reported.  For examples, different scores may be reported on multiple pathology reports for the same primary cancer; different scores may be reported for multiple tumors assigned to the same primary cancer.",
+          "codes": {
+            "030": "Score of 3",
+            "040": "Score of 4",
+            "050": "Score of 5",
+            "060": "Score of 6",
+            "070": "Score of 7",
+            "080": "Score of 8",
+            "090": "Score of 9",
+            "110": "Low Grade, Bloom-Richardson (BR) grade 1, score not given",
+            "120": "Medium (Intermediate) Grade, BR grade 2, score not given",
+            "130": "High Grade, BR grade 3, score not given",
+            "988": "Not applicable: Information not collected for this case\n(If this information is required by your standard setter, use of code 988 may result in an edit error.)",
+            "998": "No histologic examination of primary site",
+            "999": "Neither BR grade nor BR score given\nUnknown or no information\nNot documented in patient record"
+          }
         }
       }
     },
@@ -1049,6 +1134,313 @@
             "1": "Lymph-vascular Invasion Present/Identified",
             "8": "Not Applicable",
             "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        },
+        "2800": {
+          "source": "cs",
+          "table": "size_aaa",
+          "codes": {
+            "000": "No mass/tumor found",
+            "001-988": "001 - 988 millimeters (mm)\n(Exact size in mm)",
+            "989": "989 mm or larger",
+            "990": "Microscopic focus or foci only and no size of focus given",
+            "991": "Described as \"less than 1 centimeter (cm)\"",
+            "992": "Described as \"less than 2 cm,\" or \"greater than 1 cm,\" or \"between 1 cm and 2 cm\"\n\nStated as T1a with no other information on size",
+            "993": "Described as \"less than 3 cm,\" or \"greater than 2 cm,\" or \"between 2 cm and 3 cm\"\n\nStated as T1b or T1 [NOS] with no other information on size",
+            "994": "Described as \"less than 4 cm,\" or \"greater than 3 cm,\" or \"between 3 cm and 4 cm\"",
+            "995": "Described as \"less than 5 cm,\" or \"greater than 4 cm,\" or \"between 4 cm and 5 cm\"",
+            "996": "Malignant cells present in bronchopulmonary secretions, but no tumor seen radiographically or during bronchoscopy; \"occult\" carcinoma",
+            "997": "Diffuse (entire lobe)",
+            "998": "Diffuse (entire lung or NOS)",
+            "999": "Unknown; size not stated\nSize of tumor cannot be assessed\nNot documented in patient record"
+          }
+        },
+        "2850": {
+          "source": "cs",
+          "table": "mets_hab",
+          "codes": {
+            "00": "No distant metastasis",
+            "10": "OBSOLETE DATA CONVERTED V0200\nSee code 30\n\nDistant lymph node(s), including cervical nodes",
+            "15": "Malignant pleural effusion, ipsilateral or same lung",
+            "16": "Malignant pleural effusion, contralateral or other lung",
+            "17": "Malignant pleural effusion, ipsilateral and contralateral lungs  (Bilateral pleural effusion)",
+            "18": "Malignant pleural effusion, unknown if ipsilateral or contralateral lung",
+            "20": "Malignant pericardial effusion",
+            "21": "20 + (16 or 17)\n\nMalignant pericardial effusion plus contralateral or bilateral pleural effusion",
+            "23": "Extension to:     \n    Contralateral lung     \n    Contralateral main stem bronchus    \nSeparate tumor nodule(s) in contralateral lung\nPleural tumor foci or nodules on contralateral lung",
+            "24": "Pleural tumor foci or nodules on the ipsilateral lung separate from direct invasion",
+            "25": "23 + any of (15, 16, 17, 18, 20, 21, 24)\n\nExtension to contralateral lung plus pleural or pericardial effusion or separate pleural tumor foci",
+            "26": "Stated as M1a with no other information on distant metastasis",
+            "30": "Distant lymph node(s), including cervical nodes",
+            "32": "30 + any of (15, 16, 17, 18, 20, 21)\n\nDistant lymph nodes plus pleural or pericardial effusion",
+            "33": "30 + 24\n\nDistant lymph nodes plus pleural tumor foci",
+            "35": "OBSOLETE DATA RETAINED V0200 \nSeparate tumor nodules reclassified in AJCC 7th Edition, coded in CS Site-Specific Factor 1 \n\nSeparate tumor nodule(s) in different lobe, same lung",
+            "36": "30 + 23\n\nDistant lymph nodes plus extension to contralateral lung",
+            "37": "Extension to:\n    Skeletal muscle\n    Sternum\n    Skin of chest",
+            "38": "37 + 23\n\nExtension in code 37 plus extension to contralateral lung",
+            "39": "OBSOLETE DATA CONVERTED V0200\nSee code 23\n\nExtension to:\n    Contralateral lung\n    Contralateral main stem bronchus   \nSeparate tumor nodule(s) in contralateral lung",
+            "40": "Abdominal organs\nDistant metastasis, except distant lymph node(s) and extension specified in codes 23 and 37, including: \n    Separate lesion in chest wall or diaphragm\n    Distant metastasis, NOS\n    Carcinomatosis",
+            "41": "40+ 23  \n\nDistant mets plus extension to contralateral lung ",
+            "42": "(37 or 40) + any of (15, 16, 17, 18, 20, 21)\n\nDistant metastasis plus pleural or pericardial effusion",
+            "43": "(37 or 40) + 24\n\nDistant metastasis plus pleural tumor foci",
+            "50": "OBSOLETE DATA RETAINED V0200\n\nDistant metastases + Distant node(s)\n(10) + any of (35 to 40)",
+            "51": "(37 or 40) + 30\n\nDistant metastasis plus distant lymph node(s)",
+            "52": "51 + any of (15, 16, 17, 18, 20, 21)\n\nDistant metastasis plus distant lymph nodes plus pleural or pericardial effusion",
+            "53": "51 + 24\n\nDistant metastases plus distant lymph nodes plus pleural tumor foci",
+            "70": "Stated as M1b with no other information on distant metastasis",
+            "75": "Stated as M1 [NOS] with no other information on distant metastasis",
+            "99": "Unknown; distant metastasis not stated\nDistant metastasis cannot be assessed\nNot documented in patient record"
+          }
+        }
+      }
+    },
+    "cs/ovary": {
+      "select": [
+        {
+          "site": "C569",
+          "hist": "8000-9136,9141-9582,9700-9701",
+          "year_dx": "2004-2015"
+        }
+      ],
+      "codes": {
+        "820": {
+          "source": "cs",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative.",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+          }
+        },
+        "830": {
+          "source": "cs",
+          "table": "nodes_exam_gpa",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in patient record"
+          }
+        },
+        "1182": {
+          "source": "cs",
+          "table": "lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        },
+        "2800": {
+          "source": "cs",
+          "table": "size_apa",
+          "codes": {
+            "000": "No mass/tumor found",
+            "001-988": "001 - 988 millimeters (mm) \n(Exact size to nearest mm)",
+            "989": "989 mm or larger",
+            "990": "Microscopic focus or foci only and no size of focus given",
+            "991": "Described as \"less than 1 centimeter (cm)\"",
+            "992": "Described as \"less than 2 cm,\" or \"greater than 1 cm,\" or \"between 1 cm and 2 cm\"",
+            "993": "Described as \"less than 3 cm,\" or \"greater than 2 cm,\" or \"between 2 cm and 3 cm\"",
+            "994": "Described as \"less than 4 cm,\" or \"greater than 3 cm,\" or \"between 3 cm and 4 cm\"",
+            "995": "Described as \"less than 5 cm,\" or \"greater than 4 cm,\" or \"between 4 cm and 5 cm\"",
+            "999": "Unknown; size not stated\nSize of tumor cannot be assessed\nNot documented in patient record"
+          }
+        },
+        "2850": {
+          "source": "cs",
+          "table": "mets_hah",
+          "codes": {
+            "00": "No distant metastasis",
+            "10": "Distant lymph node(s), NOS",
+            "40": "Distant metastasis(except distant lymph node(s) and involvement of other organs by peritoneal seeding or implants (See Note 1)  including:\n    Liver parenchymal metastasis\n    Pleural effusion WITH positive cytology\n\n Carcinomatosis",
+            "50": "40 + 10\n\nDistant metastasis plus distant lymph node(s) ",
+            "60": "OBSOLETE DATA REVIEWED V0203\nSee codes 65, 70\n\nDistant metastasis, NOS\nStated as M1 [NOS]\nFIGO Stage IV [NOS]",
+            "65": "Distant metastasis, NOS\n\nStated as M1 with no other information on distant metastasis",
+            "70": "FIGO Stage IV",
+            "99": "Unknown; distant metastasis not stated\nDistant metastasis cannot be assessed\nNot documented in patient record"
+          }
+        }
+      },
+      "ssf": {
+        "3836": {
+          "item": 2890,
+          "label": "CS SSF2",
+          "name": "FIGO Stage",
+          "years": "2010-2015",
+          "source": "cs",
+          "table": "ssf2_kbu",
+          "definition": "**Note 1**:  The Federation Internationale de Gynecologie et d'Obstetrique (FIGO) stage definitions do not include Stage 0 (Tis) for ovarian cancer. Use code 987 for any case where CS Extension is coded 000.\n\n**Note 2**:  Code the FIGO stage as stated in the medical record.  When lymph node(s) is/are clinically or pathologically positive or metastasis is present, make sure that the FIGO stage reflects the combination of T, N, and M and NOT just the T. If a stage group is stated but it does not specify that it is a FIGO stage, assume that it is a FIGO stage and code it. Do not attempt to code FIGO stage based only on T, N, and M. If you cannot make a determination of stage based on the previous information, use code 999, stage unknown.",
+          "codes": {
+            "100": "FIGO Stage I [NOS]",
+            "110": "FIGO Stage IA",
+            "120": "FIGO Stage IB",
+            "130": "FIGO Stage IC",
+            "200": "FIGO Stage II [NOS]",
+            "210": "FIGO Stage IIA",
+            "220": "FIGO Stage IIB",
+            "230": "FIGO Stage IIC",
+            "300": "FIGO Stage III [NOS]",
+            "310": "FIGO Stage IIIA",
+            "320": "FIGO Stage IIIB",
+            "330": "FIGO Stage IIIC",
+            "400": "FIGO Stage IV",
+            "888": "OBSOLETE DATA CONVERTED V0200\nSee code 988\n\nNot applicable for this site",
+            "987": "Carcinoma in situ (intraepithelial, noninvasive, preinvasive)",
+            "988": "Not applicable:  Information not collected for this case\n(May include cases converted from code 888 used in CSv1 for \"Not applicable\" or when the item was not collected.  If this item is required to derive T, N, M, or any stage, use of code 988 may result in an error.)",
+            "999": "FIGO stage unknown"
+          }
+        }
+      }
+    },
+    "cs/peritoneum": {
+      "select": [
+        {
+          "site": "C481-C482,C488",
+          "hist": "8000-8576,8590-8671,8930-8934,8940-9110",
+          "year_dx": "2004-2015",
+          "ssf25": "001,003,004,009,100"
+        },
+        {
+          "site": "C481-C482,C488",
+          "hist": "8580-8589,8680-8921,9120-9136,9141-9582,9700-9701",
+          "year_dx": "2004-2015"
+        }
+      ],
+      "codes": {
+        "820": {
+          "source": "cs",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative.",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+          }
+        },
+        "830": {
+          "source": "cs",
+          "table": "nodes_exam_gpa",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in patient record"
+          }
+        },
+        "1182": {
+          "source": "cs",
+          "table": "lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        },
+        "2800": {
+          "source": "cs",
+          "table": "size_apu",
+          "codes": {
+            "000": "No mass/tumor found",
+            "001-988": "001 - 988 millimeters (mm) \n(Exact size in mms)",
+            "989": "989 mm or larger",
+            "990": "Microscopic focus or foci only and no size of focus given",
+            "991": "Described as \"less than 1 centimeter (cm)\"",
+            "992": "Described as \"less than 2 cm,\" or \"greater than 1 cm,\" or \"between 1 cm and 2 cm\"",
+            "993": "Described as \"less than 3 cm,\" or \"greater than 2 cm,\" or \"between 2 cm and 3 cm\"",
+            "994": "Described as \"less than 4 cm,\" or \"greater than 3 cm,\" or \"between 3 cm and 4 cm\"",
+            "995": "Described as \"less than 5 cm,\" or \"greater than 4 cm,\" or \"between 4 cm and 5 cm\"\n\nStated as T1b or T1 [NOS] with no other information on size",
+            "996": "Described as \"greater than 5 cm\"\n\nStated as T2b or T2 [NOS] with no other information on size",
+            "999": "Unknown; size not stated\nSize of tumor cannot be assessed\nNot documented in patient record"
+          }
+        },
+        "2850": {
+          "source": "cs",
+          "table": "mets_hpc",
+          "codes": {
+            "00": "No distant metastasis",
+            "10": "Distant lymph node(s)",
+            "40": "Distant metastasis except distant lymph node(s) \nCarcinomatosis",
+            "50": "40 + 10\n\nDistant metastasis plus distant lymph nodes",
+            "60": "Distant metastasis, NOS\n\nStated as M1 with no other information on distant metastasis",
+            "99": "Unknown; distant metastasis not stated\nDistant metastasis cannot be assessed\nNot documented in patient record"
+          }
+        }
+      },
+      "ssf": {
+        "3843": {
+          "item": 2880,
+          "label": "CS SSF1",
+          "name": "Grade for Sarcomas",
+          "years": "2010-2015",
+          "source": "cs",
+          "table": "ssf1_jpm",
+          "definition": "**Note 1**:  Comprehensive grading of soft tissue sarcomas is strongly correlated with disease specific survival and incorporates differentiation, mitotic rate, and extent of necrosis.  The grading system of the French Federation of Cancer Centers Sarcoma Group (FNCLCC) is preferred system.\n\n**Note 2**:   Record the grade from any three-grade sarcoma grading system the pathologist uses prior to neoadjuvant treatment.  Do not code terms such as \"well differentiated\" or \"poorly differentiated\" in this field.  \n\n**Note 3**:  In some cases, especially for needle biopsies, grade may be specified only as \"low grade\" or \"high grade\".  Use code 100, which maps to G1, or 200, which maps to G3.  Codes 010-030 take priority over codes 100 and 200.\n\n**Note 4**:  The mapping of grade as shown in this table is used in the derivation of AJCC 7 staging.",
+          "codes": {
+            "010": "Specified as Grade 1 [of 3]",
+            "020": "Specified as Grade 2 [of 3]",
+            "030": "Specified as Grade 3 [of 3]",
+            "100": "Grade stated as low grade, NOS",
+            "200": "Grade stated as high grade, NOS",
+            "888": "OBSOLETE DATA CONVERTED V0200\nSee code 988\n\nNot applicable for this schema",
+            "988": "Not applicable:  Information not collected for this case\n(May include cases converted from code 888 used in CSv1 for \"Not applicable\" or when the item was not collected.  If this item is required to derive T, N, M, or any stage, use of code 988 may result in an error.)",
+            "998": "No histologic examination of primary site",
+            "999": "Unknown or no information\nNot documented in patient record"
+          }
+        },
+        "3844": {
+          "item": 2880,
+          "label": "CS SSF1",
+          "name": "Grade for Sarcomas",
+          "years": "2010-2015",
+          "source": "cs",
+          "table": "ssf1_jpm",
+          "definition": "**Note 1**:  Comprehensive grading of soft tissue sarcomas is strongly correlated with disease specific survival and incorporates differentiation, mitotic rate, and extent of necrosis.  The grading system of the French Federation of Cancer Centers Sarcoma Group (FNCLCC) is preferred system.\n\n**Note 2**:   Record the grade from any three-grade sarcoma grading system the pathologist uses prior to neoadjuvant treatment.  Do not code terms such as \"well differentiated\" or \"poorly differentiated\" in this field.  \n\n**Note 3**:  In some cases, especially for needle biopsies, grade may be specified only as \"low grade\" or \"high grade\".  Use code 100, which maps to G1, or 200, which maps to G3.  Codes 010-030 take priority over codes 100 and 200.\n\n**Note 4**:  The mapping of grade as shown in this table is used in the derivation of AJCC 7 staging.",
+          "codes": {
+            "010": "Specified as Grade 1 [of 3]",
+            "020": "Specified as Grade 2 [of 3]",
+            "030": "Specified as Grade 3 [of 3]",
+            "100": "Grade stated as low grade, NOS",
+            "200": "Grade stated as high grade, NOS",
+            "888": "OBSOLETE DATA CONVERTED V0200\nSee code 988\n\nNot applicable for this schema",
+            "988": "Not applicable:  Information not collected for this case\n(May include cases converted from code 888 used in CSv1 for \"Not applicable\" or when the item was not collected.  If this item is required to derive T, N, M, or any stage, use of code 988 may result in an error.)",
+            "998": "No histologic examination of primary site",
+            "999": "Unknown or no information\nNot documented in patient record"
+          }
+        }
+      },
+      "discriminators": {
+        "2879": {
+          "name": "Schema Discriminator: Peritoneum/PeritoneumFemaleGen",
+          "title": "CS Site-Specific Factor 25",
+          "source": "cs",
+          "table": "ssf25_sqp",
+          "definition": "**Note**:  For cases coded to primary site C48.1, C48.2, or C48.8, and histology in the ranges 8000-8576, 8590-8671, 8930-8934 or 8940-9110, the sex of the case is needed to determine the correct CS schema.  AJCC stages primary carcinomas of the peritoneum in females with the same staging criteria as for ovarian cancer.",
+          "codes": {
+            "001": "Male",
+            "002": "Female",
+            "003": "Other (hermaphrodite)",
+            "004": "Transsexual",
+            "009": "Unknown sex",
+            "100": "OBSOLETE DATA RETAINED V0200\n\nC48.1, C48.2, or C48.8, and histology in the ranges 8000-8576, 8590-8671, 8930-8934, 8940-9110 coded in CSv1",
+            "981": "C48.1, C48.2, or C48.8 with histology codes 8580-8589,8680-8921,9120-9136,9141-9582,9700-9701\nNote: May include cases which were converted to this code from a blank"
           }
         }
       }
@@ -1099,6 +1491,416 @@
             "8": "Not Applicable",
             "9": "Unknown/Indeterminate/not mentioned in path report"
           }
+        },
+        "2800": {
+          "source": "cs",
+          "table": "size_app",
+          "codes": {
+            "000": "No mass/tumor found",
+            "001-988": "001 - 988 millimeters (mm)\n(Exact size in mm)",
+            "989": "989 millimeters or larger",
+            "990": "Microscopic focus or foci only and no size of focus given",
+            "991": "Described as \"less than 1 cm\"",
+            "992": "Described as \"less than 2 cm,\" or \"greater than 1 cm,\" or \"between 1 cm and 2 cm\"",
+            "993": "Described as \"less than 3 cm,\" or \"greater than 2 cm,\" or \"between 2 cm and 3 cm\"",
+            "994": "Described as \"less than 4 cm,\" or \"greater than 3 cm,\" or \"between 3 cm and 4 cm\"",
+            "995": "Described as \"less than 5 cm,\" or \"greater than 4 cm,\" or \"between 4 cm and 5 cm\"",
+            "999": "Unknown; size not stated\nNot documented in patient record"
+          }
+        },
+        "2850": {
+          "source": "cs",
+          "table": "mets_hcw",
+          "codes": {
+            "00": "No distant metastasis",
+            "10": "Distant lymph node(s)",
+            "40": "Distant metastasis except distant lymph node(s) \nCarcinomatosis",
+            "50": "40 + 10\n\nDistant metastasis plus distant lymph nodes",
+            "60": "Distant metastasis, NOS",
+            "70": "FIGO Stage IV",
+            "99": "Unknown; distant metastasis note stated\nDistant metastasis cannot be assessed\nNot documented in patient record"
+          }
+        }
+      },
+      "ssf": {
+        "3836": {
+          "item": 2890,
+          "label": "CS SSF2",
+          "name": "FIGO Stage",
+          "years": "2010-2015",
+          "source": "cs",
+          "table": "ssf2_kpn",
+          "definition": "**Note 1**: Most female primary peritoneal tumors have clinical course and treatment options similar to ovarian tumors.\n\n**Note 2**: It is very unlikely for this disease to have a FIGO Stage II or lower.\n\n**Note 3**: Code the FIGO stage as stated in the medical record.  When lymph node(s) is/are clinically or pathologically positive or metastasis is present, make sure that the FIGO stage reflects the combination of T, N, and M and NOT just the T. If a stage group is stated but it does not specify that it is a FIGO stage, assume that it is a FIGO stage and code it. Do not attempt to code FIGO stage based only on T, N, and M. If you cannot make a determination of stage based on the previous information, use code 999, stage unknown.",
+          "codes": {
+            "100": "FIGO Stage I [NOS]",
+            "110": "FIGO Stage IA",
+            "120": "FIGO Stage IB",
+            "130": "FIGO Stage IC",
+            "200": "FIGO Stage II [NOS]",
+            "210": "FIGO Stage IIA",
+            "220": "FIGO Stage IIB",
+            "230": "FIGO Stage IIC",
+            "300": "FIGO Stage III [NOS]",
+            "310": "FIGO Stage IIIA",
+            "320": "FIGO Stage IIIB",
+            "330": "FIGO Stage IIIC",
+            "400": "FIGO Stage IV",
+            "888": "OBSOLETE DATA CONVERTED V0200\nSee code 988\n\nNot applicable for this site",
+            "987": "OBSOLETE DATA RETAINED V0204 \n\nCancer in situ (intraepithelial, noninvasive, preinvasive)",
+            "988": "Not applicable:  Information not collected for this case\n(May include cases converted from code 888 used in CSv1 for \"Not applicable\" or when the item was not collected.  If this item is  required to derive T, N, M, or any stage, use of code 988 may result in an error.)",
+            "999": "FIGO stage unknown"
+          }
+        }
+      },
+      "discriminators": {
+        "2879": {
+          "name": "Schema Discriminator: Peritoneum/PeritoneumFemaleGen",
+          "title": "CS Site-Specific Factor 25",
+          "source": "cs",
+          "table": "ssf25_sqp",
+          "definition": "**Note**:  For cases coded to primary site C48.1, C48.2, or C48.8, and histology in the ranges 8000-8576, 8590-8671, 8930-8934 or 8940-9110, the sex of the case is needed to determine the correct CS schema.  AJCC stages primary carcinomas of the peritoneum in females with the same staging criteria as for ovarian cancer.",
+          "codes": {
+            "001": "Male",
+            "002": "Female",
+            "003": "Other (hermaphrodite)",
+            "004": "Transsexual",
+            "009": "Unknown sex",
+            "100": "OBSOLETE DATA RETAINED V0200\n\nC48.1, C48.2, or C48.8, and histology in the ranges 8000-8576, 8590-8671, 8930-8934, 8940-9110 coded in CSv1",
+            "981": "C48.1, C48.2, or C48.8 with histology codes 8580-8589,8680-8921,9120-9136,9141-9582,9700-9701\nNote: May include cases which were converted to this code from a blank"
+          }
+        }
+      }
+    },
+    "cs/prostate": {
+      "select": [
+        {
+          "site": "C619",
+          "hist": "8000-9136,9141-9582,9700-9701",
+          "year_dx": "2004-2015"
+        }
+      ],
+      "codes": {
+        "820": {
+          "source": "cs",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative.",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+          }
+        },
+        "830": {
+          "source": "cs",
+          "table": "nodes_exam_gpa",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in patient record"
+          }
+        },
+        "1182": {
+          "source": "cs",
+          "table": "lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        },
+        "2800": {
+          "source": "cs",
+          "table": "size_apa",
+          "codes": {
+            "000": "No mass/tumor found",
+            "001-988": "001 - 988 millimeters (mm) \n(Exact size to nearest mm)",
+            "989": "989 mm or larger",
+            "990": "Microscopic focus or foci only and no size of focus given",
+            "991": "Described as \"less than 1 centimeter (cm)\"",
+            "992": "Described as \"less than 2 cm,\" or \"greater than 1 cm,\" or \"between 1 cm and 2 cm\"",
+            "993": "Described as \"less than 3 cm,\" or \"greater than 2 cm,\" or \"between 2 cm and 3 cm\"",
+            "994": "Described as \"less than 4 cm,\" or \"greater than 3 cm,\" or \"between 3 cm and 4 cm\"",
+            "995": "Described as \"less than 5 cm,\" or \"greater than 4 cm,\" or \"between 4 cm and 5 cm\"",
+            "999": "Unknown; size not stated\nSize of tumor cannot be assessed\nNot documented in patient record"
+          }
+        },
+        "2850": {
+          "source": "cs",
+          "table": "mets_hal",
+          "codes": {
+            "00": "No distant metastasis",
+            "11": "Distant lymph node(s):\n    Common iliac",
+            "12": "Distant lymph node(s):\n    Aortic, NOS:\n        Lateral (lumbar)\n        Para-aortic\n        Periaortic\n    Cervical\n    Inguinal, NOS:\n        Deep, NOS:\n            Node of Cloquet or Rosenmuller  (highest deep inguinal)\n        Superficial (femoral)\n    Retroperitoneal, NOS\n    Scalene (inferior deep cervical)\n    Supraclavicular (transverse cervical)\n    Distant lymph node(s), NOS",
+            "20": "Stated as M1a with no other information on distant metastasis",
+            "30": "Metastasis in bone(s)",
+            "35": "30 + (11 or 12)\n\nMetastasis in bone(s) plus distant lymph node(s)",
+            "38": "Stated as M1b with no other information on distant metastasis",
+            "40": "Distant metastasis, other than distant lymph nodes or bone(s)\nCarcinomatosis",
+            "45": "OBSOLETE DATA CONVERTED V0200\nSee code 60\n\nDistant metastasis, NOS\nStage D2, NOS",
+            "50": "40 + (11 or 12)\n\nDistant metastasis other than bone(s) plus distant lymph node(s)",
+            "55": "40 + (30 or 35)\n\nDistant metastasis other than distant lymph node(s) plus bone(s) \nOR \nDistant metastasis plus distant lymph nodes and bone(s)",
+            "58": "Stated as M1c with no other information on distant metastasis",
+            "60": "Distant metastasis, NOS \n\nStated as M1 [NOS] with no other information on distant metastasis",
+            "99": "Unknown; distant metastasis not stated \nDistant metastasis cannot be assessed\nNot documented in patient record"
+          }
+        }
+      },
+      "ssf": {
+        "3838": {
+          "item": 2861,
+          "label": "CS SSF7",
+          "name": "Gleason's Primary Pattern and Secondary Pattern Values on Needle Core Biopsy/Transurethral Resection of Prostate (TURP)",
+          "years": "2010-2015",
+          "source": "cs",
+          "table": "ssf7_saw",
+          "definition": "**Note 1**:  Code the Gleason's primary and secondary patterns from needle core biopsy or TURP only in this field. Gleason's primary and secondary patterns provided on prostate tissue on a transurethral resection of bladder (TURB) specimen can also be used in this field.\n\n**Note 2**:  Code the Gleason's primary and secondary patterns prior to neoadjuvant treatment.\n\n**Note 3**:  Usually prostate cancers are graded using Gleason's score or pattern.  Gleason's grading for prostate primaries is based on a 5-component system (5 histologic patterns).  Prostatic cancer generally shows two main histologic patterns.  The primary pattern, the pattern occupying greater than 50% of the cancer, is usually indicated by the first number of the Gleason's grade, and the secondary pattern is usually indicated by the second number.  These two numbers are added together to create a pattern score, ranging from 2 to 10.  \n\n* If there are two numbers, assume that they refer to two patterns (the first number being the primary pattern and the second number the secondary pattern), and sum them to obtain the score.\n* If only one number is given and it is less than or equal to 5, assume that it describes a pattern.  Code the number as the primary pattern and code the secondary pattern as 9.   \n* If only one number is given and it is greater than 5, assume that it is a score.  Code 099.  \n* If the pathology report specifies a specific number out of a total of 10, the first number given is the score.  Example:  The pathology report says Gleason's 3/10.  The Gleason's score would be 3, and coded as 099.\n\n**Note 4**:  If different patterns are documented on multiple needle core biopsies code the pattern that reflects the highest or most aggressive score regardless if the pathologist provides an overall pattern in a final summary.  If different patterns equal the same high score, give priority to the highest primary pattern and then the highest secondary pattern.  For example, both Gleason's 3, 4 and Gleason's 4, 3 equal Gleason's score 7; code 043. Do not mix patterns from multiple specimens.\n\n**Note 5**:  If needle core biopsy and TURP are both performed, code the pattern that reflects the highest score.\n\n**Note 6**:  If needle core biopsy and TURP are not performed, use code 998. If the Gleason's pattern and score are not documented on needle core biopsy or TURP, use code 999.",
+          "codes": {
+            "011": "Primary pattern 1, secondary pattern 1 ",
+            "012": "Primary pattern 1, secondary pattern 2",
+            "013": "Primary pattern 1, secondary pattern 3",
+            "014": "Primary pattern 1, secondary pattern 4",
+            "015": "Primary pattern 1, secondary pattern 5",
+            "019": "Primary pattern 1, secondary pattern unknown",
+            "021": "Primary pattern 2, secondary pattern 1",
+            "022": "Primary pattern 2, secondary pattern 2",
+            "023": "Primary pattern 2, secondary pattern 3",
+            "024": "Primary pattern 2, secondary pattern 4",
+            "025": "Primary pattern 2, secondary pattern 5",
+            "029": "Primary pattern 2, secondary pattern unknown",
+            "031": "Primary pattern 3, secondary pattern 1",
+            "032": "Primary pattern 3, secondary pattern 2",
+            "033": "Primary pattern 3, secondary pattern 3",
+            "034": "Primary pattern 3, secondary pattern 4",
+            "035": "Primary pattern 3, secondary pattern 5",
+            "039": "Primary pattern 3, secondary pattern unknown",
+            "041": "Primary pattern 4, secondary pattern 1",
+            "042": "Primary pattern 4, secondary pattern 2",
+            "043": "Primary pattern 4, secondary pattern 3",
+            "044": "Primary pattern 4, secondary pattern 4",
+            "045": "Primary pattern 4, secondary pattern 5",
+            "049": "Primary pattern 4, secondary pattern unknown",
+            "051": "Primary pattern 5, secondary pattern 1",
+            "052": "Primary pattern 5, secondary pattern 2",
+            "053": "Primary pattern 5, secondary pattern 3",
+            "054": "Primary pattern 5, secondary pattern 4",
+            "055": "Primary pattern 5, secondary pattern 5",
+            "059": "Primary pattern 5, secondary pattern unknown",
+            "099": "Primary pattern unknown, secondary pattern unknown",
+            "988": "Not applicable: Information not collected for this case\n(If this information is required by your standard setter, use of code 988 may result in an edit error.)",
+            "998": "No needle core biopsy/TURP performed",
+            "999": "Unknown or no information\nNot documented in patient record"
+          }
+        },
+        "3839": {
+          "item": 2863,
+          "label": "CS SSF9",
+          "name": "Gleason's Primary Pattern and Secondary Pattern Values on Prostatectomy/Autopsy",
+          "years": "2010-2015",
+          "source": "cs",
+          "table": "ssf9_say",
+          "definition": "**Note 1**:  Code the Gleason's primary and secondary patterns from prostatectomy or autopsy only in this field.\n\n**Note 2**:  Code the Gleason's primary and secondary patterns prior to neoadjuvant treatment.\n\n**Note 3**:  Usually prostate cancers are graded using Gleason's score or pattern.  Gleason's grading for prostate primaries is based on a 5-component system (5 histologic patterns).  Prostatic cancer generally shows two main histologic patterns.  The primary pattern, the pattern occupying greater than 50% of the cancer, is usually indicated by the first number of the Gleason's grade, and the secondary pattern is usually indicated by the second number.  These two numbers are added together to create a pattern score, ranging from 2 to 10.\n\n* If there are two numbers, assume that they refer to two patterns (the first number being the primary pattern and the second number the secondary pattern) and sum them to obtain the score.   \n* If only one number is given and it is less than or equal to 5, assume that it describes a pattern.  Code the number as the primary pattern and code the secondary pattern as 9.\n* If only one number is given and it is greater than 5, assume that it is a score.  Code 099.    \n* If the pathology report specifies a specific number out of a total of 10, the first number given is the score.  Example:  The pathology report says Gleason's 3/10.  The Gleason's score would be 3, and coded as 099.\n\n**Note 4**:  If prostatectomy and autopsy are not performed, assign code 998. If the Gleason's pattern and score are not documented on prostatectomy or autopsy, assign code 999.\n\n**Note 5**:  If a tertiary pattern is documented on prostatectomy or autopsy, do not code in either CS Site-Specific Factor 9 or CS Site-Specific Factor 10. Record the tertiary pattern in CS Site-Specific Factor 11.",
+          "codes": {
+            "011": "Primary pattern 1, secondary pattern 1",
+            "012": "Primary pattern 1, secondary pattern 2",
+            "013": "Primary pattern 1, secondary pattern 3",
+            "014": "Primary pattern 1, secondary pattern 4",
+            "015": "Primary pattern 1, secondary pattern 5",
+            "019": "Primary pattern 1, secondary pattern unknown",
+            "021": "Primary pattern 2, secondary pattern 1",
+            "022": "Primary pattern 2, secondary pattern 2",
+            "023": "Primary pattern 2, secondary pattern 3",
+            "024": "Primary pattern 2, secondary pattern 4",
+            "025": "Primary pattern 2, secondary pattern 5",
+            "029": "Primary pattern 2, secondary pattern unknown",
+            "031": "Primary pattern 3, secondary pattern 1",
+            "032": "Primary pattern 3, secondary pattern 2",
+            "033": "Primary pattern 3, secondary pattern 3",
+            "034": "Primary pattern 3, secondary pattern 4",
+            "035": "Primary pattern 3, secondary pattern 5",
+            "039": "Primary pattern 3, secondary pattern unknown",
+            "041": "Primary pattern 4, secondary pattern 1",
+            "042": "Primary pattern 4, secondary pattern 2",
+            "043": "Primary pattern 4, secondary pattern 3",
+            "044": "Primary pattern 4, secondary pattern 4",
+            "045": "Primary pattern 4, secondary pattern 5",
+            "049": "Primary pattern 4, secondary pattern unknown",
+            "051": "Primary pattern 5, secondary pattern 1",
+            "052": "Primary pattern 5, secondary pattern 2",
+            "053": "Primary pattern 5, secondary pattern 3",
+            "054": "Primary pattern 5, secondary pattern 4",
+            "055": "Primary pattern 5, secondary pattern 5",
+            "059": "Primary pattern 5, secondary pattern unknown",
+            "099": "Primary pattern unknown, secondary pattern unknown",
+            "988": "Not applicable: Information not collected for this case\n(If this information is required by your standard setter, use of code 988 may result in an edit error.)",
+            "998": "No prostatectomy/autopsy performed",
+            "999": "No residual disease on prostatectomy/autopsy\nUnknown or no information \nNot documented in patient record"
+          }
+        },
+        "3840": {
+          "item": 2862,
+          "label": "CS SSF8",
+          "name": "Gleason's Score on Needle Core Biopsy/Transurethral Resection of Prostate (TURP)",
+          "years": "2010-2015",
+          "source": "cs",
+          "table": "ssf8_sax",
+          "definition": "**Note 1**:  Code the Gleason's score from needle core biopsy or TURP only in this field. Gleason's score provided on prostate tissue on a transurethral resection of bladder (TURB) can also be used in this field.\n\n**Note 2**:  Code the Gleason's score prior to neoadjuvant treatment.\n\n**Note 3**:  Usually prostate cancers are graded using Gleason's score or pattern.  Gleason's grading for prostate primaries is based on a 5-component system (5 histologic patterns).  Prostatic cancer generally shows two main histologic patterns.  The primary pattern, the pattern occupying greater than 50% of the cancer, is usually indicated by the first number of the Gleason's grade, and the secondary pattern is usually indicated by the second number.  These two numbers are added together to create a pattern score, ranging from 2 to 10. \n\n* If there are two numbers, assume that they refer to two patterns (the first number being the primary pattern and the second number the secondary pattern), and sum them to obtain the score.\n* If only one number is given and it is less than or equal to 5, code the total score to 999, unknown or no information. \n* If only one number is given and it is greater than 5, assume that it is a score and code as stated.  \n* If the pathology report specifies a specific number out of a total of 10, the first number given is the score.  Example:  The pathology report says Gleason's 3/10.  The Gleason's score would be 3, and coded as 003.\n\n**Note 4**:  Record the Gleason's score based on the addition of the primary and secondary patterns coded in CS Site-Specific Factor 7.\n\n**Note 5**:  If needle core biopsy and TURP are not performed, assign code 998. If the Gleason's pattern and score are not documented on needle core biopsy or TURP, assign code 999.",
+          "codes": {
+            "002-010": "Gleason's score",
+            "988": "Not applicable: Information not collected for this case (If this information is required by your standard setter, use of code 988 may result in an edit error.)",
+            "998": "No needle core biopsy/TURP performed",
+            "999": "Unknown or no information\nNot documented in patient record"
+          }
+        },
+        "3841": {
+          "item": 2864,
+          "label": "CS SSF10",
+          "name": "Gleason's Score on Prostatectomy/Autopsy",
+          "years": "2010-2015",
+          "source": "cs",
+          "table": "ssf10_saz",
+          "definition": "**Note 1**:  Code the Gleason's score from prostatectomy or autopsy only in this field.\n\n**Note 2**:  Code the Gleason's score prior to neoadjuvant treatment.\n\n**Note 3**:  Usually prostate cancers are graded using Gleason's score or pattern.  Gleason's grading for prostate primaries is based on a 5-component system (5 histologic patterns).  Prostatic cancer generally shows two main histologic patterns.  The primary pattern, the pattern occupying greater than 50% of the cancer, is usually indicated by the first number of the Gleason's grade, and the secondary pattern is usually indicated by the second number.  These two numbers are added together to create a pattern score, ranging from 2 to 10.\n\n* If there are two numbers, assume that they refer to two patterns (the first number being the primary pattern and the second number being the secondary pattern), and sum them to obtain the score.\n* If only one number is given and it is less than or equal to 5, code the total score to 999, unknown or no information. \n* If only one number is given and it is greater than 5, assume that it is a score and code as stated.  \n* If the pathology report specifies a specific number out of a total of 10, the first number given is the score.  Example:  The pathology report says Gleason's 3/10.  The Gleason's score would be 3, and coded as 003.\n\n**Note 4**:  Record the Gleason's score based on the addition of the primary and secondary patterns coded in CS Site-Specific Factor 9.\n\n**Note 5**:  If prostatectomy and autopsy are not performed, assign code 998. If the Gleason's pattern and score are not documented on prostatectomy or autopsy, assign code 999.\n\n**Note 6**:  If a tertiary pattern is documented on prostatectomy or autopsy, do not code in either CS Site-Specific Factor 9 or CS Site-Specific Factor 10. Record the tertiary pattern in CS Site-Specific Factor 11.",
+          "codes": {
+            "002-010": "Gleason's Score \n(See Notes 1-5) ",
+            "988": "Not applicable: Information not collected for this case (If this information is required by your standard setter, use of code 988 may result in an edit error.)",
+            "998": "No prostatectomy/autopsy performed",
+            "999": "No Gleason's score documented on prostatectomy/autopsy\nNo residual disease on prostatectomy/autopsy\nUnknown or no information\nNot documented in patient record"
+          }
+        },
+        "3842": {
+          "item": 2865,
+          "label": "CS SSF11",
+          "name": "Gleason's Tertiary Pattern Value on Prostatectomy/Autopsy",
+          "years": "2010-2015",
+          "source": "cs",
+          "table": "ssf11_sba",
+          "definition": "**Note 1**:  If present, a high tertiary Gleason's pattern appears to be an indication for a worse outcome.\n\n**Note 2**:  Record the tertiary pattern documented on prostatectomy or autopsy only. Record the tertiary pattern prior to neoadjuvant treatment. If a tertiary pattern is documented on needle core biopsy or transurethral resection of prostate (TURP), it should be disregarded. Do not code the tertiary pattern on prostatectomy or autopsy in CS Site-Specific Factor 9 or CS Site-Specific Factor 10.",
+          "codes": {
+            "010": "Tertiary pattern 1",
+            "020": "Tertiary pattern 2",
+            "030": "Tertiary pattern 3",
+            "040": "Tertiary pattern 4",
+            "050": "Tertiary pattern 5",
+            "988": "Not applicable: Information not collected for this case\n(If this information is required by your standard setter, use of code 988 may result in an edit error.)",
+            "998": "No prostatectomy/autopsy performed",
+            "999": "No Gleason's tertiary pattern documented on prostatectomy/autopsy\nNo residual disease on prostatectomy/autopsy\nUnknown or no information \nNot documented in patient record"
+          }
+        }
+      }
+    },
+    "cs/vulva": {
+      "select": [
+        {
+          "site": "C510-C512,C518-C519",
+          "hist": "8000-8246,8248-8713,8800-9136,9141-9582",
+          "year_dx": "2004-2015"
+        }
+      ],
+      "codes": {
+        "820": {
+          "source": "cs",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative.",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+          }
+        },
+        "830": {
+          "source": "cs",
+          "table": "nodes_exam_gpa",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in patient record"
+          }
+        },
+        "1182": {
+          "source": "cs",
+          "table": "lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        },
+        "2800": {
+          "source": "cs",
+          "table": "size_app",
+          "codes": {
+            "000": "No mass/tumor found",
+            "001-988": "001 - 988 millimeters (mm)\n(Exact size in mm)",
+            "989": "989 millimeters or larger",
+            "990": "Microscopic focus or foci only and no size of focus given",
+            "991": "Described as \"less than 1 cm\"",
+            "992": "Described as \"less than 2 cm,\" or \"greater than 1 cm,\" or \"between 1 cm and 2 cm\"",
+            "993": "Described as \"less than 3 cm,\" or \"greater than 2 cm,\" or \"between 2 cm and 3 cm\"",
+            "994": "Described as \"less than 4 cm,\" or \"greater than 3 cm,\" or \"between 3 cm and 4 cm\"",
+            "995": "Described as \"less than 5 cm,\" or \"greater than 4 cm,\" or \"between 4 cm and 5 cm\"",
+            "999": "Unknown; size not stated\nNot documented in patient record"
+          }
+        },
+        "2850": {
+          "source": "cs",
+          "table": "mets_hba",
+          "codes": {
+            "00": "No distant metastasis",
+            "10": "Distant lymph node(s), NOS",
+            "11": "Distant lymph node(s):\n    External iliac",
+            "12": "Distant lymph node(s):\n    Internal iliac (hypogastric)\n        Obturator\n    Pelvic, NOS",
+            "13": "Distant lymph node(s) other than code 11 and 12, including common iliac",
+            "40": "Distant metastases other than distant lymph node(s)\nCarcinomatosis",
+            "50": "(40 + any of (10-13)\n\nDistant metastasis plus distant lymph nodes",
+            "55": "FIGO Stage IVB",
+            "60": "Distant metastasis, NOS",
+            "70": "FIGO Stage IV [NOS] based on distant metastasis",
+            "99": "Unknown; distant metastasis not stated\nDistant metastasis cannot be assessed\nNot documented in patient record"
+          }
+        }
+      },
+      "ssf": {
+        "3836": {
+          "item": 2864,
+          "label": "CS SSF10",
+          "name": "FIGO Stage",
+          "years": "2010-2015",
+          "source": "cs",
+          "table": "ssf10_sex",
+          "definition": "**Note 1**:  The Federation Internationale de Gynecologie et d'Obstetrique (FIGO) stage definitions do not include Stage 0 (Tis) for vulvar cancer. Use code 987 for any case where CS Extension is coded 000.\n\n**Note 2**:  Code the FIGO stage as stated in the medical record. When lymph node(s) is/are clinically or pathologically positive or metastasis is present, make sure that the FIGO stage reflects the combination of T, N, and M and NOT just the T. If a stage group is stated but it does not specify that it is a FIGO stage, assume that it is a FIGO stage and code it. Do not attempt to code FIGO stage based only on T, N, and M. If you cannot make a determination of stage based on the previous information, use code 999, stage unknown.",
+          "codes": {
+            "100": "FIGO Stage I [NOS]",
+            "110": "FIGO Stage IA",
+            "120": "FIGO Stage IB",
+            "200": "FIGO Stage II",
+            "300": "FIGO Stage III [NOS]",
+            "310": "FIGO Stage IIIA",
+            "320": "FIGO Stage IIIB",
+            "330": "FIGO Stage IIIC",
+            "400": "FIGO Stage IV [NOS]",
+            "410": "FIGO Stage IVA",
+            "420": "FIGO Stage IVB",
+            "987": "Carcinoma in situ (intraepithelial, noninvasive, preinvasive,)",
+            "988": "Not applicable: Information not collected for this case\n(If this information is required by your standard setter, use of code 988 may result in an edit error.)",
+            "999": "FIGO stage unknown"
+          }
         }
       }
     },
@@ -1131,6 +1933,54 @@
             "1": "Lymph-vascular Invasion Present/Identified",
             "8": "Not Applicable",
             "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        }
+      },
+      "ssf": {
+        "3843": {
+          "item": 2861,
+          "label": "CS SSF7",
+          "name": "Nottingham or Bloom-Richardson (BR) Score/Grade",
+          "source": "tnm",
+          "table": "ssf7_saa",
+          "definition": "**Note 1:**  TNM recommends the Nottingham combined histologic grade (Elston-Ellis modification of the Scarff-Bloom-Richardson grading system).  Terms seen on pathology reports may include\n* Bloom-Richardson (BR) \n* Modified Bloom-Richardson, BR \n* BR grading \n* Scarff-Bloom-Richardson \n* SBR grading \n* Elston-Ellis modification of Bloom-Richardson score \n* Nottingham modification of Bloom-Richardson score\n* Nottingham modification of Scarff-Bloom-Richardson\n* Nottingham-Tenovus grade\n* Nottingham grade\n\n**Note 2:**  Code the highest score prior to neoadjuvant treatment.\n\n**Note 3:**  Code the tumor grade using the following priority order\n* BR scores 3-9 \n* BR grade (low, intermediate, high).\n\n**Note 4:**  BR score may be expressed as a range, 3-9.  The score is based on three morphologic features of \"invasive no-special-type\" breast cancers \n* Degree of tubule formation/histologic grade\n* Mitotic activity \n* Nuclear pleomorphism/nuclear grade of tumor cells).  \n\nIf a report describes any of the factors with words (low, intermediate, high) rather than numbers, do not attempt to translate these words into a score or number; use codes 110-130.\n\n**Note 5:**  If only a grade of 1 through 4 is given with no information on the score and it is unclear if it is a Nottingham or BR Grade, code 999.\n\n**Note 6:** Code the highest score prior to neoadjuvant treatment if multiple scores are reported.  \n* For examples, different scores may be reported on multiple pathology reports for the same primary cancer; different scores may be reported for multiple tumors assigned to the same primary cancer",
+          "codes": {
+            "030": "Score of 3",
+            "040": "Score of 4",
+            "050": "Score of 5",
+            "060": "Score of 6",
+            "070": "Score of 7",
+            "080": "Score of 8",
+            "090": "Score of 9",
+            "110": "Low Grade, Bloom-Richardson (BR) grade 1, score not given",
+            "120": "Medium (Intermediate) Grade, BR grade 2, score not given",
+            "130": "High Grade, BR grade 3, score not given",
+            "988": "Not applicable: Information not collected for this case",
+            "998": "No histologic examination of primary site",
+            "999": "Neither BR grade nor BR score given\nUnknown or no information\nNot documented in patient record"
+          }
+        },
+        "3844": {
+          "item": 2861,
+          "label": "CS SSF7",
+          "name": "Nottingham or Bloom-Richardson (BR) Score/Grade",
+          "source": "tnm",
+          "table": "ssf7_saa",
+          "definition": "**Note 1:**  TNM recommends the Nottingham combined histologic grade (Elston-Ellis modification of the Scarff-Bloom-Richardson grading system).  Terms seen on pathology reports may include\n* Bloom-Richardson (BR) \n* Modified Bloom-Richardson, BR \n* BR grading \n* Scarff-Bloom-Richardson \n* SBR grading \n* Elston-Ellis modification of Bloom-Richardson score \n* Nottingham modification of Bloom-Richardson score\n* Nottingham modification of Scarff-Bloom-Richardson\n* Nottingham-Tenovus grade\n* Nottingham grade\n\n**Note 2:**  Code the highest score prior to neoadjuvant treatment.\n\n**Note 3:**  Code the tumor grade using the following priority order\n* BR scores 3-9 \n* BR grade (low, intermediate, high).\n\n**Note 4:**  BR score may be expressed as a range, 3-9.  The score is based on three morphologic features of \"invasive no-special-type\" breast cancers \n* Degree of tubule formation/histologic grade\n* Mitotic activity \n* Nuclear pleomorphism/nuclear grade of tumor cells).  \n\nIf a report describes any of the factors with words (low, intermediate, high) rather than numbers, do not attempt to translate these words into a score or number; use codes 110-130.\n\n**Note 5:**  If only a grade of 1 through 4 is given with no information on the score and it is unclear if it is a Nottingham or BR Grade, code 999.\n\n**Note 6:** Code the highest score prior to neoadjuvant treatment if multiple scores are reported.  \n* For examples, different scores may be reported on multiple pathology reports for the same primary cancer; different scores may be reported for multiple tumors assigned to the same primary cancer",
+          "codes": {
+            "030": "Score of 3",
+            "040": "Score of 4",
+            "050": "Score of 5",
+            "060": "Score of 6",
+            "070": "Score of 7",
+            "080": "Score of 8",
+            "090": "Score of 9",
+            "110": "Low Grade, Bloom-Richardson (BR) grade 1, score not given",
+            "120": "Medium (Intermediate) Grade, BR grade 2, score not given",
+            "130": "High Grade, BR grade 3, score not given",
+            "988": "Not applicable: Information not collected for this case",
+            "998": "No histologic examination of primary site",
+            "999": "Neither BR grade nor BR score given\nUnknown or no information\nNot documented in patient record"
           }
         }
       }
@@ -1189,6 +2039,33 @@
             "97": "Positive nodes - number unspecified",
             "98": "No nodes examined",
             "99": "Unknown if nodes are positive; not applicable\nNot documented in patient record"
+          }
+        }
+      },
+      "ssf": {
+        "3836": {
+          "item": 2890,
+          "label": "CS SSF2",
+          "name": "FIGO Stage",
+          "source": "tnm",
+          "table": "ssf2_kpn",
+          "definition": "**Note 1:** Most female primary peritoneal tumors have clinical course and treatment options similar to ovarian tumors.\n\n**Note 2:** It is very unlikely for this disease to have a FIGO Stage II or lower.\n\n**Note 3:**  Code the FIGO stage as stated in the medical record.  When lymph node(s) is/are clinically or pathologically positive or metastasis is present, make sure that the FIGO stage reflects the combination of T, N, and M and NOT just the T. \n* If a stage group is stated but it does not specify that it is a FIGO stage, assume that it is a FIGO stage and code it\n* Do not attempt to code FIGO stage based only on T, N, and M\n* If you cannot make a determination of stage based on the previous information, use code 999, stage unknown",
+          "codes": {
+            "100": "FIGO Stage I [NOS]",
+            "110": "FIGO Stage IA",
+            "120": "FIGO Stage IB",
+            "130": "FIGO Stage IC",
+            "200": "FIGO Stage II [NOS]",
+            "210": "FIGO Stage IIA",
+            "220": "FIGO Stage IIB",
+            "230": "FIGO Stage IIC",
+            "300": "FIGO Stage III [NOS]",
+            "310": "FIGO Stage IIIA",
+            "320": "FIGO Stage IIIB",
+            "330": "FIGO Stage IIIC",
+            "400": "FIGO Stage IV",
+            "988": "Not applicable: Information not collected for this case",
+            "999": "FIGO stage unknown"
           }
         }
       }
@@ -1630,6 +2507,22 @@
             "8": "Not applicable"
           }
         }
+      },
+      "discriminators": {
+        "3926": {
+          "name": "Schema Discriminator 1",
+          "title": "Schema Discriminator 1: Histology Discriminator for 9591/3",
+          "source": "eod",
+          "table": "schema_discriminator_1_63995",
+          "definition": "**Note:** **Schema Discriminator for 9591/3** \n* A schema discriminator is used to discriminate for histology 9591/3: Non-Hodgkin lymphoma to determine which Stage Group table to use.",
+          "codes": {
+            "1": "Splenic B-cell lymphoma/leukemia, unclassifiable",
+            "2": "Hairy cell leukemia variant\nProlymphocytic variant of hairy cell leukemia",
+            "3": "Splenic diffuse red pulp small B-cell lymphoma\nSplenic marginal zone lymphoma, diffuse variant\nSplenic red pulp lymphoma with numerous basophilic villous lymphocytes\nSplenic lymphoma with villous lymphocytes",
+            "9": "Non-Hodgkin lymphoma, NOS\nAny other terminology describing non-Hodgkin lymphoma, NOS",
+            "": "Histology is NOT 9591, Discriminator is not necessary"
+          }
+        }
       }
     },
     "eod/lung": {
@@ -1929,6 +2822,22 @@
           "table": "grade_pathological_73388",
           "codes": {
             "8": "Not applicable"
+          }
+        }
+      },
+      "discriminators": {
+        "3926": {
+          "name": "Schema Discriminator 1",
+          "title": "Schema Discriminator 1: Histology Discriminator for 9591/3",
+          "source": "eod",
+          "table": "schema_discriminator_1_63995",
+          "definition": "**Note:** **Schema Discriminator for 9591/3** \n* A schema discriminator is used to discriminate for histology 9591/3: Non-Hodgkin lymphoma to determine which Stage Group table to use.",
+          "codes": {
+            "1": "Splenic B-cell lymphoma/leukemia, unclassifiable",
+            "2": "Hairy cell leukemia variant\nProlymphocytic variant of hairy cell leukemia",
+            "3": "Splenic diffuse red pulp small B-cell lymphoma\nSplenic marginal zone lymphoma, diffuse variant\nSplenic red pulp lymphoma with numerous basophilic villous lymphocytes\nSplenic lymphoma with villous lymphocytes",
+            "9": "Non-Hodgkin lymphoma, NOS\nAny other terminology describing non-Hodgkin lymphoma, NOS",
+            "": "Histology is NOT 9591, Discriminator is not necessary"
           }
         }
       }
@@ -2251,6 +3160,543 @@
             "L": "Low grade",
             "H": "High grade",
             "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        }
+      }
+    },
+    "eod/soft_tissue_abdomen_thoracic": {
+      "select": [
+        {
+          "site": "C151-C152,C154-C155,C159,C170-C220,C239-C249,C260-C269, C339, C600-C619,C630-C689",
+          "hist": "8710-8714,8800-8803,8810-8921,8932-8934,8940-8990,9000-9016,9030-9043,9045-9138,9141-9230,9240-9580,9582",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C160-C169",
+          "hist": "8710-8714,8800-8803,8810-8921,8932-8934,8940-8975,8980-8990,9000-9016,9030-9043,9045-9138,9141-9230,9240-9580,9582",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C221",
+          "hist": "8710-8714,8800-8803,8810-8921,8932-8934,8940-8976,8981-8990,9000-9016,9030-9043,9045-9138,9141-9230,9240-9580,9582",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C250-C259",
+          "hist": "8710-8714,8800-8803,8810-8921,8932-8934,8940-8970,8972-8990,9000-9016,9030-9043,9045-9138,9141-9230,9240-9580,9582",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C340-C349",
+          "hist": "8710-8714,8800-8803,8810-8921,8932-8934,8940-8971,8973-8976,8981, 8983-8990,9000-9016,9030-9043,9045,9054-9138,9141-9230,9240-9580,9582",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C340-C349",
+          "hist": "8982",
+          "year_dx": "2018-2024"
+        },
+        {
+          "site": "C379",
+          "hist": "8710-8714, 8800-8803, 8810-8921, 8932-8934, 8940-8976, 8981-8990, 9000-9016, 9030-9043, 9045-9138, 9141-9230, 9240-9580, 9582",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C379",
+          "hist": "8980",
+          "year_dx": "2018-2024"
+        },
+        {
+          "site": "C473, C475, C493-C495",
+          "hist": "8000-8803, 8810-8921, 8932-8934, 8940-8990, 9000-9016, 9030-9043, 9045-9138, 9141-9230, 9240-9580, 9582",
+          "year_dx": "2018-2020",
+          "discriminator_2": "8"
+        },
+        {
+          "site": "C473, C475,C493-C495",
+          "hist": "8000-8803,8810-8921,8932-8934,8940-8990,9000-9016,9030-9043,9045-9138,9141-9230,9240-9580,9582",
+          "year_dx": "2018-",
+          "discriminator_2": "2"
+        },
+        {
+          "site": "C510-C519",
+          "hist": "8710-8714,8800-8803,8810-8921,8932-8934,8940-8981, 8983-8990,9000-9016,9030-9043,9045-9063, 9065-9070,9072-9138,9141-9230,9240-9580,9582",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C510-C519",
+          "hist": "8982, 9064",
+          "year_dx": "2018-2023"
+        },
+        {
+          "site": "C529",
+          "hist": "8710-8714,8800-8803,8810-8921,8932,8934,8940-8976,8981-8990,9000-9016,9030-9043,9045-9070,9072-9105,9111, 9120-9138,9141-9230,9240-9580,9582",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C530-C539",
+          "hist": "8710-8714,8800-8803,8810-8921,8932,8934,8940-8941,8951-8976,8981-8990,9000-9016,9030-9043,9045-9105,9111, 9120-9138,9141-9230,9240-9580,9582",
+          "year_dx": "2018-2020"
+        },
+        {
+          "site": "C530-C539",
+          "hist": "8950",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C589",
+          "hist": "8710-8714,8800-8803,8810-8921,8932-8934,8940-8990,9000-9016,9030-9043,9045-9091,9110-9138,9141-9230,9240-9580,9582",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C620-C629",
+          "hist": "8710-8714,8800-8803,8810-8921,8932-8934,8940-8990,9000-9016,9030-9043,9045-9060,9062-9063,9072-9073,9082-9083,9086-9091,9102-9103,9110-9138,9141-9230,9240-9580,9582",
+          "year_dx": "2018-"
+        }
+      ],
+      "codes": {
+        "756": {
+          "source": "eod",
+          "table": "tumor_size_summary_full_15510",
+          "codes": {
+            "000": "No mass/tumor found",
+            "001": "1 mm or described as less than 1 mm",
+            "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+            "989": "989 millimeters or larger",
+            "990": "Microscopic focus or foci only and no size of focus is given",
+            "998": "Alternate descriptions of tumor size for specific sites:\n\nFamilial/multiple polyposis:\n- Rectosigmoid and rectum (C19.9, C20.9)\n- Colon (C18.0, C18.2-C18.9)\n\nIf no size is documented:\nCircumferential:\n- Esophagus (C15.0-C15.5, C15.8-C15.9)\n\nDiffuse; widespread: 3/4s or more; linitis plastica:\n- Stomach and Esophagus GE Junction (C16.0-C16.6, C16.8-C16.9)\n\nDiffuse, entire lung or NOS:\n- Lung and main stem bronchus (C34.0-C34.3, C34.8-C34.9)\n\nDiffuse:\n- Breast (C50.0-C50.6, C50.8-C50.9)",
+            "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+          }
+        },
+        "764": {
+          "source": "eod",
+          "table": "ss2018_soft_tissue_31311",
+          "codes": {
+            "1": "**Localized only (localized, NOS)**\n- Confined to site of origin\n- Deep tumor, NOS\n- Superficial tumor, NOS",
+            "2": "**Regional by direct extension only**\n- Adjacent (connective) tissue, NOS\n  + Into tissue beyond organ\n- Adjacent organ(s)/structure(s), NOS\n- Major vessel invasion\n- Superficial or deep tumor WITH involvement of\n  + adjacent (connective) tissue or adjacent organ(s)/structure(s)\n- Abdomen and Thoracic Visceral Organs\n  + Mesentery\n  + Serosa\n  + Visceral peritoneum",
+            "3": "**Regional lymph node(s) involved only**\n- Head and Neck \n    + Cervical\n- Lip\n    + Facial, NOS\n    + Buccinator (buccal)\n    + Mandibular (submandibular, submaxillary, submental)\n    + Nasolabial\n    + Parotid (infra-auricular, preauricular) \n- Eyelid/canthus\n    + Facial (buccinator [buccal], nasolabial, NOS)\n    + Mandibular (submandibular, submaxillary, submental)\n    + Parotid, NOS (infra-auricular)\n- External ear and auditory canal\n    + Mastoid (posterior, retro-auricular) (occipital)\n    + Preauricular\n- Face, Other (cheek, chin, forehead, jaw, nose, and temple):\n    + Facial, NOS (buccinator [buccal], nasolabial) \n    + Mandibular (submandibular, submaxillary, submental)\n    + Parotid (infra-auricular, preauricular)\n- Scalp\n    + Mastoid (posterior, retro-auricular) (occipital)\n    + Parotid (infra-auricular, preauricular)\n    + Spinal accessory (posterior cervical)\n- Neck\n    + Axillary\n    + Mandibular\n    + Mastoid (posterior, retro-auricular) (occipital)\n    + Parotid (infra-auricular, preauricular)\n    + Spinal accessory (posterior cervical)\n    + Submental (bilateral or contralateral)\n    + Supraclavicular (transverse cervical)\n- Arm/shoulder\n    + Axillary\n    + Epitrochlear for hand/forearm\n    + Spinal accessory for shoulder\n - Leg/hip\n    + Femoral (superficial inguinal)\n    + Popliteal for heel and calf\n- Thorax\n    + Hilar (bronchopulmonary) (proximal lobar) (pulmonary root)\n    + Mediastinal\n - Abdomen\n    + Celiac\n    + Iliac\n    + Para-aortic\n- Pelvis\n    + Deep inguinal, NOS\n    + Rosenmuller or Cloquet node\n    + Superficial inguinal (femoral)\n- Upper trunk\n    + Axillary\n    + Cervical\n    + Internal mammary\n    + Supraclavicular (transverse cervical)\n - Lower trunk\n    + Superficial inguinal (femoral)\n- Regional lymph node(s), NOS\n  + Lymph node(s), NOS",
+            "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+            "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n  + Head and Neck subsites\n     * Brain parenchymal invasion\n     * Carotid artery encasement\n     * Central compartment visceral\n     * Central nervous system involvement via perineural spread\n     * Fascial skeleton\n     * Orbital invasion\n     * Prevertebral muscle invasion\n     * Pterygoid muscles\n     * Skull base/dural invasion\n- Distant lymph node(s), NOS\n- Distant metastasis, NOS\n  + Carcinomatosis\n  + Distant metastasis WITH or WITHOUT distant lymph node(s)",
+            "9": "Unknown if extension or metastasis"
+          }
+        },
+        "820": {
+          "source": "eod",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+          }
+        },
+        "830": {
+          "source": "eod",
+          "table": "nodes_exam_76029",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+          }
+        },
+        "1182": {
+          "source": "cipoc_lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        },
+        "3843": {
+          "source": "eod",
+          "table": "grade_clinical_41135",
+          "codes": {
+            "1": "G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3\n\nStated as FNCLCC Grade 1",
+            "2": "G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5\n\nStated as FNCLCC Grade 2",
+            "3": "G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8\n\nStated as FNCLCC Grade 3",
+            "A": "Well differentiated",
+            "B": "Moderately differentiated",
+            "C": "Poorly differentiated",
+            "D": "Undifferentiated, anaplastic",
+            "H": "Stated as \"high grade\" only",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        },
+        "3844": {
+          "source": "eod",
+          "table": "grade_pathological_40399",
+          "codes": {
+            "1": "G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3\n\nStated as FNCLCC Grade 1",
+            "2": "G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5\n\nStated as FNCLCC Grade 2",
+            "3": "G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8\n\nStated as FNCLCC Grade 3",
+            "A": "Well differentiated",
+            "B": "Moderately differentiated",
+            "C": "Poorly differentiated",
+            "D": "Undifferentiated, anaplastic",
+            "H": "Stated as \"high grade\" only",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        }
+      },
+      "discriminators": {
+        "3927": {
+          "name": "Schema Discriminator 2",
+          "title": "Schema Discriminator 2: Soft Tissue Trunk and Extremities/Soft Tissue Abdomen and Thoracic",
+          "source": "eod",
+          "table": "schema_discriminator_2_15990",
+          "definition": "**Note:** **Schema discriminator for C473, C475, C493-C495** \n* A schema discriminator is used to discriminate for peripheral nerve tumors (C473, C475) and connective tissue tumors (C493, C494, C495) for the subsite in which the tumor arose.",
+          "codes": {
+            "1": "External structures (sites), NOS\n\n***Examples*** of terms include:\n\nPeripheral nerves and autonomic nervous system (C47)\n* Pelvis (C475)\n  - Buttock\n  - Gluteal region\n  - Groin\n  - Inguinal region\n  - Perineum\n  - Sacrococcygeal region (stated as external)\n* Thorax (C473)\n   - Axilla\n   - Chest wall\n   - Infraclavicular region\n   - Scapular region\n   - Thoracic wall\n\nConnective, subcutaneous and other soft tissues (C49)\n* Abdomen (C494)\n  - Abdominal wall\n  - Abdominal wall muscle\n  - Iliopsoas muscle\n  - Psoas muscle\n  - Rectus abdominis muscle\n  - Umbilicus\n* Pelvis (C495)\n   - Buttock\n   - Gluteal region\n   - Gluteus maximus muscle\n   - Groin\n   - Inguinal region\n   - Perineum\n   - Sacrococcygeal region\n* Thorax (C493)\n   - Axilla\n   - Chest wall\n   - Infraclavicular region\n   - Intracostal muscle\n   - Latissimus dorsi muscle\n   - Pectoralis major muscle\n   - Scapular region\n   - Thoracic wall\n   - Trapezius muscle",
+            "2": "Internal structures and viscera (sites), NOS\n\n***Examples*** of terms include\n\nPeripheral nerves and autonomic nervous system (C47)\n* Sacrococcygeal region (intrapelvic)\n\nConnective, subcutaneous and other soft tissues (C49)\n* Abdomen (C494)\n  - Abdominal aorta\n  - Abdominal vena cava\n  - Celiac artery\n  - Inferior vena cava\n  - Mesenteric artery\n  - Renal artery\n  - Vena cava\n* Pelvis (C495)\n   - Iliac artery\n   - Iliac vein\n* Thorax (C493)\n   - Aorta\n   - Axillary artery\n   - Diaphragm \n   - Internal mammary artery\n   - Subclavian artery\n   - Superior vena cava\n   - Thoracic duct",
+            "8": "Not applicable: Case abstracted prior to 2021 update",
+            "9": "Not specific enough to determine if external or internal\n\n***Examples*** of terms include\n\nPeripheral nerves and autonomic nervous system (C47)\n* Pelvis (C475)\n  - Lumbosacral plexus\n  - Sacral nerve\n  - Sacral plexus\n* Thorax (C473)\n   - Chest\n   - Intercostal nerve\n\nConnective, subcutaneous and other soft tissues (C49)\n* Thorax (C493)\n   - Chest, NOS\n   - Thorax",
+            "": "Primary Site is not C473, C475, C493-C495, Discriminator is not necessary"
+          }
+        }
+      }
+    },
+    "eod/soft_tissue_other": {
+      "select": [
+        {
+          "site": "C000-C388,C470-C529,C589-C699, C739,C750, C754-C759",
+          "hist": "8992",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C530-C539",
+          "hist": "8992",
+          "year_dx": "2018-2020"
+        },
+        {
+          "site": "C722-C725, C751-C753",
+          "hist": "8992",
+          "behavior": "3",
+          "year_dx": "2018-2022"
+        },
+        {
+          "site": "C390,C398-C399,C420-C424",
+          "hist": "8710-8714,8800-8934,8940-9138,9141-9582",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C440,C442-C449",
+          "hist": "8710-8714,8800-8934,8941-8981,8983-9138,9141-9582",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C441",
+          "hist": "8710-8714,8800-8934,8950-8976,8981-9138,9141-9582",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C473, C475, C493-C495",
+          "hist": "8000-8803,8810-8921,8932-8934,8940-8990,9000-9016,9030-9043,9045-9138,9141-9230,9240-9580,9582",
+          "year_dx": "2018-",
+          "discriminator_2": "9"
+        },
+        {
+          "site": "C569,C570",
+          "hist": "8710-8714,8800-8803,8811-8814,8816-8818,8820-8821,8823-8824,8826-8858,8860-8881,8891-8900,8902-8905,8921,8932,8934,8940-8941,8951-8959,8963-8976,8981-8990,8992,9010-9016,9030-9043,9045,9051,9053-9055,9061-9065,9072,9081-9084,9086,9101-9105,9121-9132,9135-9138,9141-9175,9181-9221,9230,9240-9365,9370-9580,9582",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C571-C579,C740-C749,C809",
+          "hist": "8710-8714,8800-8803,8810-8814,8816-8818,8820-8858,8860-8900,8902-8905,8921,8932-8934,8940-8990,8992,9000-9016,9030-9043,9045-9111,9121-9132,9135-9138,9141-9175,9181-9221,9230,9240-9365,9370-9580,9582",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C696,C698",
+          "hist": "8859,8930-8931,8991,9020,9180,9222,9231,9366-9368",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C700-C721,C728-C729",
+          "hist": "8710-8714, 8800-8801, 8803, 8811-8814, 8816-8818, 8820-8842, 8851-8858, 8860-8881, 8891-8898, 8902-8905, 8921, 8932-8934, 8940-8990, 8992, 9000-9016, 9030-9043, 9045-9063, 9065, 9072-9073, 9081-9083, 9086-9091, 9110-9111, 9121-9132, 9135-9138, 9141-9175, 9181-9213, 9221, 9230, 9240-9361, 9363, 9365, 9370-9373, 9541-9580, 9582",
+          "behavior": "3",
+          "year_dx": "2018-2022"
+        },
+        {
+          "site": "C760",
+          "hist": "8710-8714,8800-8934,8940,8950-9138,9141-9582",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C760",
+          "hist": "8941",
+          "year_dx": "2018-",
+          "discriminator_1": "0,1"
+        },
+        {
+          "site": "C761-C765,C767-C768,C770-C775,C778-C779",
+          "hist": "8710-8714,8800-8934,8940-9138,9141-9582",
+          "year_dx": "2018-"
+        }
+      ],
+      "codes": {
+        "756": {
+          "source": "eod",
+          "table": "tumor_size_summary_full_15510",
+          "codes": {
+            "000": "No mass/tumor found",
+            "001": "1 mm or described as less than 1 mm",
+            "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+            "989": "989 millimeters or larger",
+            "990": "Microscopic focus or foci only and no size of focus is given",
+            "998": "Alternate descriptions of tumor size for specific sites:\n\nFamilial/multiple polyposis:\n- Rectosigmoid and rectum (C19.9, C20.9)\n- Colon (C18.0, C18.2-C18.9)\n\nIf no size is documented:\nCircumferential:\n- Esophagus (C15.0-C15.5, C15.8-C15.9)\n\nDiffuse; widespread: 3/4s or more; linitis plastica:\n- Stomach and Esophagus GE Junction (C16.0-C16.6, C16.8-C16.9)\n\nDiffuse, entire lung or NOS:\n- Lung and main stem bronchus (C34.0-C34.3, C34.8-C34.9)\n\nDiffuse:\n- Breast (C50.0-C50.6, C50.8-C50.9)",
+            "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+          }
+        },
+        "764": {
+          "source": "eod",
+          "table": "ss2018_soft_tissue_31311",
+          "codes": {
+            "1": "**Localized only (localized, NOS)**\n- Confined to site of origin\n- Deep tumor, NOS\n- Superficial tumor, NOS",
+            "2": "**Regional by direct extension only**\n- Adjacent (connective) tissue, NOS\n  + Into tissue beyond organ\n- Adjacent organ(s)/structure(s), NOS\n- Major vessel invasion\n- Superficial or deep tumor WITH involvement of\n  + adjacent (connective) tissue or adjacent organ(s)/structure(s)\n- Abdomen and Thoracic Visceral Organs\n  + Mesentery\n  + Serosa\n  + Visceral peritoneum",
+            "3": "**Regional lymph node(s) involved only**\n- Head and Neck \n    + Cervical\n- Lip\n    + Facial, NOS\n    + Buccinator (buccal)\n    + Mandibular (submandibular, submaxillary, submental)\n    + Nasolabial\n    + Parotid (infra-auricular, preauricular) \n- Eyelid/canthus\n    + Facial (buccinator [buccal], nasolabial, NOS)\n    + Mandibular (submandibular, submaxillary, submental)\n    + Parotid, NOS (infra-auricular)\n- External ear and auditory canal\n    + Mastoid (posterior, retro-auricular) (occipital)\n    + Preauricular\n- Face, Other (cheek, chin, forehead, jaw, nose, and temple):\n    + Facial, NOS (buccinator [buccal], nasolabial) \n    + Mandibular (submandibular, submaxillary, submental)\n    + Parotid (infra-auricular, preauricular)\n- Scalp\n    + Mastoid (posterior, retro-auricular) (occipital)\n    + Parotid (infra-auricular, preauricular)\n    + Spinal accessory (posterior cervical)\n- Neck\n    + Axillary\n    + Mandibular\n    + Mastoid (posterior, retro-auricular) (occipital)\n    + Parotid (infra-auricular, preauricular)\n    + Spinal accessory (posterior cervical)\n    + Submental (bilateral or contralateral)\n    + Supraclavicular (transverse cervical)\n- Arm/shoulder\n    + Axillary\n    + Epitrochlear for hand/forearm\n    + Spinal accessory for shoulder\n - Leg/hip\n    + Femoral (superficial inguinal)\n    + Popliteal for heel and calf\n- Thorax\n    + Hilar (bronchopulmonary) (proximal lobar) (pulmonary root)\n    + Mediastinal\n - Abdomen\n    + Celiac\n    + Iliac\n    + Para-aortic\n- Pelvis\n    + Deep inguinal, NOS\n    + Rosenmuller or Cloquet node\n    + Superficial inguinal (femoral)\n- Upper trunk\n    + Axillary\n    + Cervical\n    + Internal mammary\n    + Supraclavicular (transverse cervical)\n - Lower trunk\n    + Superficial inguinal (femoral)\n- Regional lymph node(s), NOS\n  + Lymph node(s), NOS",
+            "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+            "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n  + Head and Neck subsites\n     * Brain parenchymal invasion\n     * Carotid artery encasement\n     * Central compartment visceral\n     * Central nervous system involvement via perineural spread\n     * Fascial skeleton\n     * Orbital invasion\n     * Prevertebral muscle invasion\n     * Pterygoid muscles\n     * Skull base/dural invasion\n- Distant lymph node(s), NOS\n- Distant metastasis, NOS\n  + Carcinomatosis\n  + Distant metastasis WITH or WITHOUT distant lymph node(s)",
+            "9": "Unknown if extension or metastasis"
+          }
+        },
+        "820": {
+          "source": "eod",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+          }
+        },
+        "830": {
+          "source": "eod",
+          "table": "nodes_exam_76029",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+          }
+        },
+        "1182": {
+          "source": "cipoc_lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        },
+        "3843": {
+          "source": "eod",
+          "table": "grade_clinical_41135",
+          "codes": {
+            "1": "G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3\n\nStated as FNCLCC Grade 1",
+            "2": "G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5\n\nStated as FNCLCC Grade 2",
+            "3": "G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8\n\nStated as FNCLCC Grade 3",
+            "A": "Well differentiated",
+            "B": "Moderately differentiated",
+            "C": "Poorly differentiated",
+            "D": "Undifferentiated, anaplastic",
+            "H": "Stated as \"high grade\" only",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        },
+        "3844": {
+          "source": "eod",
+          "table": "grade_pathological_40399",
+          "codes": {
+            "1": "G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3\n\nStated as FNCLCC Grade 1",
+            "2": "G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5\n\nStated as FNCLCC Grade 2",
+            "3": "G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8\n\nStated as FNCLCC Grade 3",
+            "A": "Well differentiated",
+            "B": "Moderately differentiated",
+            "C": "Poorly differentiated",
+            "D": "Undifferentiated, anaplastic",
+            "H": "Stated as \"high grade\" only",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        }
+      },
+      "discriminators": {
+        "3926": {
+          "name": "Schema Discriminator 1",
+          "title": "Schema Discriminator 1: Occult Head and Neck Lymph Nodes",
+          "source": "eod",
+          "table": "occult_head_and_neck_lymph_nodes_10277",
+          "definition": "**Note:** **Schema Discriminator for C760** \n* This schema discriminator is used to discriminate between head and neck tumors with unknown primary site coded as C760. \n\t\n* **00060: Cervical Lymph Nodes and Unknown Primary**\n\n     Occult head and neck tumor with cervical metastasis in Levels I-VII, and other group lymph nodes without a p16 immunostaining or with negative results and without an Epstein-Barr virus (EBV) encoded small RNAs (EBER) by in situ hybridization performed or with negative results are staged using the AJCC Cervical Lymph Nodes and Unknown Primary Tumors of the Head and Neck Staging System. **Assign primary site C760; code the schema discriminator accordingly.**\n\n* **00090: Nasopharynx 8th (2018-2024) and \n09090: Nasopharynx V9 (2025+)**\n\n     Occult head and neck tumors with cervical metastasis in Levels I-VII, and other group lymph nodes that is positive for Epstein-Barr virus (EBV+) (regardless of p16 status) encoded small RNAs (EBER) identified by in situ hybridization are staged using the AJCC Nasopharynx Staging System. **Assign primary site C119; do NOT code this discriminator**\n\n* **00100: Oropharynx HPV-Associated 8th (2018-2025) and \n09100: Oropharynx HPV-Associated V9 (2026+)**\n\n    Occult head and neck tumors with cervical metastasis in Levels I-VII, and other group lymph nodes, p16 positive with histology consistent with HPV-associated oropharyngeal carcinoma (OPC), are staged using the AJCC Oropharynx HPV-Associated Staging System. **Assign primary site C109; do NOT code this discriminator**\n\n* **99999: Ill-Defined Other**\n\n   If the tumor is not occult or does not have cervical metastasis in Levels I-VII, and other group lymph nodes, it is not included in the AJCC Cervical Lymph Nodes and Unknown Primary Tumors of the Head and Neck Staging System and will be classified as Ill-Defined Other for Summary Staging",
+          "codes": {
+            "0": "Not Occult",
+            "1": "Occult, Negative cervical nodes (regional head and neck nodes)",
+            "2": "Not tested for EBV or p16 in head and neck regional nodes  (EBV and p16 both unknown)",
+            "3": "Unknown EBV, p16 negative in head and neck regional nodes",
+            "4": "Unknown p16, EBV negative in head and neck regional nodes",
+            "5": "Negative for both EBV and p16 in head and neck regional nodes",
+            "": "Not C760, discriminator does not apply\n\nPositive p16 in head and neck regional nodes, EBV unknown or negative\nAssign primary site C109\n\nPositive EBV in head and neck regional nodes, p16 positive, negative, or unknown\nAssign primary site C119"
+          }
+        },
+        "3927": {
+          "name": "Schema Discriminator 2",
+          "title": "Schema Discriminator 2: Soft Tissue Trunk and Extremities/Soft Tissue Abdomen and Thoracic",
+          "source": "eod",
+          "table": "schema_discriminator_2_15990",
+          "definition": "**Note:** **Schema discriminator for C473, C475, C493-C495** \n* A schema discriminator is used to discriminate for peripheral nerve tumors (C473, C475) and connective tissue tumors (C493, C494, C495) for the subsite in which the tumor arose.",
+          "codes": {
+            "1": "External structures (sites), NOS\n\n***Examples*** of terms include:\n\nPeripheral nerves and autonomic nervous system (C47)\n* Pelvis (C475)\n  - Buttock\n  - Gluteal region\n  - Groin\n  - Inguinal region\n  - Perineum\n  - Sacrococcygeal region (stated as external)\n* Thorax (C473)\n   - Axilla\n   - Chest wall\n   - Infraclavicular region\n   - Scapular region\n   - Thoracic wall\n\nConnective, subcutaneous and other soft tissues (C49)\n* Abdomen (C494)\n  - Abdominal wall\n  - Abdominal wall muscle\n  - Iliopsoas muscle\n  - Psoas muscle\n  - Rectus abdominis muscle\n  - Umbilicus\n* Pelvis (C495)\n   - Buttock\n   - Gluteal region\n   - Gluteus maximus muscle\n   - Groin\n   - Inguinal region\n   - Perineum\n   - Sacrococcygeal region\n* Thorax (C493)\n   - Axilla\n   - Chest wall\n   - Infraclavicular region\n   - Intracostal muscle\n   - Latissimus dorsi muscle\n   - Pectoralis major muscle\n   - Scapular region\n   - Thoracic wall\n   - Trapezius muscle",
+            "2": "Internal structures and viscera (sites), NOS\n\n***Examples*** of terms include\n\nPeripheral nerves and autonomic nervous system (C47)\n* Sacrococcygeal region (intrapelvic)\n\nConnective, subcutaneous and other soft tissues (C49)\n* Abdomen (C494)\n  - Abdominal aorta\n  - Abdominal vena cava\n  - Celiac artery\n  - Inferior vena cava\n  - Mesenteric artery\n  - Renal artery\n  - Vena cava\n* Pelvis (C495)\n   - Iliac artery\n   - Iliac vein\n* Thorax (C493)\n   - Aorta\n   - Axillary artery\n   - Diaphragm \n   - Internal mammary artery\n   - Subclavian artery\n   - Superior vena cava\n   - Thoracic duct",
+            "8": "Not applicable: Case abstracted prior to 2021 update",
+            "9": "Not specific enough to determine if external or internal\n\n***Examples*** of terms include\n\nPeripheral nerves and autonomic nervous system (C47)\n* Pelvis (C475)\n  - Lumbosacral plexus\n  - Sacral nerve\n  - Sacral plexus\n* Thorax (C473)\n   - Chest\n   - Intercostal nerve\n\nConnective, subcutaneous and other soft tissues (C49)\n* Thorax (C493)\n   - Chest, NOS\n   - Thorax",
+            "": "Primary Site is not C473, C475, C493-C495, Discriminator is not necessary"
+          }
+        }
+      }
+    },
+    "eod/soft_tissue_trunk_extremities": {
+      "select": [
+        {
+          "site": "C471-C472, C476,C478-C479,C491-C492,C496,C498-C499",
+          "hist": "8000-8803,8810-8921,8932-8934,8940-8990,9000-9016,9030-9043,9045-9138,9141-9230,9240-9580,9582",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C473, C475, C493-C495",
+          "hist": "8000-8803, 8810-8921, 8932-8934, 8940-8990, 9000-9016, 9030-9043, 9045-9138, 9141-9230, 9240-9580, 9582",
+          "year_dx": "2018-",
+          "discriminator_2": "1"
+        },
+        {
+          "site": "C474",
+          "hist": "8000-8803, 8810-8921, 8932-8934, 8940-8990, 9000-9016, 9030-9043, 9045-9138, 9141-9230, 9240-9580, 9582",
+          "year_dx": "2018-"
+        },
+        {
+          "site": "C500-C506, C508-C509",
+          "hist": "8710-8714,8800-8803,8810-8921,8932-8934,8940-8981,8990,9000-9016,9030-9043,9045-9138,9141-9230,9240-9580,9582",
+          "year_dx": "2018-"
+        }
+      ],
+      "codes": {
+        "756": {
+          "source": "eod",
+          "table": "tumor_size_summary_full_31213",
+          "codes": {
+            "000": "No mass/tumor found",
+            "001": "1 mm or described as less than 1 mm",
+            "002-988": "Exact size in millimeters (2 mm to 988 mm)",
+            "989": "989 millimeters or larger",
+            "990": "Microscopic focus or foci only and no size of focus is given",
+            "998": "Alternate descriptions of tumor size for specific sites:\n\nFamilial/multiple polyposis:\n- Rectosigmoid and rectum (C19.9, C20.9)\n- Colon (C18.0, C18.2-C18.9)\n\nIf no size is documented:\nCircumferential:\n- Esophagus (C15.0-C15.5, C15.8-C15.9)\n\nDiffuse; widespread: 3/4s or more; linitis plastica:\n- Stomach and Esophagus GE Junction (C16.0-C16.6, C16.8-C16.9)\n\nDiffuse, entire lung or NOS:\n- Lung and main stem bronchus (C34.0-C34.3, C34.8-C34.9)\n\nDiffuse:\n- Breast (C50.0-C50.6, C50.8-C50.9)",
+            "999": "Unknown\nSize not stated\nNot documented in medical record\nSize of tumor cannot be assessed\nNot applicable"
+          }
+        },
+        "764": {
+          "source": "eod",
+          "table": "ss2018_soft_tissue_31311",
+          "codes": {
+            "1": "**Localized only (localized, NOS)**\n- Confined to site of origin\n- Deep tumor, NOS\n- Superficial tumor, NOS",
+            "2": "**Regional by direct extension only**\n- Adjacent (connective) tissue, NOS\n  + Into tissue beyond organ\n- Adjacent organ(s)/structure(s), NOS\n- Major vessel invasion\n- Superficial or deep tumor WITH involvement of\n  + adjacent (connective) tissue or adjacent organ(s)/structure(s)\n- Abdomen and Thoracic Visceral Organs\n  + Mesentery\n  + Serosa\n  + Visceral peritoneum",
+            "3": "**Regional lymph node(s) involved only**\n- Head and Neck \n    + Cervical\n- Lip\n    + Facial, NOS\n    + Buccinator (buccal)\n    + Mandibular (submandibular, submaxillary, submental)\n    + Nasolabial\n    + Parotid (infra-auricular, preauricular) \n- Eyelid/canthus\n    + Facial (buccinator [buccal], nasolabial, NOS)\n    + Mandibular (submandibular, submaxillary, submental)\n    + Parotid, NOS (infra-auricular)\n- External ear and auditory canal\n    + Mastoid (posterior, retro-auricular) (occipital)\n    + Preauricular\n- Face, Other (cheek, chin, forehead, jaw, nose, and temple):\n    + Facial, NOS (buccinator [buccal], nasolabial) \n    + Mandibular (submandibular, submaxillary, submental)\n    + Parotid (infra-auricular, preauricular)\n- Scalp\n    + Mastoid (posterior, retro-auricular) (occipital)\n    + Parotid (infra-auricular, preauricular)\n    + Spinal accessory (posterior cervical)\n- Neck\n    + Axillary\n    + Mandibular\n    + Mastoid (posterior, retro-auricular) (occipital)\n    + Parotid (infra-auricular, preauricular)\n    + Spinal accessory (posterior cervical)\n    + Submental (bilateral or contralateral)\n    + Supraclavicular (transverse cervical)\n- Arm/shoulder\n    + Axillary\n    + Epitrochlear for hand/forearm\n    + Spinal accessory for shoulder\n - Leg/hip\n    + Femoral (superficial inguinal)\n    + Popliteal for heel and calf\n- Thorax\n    + Hilar (bronchopulmonary) (proximal lobar) (pulmonary root)\n    + Mediastinal\n - Abdomen\n    + Celiac\n    + Iliac\n    + Para-aortic\n- Pelvis\n    + Deep inguinal, NOS\n    + Rosenmuller or Cloquet node\n    + Superficial inguinal (femoral)\n- Upper trunk\n    + Axillary\n    + Cervical\n    + Internal mammary\n    + Supraclavicular (transverse cervical)\n - Lower trunk\n    + Superficial inguinal (femoral)\n- Regional lymph node(s), NOS\n  + Lymph node(s), NOS",
+            "4": "**Regional by BOTH direct extension AND regional lymph node(s) involved**\n- Codes (2) + (3)",
+            "7": "**Distant site(s)/lymph node(s) involved**\n- Distant site(s) (including further contiguous extension)\n  + Head and Neck subsites\n     * Brain parenchymal invasion\n     * Carotid artery encasement\n     * Central compartment visceral\n     * Central nervous system involvement via perineural spread\n     * Fascial skeleton\n     * Orbital invasion\n     * Prevertebral muscle invasion\n     * Pterygoid muscles\n     * Skull base/dural invasion\n- Distant lymph node(s), NOS\n- Distant metastasis, NOS\n  + Carcinomatosis\n  + Distant metastasis WITH or WITHOUT distant lymph node(s)",
+            "9": "Unknown if extension or metastasis"
+          }
+        },
+        "820": {
+          "source": "eod",
+          "table": "nodes_pos_fpa",
+          "codes": {
+            "00": "All nodes examined negative",
+            "01-89": "1 - 89 nodes positive (code exact number of nodes positive)",
+            "90": "90 or more nodes positive",
+            "95": "Positive aspiration or core biopsy of lymph node(s)",
+            "97": "Positive nodes - number unspecified",
+            "98": "No nodes examined",
+            "99": "Unknown if nodes are positive; not applicable\nNot documented in medical record"
+          }
+        },
+        "830": {
+          "source": "eod",
+          "table": "nodes_exam_76029",
+          "codes": {
+            "00": "No nodes examined",
+            "01-89": "1 - 89 nodes examined (code exact number of regional lymph nodes examined)",
+            "90": "90 or more nodes examined",
+            "95": "No regional nodes removed, but aspiration or core biopsy of regional nodes performed",
+            "96": "Regional lymph node removal documented as sampling and number of nodes unknown/not stated",
+            "97": "Regional lymph node removal documented as dissection and number of nodes unknown/not stated",
+            "98": "Regional lymph nodes surgically removed but number of lymph nodes unknown/not stated and not documented as sampling or dissection; nodes examined, but number unknown",
+            "99": "Unknown if nodes were examined; not applicable or negative \nNot documented in medical record"
+          }
+        },
+        "1182": {
+          "source": "cipoc_lvi",
+          "codes": {
+            "0": "Lymph-vascular Invasion stated as Not Present",
+            "1": "Lymph-vascular Invasion Present/Identified",
+            "8": "Not Applicable",
+            "9": "Unknown/Indeterminate/not mentioned in path report"
+          }
+        },
+        "3843": {
+          "source": "eod",
+          "table": "grade_clinical_64933",
+          "codes": {
+            "1": "G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3\n\nStated as FNCLCC Grade 1",
+            "2": "G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5\n\nStated as FNCLCC Grade 2",
+            "3": "G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8\n\nStated as FNCLCC Grade 3",
+            "A": "Well differentiated",
+            "B": "Moderately differentiated",
+            "C": "Poorly differentiated",
+            "D": "Undifferentiated, anaplastic",
+            "H": "Stated as \"high grade\" only",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        },
+        "3844": {
+          "source": "eod",
+          "table": "grade_pathological_19141",
+          "codes": {
+            "1": "G1: Sum of differentiation score, mitotic count score and necrosis score equals 2 or 3\n\nStated as FNCLCC Grade 1",
+            "2": "G2: Sum of differentiation score, mitotic count score and necrosis score of 4 or 5\n\nStated as FNCLCC Grade 2",
+            "3": "G3: Sum of differentiation score, mitotic count score and necrosis score of 6, 7, or 8\n\nStated as FNCLCC Grade 3",
+            "A": "Well differentiated",
+            "B": "Moderately differentiated",
+            "C": "Poorly differentiated",
+            "D": "Undifferentiated, anaplastic",
+            "H": "Stated as \"high grade\" only",
+            "9": "Grade cannot be assessed (GX); Unknown"
+          }
+        }
+      },
+      "discriminators": {
+        "3927": {
+          "name": "Schema Discriminator 2",
+          "title": "Schema Discriminator 2: Soft Tissue Trunk and Extremities/Soft Tissue Abdomen and Thoracic",
+          "source": "eod",
+          "table": "schema_discriminator_2_15990",
+          "definition": "**Note:** **Schema discriminator for C473, C475, C493-C495** \n* A schema discriminator is used to discriminate for peripheral nerve tumors (C473, C475) and connective tissue tumors (C493, C494, C495) for the subsite in which the tumor arose.",
+          "codes": {
+            "1": "External structures (sites), NOS\n\n***Examples*** of terms include:\n\nPeripheral nerves and autonomic nervous system (C47)\n* Pelvis (C475)\n  - Buttock\n  - Gluteal region\n  - Groin\n  - Inguinal region\n  - Perineum\n  - Sacrococcygeal region (stated as external)\n* Thorax (C473)\n   - Axilla\n   - Chest wall\n   - Infraclavicular region\n   - Scapular region\n   - Thoracic wall\n\nConnective, subcutaneous and other soft tissues (C49)\n* Abdomen (C494)\n  - Abdominal wall\n  - Abdominal wall muscle\n  - Iliopsoas muscle\n  - Psoas muscle\n  - Rectus abdominis muscle\n  - Umbilicus\n* Pelvis (C495)\n   - Buttock\n   - Gluteal region\n   - Gluteus maximus muscle\n   - Groin\n   - Inguinal region\n   - Perineum\n   - Sacrococcygeal region\n* Thorax (C493)\n   - Axilla\n   - Chest wall\n   - Infraclavicular region\n   - Intracostal muscle\n   - Latissimus dorsi muscle\n   - Pectoralis major muscle\n   - Scapular region\n   - Thoracic wall\n   - Trapezius muscle",
+            "2": "Internal structures and viscera (sites), NOS\n\n***Examples*** of terms include\n\nPeripheral nerves and autonomic nervous system (C47)\n* Sacrococcygeal region (intrapelvic)\n\nConnective, subcutaneous and other soft tissues (C49)\n* Abdomen (C494)\n  - Abdominal aorta\n  - Abdominal vena cava\n  - Celiac artery\n  - Inferior vena cava\n  - Mesenteric artery\n  - Renal artery\n  - Vena cava\n* Pelvis (C495)\n   - Iliac artery\n   - Iliac vein\n* Thorax (C493)\n   - Aorta\n   - Axillary artery\n   - Diaphragm \n   - Internal mammary artery\n   - Subclavian artery\n   - Superior vena cava\n   - Thoracic duct",
+            "8": "Not applicable: Case abstracted prior to 2021 update",
+            "9": "Not specific enough to determine if external or internal\n\n***Examples*** of terms include\n\nPeripheral nerves and autonomic nervous system (C47)\n* Pelvis (C475)\n  - Lumbosacral plexus\n  - Sacral nerve\n  - Sacral plexus\n* Thorax (C473)\n   - Chest\n   - Intercostal nerve\n\nConnective, subcutaneous and other soft tissues (C49)\n* Thorax (C493)\n   - Chest, NOS\n   - Thorax",
+            "": "Primary Site is not C473, C475, C493-C495, Discriminator is not necessary"
           }
         }
       }

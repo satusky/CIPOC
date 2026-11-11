@@ -1,16 +1,18 @@
 import unittest
 
 from cipoc.models import CaseFacts, NoteCorpusDescriptors, TargetGroup
-from cipoc.tools import GroupNode, load_group_hierarchy, load_variable_groups
+from cipoc.tools import GroupNode, load_group_hierarchy, load_scoping_dictionary, load_variable_groups
 from cipoc.utils.progress.events import ProgressEvent, normalize
 from cipoc.utils.progress.layout import build_rows, render_lines
 from cipoc.utils.progress.model import ProgressModel, Stage
 from cipoc.utils.progress.renderers import PlainLog
 from tests.fake_orchestrator import (
+    SCOPING_DICTIONARY,
     Outcome,
     Script,
     TISSUE_CODES,
     VARIABLE_GROUPS,
+    build_fake_orchestrator,
     graph_input,
     record_events,
 )
@@ -468,6 +470,42 @@ class FakeOrchestratorStreamTests(unittest.TestCase):
         )
         self.assertEqual(snapshot.notes_done, len(input_state["note_corpus"]))
         self.assertEqual(snapshot.branches, ())
+        self.assertEqual(snapshot.counts.get("pending", 0), 0)
+        self.assertTrue(snapshot.finished)
+
+    def test_an_ssf_extracted_for_grade_shows_only_in_its_group(self):
+        # A 2012 breast case extracts CS SSF7 (2861) for both grade items, in
+        # site_specific_codes, which extracts each variable on its own branch.
+        target_groups = load_variable_groups(VARIABLE_GROUPS)
+        model = ProgressModel(
+            "Orchestrator",
+            0.0,
+            target_groups=target_groups,
+            group_hierarchy=load_group_hierarchy(VARIABLE_GROUPS),
+            graph_input=graph_input(),
+        )
+        agent = build_fake_orchestrator(Script(outcomes={
+            390: Outcome(value="20120615"), 400: Outcome(value="C504"),
+            522: Outcome(value="8500"), 523: Outcome(value="3"),
+        }))
+        agent._site_dictionary = load_scoping_dictionary(SCOPING_DICTIONARY)
+        raw_events = list(agent._graph.stream(graph_input(), stream_mode=["values", "tasks"], subgraphs=True))
+        branched = [
+            payload for _, mode, payload in raw_events
+            if mode == "tasks" and payload.get("name") == "variable_branch" and "input" in payload
+            and payload["input"].task.variable.item_id == 2861
+        ]
+        self.assertEqual(len(branched), 1)
+
+        for index, raw_event in enumerate(raw_events, 1):
+            model.ingest(normalize(raw_event, subgraphs=True), index / 10)
+        model.finish()
+
+        snapshot = model.snapshot()
+        expected_variables = sum(len(group.variables) for group in target_groups)
+        self.assertNotIn(2861, snapshot.variables)
+        self.assertEqual(snapshot.total_variables, expected_variables)
+        self.assertEqual(snapshot.terminal_variables, expected_variables)
         self.assertEqual(snapshot.counts.get("pending", 0), 0)
         self.assertTrue(snapshot.finished)
 

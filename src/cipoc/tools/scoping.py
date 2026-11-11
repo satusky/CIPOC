@@ -6,7 +6,15 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Collection, Iterable, Mapping, Sequence, get_args
 
-from cipoc.models import CaseFacts, GrossSite, HistologyScope, ScopingDictionary
+from cipoc.models import (
+    CaseFacts,
+    GrossSite,
+    HistologyScope,
+    ScopingDictionary,
+    SsfChoice,
+    SsfMapping,
+    VariableInfo,
+)
 
 
 PRIMARY_SITE_ITEM = 400
@@ -17,6 +25,12 @@ _GENERATOR = "`python -m canonical_naaccr.cipoc_scoping` in canonical-naaccr"
 # The sections CIPOC reads, each added by a later version of the generator.
 _SECTIONS = ("sources", "tissues", "schemas", "histology", "blocks", "algorithms", "items")
 _ALGORITHMS = ("cs", "tnm", "eod")
+# The algorithms whose schemas held some requested items in Site-Specific
+# Factors before 2018 (the schemas' ``ssf``).
+_SSF_ALGORITHMS = ("cs", "tnm")
+# An SSF table keeps the rows a later CS version converted away, for old data.
+# Each starts "OBSOLETE DATA CONVERTED" or "OBSOLETE DATA RETAINED".
+_OBSOLETE_CODE = re.compile(r"\s*OBSOLETE\b", re.IGNORECASE)
 _TISSUES = frozenset(get_args(GrossSite)) - {"unspecified"}
 # The select keys the generator writes. CIPOC doesn't extract the discriminators
 # (3926, 3927) or CS Site-Specific Factor 25 (2879), so those always match.
@@ -182,6 +196,24 @@ def _check_items(scoping: ScopingDictionary) -> None:
             raise ValueError(f"Item {item_id}: {error} Regenerate the file with {_GENERATOR}.") from None
 
 
+def _check_ssf(scoping: ScopingDictionary) -> None:
+    for key, schema in scoping.schemas.items():
+        if schema.ssf and key.partition("/")[0] not in _SSF_ALGORITHMS:
+            raise ValueError(
+                f"Schema {key} has SSF mappings, which only CS and TNM schemas hold. "
+                f"Regenerate the file with {_GENERATOR}."
+            )
+        for item_id, mapping in schema.ssf.items():
+            if mapping.years is None:
+                continue
+            try:
+                _item_years(mapping.years)
+            except ValueError as error:
+                raise ValueError(
+                    f"Schema {key}, item {item_id}'s SSF: {error} Regenerate the file with {_GENERATOR}."
+                ) from None
+
+
 def _check_histology(scoping: ScopingDictionary) -> None:
     codes = _all_site_codes(scoping)
     owner: dict[str, str] = {}
@@ -237,7 +269,8 @@ def parse_scoping_dictionary(data: Mapping[str, Any]) -> ScopingDictionary:
     must start with the family's 3 digits. Morphology blocks mustn't overlap.
     The algorithms must be cs, tnm and eod, with diagnosis years that don't
     overlap and histology codes that parse. Every item's years must parse and
-    run forwards.
+    run forwards, and so must the years of every SSF mapping, which only CS and
+    TNM schemas may hold.
     Coverage of item 400, and of item 522's pairs, is checked separately
     (``check_primary_site_coverage``, ``check_histology_pairs``), since it needs
     the NAACCR dictionary.
@@ -283,6 +316,7 @@ def parse_scoping_dictionary(data: Mapping[str, Any]) -> ScopingDictionary:
     _check_blocks(scoping)
     _check_algorithms(scoping)
     _check_items(scoping)
+    _check_ssf(scoping)
     return scoping
 
 
@@ -590,6 +624,8 @@ def out_of_year_reason(
     *,
     held_by: Sequence[tuple[int, str | None]] = (),
     replaced_by: Sequence[tuple[int, str | None]] = (),
+    ssf: SsfMapping | None = None,
+    ssf_disagreement: str | None = None,
 ) -> str | None:
     """Why the item isn't collected for the diagnosis year, or None when it is
     (``item_applies_in_year``).
@@ -600,6 +636,11 @@ def out_of_year_reason(
     each as ``(item_id, name)``. The ones collected that year are named: "…;
     Grade (440) holds it for this year." or "…; Grade Clinical (3843) and Grade
     Pathological (3844) replace it."
+
+    ``ssf`` is the case's CS Site-Specific Factor for the item
+    (``ssf_equivalent``), named with them: "…; CS SSF2 (2890, FIGO Stage) holds
+    it for this year." ``ssf_disagreement`` says instead why no SSF could be
+    chosen.
     """
     if item_applies_in_year(scoping, item_id, date_of_diagnosis):
         return None
@@ -612,18 +653,143 @@ def out_of_year_reason(
         f"Not collected for {_diagnosis_year(date_of_diagnosis)} diagnoses: "
         f"{_item_label(item_id, name)} applies {span}"
     )
-    for equivalents, one, several in (
-        (held_by, "holds it for this year", "hold it for this year"),
-        (replaced_by, "replaces it", "replace it"),
+    held = [
+        _item_label(equivalent, equivalent_name)
+        for equivalent, equivalent_name in held_by
+        if item_applies_in_year(scoping, equivalent, date_of_diagnosis)
+    ]
+    if ssf is not None:
+        held.append(_ssf_label(ssf))
+    replaced = [
+        _item_label(equivalent, equivalent_name)
+        for equivalent, equivalent_name in replaced_by
+        if item_applies_in_year(scoping, equivalent, date_of_diagnosis)
+    ]
+    for labels, one, several in (
+        (held, "holds it for this year", "hold it for this year"),
+        (replaced, "replaces it", "replace it"),
     ):
-        labels = [
-            _item_label(equivalent, equivalent_name)
-            for equivalent, equivalent_name in equivalents
-            if item_applies_in_year(scoping, equivalent, date_of_diagnosis)
-        ]
         if labels:
             reason += f"; {_join_labels(labels)} {one if len(labels) == 1 else several}"
+    if ssf_disagreement:
+        reason += f"; the candidate schemas disagree on the CS Site-Specific Factor that holds it: {ssf_disagreement}"
     return reason + "."
+
+
+def _ssf_label(mapping: SsfMapping) -> str:
+    return f"{mapping.label} ({mapping.item}, {mapping.name})"
+
+
+def ssf_items(scoping: ScopingDictionary, date_of_diagnosis: str | None) -> frozenset[int]:
+    """The requested items that some schema of the diagnosis year's algorithm
+    holds in a CS Site-Specific Factor (the schemas' ``ssf``).
+
+    Empty unless the year picks CS or TNM (``diagnosis_algorithm``).
+    """
+    algorithm = diagnosis_algorithm(scoping, date_of_diagnosis)
+    if algorithm not in _SSF_ALGORITHMS:
+        return frozenset()
+    return frozenset(
+        item_id
+        for key, schema in scoping.schemas.items()
+        if key.startswith(f"{algorithm}/")
+        for item_id in schema.ssf
+    )
+
+
+def ssf_offered_codes(mapping: SsfMapping) -> dict[str, str]:
+    """The SSF's codes, without the rows CS kept only for converted data.
+
+    Those rows, like ovary's "888: OBSOLETE DATA CONVERTED V0200 / See code 988",
+    describe codes a later CS version replaced, so new abstraction never uses
+    them.
+    """
+    return {
+        code: description
+        for code, description in mapping.codes.items()
+        if not _OBSOLETE_CODE.match(description)
+    }
+
+
+def _ssf_signature(mapping: SsfMapping) -> tuple:
+    codes = ssf_offered_codes(mapping)
+    return (
+        mapping.item,
+        _normalize_text(mapping.name),
+        tuple(sorted((code, _normalize_text(description)) for code, description in codes.items())),
+    )
+
+
+def _schema_list(keys: Sequence[str], shown: int = 4) -> str:
+    if len(keys) <= shown:
+        return _join_labels(list(keys))
+    return f"{', '.join(keys[:shown])} and {len(keys) - shown} others"
+
+
+def ssf_equivalent(
+    scoping: ScopingDictionary, item_id: int, facts: CaseFacts | None
+) -> SsfChoice:
+    """The CS Site-Specific Factor that holds a requested item for the case.
+
+    The candidates are the schemas of the diagnosis year's algorithm that the
+    case matches (``matching_schemas``). A schema holds the item when its
+    ``ssf`` maps it and the mapping's years, if it has them, include the year.
+
+    * substitute: every candidate holds it in the same SSF item, with the same
+      name and offered codes (``ssf_offered_codes``). ``mapping`` is that SSF.
+    * disagree: candidates hold it in different SSFs, or some hold it and some
+      don't. ``reason`` says which does what. A discriminator usually settles
+      it.
+    * none: no candidate holds it that year. So does an EOD, unknown or
+      pre-2004 year, which never substitutes.
+    """
+    date_of_diagnosis = facts.date_of_diagnosis if facts else None
+    algorithm = diagnosis_algorithm(scoping, date_of_diagnosis)
+    if algorithm not in _SSF_ALGORITHMS:
+        return SsfChoice(outcome="none")
+    year = _diagnosis_year(date_of_diagnosis)
+    candidates = [key for key in matching_schemas(scoping, facts) if key.startswith(f"{algorithm}/")]
+    held: dict[str, SsfMapping | None] = {}
+    for key in candidates:
+        mapping = scoping.schemas[key].ssf.get(item_id)
+        if mapping is not None and mapping.years is not None:
+            first, last = _item_years(mapping.years)
+            if (first is not None and year < first) or (last is not None and year > last):
+                mapping = None
+        held[key] = mapping
+    mappings = [mapping for mapping in held.values() if mapping is not None]
+    if not mappings:
+        return SsfChoice(outcome="none", schemas=candidates)
+    signatures = {None if mapping is None else _ssf_signature(mapping) for mapping in held.values()}
+    if len(signatures) == 1:
+        return SsfChoice(outcome="substitute", schemas=candidates, mapping=mappings[0])
+
+    by_signature: dict[tuple | None, list[str]] = {}
+    labels: dict[tuple | None, str] = {}
+    for key, mapping in held.items():
+        signature = None if mapping is None else _ssf_signature(mapping)
+        by_signature.setdefault(signature, []).append(key)
+        if mapping is not None:
+            labels.setdefault(signature, _ssf_label(mapping))
+    parts = []
+    for signature, keys in by_signature.items():
+        verb = "holds" if len(keys) == 1 else "hold"
+        held_in = f"it in {labels[signature]}" if signature is not None else "no SSF for it"
+        parts.append(f"{_schema_list(keys)} {verb} {held_in}")
+    return SsfChoice(outcome="disagree", schemas=candidates, reason="; ".join(parts))
+
+
+def ssf_variable(mapping: SsfMapping) -> VariableInfo:
+    """The SSF as the extractor is offered it: the schema's own name, notes and
+    codes (``ssf_offered_codes``), never the NAACCR dictionary's generic "CS
+    Site-Specific Factor N". The orchestrator adds the dictionary's format and
+    length when it scopes the group."""
+    return VariableInfo(
+        item_id=mapping.item,
+        name=mapping.name,
+        description=mapping.definition.strip() or f"{mapping.name}, recorded in {mapping.label}.",
+        valid_codes=ssf_offered_codes(mapping),
+    )
 
 
 def _accepted(pair: str, accepted: Collection[int] | None) -> bool:

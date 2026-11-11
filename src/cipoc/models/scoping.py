@@ -6,6 +6,8 @@ the staging schemas, the histology site groups and the morphology blocks;
 ``tools/scoping.py`` loads and checks it.
 """
 
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -47,6 +49,22 @@ class CodeOverride(BaseModel):
     codes: dict[str, str] = Field(description="Description of each code or code range.")
 
 
+class SsfMapping(BaseModel):
+    """The CS Site-Specific Factor that held a requested item in one CS or TNM schema before 2018."""
+
+    item: int = Field(description="The SSF's own NAACCR item ID, e.g. 2890 for CS SSF2.")
+    label: str = Field(description="Which SSF it is, e.g. 'CS SSF2'.")
+    name: str = Field(description="The schema's name for it, e.g. 'FIGO Stage'.")
+    years: str | None = Field(
+        default=None,
+        description="Diagnosis years it applies to when they're narrower than the schema's, like '2010-2015'.",
+    )
+    source: str = Field(description="Key in the file's sources that it comes from.")
+    table: str | None = Field(default=None, description="Staging table its codes come from.")
+    definition: str = Field(default="", description="The table's notes: the schema's coding instructions for it.")
+    codes: dict[str, str] = Field(description="Description of each code or code range, as the table holds them.")
+
+
 class StagingSchema(BaseModel):
     """One CS, TNM or EOD schema: when it applies and which item codes it changes."""
 
@@ -56,6 +74,21 @@ class StagingSchema(BaseModel):
     codes: dict[int, CodeOverride] = Field(
         description="Code overrides keyed by NAACCR item ID. An item without one keeps the NAACCR codes.",
     )
+    ssf: dict[int, SsfMapping] = Field(
+        default_factory=dict,
+        description="CS and TNM schemas only: the SSF that held each requested item before 2018, keyed by the requested item's ID.",
+    )
+
+
+class SsfChoice(BaseModel):
+    """How a case's candidate schemas settle the SSF for one requested item (``ssf_equivalent``)."""
+
+    outcome: Literal["substitute", "disagree", "none"] = Field(
+        description="substitute: every candidate holds it in the same SSF. disagree: they hold it in different SSFs, or some don't. none: no candidate holds it that year.",
+    )
+    schemas: list[str] = Field(default_factory=list, description="The candidate CS or TNM schemas, in file order.")
+    mapping: SsfMapping | None = Field(default=None, description="The SSF the candidates agree on, for substitute.")
+    reason: str | None = Field(default=None, description="For disagree, what each candidate holds it in.")
 
 
 class HistologyCode(BaseModel):

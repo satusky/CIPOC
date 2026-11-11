@@ -466,7 +466,10 @@ class ProgressModel:
         attempt = int(field(field(event.payload, "task"), "extraction_attempts", 0) or 0)
         if item_id is not None:
             self._advance_variable(item_id, stage, attempt)
-            group_id = group_id or self._variables[item_id].group_id
+            # An SSF extracted in place of a requested item isn't a configured
+            # variable, so only its group's progress shows it.
+            if group_id is None and item_id in self._variables:
+                group_id = self._variables[item_id].group_id
         elif group_id is not None:
             for member in self._groups[group_id].item_ids:
                 self._advance_variable(member, stage, attempt)

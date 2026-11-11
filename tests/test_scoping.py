@@ -30,6 +30,10 @@ from cipoc.tools import (
     primary_site_tissues,
     scoped_codes,
     scoped_item_codes,
+    ssf_equivalent,
+    ssf_items,
+    ssf_offered_codes,
+    ssf_variable,
 )
 
 
@@ -97,7 +101,8 @@ class ScopingDictionaryLoadTests(unittest.TestCase):
         newer["algorithms"]["eod"]["notes"] = "added later"
         newer["items"]["670"]["replaced_by"] = "671"
         newer["tissues"]["breast"]["notes"] = "added later"
-        newer["schemas"]["cs/breast"]["ssf"] = {"3836": "2880"}
+        newer["schemas"]["cs/breast"]["notes"] = "added later"
+        newer["schemas"]["cs/breast"]["ssf"]["3843"]["notes"] = "added later"
         newer["histology"]["breast"]["notes"] = "added later"
 
         scoping = parse_scoping_dictionary(newer)
@@ -310,10 +315,13 @@ class SchemaMatchingTests(unittest.TestCase):
         self.assertEqual(self.match(None), list(self.scoping.schemas))
         self.assertEqual(self.match(CaseFacts()), list(self.scoping.schemas))
         self.assertEqual(self.match(CaseFacts(histology="8140")), [
-            "cs/breast", "cs/lung", "cs/peritoneum_female_gen",
+            "cs/breast", "cs/lung", "cs/ovary", "cs/peritoneum", "cs/peritoneum_female_gen",
+            "cs/prostate", "cs/vulva",
             "tnm/breast", "tnm/lung", "tnm/peritoneum_female_gen",
             "eod/breast", "eod/colon_rectum", "eod/corpus_carcinoma", "eod/lung",
             "eod/lung_v9_2025", "eod/primary_peritoneal_carcinoma",
+            "eod/soft_tissue_abdomen_thoracic", "eod/soft_tissue_other",
+            "eod/soft_tissue_trunk_extremities",
         ])
 
     def test_diagnosis_year_picks_the_algorithm(self):
@@ -376,7 +384,11 @@ class SchemaMatchingTests(unittest.TestCase):
     def test_candidate_histology_families_stand_in_for_an_uncoded_histology(self):
         breast = {"primary_site": "C504", "date_of_diagnosis": "2020-06-15"}
         everything = self.match(CaseFacts(**breast))
-        self.assertEqual(everything, ["eod/breast", "eod/hemeretic", "eod/lymphoma"])
+        # Sarcomas at C50 belong to the soft tissue schemas.
+        self.assertEqual(everything, [
+            "eod/breast", "eod/hemeretic", "eod/lymphoma",
+            "eod/soft_tissue_other", "eod/soft_tissue_trunk_extremities",
+        ])
         for facts, expected in (
             # Lymphoma families steer an uncoded histology to the lymphoma schema.
             ({"candidate_histology_families": ["967", "968"]}, ["eod/lymphoma"]),
@@ -413,8 +425,9 @@ class SchemaMatchingTests(unittest.TestCase):
             ("2020-06-15", "1", []),
             ("2020-06-15", "9", ["eod/primary_peritoneal_carcinoma"]),
             ("2016-06-15", "1", []),
-            # CS selects on Site-Specific Factor 25, which is always unknown.
-            ("2012-06-15", "1", ["cs/peritoneum_female_gen"]),
+            # CS selects on Site-Specific Factor 25, which is always unknown,
+            # so both CS peritoneum schemas match.
+            ("2012-06-15", "1", ["cs/peritoneum", "cs/peritoneum_female_gen"]),
         ):
             with self.subTest(date_of_diagnosis=date_of_diagnosis, sex=sex):
                 self.assertEqual(
@@ -430,8 +443,12 @@ class ScopedCodesTests(unittest.TestCase):
         cls.scoping = parse_scoping_dictionary(cls.raw)
 
     def test_several_matches_give_the_union(self):
-        matched = matching_schemas(self.scoping, CaseFacts(primary_site="C504", date_of_diagnosis="2020-06-15"))
-        self.assertEqual(matched, ["eod/breast", "eod/hemeretic", "eod/lymphoma"])
+        # Duct carcinoma or a lymphoma: the soft tissue schemas, which describe
+        # grade's codes differently, don't match.
+        matched = matching_schemas(self.scoping, CaseFacts(
+            primary_site="C504", date_of_diagnosis="2020-06-15", candidate_histology_families=["850", "967"],
+        ))
+        self.assertEqual(matched, ["eod/breast", "eod/lymphoma"])
 
         grade = scoped_codes(self.scoping, matched, 3843)
 
@@ -908,6 +925,149 @@ class ItemYearsTests(unittest.TestCase):
             "Not collected for 2008 diagnoses: Item 2851 applies from 2010 through 2015.",
         )
         self.assertIsNone(out_of_year_reason(self.scoping, 440, "2015", "Grade", replaced_by=[(3843, None)]))
+
+
+class SsfLoadTests(unittest.TestCase):
+    def setUp(self):
+        self.raw = json.loads(FIXTURE.read_text())
+
+    def test_fixture_maps_figo_gleason_and_grade(self):
+        scoping = load_scoping_dictionary(FIXTURE)
+        self.assertEqual(
+            {key: sorted(schema.ssf) for key, schema in scoping.schemas.items() if schema.ssf},
+            {
+                "cs/breast": [3843, 3844], "cs/ovary": [3836], "cs/peritoneum": [3843, 3844],
+                "cs/peritoneum_female_gen": [3836], "cs/prostate": [3838, 3839, 3840, 3841, 3842],
+                "cs/vulva": [3836], "tnm/breast": [3843, 3844], "tnm/peritoneum_female_gen": [3836],
+            },
+        )
+
+    def test_only_cs_and_tnm_schemas_hold_ssfs(self):
+        broken = copy.deepcopy(self.raw)
+        broken["schemas"]["eod/breast"]["ssf"] = copy.deepcopy(self.raw["schemas"]["cs/breast"]["ssf"])
+        with self.assertRaisesRegex(ValueError, "Schema eod/breast has SSF mappings.*canonical_naaccr"):
+            parse_scoping_dictionary(broken)
+
+    def test_ssf_years_must_parse(self):
+        broken = copy.deepcopy(self.raw)
+        broken["schemas"]["cs/ovary"]["ssf"]["3836"]["years"] = "2010 on"
+        with self.assertRaisesRegex(
+            ValueError, "Schema cs/ovary, item 3836's SSF: Unsupported item years '2010 on'.*canonical_naaccr"
+        ):
+            parse_scoping_dictionary(broken)
+
+
+class SsfEquivalentTests(unittest.TestCase):
+    """Before 2018, the case's CS or TNM schema holds FIGO, Gleason and grade in an SSF."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.scoping = load_scoping_dictionary(FIXTURE)
+
+    def choose(self, item_id, primary_site, histology, date_of_diagnosis):
+        facts = CaseFacts(
+            primary_site=primary_site, histology=histology, behavior="3", date_of_diagnosis=date_of_diagnosis,
+        )
+        return ssf_equivalent(self.scoping, item_id, facts)
+
+    def test_a_2012_ovary_case_codes_figo_stage_in_ssf2(self):
+        choice = self.choose(3836, "C569", "8441", "20120615")
+
+        self.assertEqual((choice.outcome, choice.schemas), ("substitute", ["cs/ovary"]))
+        self.assertEqual((choice.mapping.item, choice.mapping.label, choice.mapping.name), (2890, "CS SSF2", "FIGO Stage"))
+        offered = ssf_offered_codes(choice.mapping)
+        table = self.scoping.schemas["cs/ovary"].ssf[3836].codes
+        # 888 is CS Version 1 data converted to 988, so it's never offered.
+        self.assertTrue(table["888"].startswith("OBSOLETE DATA CONVERTED"))
+        self.assertEqual(set(table) - set(offered), {"888"})
+        self.assertEqual(offered["987"], table["987"])
+
+    def test_ssf10_is_figo_for_vulva_and_gleason_for_prostate(self):
+        vulva = self.choose(3836, "C510", "8070", "20120615")
+        prostate = self.choose(3841, "C619", "8140", "20120615")
+
+        self.assertEqual((vulva.outcome, vulva.mapping.item, vulva.mapping.name), ("substitute", 2864, "FIGO Stage"))
+        self.assertEqual(
+            (prostate.outcome, prostate.mapping.item, prostate.mapping.name),
+            ("substitute", 2864, "Gleason's Score on Prostatectomy/Autopsy"),
+        )
+        self.assertNotEqual(ssf_offered_codes(vulva.mapping), ssf_offered_codes(prostate.mapping))
+
+    def test_candidates_that_hold_it_differently_disagree(self):
+        # CS SSF25 tells the two peritoneum schemas apart, and CIPOC doesn't
+        # extract it, so both are candidates.
+        grade = self.choose(3843, "C481", "8441", "20120615")
+        figo = self.choose(3836, "C481", "8441", "20120615")
+
+        self.assertEqual((grade.outcome, grade.schemas), ("disagree", ["cs/peritoneum", "cs/peritoneum_female_gen"]))
+        self.assertIsNone(grade.mapping)
+        self.assertEqual(
+            grade.reason,
+            "cs/peritoneum holds it in CS SSF1 (2880, Grade for Sarcomas); "
+            "cs/peritoneum_female_gen holds no SSF for it",
+        )
+        self.assertEqual(figo.outcome, "disagree")
+        self.assertIn("cs/peritoneum_female_gen holds it in CS SSF2 (2890, FIGO Stage)", figo.reason)
+
+    def test_a_year_before_the_ssf_existed_has_none(self):
+        # CS added ovary's FIGO Stage SSF in Version 2, for 2010 diagnoses.
+        choice = self.choose(3836, "C569", "8441", "20080615")
+        self.assertEqual((choice.outcome, choice.schemas, choice.mapping), ("none", ["cs/ovary"], None))
+
+    def test_tnm_years_use_the_tnm_schema(self):
+        choice = self.choose(3836, "C481", "8441", "20160615")
+        self.assertEqual((choice.outcome, choice.schemas), ("substitute", ["tnm/peritoneum_female_gen"]))
+        self.assertEqual((choice.mapping.item, choice.mapping.years), (2890, None))
+        breast = self.choose(3843, "C504", "8500", "20160615")
+        self.assertEqual((breast.outcome, breast.mapping.item), ("substitute", 2861))
+
+    def test_an_eod_or_unknown_year_never_substitutes(self):
+        for date in ("20200615", None, "2000"):
+            with self.subTest(date=date):
+                self.assertEqual(self.choose(3836, "C569", "8441", date).outcome, "none")
+        self.assertEqual(ssf_equivalent(self.scoping, 3836, None).outcome, "none")
+
+    def test_ssf_items_follow_the_years_algorithm(self):
+        self.assertEqual(sorted(ssf_items(self.scoping, "20120615")), [3836, 3838, 3839, 3840, 3841, 3842, 3843, 3844])
+        # The fixture's TNM schemas are breast and peritoneum_female_gen.
+        self.assertEqual(sorted(ssf_items(self.scoping, "2016")), [3836, 3843, 3844])
+        for date in ("20200615", None, "2000"):
+            with self.subTest(date=date):
+                self.assertEqual(ssf_items(self.scoping, date), frozenset())
+
+    def test_the_ssf_is_offered_under_the_schemas_name_and_codes(self):
+        mapping = self.scoping.schemas["cs/ovary"].ssf[3836]
+        variable = ssf_variable(mapping)
+
+        self.assertEqual((variable.item_id, variable.name), (2890, "FIGO Stage"))
+        self.assertEqual(variable.description, mapping.definition.strip())
+        self.assertEqual(variable.valid_codes, ssf_offered_codes(mapping))
+        self.assertNotIn("Site-Specific Factor", variable.name)
+
+    def test_the_reason_names_the_ssf(self):
+        mapping = self.scoping.schemas["cs/ovary"].ssf[3836]
+        self.assertEqual(
+            out_of_year_reason(self.scoping, 3836, "20120615", "FIGO Stage", ssf=mapping),
+            "Not collected for 2012 diagnoses: FIGO Stage (3836) applies from 2018; "
+            "CS SSF2 (2890, FIGO Stage) holds it for this year.",
+        )
+        grade = self.scoping.schemas["cs/breast"].ssf[3843]
+        self.assertEqual(
+            out_of_year_reason(self.scoping, 3843, "20120615", "Grade Clinical", held_by=[(440, "Grade")], ssf=grade),
+            "Not collected for 2012 diagnoses: Grade Clinical (3843) applies from 2018; Grade (440) and "
+            "CS SSF7 (2861, Nottingham or Bloom-Richardson (BR) Score/Grade) hold it for this year.",
+        )
+        self.assertEqual(
+            out_of_year_reason(
+                self.scoping, 3843, "20120615", "Grade Clinical", held_by=[(440, "Grade")],
+                ssf_disagreement="cs/peritoneum holds it in CS SSF1 (2880, Grade for Sarcomas); "
+                "cs/peritoneum_female_gen holds no SSF for it",
+            ),
+            "Not collected for 2012 diagnoses: Grade Clinical (3843) applies from 2018; Grade (440) holds it "
+            "for this year; the candidate schemas disagree on the CS Site-Specific Factor that holds it: "
+            "cs/peritoneum holds it in CS SSF1 (2880, Grade for Sarcomas); cs/peritoneum_female_gen holds "
+            "no SSF for it.",
+        )
 
 
 class RealHistologyPairsTests(unittest.TestCase):

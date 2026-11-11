@@ -20,7 +20,7 @@ from langgraph.graph.message import add_messages
 from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
-from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_data_dictionary, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, out_of_year_results, derive_case_facts, candidate_gross_sites, not_found_results, to_case_results, build_report, load_scoping_dictionary, check_primary_site_coverage, check_histology_pairs, histology_pairs, build_histology_scope, lookup_variable_info, tissue_site_codes, checkpoint_one_stop_reason, checkpoint_two_stop_reason, stop_pending_results
+from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_data_dictionary, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, out_of_year_results, with_ssf_equivalents, ssf_equivalent_results, overlay_schema_variable, derive_case_facts, candidate_gross_sites, not_found_results, to_case_results, build_report, load_scoping_dictionary, check_primary_site_coverage, check_histology_pairs, histology_pairs, build_histology_scope, lookup_variable_info, tissue_site_codes, checkpoint_one_stop_reason, checkpoint_two_stop_reason, stop_pending_results
 from cipoc.tools.scoping import HISTOLOGY_ITEM
 from cipoc.utils import CipocConfig, ObservabilityCollector, run_graph_stream
 from cipoc.utils.progress.events import ProgressEvent
@@ -55,6 +55,7 @@ from cipoc.models import (
     ExtractionStop,
     ReportabilityStop,
     ScopingDictionary,
+    SsfEquivalent,
     confidence_field,
 )
 
@@ -105,6 +106,10 @@ class CaseState(BaseModel):
         default=None,
         description="Review roll-up assembled at finalization; absent until then.",
     )
+    ssf_equivalents: Annotated[dict[int, SsfEquivalent], dict_merge_reducer] = Field(
+        default_factory=dict,
+        description="CS Site-Specific Factors extracted in place of requested items, keyed by the SSF's item ID; written by plan_extraction.",
+    )
     note_corpus: Annotated[dict[int | str, ClinicalNote | ProcessedClinicalNote], dict_merge_reducer] = Field(
         default_factory=dict,
         description="Dictionary of processed clinical notes keyed by note ID."
@@ -139,6 +144,7 @@ class CaseState(BaseModel):
             fatal_blocker=self.fatal_blocker,
             reportability_stop=self.reportability_stop,
             report=self.report,
+            ssf_equivalents=dict(self.ssf_equivalents),
         )
 
 
@@ -204,6 +210,7 @@ class OrchestratorOutput(BaseModel):
     fatal_blocker: str | None = None
     reportability_stop: ReportabilityStop | None = None
     report: CaseReport | None = None
+    ssf_equivalents: dict[int, SsfEquivalent] = Field(default_factory=dict)
 
 
 class OrchestratorAgent(BaseAgent):
@@ -426,6 +433,11 @@ class OrchestratorAgent(BaseAgent):
         site dictionary, Histology (522) also gets its ``histology_scope`` for the
         coded Primary Site, or the unknown primary's when none is coded, limited
         to the codes the diagnosis year's algorithm accepts.
+
+        A variable that arrives with its own codes is a CS Site-Specific Factor
+        standing in for a requested item (``with_ssf_equivalents``). It keeps
+        its schema's name, description and codes, and takes only the format and
+        length from the NAACCR dictionary (``overlay_schema_variable``).
         """
         enriched = build_variable_group(
             [variable.item_id for variable in group.variables],
@@ -434,6 +446,11 @@ class OrchestratorAgent(BaseAgent):
             site_dictionary=self._site_dictionary,
         )
         enriched_by_id = {variable.item_id: variable for variable in enriched.variables}
+        for variable in group.variables:
+            if variable.valid_codes is not None:
+                enriched_by_id[variable.item_id] = overlay_schema_variable(
+                    enriched_by_id[variable.item_id], variable
+                )
         histology = enriched_by_id.get(HISTOLOGY_ITEM)
         if histology is not None and self._site_dictionary is not None:
             # Histology is chosen in two steps from the coded site's list, so it
@@ -471,6 +488,15 @@ class OrchestratorAgent(BaseAgent):
         the checkpoint, that goes back through check_state, so planning resumes
         from the closed results: a closed item is never extracted, and a group
         left with none pending is terminal and releases the next stage.
+
+        In a CS or TNM year, an item a schema held in a Site-Specific Factor waits
+        until its group is ready, when the earlier stages have coded the site and
+        histology. It's then replaced by the case's SSF, BLOCKED when the
+        candidate schemas disagree, or closed like the others
+        (``ssf_equivalent_results``), again through check_state. Each SSF is
+        recorded in ``ssf_equivalents`` and planned as part of its group
+        (``with_ssf_equivalents``), so it's extracted with the group and keeps
+        the run open while it's PENDING.
         """
         if state.reportability_stop is None:
             stop_reason = checkpoint_two_stop_reason(
@@ -483,8 +509,11 @@ class OrchestratorAgent(BaseAgent):
                         state.variable_results, ExtractionStop.NOT_REPORTABLE
                     ),
                 })
+        groups = with_ssf_equivalents(
+            state.target_variables, state.ssf_equivalents, self._site_dictionary
+        )
         closed = out_of_year_results(
-            state.target_variables,
+            groups,
             state.variable_results,
             self._site_dictionary,
             state.case_facts.date_of_diagnosis if state.case_facts else None,
@@ -492,13 +521,26 @@ class OrchestratorAgent(BaseAgent):
         if closed:
             return Command(goto="check_state", update={"variable_results": closed})
         ready = eligible_groups(
-            state.target_variables,
+            groups,
             state.variable_results,
             state.note_corpus_descriptors,
             state.case_facts,
             stages=self._stages,
             tissue_codes=self._tissue_codes,
         )
+        settled, equivalents = ssf_equivalent_results(
+            ready,
+            groups,
+            state.variable_results,
+            self._site_dictionary,
+            state.case_facts,
+            state.ssf_equivalents,
+            state.structured_data,
+        )
+        if settled:
+            return Command(goto="check_state", update={
+                "variable_results": settled, "ssf_equivalents": equivalents,
+            })
         if ready:
             # Extract only each group's still-pending variables, so structured-data
             # seeds (or values coded on an earlier pass) are never re-extracted.
@@ -519,7 +561,7 @@ class OrchestratorAgent(BaseAgent):
         return Command(
             goto="check_state",
             update={"variable_results": resolve_leftovers(
-                state.target_variables,
+                groups,
                 state.variable_results,
                 state.note_corpus_descriptors,
                 state.case_facts,

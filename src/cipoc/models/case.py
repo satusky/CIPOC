@@ -146,6 +146,21 @@ class CaseVariableResult(BaseModel):
         return self
 
 
+class SsfEquivalent(BaseModel):
+    """A CS Site-Specific Factor extracted in place of requested items its diagnosis year predates.
+
+    The SSF wasn't requested, so its result is keyed by its own item ID and the
+    run's inputs don't list it. This records where it came from.
+    """
+
+    item_id: int = Field(description="The SSF's own NAACCR item ID, e.g. 2890.")
+    label: str = Field(description="Which SSF it is, e.g. 'CS SSF2'.")
+    name: str = Field(description="The schemas' name for it, e.g. 'FIGO Stage'.")
+    replaces: list[int] = Field(description="The requested items it stands in for, each ending NOT_APPLICABLE with a reason naming it.")
+    schemas: list[str] = Field(description="The candidate CS or TNM schemas, which all hold the requested items in this SSF.")
+    group_id: str | None = Field(default=None, description="The group it's extracted with: the requested items' group.")
+
+
 class ReviewFlagType(str, Enum):
     """Controlled reasons a coded variable is surfaced for human review."""
 
@@ -210,6 +225,10 @@ class Case(BaseModel):
         default=None,
         description="Review roll-up flagging errors, invalid extractions, low-confidence values, several candidate tissues, and a histology off the site's list.",
     )
+    ssf_equivalents: dict[int, SsfEquivalent] = Field(
+        default_factory=dict,
+        description="The CS Site-Specific Factors extracted in place of requested items, keyed by the SSF's item ID. Each SSF's result is in variable_results under the same key.",
+    )
 
     @model_validator(mode="after")
     def check_result_keys(self):
@@ -220,6 +239,12 @@ class Case(BaseModel):
                 raise ValueError(
                     f"Variable result key {item_id} does not match item ID "
                     f"{result.item_id}."
+                )
+        for item_id, equivalent in self.ssf_equivalents.items():
+            if equivalent.item_id != item_id:
+                raise ValueError(
+                    f"SSF equivalent key {item_id} does not match item ID "
+                    f"{equivalent.item_id}."
                 )
         for key, selection in self.note_selection.items():
             expected_key = f"group:{selection.group_id}"
