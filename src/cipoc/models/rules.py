@@ -63,6 +63,9 @@ class CaseFacts(BaseModel):
     behavior: str | None = Field(default=None, description="ICD-O-3 behavior code, when known.")
     sex: str | None = Field(default=None, description="Patient sex, when known.")
     date_of_diagnosis: str | None = Field(default=None, description="Date of diagnosis as recorded; parse leniently for comparisons.")
+    schema_discriminator_1: str | None = Field(default=None, description="Schema Discriminator 1 (3926), when coded. It picks among EOD schemas that share a site and histology; unknown, it matches every one.")
+    schema_discriminator_2: str | None = Field(default=None, description="Schema Discriminator 2 (3927), when coded, like schema_discriminator_1.")
+    cs_site_specific_factor_25: str | None = Field(default=None, description="CS Site-Specific Factor 25 (2879), when coded: the discriminator CS and TNM schemas use before 2018.")
 
 
 class ScopingReviewReason(str, Enum):

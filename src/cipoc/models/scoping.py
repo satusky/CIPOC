@@ -65,6 +65,17 @@ class SsfMapping(BaseModel):
     codes: dict[str, str] = Field(description="Description of each code or code range, as the table holds them.")
 
 
+class SchemaDiscriminator(BaseModel):
+    """A discriminator the schema's selection reads: Schema Discriminator 1 or 2 (EOD), or CS Site-Specific Factor 25 (CS, TNM)."""
+
+    name: str = Field(description="The schema input's name, e.g. 'Schema Discriminator 1' (EOD) or 'Schema Discriminator: Peritoneum/PeritoneumFemaleGen' (CS).")
+    title: str = Field(description="The discriminator table's title, e.g. 'Schema Discriminator 1: Histology Discriminator for 9591/3' (EOD) or 'CS Site-Specific Factor 25' (CS).")
+    source: str = Field(description="Key in the file's sources that it comes from.")
+    table: str = Field(description="The discriminator table, which every schema read alongside this one shares.")
+    definition: str = Field(default="", description="The table's notes.")
+    codes: dict[str, str] = Field(description="Description of each code. A blank code '' says when the discriminator isn't needed.")
+
+
 class StagingSchema(BaseModel):
     """One CS, TNM or EOD schema: when it applies and which item codes it changes."""
 
@@ -78,6 +89,10 @@ class StagingSchema(BaseModel):
         default_factory=dict,
         description="CS and TNM schemas only: the SSF that held each requested item before 2018, keyed by the requested item's ID.",
     )
+    discriminators: dict[int, SchemaDiscriminator] = Field(
+        default_factory=dict,
+        description="The discriminators the schema's selection rows read, keyed by NAACCR item: 3926 and 3927 (EOD) or 2879 (CS, TNM).",
+    )
 
 
 class SsfChoice(BaseModel):
@@ -89,6 +104,17 @@ class SsfChoice(BaseModel):
     schemas: list[str] = Field(default_factory=list, description="The candidate CS or TNM schemas, in file order.")
     mapping: SsfMapping | None = Field(default=None, description="The SSF the candidates agree on, for substitute.")
     reason: str | None = Field(default=None, description="For disagree, what each candidate holds it in.")
+
+
+class DiscriminatorChoice(BaseModel):
+    """Whether a case needs a schema discriminator (``discriminator_choice``)."""
+
+    needed: bool = Field(description="True when the candidate schemas differ by the discriminator, so its value picks among them.")
+    schemas: list[str] = Field(default_factory=list, description="The candidate schemas, matched without the discriminator's own value, in file order.")
+    discriminator: SchemaDiscriminator | None = Field(
+        default=None,
+        description="When needed, the table the candidates that read it share. None if they don't share one.",
+    )
 
 
 class HistologyCode(BaseModel):

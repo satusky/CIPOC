@@ -9,7 +9,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from operator import add
-from typing import Any, Callable, Mapping
+from typing import Any, Callable, Mapping, Sequence
 from typing_extensions import Annotated, Literal
 from pydantic import BaseModel, Field, model_validator
 
@@ -20,7 +20,7 @@ from langgraph.graph.message import add_messages
 from langchain.messages import AnyMessage, HumanMessage, SystemMessage
 
 from cipoc.llm import BaseAgentModel
-from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_data_dictionary, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, out_of_year_results, with_ssf_equivalents, ssf_equivalent_results, overlay_schema_variable, derive_case_facts, candidate_gross_sites, not_found_results, to_case_results, build_report, load_scoping_dictionary, check_primary_site_coverage, check_histology_pairs, histology_pairs, build_histology_scope, lookup_variable_info, tissue_site_codes, checkpoint_one_stop_reason, checkpoint_two_stop_reason, stop_pending_results
+from cipoc.tools import build_corpus_descriptors, build_corpus_digests, VariableValueValidator, build_variable_group, load_data_dictionary, load_group_hierarchy, load_stages, load_variable_groups, evaluate_note_filter, eligible_groups, pending_group, resolve_leftovers, out_of_year_results, with_ssf_equivalents, ssf_equivalent_results, discriminator_results, with_discriminator_variables, overlay_schema_variable, derive_case_facts, candidate_gross_sites, not_found_results, to_case_results, build_report, load_scoping_dictionary, check_primary_site_coverage, check_histology_pairs, histology_pairs, build_histology_scope, lookup_variable_info, tissue_site_codes, checkpoint_one_stop_reason, checkpoint_two_stop_reason, stop_pending_results
 from cipoc.tools.scoping import HISTOLOGY_ITEM
 from cipoc.utils import CipocConfig, ObservabilityCollector, run_graph_stream
 from cipoc.utils.progress.events import ProgressEvent
@@ -211,6 +211,19 @@ class OrchestratorOutput(BaseModel):
     reportability_stop: ReportabilityStop | None = None
     report: CaseReport | None = None
     ssf_equivalents: dict[int, SsfEquivalent] = Field(default_factory=dict)
+
+
+def run_recursion_limit(stages: Sequence[str]) -> int:
+    """Supersteps a run may take, which LangGraph caps at 25 by default.
+
+    The scan takes five (initialize, scan_notes, note_branch,
+    characterize_corpus, finalize_case). Each stage takes a planning pass,
+    extraction and the merge, plus a check_state round trip for every way
+    planning settles items without extracting them: by year, by SSF, by
+    discriminator, and as leftovers. Sixteen per stage leaves room to spare,
+    and the discriminator file's four stages need more than the default.
+    """
+    return 10 + 16 * len(stages)
 
 
 class OrchestratorAgent(BaseAgent):
@@ -434,16 +447,23 @@ class OrchestratorAgent(BaseAgent):
         coded Primary Site, or the unknown primary's when none is coded, limited
         to the codes the diagnosis year's algorithm accepts.
 
-        A variable that arrives with its own codes is a CS Site-Specific Factor
-        standing in for a requested item (``with_ssf_equivalents``). It keeps
-        its schema's name, description and codes, and takes only the format and
-        length from the NAACCR dictionary (``overlay_schema_variable``).
+        A variable that arrives with its own codes comes from a staging schema:
+        a CS Site-Specific Factor standing in for a requested item
+        (``with_ssf_equivalents``), or a schema discriminator with its table
+        (``with_discriminator_variables``). It keeps the schema's name,
+        description and codes, and takes only the format and length from the
+        NAACCR dictionary (``overlay_schema_variable``).
         """
         enriched = build_variable_group(
             [variable.item_id for variable in group.variables],
             self._data_dictionary,
             case_facts=case_facts,
             site_dictionary=self._site_dictionary,
+            schema_codes={
+                variable.item_id: variable.valid_codes
+                for variable in group.variables
+                if variable.valid_codes is not None
+            },
         )
         enriched_by_id = {variable.item_id: variable for variable in enriched.variables}
         for variable in group.variables:
@@ -497,6 +517,14 @@ class OrchestratorAgent(BaseAgent):
         recorded in ``ssf_equivalents`` and planned as part of its group
         (``with_ssf_equivalents``), so it's extracted with the group and keeps
         the run open while it's PENDING.
+
+        With the discriminator variable groups file, the schema discriminators
+        (3926, 3927, 2879) run in their own stage after histology. Each one the
+        case's candidate schemas don't differ by ends NOT_APPLICABLE
+        (``discriminator_results``), again through check_state, and the rest are
+        sent with their table's codes (``with_discriminator_variables``). A coded
+        discriminator is a case fact, so the dependent stage's schemas narrow to
+        the one it picks.
         """
         if state.reportability_stop is None:
             stop_reason = checkpoint_two_stop_reason(
@@ -541,6 +569,14 @@ class OrchestratorAgent(BaseAgent):
             return Command(goto="check_state", update={
                 "variable_results": settled, "ssf_equivalents": equivalents,
             })
+        unneeded = discriminator_results(
+            ready, state.variable_results, self._site_dictionary, state.case_facts
+        )
+        if unneeded:
+            return Command(goto="check_state", update={"variable_results": unneeded})
+        ready = with_discriminator_variables(
+            ready, state.variable_results, self._site_dictionary, state.case_facts
+        )
         if ready:
             # Extract only each group's still-pending variables, so structured-data
             # seeds (or values coded on an earlier pass) are never re-extracted.
@@ -921,6 +957,7 @@ class OrchestratorAgent(BaseAgent):
             structured_data=validated_input.structured_data,
         )
         graph_config = dict(config or {})
+        graph_config.setdefault("recursion_limit", run_recursion_limit(self._stages))
         configured_concurrency = graph_config.get("max_concurrency")
         if max_concurrency is not None:
             graph_config["max_concurrency"] = max_concurrency

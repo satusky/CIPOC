@@ -8,11 +8,14 @@ from typing import Any, Collection, Iterable, Mapping, Sequence, get_args
 
 from cipoc.models import (
     CaseFacts,
+    DiscriminatorChoice,
     GrossSite,
     HistologyScope,
+    SchemaDiscriminator,
     ScopingDictionary,
     SsfChoice,
     SsfMapping,
+    StagingSchema,
     VariableInfo,
 )
 
@@ -32,12 +35,22 @@ _SSF_ALGORITHMS = ("cs", "tnm")
 # Each starts "OBSOLETE DATA CONVERTED" or "OBSOLETE DATA RETAINED".
 _OBSOLETE_CODE = re.compile(r"\s*OBSOLETE\b", re.IGNORECASE)
 _TISSUES = frozenset(get_args(GrossSite)) - {"unspecified"}
-# The select keys the generator writes. CIPOC doesn't extract the discriminators
-# (3926, 3927) or CS Site-Specific Factor 25 (2879), so those always match.
+# The select keys the generator writes. The discriminators match anything until
+# they're coded, which only happens with the discriminator variable groups file.
 SELECT_KEYS = (
     "site", "hist", "behavior", "year_dx", "sex_at_birth",
     "discriminator_1", "discriminator_2", "ssf25",
 )
+# The discriminator items, with the select key each fills and its case fact:
+# Schema Discriminators 1 and 2 (EOD) and CS Site-Specific Factor 25 (CS, TNM).
+DISCRIMINATOR_KEYS = {3926: "discriminator_1", 3927: "discriminator_2", 2879: "ssf25"}
+DISCRIMINATOR_FACTS = {
+    3926: "schema_discriminator_1",
+    3927: "schema_discriminator_2",
+    2879: "cs_site_specific_factor_25",
+}
+# A line of a discriminator table's blank code that only says it isn't needed.
+_NOT_NEEDED = re.compile(r"not necessary|does not apply", re.IGNORECASE)
 _SITE_CODE = re.compile(r"C[0-9]{3}")
 # A coded Primary Site as site_applies accepts it: upper case, with or without the dot.
 _CODED_PRIMARY = re.compile(r"C[0-9]{2}\.?[0-9]")
@@ -214,6 +227,16 @@ def _check_ssf(scoping: ScopingDictionary) -> None:
                 ) from None
 
 
+def _check_discriminators(scoping: ScopingDictionary) -> None:
+    for key, schema in scoping.schemas.items():
+        unknown = sorted(set(schema.discriminators) - set(DISCRIMINATOR_KEYS))
+        if unknown:
+            raise ValueError(
+                f"Schema {key} has discriminators for items {unknown}; CIPOC reads "
+                f"{sorted(DISCRIMINATOR_KEYS)}. Regenerate the file with {_GENERATOR}."
+            )
+
+
 def _check_histology(scoping: ScopingDictionary) -> None:
     codes = _all_site_codes(scoping)
     owner: dict[str, str] = {}
@@ -270,7 +293,8 @@ def parse_scoping_dictionary(data: Mapping[str, Any]) -> ScopingDictionary:
     The algorithms must be cs, tnm and eod, with diagnosis years that don't
     overlap and histology codes that parse. Every item's years must parse and
     run forwards, and so must the years of every SSF mapping, which only CS and
-    TNM schemas may hold.
+    TNM schemas may hold. Schemas may only hold discriminators for 3926, 3927
+    and 2879.
     Coverage of item 400, and of item 522's pairs, is checked separately
     (``check_primary_site_coverage``, ``check_histology_pairs``), since it needs
     the NAACCR dictionary.
@@ -317,6 +341,7 @@ def parse_scoping_dictionary(data: Mapping[str, Any]) -> ScopingDictionary:
     _check_algorithms(scoping)
     _check_items(scoping)
     _check_ssf(scoping)
+    _check_discriminators(scoping)
     return scoping
 
 
@@ -473,6 +498,12 @@ def _case_values(scoping: ScopingDictionary, facts: CaseFacts | None) -> dict[st
     # agree only on 1 (male) and 2 (female).
     if (facts.sex or "").strip() in ("1", "2"):
         values["sex_at_birth"] = frozenset({int(facts.sex.strip())})
+
+    # A coded discriminator picks among the schemas its select key separates.
+    for item_id, key in DISCRIMINATOR_KEYS.items():
+        coded = (getattr(facts, DISCRIMINATOR_FACTS[item_id]) or "").strip()
+        if coded.isdigit():
+            values[key] = frozenset({int(coded)})
     return values
 
 
@@ -498,9 +529,13 @@ def matching_schemas(scoping: ScopingDictionary, facts: CaseFacts | None) -> lis
     matches a row whose sites overlap any of them. Histology is the coded
     morphology's 4 digits, or else every code under the candidate histology
     families. Behavior comes from the behavior fact or the histology's ``/n``
-    suffix, and the year is parsed from the date of diagnosis.
+    suffix, and the year is parsed from the date of diagnosis. A coded
+    discriminator (3926, 3927, 2879) filters the rows that read it.
     """
-    values = _case_values(scoping, facts)
+    return _matching(scoping, _case_values(scoping, facts))
+
+
+def _matching(scoping: ScopingDictionary, values: Mapping[str, frozenset]) -> list[str]:
     return [
         key
         for key, schema in scoping.schemas.items()
@@ -608,8 +643,10 @@ def item_applies_in_year(
     return (first is None or first <= year) and (last is None or year <= last)
 
 
-def _item_label(item_id: int, name: str | None) -> str:
+def item_label(item_id: int, name: str | None) -> str:
+    """An item as reasons name it: "Grade (440)", or "Item 440" without a name."""
     return f"{name} ({item_id})" if name else f"Item {item_id}"
+
 
 
 def _join_labels(labels: Sequence[str]) -> str:
@@ -651,17 +688,17 @@ def out_of_year_reason(
         span = f"from {first}" if first is not None else f"through {last}"
     reason = (
         f"Not collected for {_diagnosis_year(date_of_diagnosis)} diagnoses: "
-        f"{_item_label(item_id, name)} applies {span}"
+        f"{item_label(item_id, name)} applies {span}"
     )
     held = [
-        _item_label(equivalent, equivalent_name)
+        item_label(equivalent, equivalent_name)
         for equivalent, equivalent_name in held_by
         if item_applies_in_year(scoping, equivalent, date_of_diagnosis)
     ]
     if ssf is not None:
         held.append(_ssf_label(ssf))
     replaced = [
-        _item_label(equivalent, equivalent_name)
+        item_label(equivalent, equivalent_name)
         for equivalent, equivalent_name in replaced_by
         if item_applies_in_year(scoping, equivalent, date_of_diagnosis)
     ]
@@ -790,6 +827,131 @@ def ssf_variable(mapping: SsfMapping) -> VariableInfo:
         description=mapping.definition.strip() or f"{mapping.name}, recorded in {mapping.label}.",
         valid_codes=ssf_offered_codes(mapping),
     )
+
+
+def _discriminator_values(
+    schema: StagingSchema, key: str, values: Mapping[str, frozenset]
+) -> frozenset[int] | None:
+    """The discriminator values the schema's rows matching the case accept, or
+    None when one of those rows doesn't constrain it."""
+    accepted: set[int] = set()
+    for row in schema.select:
+        if not _row_matches(row, values):
+            continue
+        if key not in row:
+            return None
+        for low, high in _select_ranges(key, row[key]):
+            if high is None:
+                return None
+            accepted.update(range(low, high + 1))
+    return frozenset(accepted)
+
+
+def _shared_discriminator(
+    scoping: ScopingDictionary, item_id: int, schemas: Sequence[str]
+) -> SchemaDiscriminator | None:
+    """The table the schemas that read the discriminator hold, or None if they
+    hold different ones. The generator gives schemas a case can match together
+    the same table."""
+    tables = {
+        scoping.schemas[key].discriminators[item_id].model_dump_json(): scoping.schemas[key].discriminators[item_id]
+        for key in schemas
+        if item_id in scoping.schemas[key].discriminators
+    }
+    return next(iter(tables.values())) if len(tables) == 1 else None
+
+
+def discriminator_choice(
+    scoping: ScopingDictionary,
+    item_id: int,
+    facts: CaseFacts | None,
+    *,
+    schemas: Sequence[str] | None = None,
+) -> DiscriminatorChoice:
+    """Whether the case's candidate schemas differ by a discriminator (3926,
+    3927 or 2879, ``DISCRIMINATOR_KEYS``).
+
+    The candidates are the schemas the case matches (``matching_schemas``) with
+    the discriminator itself unknown, or ``schemas`` when given. They differ
+    when the values their matching rows accept for it aren't all the same,
+    counting a row that leaves it open as accepting anything, so some value
+    would leave out a candidate. One candidate, or none, never needs it. Year is
+    one of the facts, so a 2012 case's candidates are CS and TNM schemas, which
+    never read Schema Discriminator 1 or 2, and a 2020 case's are EOD schemas,
+    which never read CS Site-Specific Factor 25.
+    """
+    key = DISCRIMINATOR_KEYS[item_id]
+    values = {name: known for name, known in _case_values(scoping, facts).items() if name != key}
+    candidates = list(schemas) if schemas is not None else _matching(scoping, values)
+    accepted = {
+        schema_key: _discriminator_values(scoping.schemas[schema_key], key, values)
+        for schema_key in candidates
+    }
+    if len(set(accepted.values())) < 2:
+        return DiscriminatorChoice(needed=False, schemas=candidates)
+    return DiscriminatorChoice(
+        needed=True,
+        schemas=candidates,
+        discriminator=_shared_discriminator(scoping, item_id, candidates),
+    )
+
+
+def discriminator_not_needed_reason(choice: DiscriminatorChoice, label: str) -> str:
+    """Why a discriminator the candidates don't differ by isn't extracted."""
+    if not choice.schemas:
+        return f"No staging schema matches the case, so {label} isn't needed."
+    if len(choice.schemas) == 1:
+        return f"Only {choice.schemas[0]} matches the case, so {label} isn't needed."
+    return (
+        f"The schemas the case matches ({_schema_list(choice.schemas)}) don't differ "
+        f"by {label}, so it isn't needed."
+    )
+
+
+def discriminator_variable(discriminator: SchemaDiscriminator, item_id: int) -> VariableInfo:
+    """The discriminator as the extractor is offered it: the table's name, notes
+    and codes, overlaid on the NAACCR entry like an SSF (``ssf_variable``).
+
+    EOD names its input just "Schema Discriminator 1" and titles the table with
+    what it separates; CS does the reverse, so the name uses whichever says
+    more. The blank code says the discriminator isn't needed, which can't hold
+    when it's extracted, so it isn't offered. Lines of its text that say more,
+    like the occult head and neck table's site guidance, join the description.
+    """
+    if discriminator.title.startswith(discriminator.name):
+        name = discriminator.title
+    else:
+        name = f"{discriminator.name} ({discriminator.title})"
+    description = discriminator.definition.strip() or f"{name}, which picks the staging schema."
+    extra = [
+        line.strip()
+        for line in discriminator.codes.get("", "").splitlines()
+        if line.strip() and not _NOT_NEEDED.search(line)
+    ]
+    if extra:
+        description += "\n\nWhen it isn't needed, the table also says:\n" + "\n".join(extra)
+    return VariableInfo(
+        item_id=item_id,
+        name=name,
+        description=description,
+        valid_codes={code: text for code, text in discriminator.codes.items() if code.strip()},
+    )
+
+
+def discriminators_separating(
+    scoping: ScopingDictionary,
+    facts: CaseFacts | None,
+    schemas: Sequence[str],
+    item_ids: Iterable[int],
+) -> list[int]:
+    """Which of the discriminator ``item_ids`` the ``schemas`` differ by
+    (``discriminator_choice``), in the order given."""
+    return [
+        item_id
+        for item_id in item_ids
+        if item_id in DISCRIMINATOR_KEYS
+        and discriminator_choice(scoping, item_id, facts, schemas=schemas).needed
+    ]
 
 
 def _accepted(pair: str, accepted: Collection[int] | None) -> bool:

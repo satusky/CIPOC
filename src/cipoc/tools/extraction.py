@@ -2,7 +2,7 @@ import json
 import re
 from datetime import date
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Mapping
 
 from cipoc.models import VariableInfo, VariableGroupInfo, VariableOutput
 
@@ -412,9 +412,16 @@ def build_variable_group(
     *,
     case_facts: "CaseFacts | None" = None,
     site_dictionary: "ScopingDictionary | None" = None,
+    schema_codes: Mapping[int, dict[str, str]] | None = None,
 ) -> VariableGroupInfo:
     """Build NAACCR variable metadata, with codes scoped to the case when a
-    scoping dictionary is given."""
+    scoping dictionary is given.
+
+    ``schema_codes`` gives items a staging schema's own codes, such as a CS
+    Site-Specific Factor's or a schema discriminator's table, in place of
+    NAACCR's and the scoping. They apply before the metadata is checked, since
+    v25 gives the discriminators no code domain of their own.
+    """
     if isinstance(item_ids, int):
         item_ids = [item_ids]
 
@@ -424,6 +431,7 @@ def build_variable_group(
         if site_dictionary is not None
         else {}
     )
+    scoped.update(schema_codes or {})
 
     item_info = []
     for item_id in item_ids:

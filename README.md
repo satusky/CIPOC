@@ -117,6 +117,17 @@ NAACCR codes.
   `ssf_equivalents`. It isn't one of the run's requested items. If the
   candidate schemas hold the item differently, it ends BLOCKED, with a reason
   saying what each holds it in.
+- **Schema discriminators** (optional): some cases match two or more schemas
+  that only Schema Discriminator 1 or 2 (3926, 3927; EOD) or CS Site-Specific
+  Factor 25 (2879; CS and TNM) tell apart, such as 9591/3 in HemeRetic or
+  Lymphoma. They're extracted only with
+  `config/variable_groups_+discriminators.json`, which runs them in a
+  `discriminator` stage between histology and the dependent groups. Each is
+  extracted only when the case's candidate schemas differ by it, with that
+  table's codes and notes; otherwise it ends NOT_APPLICABLE. A coded
+  discriminator narrows the dependent items' schemas and settles an SSF the
+  candidates disagreed on. An SSF still BLOCKED names the discriminator that
+  ended without a value in `blocking_item_ids`.
 
 The orchestrator checks the file the first time it reads it. The old
 tissue-keyed format and builds without the histology, algorithm or item-year
@@ -159,14 +170,18 @@ export RENCI_AZURE_API_KEY=...
 
 `config/variable_groups.json` defines what to extract: ordered groups of NAACCR
 item IDs, each with gates, note filters, and a stage. Its `stages` list sets the
-order: `["initial", "histology", "dependent"]` in the shipped files, and
+order: `["initial", "histology", "dependent"]` in the shipped files (the
+discriminator file adds `"discriminator"` before `"dependent"`), and
 `["initial", "dependent"]` when a file has no list. Histology (522, 523) runs
 after the initial stage codes Primary Site, and before the dependent groups.
 Each stage waits until every group in the stages before it has finished, even
 ones that found nothing. A stage name that isn't in the list fails at load.
 An older equivalent lists the items it stands in for in its group, for example
 `{ "item_id": 440, "name": "Grade", "replaces": [3843, 3844] }`. They must be
-other items in the same group.
+other items in the same group. To extract the schema discriminators, point
+`documents.variable_groups_path` in `config/config.yaml` at
+`config/variable_groups_+discriminators.json`: the default file plus a
+`schema_discriminators` group in a `discriminator` stage.
 
 `llm.max_concurrency` caps simultaneous calls to one model at one endpoint,
 across the whole process. The separate `run(max_concurrency=...)` setting limits

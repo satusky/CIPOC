@@ -43,10 +43,17 @@ from cipoc.models.case import TERMINAL_VARIABLE_STATUSES
 from .coding_context import ranges_overlap, site_in_ranges
 from .scoping import (
     BEHAVIOR_ITEM,
+    DISCRIMINATOR_FACTS,
+    DISCRIMINATOR_KEYS,
     HISTOLOGY_ITEM,
     PRIMARY_SITE_ITEM,
+    discriminator_choice,
+    discriminator_not_needed_reason,
+    discriminator_variable,
+    discriminators_separating,
     gross_site_candidates,
     item_applies_in_year,
+    item_label,
     out_of_year_reason,
     ssf_equivalent,
     ssf_items,
@@ -863,7 +870,10 @@ def ssf_equivalent_results(
       caller's structured data, unless it already has one. Two items held in
       one SSF, like Grade Clinical and Pathological, share it.
     * disagree: the item ends BLOCKED, the reason saying what each candidate
-      schema holds it in. Nothing is extracted for it.
+      schema holds it in. Nothing is extracted for it. When the run requests a
+      discriminator the candidates differ by and it ended without a value, as
+      with the discriminator variable groups file, ``blocking_item_ids`` names
+      it (``_unsettled_discriminators``).
     * none: the item ends NOT_APPLICABLE with the plain year reason.
 
     ``groups`` supplies the items' names and fixed equivalents. Returns the
@@ -920,12 +930,19 @@ def ssf_equivalent_results(
                         )
                     )
             elif choice.outcome == "disagree":
+                blocking = _unsettled_discriminators(scoping, facts, choice.schemas, names, results)
+                disagreement = choice.reason
+                if blocking:
+                    labels = " and ".join(item_label(blocker, names[blocker]) for blocker in blocking)
+                    verb = "has" if len(blocking) == 1 else "have"
+                    disagreement += f"; {labels}, which would tell them apart, {verb} no value"
                 updates[item_id] = CaseVariableResult(
                     item_id=item_id, status=VariableStatus.BLOCKED,
                     reason=_year_reason(
                         scoping, variable, date_of_diagnosis, names, replaces,
-                        ssf_disagreement=choice.reason,
+                        ssf_disagreement=disagreement,
                     ),
+                    blocking_item_ids=blocking,
                 )
             else:
                 updates[item_id] = CaseVariableResult(
@@ -933,6 +950,110 @@ def ssf_equivalent_results(
                     reason=_year_reason(scoping, variable, date_of_diagnosis, names, replaces),
                 )
     return updates, recorded
+
+
+# A discriminator that ended this way can't have narrowed the schemas.
+_UNSETTLED = frozenset({VariableStatus.NOT_FOUND, VariableStatus.ERROR})
+
+
+def _unsettled_discriminators(
+    scoping: ScopingDictionary,
+    facts: CaseFacts | None,
+    schemas: Sequence[str],
+    names: Mapping[int, str | None],
+    results: Mapping[int, CaseVariableResult],
+) -> list[int]:
+    """The requested discriminators ``schemas`` differ by that ended without a value."""
+    requested = [item_id for item_id in DISCRIMINATOR_KEYS if item_id in names]
+    return [
+        item_id
+        for item_id in discriminators_separating(scoping, facts, schemas, requested)
+        if (result := results.get(item_id)) is not None and result.status in _UNSETTLED
+    ]
+
+
+def _pending_discriminators(
+    groups: Sequence[TargetGroup], results: Mapping[int, CaseVariableResult]
+):
+    for group in groups:
+        for variable in group.variables:
+            result = results.get(variable.item_id)
+            if variable.item_id in DISCRIMINATOR_KEYS and result is not None and result.status == VariableStatus.PENDING:
+                yield group, variable
+
+
+def discriminator_results(
+    ready: Sequence[TargetGroup],
+    results: Mapping[int, CaseVariableResult],
+    scoping: ScopingDictionary | None,
+    facts: CaseFacts | None,
+) -> dict[int, CaseVariableResult]:
+    """Settle each PENDING discriminator in a ``ready`` group the case can't use.
+
+    The discriminator variable groups file runs them in their own stage, after
+    histology, so site, histology and year are coded by then
+    (``discriminator_choice``):
+
+    * the candidate schemas don't differ by it: NOT_APPLICABLE, naming them.
+    * they differ by it but read it from different tables, so there's no one
+      set of codes to offer: BLOCKED. The generator gives schemas a case can
+      match together the same table, so this shouldn't happen.
+    * no site dictionary: NOT_APPLICABLE, since there are no schemas to pick
+      between, and v25 gives the discriminators no codes of their own.
+
+    The rest stay PENDING and are extracted with their table
+    (``with_discriminator_variables``).
+    """
+    closed: dict[int, CaseVariableResult] = {}
+    for _, variable in _pending_discriminators(ready, results):
+        label = item_label(variable.item_id, variable.name)
+        if scoping is None:
+            closed[variable.item_id] = CaseVariableResult(
+                item_id=variable.item_id, status=VariableStatus.NOT_APPLICABLE,
+                reason=f"No site dictionary is loaded, so there are no staging schemas for {label} to pick between.",
+            )
+            continue
+        choice = discriminator_choice(scoping, variable.item_id, facts)
+        if not choice.needed:
+            closed[variable.item_id] = CaseVariableResult(
+                item_id=variable.item_id, status=VariableStatus.NOT_APPLICABLE,
+                reason=discriminator_not_needed_reason(choice, label),
+            )
+        elif choice.discriminator is None:
+            closed[variable.item_id] = CaseVariableResult(
+                item_id=variable.item_id, status=VariableStatus.BLOCKED,
+                reason=f"The schemas the case matches differ by {label} but read it from different tables, "
+                       "so there's no one set of codes to offer.",
+            )
+    return closed
+
+
+def with_discriminator_variables(
+    groups: Sequence[TargetGroup],
+    results: Mapping[int, CaseVariableResult],
+    scoping: ScopingDictionary | None,
+    facts: CaseFacts | None,
+) -> list[TargetGroup]:
+    """The groups with each PENDING discriminator the candidates differ by
+    replaced by its table's variable (``discriminator_variable``), so it's
+    offered the table's codes under its name and notes. One whose candidates
+    don't share a table keeps the NAACCR entry."""
+    if scoping is None:
+        return list(groups)
+    replaced: dict[int, VariableInfo] = {}
+    for _, variable in _pending_discriminators(groups, results):
+        choice = discriminator_choice(scoping, variable.item_id, facts)
+        if choice.needed and choice.discriminator is not None:
+            replaced[variable.item_id] = discriminator_variable(choice.discriminator, variable.item_id)
+    if not replaced:
+        return list(groups)
+    return [
+        group.model_copy(update={
+            "variables": [replaced.get(variable.item_id, variable) for variable in group.variables],
+        })
+        if any(variable.item_id in replaced for variable in group.variables) else group
+        for group in groups
+    ]
 
 
 def _result_from_extraction(extraction: ValidatedVariableOutput) -> CaseVariableResult:
@@ -978,6 +1099,7 @@ ITEM_ID_TO_CASE_FACT: dict[int, str] = {
     522: "histology",
     523: "behavior",
     220: "sex",
+    **DISCRIMINATOR_FACTS,
 }
 
 
