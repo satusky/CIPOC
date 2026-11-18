@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CIPOC evaluation · Trends</title>
+<link rel="stylesheet" href="core.css">
+<style>
+  .panels { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+  .panel { padding: 10px 12px 8px; cursor: pointer; }
+  .panel:hover { border-color: var(--axis); }
+  .panels.wide { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+  .panel .name { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .panel .now { display: flex; align-items: baseline; gap: 8px; margin: 1px 0 4px; }
+  .panel .now b { font-size: 17px; font-weight: 600; }
+  .rank td.bar { width: 45%; min-width: 220px; }
+</style>
+<script src="data.js"></script>
+<script src="core.js"></script>
+</head>
+<body>
+<script>
+"use strict";
+/* Trends — small multiples. One trend panel per variable on a shared y-axis,
+ * so a regression is a line that bends. Variability is a ranked list of
+ * composition bars. */
+(function () {
+  const E = window.Eval, { h, R, V, P, ALL_V, LAST } = E;
+  const local = { sort: "group", by: "patient", order: "varies" };
+  const redraw = (key, value) => { local[key] = value; E.render(); };
+
+  function performance(ps) {
+    const groups = E.strata(ps);
+    const rows = ALL_V.map((v) => {
+      const overall = R.map((_, r) => E.score(E.counts(r, [v], ps)));
+      const series = groups.length === 1 ? [{ label: "All patients", color: "var(--accent)", values: overall }]
+        : groups.map((g) => ({ label: g.label, color: g.color, values: R.map((_, r) => E.score(E.counts(r, [v], g.patients))) }));
+      const real = overall.filter((x) => x != null);
+      return { v, overall, series, below: overall[LAST] == null ? -1 : Math.max(...real) - overall[LAST] };
+    });
+    const domain = E.domainOf(rows.flatMap((row) => row.series.flatMap((x) => x.values)));
+    // Several lines need more room than one.
+    const tall = groups.length > 1 ? 110 : 66, panels = "panels" + (groups.length > 1 ? " wide" : "");
+
+    const panel = (row) => h("div", {
+      class: "card panel", tabindex: 0, role: "button",
+      onclick: () => E.variableDrawer(row.v), onkeydown: (e) => { if (e.key === "Enter") E.variableDrawer(row.v); },
+    },
+      h("div", { class: "name", title: E.variableLabel(row.v) }, h("span", { class: "muted num" }, V[row.v].item_id + " "), V[row.v].name),
+      h("div", { class: "now" }, h("b", null, E.pct(row.overall[LAST])), LAST ? E.deltaPP(row.overall[LAST], row.overall[LAST - 1]) : null),
+      E.host((width) => E.lineChart(width, tall, { series: row.series, domain, compact: true, title: (i) => `${E.variableLabel(row.v)} · ${E.runTitle(i)}` }), tall));
+
+    let body;
+    if (local.sort === "group") {
+      body = [];
+      let group = null, grid = null;
+      for (const row of rows) {
+        if (V[row.v].group_id !== group) {
+          group = V[row.v].group_id;
+          grid = h("div", { class: panels });
+          body.push(h("div", { class: "section-title" }, V[row.v].group_name), grid);
+        }
+        grid.append(panel(row));
+      }
+    } else {
+      const sorted = rows.slice().sort(local.sort === "low"
+        ? (a, b) => (a.overall[LAST] == null ? 2 : a.overall[LAST]) - (b.overall[LAST] == null ? 2 : b.overall[LAST])
+        : (a, b) => b.below - a.below);
+      body = h("div", { class: panels }, sorted.map(panel));
+    }
+
+    return [
+      E.kpiRow(ps),
+      h("div", { class: "toolbar" },
+        E.field("Order", E.seg([["group", "By group"], ["low", "Lowest first"], ["below", "Furthest below its best"]], local.sort, (x) => redraw("sort", x), "Order")),
+        h("span", { class: "spacer" }),
+        groups.length > 1 && E.legend(groups, "line")),
+      h("div", { class: "note" }, `Panels share one y-axis, ${E.pct(domain[0], 0)} to 100%. Ticks on the baseline mark a configuration change. Click a panel for the variable's detail.`),
+      body,
+      h("div", { style: "margin-top:16px" }, E.usageCard(ps)),
+    ];
+  }
+
+  function variability(ps) {
+    const runs = E.windowRuns();
+    if (runs.length < 2) return h("div", { class: "card muted" }, "The variability window holds one run. Pick a wider window to compare runs.");
+    const total = E.stability(ps, ALL_V, runs);
+    const byPatient = local.by === "patient";
+    const rows = (byPatient ? ps.map((p) => ({ id: p, sum: E.stability([p], ALL_V, runs) }))
+      : ALL_V.map((v) => ({ id: v, sum: E.stability(ps, [v], runs) }))).filter((row) => row.sum.scored);
+    const share = (row, key) => row.sum[key] / row.sum.scored;
+    rows.sort(local.order === "id" ? (a, b) => a.id - b.id : (a, b) => share(b, local.order) - share(a, local.order) || a.id - b.id);
+
+    const line = (row) => h("tr", { class: "click", onclick: () => (byPatient ? E.patientDrawer(row.id) : E.variableDrawer(row.id)) },
+      byPatient
+        ? [h("td", null, P[row.id].patient_id), h("td", null, P[row.id].tissue), h("td", { class: "r" }, P[row.id].year), h("td", { class: "r" }, P[row.id].n_notes)]
+        : [h("td", { class: "ellip" }, h("span", { class: "muted num" }, V[row.id].item_id + " "), V[row.id].name), h("td", { class: "muted ellip" }, V[row.id].group_name)],
+      h("td", { class: "bar" }, E.stack(E.STABILITY_PARTS(row.sum))),
+      h("td", { class: "r" }, E.pct(share(row, "varies"), 0)), h("td", { class: "r" }, E.pct(share(row, "wrong"), 0)),
+      h("td", { class: "r" }, row.sum.scored), h("td", { class: "r" }, E.pct(row.sum.accuracy, 0)));
+
+    return [
+      h("div", { class: "card", style: "margin-bottom:12px" },
+        h("h2", null, `Run-to-run agreement, ${E.windowLabel()}`),
+        h("div", { class: "sub" }, `${total.scored} patient-variable cells: ${E.pct(total.right / total.scored, 0)} give the same correct value every run, `
+          + `${E.pct(total.wrong / total.scored, 0)} the same wrong value, ${E.pct(total.varies / total.scored, 0)} change between runs.`),
+        E.stack(E.STABILITY_PARTS(total), null, "tall"), h("div", { style: "margin-top:8px" }, E.stabilityLegend())),
+      h("div", { class: "toolbar" },
+        E.seg([["patient", "By patient"], ["variable", "By variable"]], local.by, (x) => redraw("by", x), "Rows"),
+        E.field("Order", E.seg([["varies", "Most variable"], ["wrong", "Most always-wrong"], ["id", byPatient ? "Patient ID" : "Variable order"]], local.order, (x) => redraw("order", x), "Order"))),
+      h("div", { class: "card scroll-x" }, h("table", { class: "rank" },
+        h("thead", null, h("tr", null,
+          byPatient ? [h("th", null, "Patient"), h("th", null, "Tissue"), h("th", { class: "r" }, "Year"), h("th", { class: "r" }, "Notes")] : [h("th", null, "Variable"), h("th", null, "Group")],
+          h("th", null, "Cells over the window"), h("th", { class: "r" }, "Varies"), h("th", { class: "r" }, "Always wrong"),
+          h("th", { class: "r" }, "Scored"), h("th", { class: "r" }, "Correct"))),
+        h("tbody", null, rows.map(line)))),
+    ];
+  }
+
+  E.mount({ render: (ps) => (E.state.view === "variability" ? variability(ps) : performance(ps)) });
+})();
+</script>
+</body>
+</html>

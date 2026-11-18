@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CIPOC evaluation · Triage</title>
+<link rel="stylesheet" href="core.css">
+<style>
+  .list td.heat { border-right: 2px solid var(--surface); border-bottom: 2px solid var(--surface); min-width: 44px; }
+</style>
+<script src="data.js"></script>
+<script src="core.js"></script>
+</head>
+<body>
+<script>
+"use strict";
+/* Triage. A ranked work list: which variables cost the most errors
+ * right now, what kind of errors, and whether they are systematic or noise.
+ * Variability is a consistency-against-accuracy scatter over the same list. */
+(function () {
+  const E = window.Eval, { h, s, R, V, P, ALL_V, LAST } = E;
+  const local = { base: Math.max(0, LAST - 1), sort: "errors", dir: -1, dots: "patient", vsort: "unstable", vdir: -1 };
+  const redraw = (key, value) => { local[key] = value; E.render(); };
+  const name = E.variableName, bars = E.bars;
+
+  function performance(ps) {
+    const metric = E.METRICS[E.state.metric], base = local.base, windowed = E.windowRuns();
+    const groups = E.strata(ps), stratified = groups.length > 1;
+    const rows = ALL_V.map((v) => {
+      const trend = R.map((_, r) => E.score(E.counts(r, [v], ps))), c = E.counts(LAST, [v], ps);
+      return {
+        v, c, trend, now: trend[LAST], support: c.match + c.wrong + c.missed, errors: c.wrong + c.missed + c.spurious,
+        change: trend[LAST] == null || trend[base] == null ? null : trend[LAST] - trend[base],
+        sum: E.stability(ps, [v], windowed),
+        strata: stratified ? groups.map((g) => { const gc = E.counts(LAST, [v], g.patients); return { c: gc, value: E.score(gc) }; }) : [],
+      };
+    });
+    const maxErrors = Math.max(1, ...rows.map((row) => row.errors));
+    const [lo] = E.domainOf(rows.flatMap((row) => row.strata.map((x) => x.value)));
+    const heat = (row, i) => {
+      const data = row.strata[i], paint = data.value == null ? null : E.seqColor((data.value - lo) / (1 - lo));
+      const td = h("td", { class: "r heat", style: paint ? `background:${paint.fill};color:${paint.ink}` : "" }, data.value == null ? "–" : (data.value * 100).toFixed(0));
+      td.addEventListener("pointermove", (event) => {
+        const band = metric.ci ? E.wilson(...metric.parts(data.c)) : null;
+        E.tip.show(event, `${E.variableLabel(row.v)} · ${groups[i].label}`, [
+          { value: E.pct(data.value), label: metric.label + (band ? `  (95% CI ${E.pct(band[0], 0)}–${E.pct(band[1], 0)})` : "") },
+          { value: data.c.wrong + data.c.missed + data.c.spurious, label: `errors in ${data.c.n} patients` }]);
+      });
+      td.addEventListener("pointerleave", E.tip.hide);
+      return td;
+    };
+    const unstable = (row) => (row.sum.scored ? row.sum.varies / row.sum.scored : null);
+
+    const cols = [
+      { key: "variable", label: "Variable", value: (row) => V[row.v].item_id, cell: (row) => h("td", { class: "ellip" }, name(row.v)) },
+      { key: "group", label: "Group", value: (row) => V[row.v].group_name, cell: (row) => h("td", { class: "muted ellip", style: "max-width:150px" }, V[row.v].group_name) },
+      { key: "support", label: "In truth", right: true, num: true, title: "Patients whose ground truth has a value for this variable", value: (row) => row.support, cell: (row) => h("td", { class: "r" }, row.support) },
+      {
+        key: "now", label: `${metric.label}, run ${E.nR}`, right: true, num: true, value: (row) => row.now,
+        cell: (row) => h("td", { class: "r" }, h("div", { class: "cell-bar" }, E.pct(row.now), h("div", { class: "track" }, h("i", { style: `width:${(row.now || 0) * 100}%` })))),
+      },
+      { key: "change", label: `vs run ${base + 1}`, right: true, num: true, value: (row) => row.change, cell: (row) => h("td", { class: "r" }, E.deltaPP(row.now, row.trend[base])) },
+      { key: "trend", label: `Runs 1–${E.nR}`, cell: (row) => h("td", null, E.sparkline(row.trend)) },
+      { key: "errors", label: `Errors, run ${E.nR}`, num: true, value: (row) => row.errors, cell: (row) => h("td", null, bars(row.errors, row.errors ? E.stack(E.ERROR_PARTS(row.c), maxErrors) : null)) },
+      {
+        key: "unstable", label: "Varies run to run", num: true, title: `Share of scored patients whose value changes over ${E.windowLabel()}`, value: unstable,
+        cell: (row) => h("td", null, bars(E.pct(unstable(row), 0), row.sum.scored ? E.stack(E.STABILITY_PARTS(row.sum)) : null)),
+      },
+    ].concat(groups.length > 1 ? groups.map((g, i) => ({
+      key: "s:" + g.key, label: g.label, right: true, num: true, title: `${metric.label}, run ${E.nR}, ${g.patients.length} patients`,
+      value: (row) => row.strata[i].value, cell: (row) => heat(row, i),
+    })) : []);
+
+    return [
+      E.kpiRow(ps),
+      h("div", { class: "toolbar" },
+        E.field("Compare latest run to", E.select(R.slice(0, LAST).map((run, r) => [String(r), `Run ${r + 1} · ${run.label || run.run_id}`]), String(base), (x) => redraw("base", Number(x)), "Baseline run")),
+        h("span", { class: "spacer" }), E.errorLegend(), E.stabilityLegend()),
+      h("div", { class: "note", style: "margin-bottom:8px" }, `Run-to-run covers ${E.windowLabel()}. Click a row for the variable's detail.`
+        + (stratified ? ` ${E.state.stratify === "tissue" ? "Tissue" : "Year"} columns are ${metric.label} (%) in run ${E.nR}.` : "")),
+      h("div", { class: "card scroll-x" }, E.sortable(cols, rows, local, "sort", "dir", (row) => E.variableDrawer(row.v))),
+      h("div", { style: "margin-top:16px" }, E.usageCard(ps)),
+    ];
+  }
+
+  /* Consistency (x) against accuracy (y): one dot per patient or per variable. */
+  function scatter(width, height, rows, label, colorOf, open) {
+    const m = { l: 48, r: 24, t: 28, b: 44 }, iw = width - m.l - m.r, ih = height - m.t - m.b;
+    const [x0] = E.domainOf(rows.map((row) => row.sum.consistency)), [y0] = E.domainOf(rows.map((row) => row.sum.accuracy));
+    const x = (value) => m.l + (iw * (value - x0)) / (1 - x0), y = (value) => m.t + ih * (1 - (value - y0) / (1 - y0));
+    const svg = s("svg", { width, height, role: "img", "aria-label": "consistency against accuracy" });
+    for (const tick of E.ticksFor(y0, 1)) {
+      svg.append(s("line", { class: "gridline", x1: m.l, x2: width - m.r, y1: y(tick), y2: y(tick) }), s("text", { x: m.l - 10, y: y(tick) + 4, "text-anchor": "end" }, E.pct(tick, 0)));
+    }
+    for (const tick of E.ticksFor(x0, 1)) {
+      svg.append(s("line", { class: "gridline", x1: x(tick), x2: x(tick), y1: m.t, y2: m.t + ih }), s("text", { x: x(tick), y: m.t + ih + 18, "text-anchor": "middle" }, E.pct(tick, 0)));
+    }
+    svg.append(s("text", { x: 0, y: 12 }, "↑ Correct"), s("text", { x: width - m.r, y: height - 6, "text-anchor": "end" }, "Same value every run →"));
+
+    const points = rows.map((row) => ({ row, cx: x(row.sum.consistency), cy: y(row.sum.accuracy) }));
+    for (const pt of points) svg.append(s("circle", { cx: pt.cx, cy: pt.cy, r: 5, fill: colorOf(pt.row), stroke: "var(--surface)", "stroke-width": 2 }));
+    // Name only the outliers: the least consistent and the least accurate.
+    const named = new Set(points.slice().sort((a, b) => a.cx - b.cx).slice(0, 3).concat(points.slice().sort((a, b) => b.cy - a.cy).slice(0, 2)));
+    for (const pt of named) {
+      const left = pt.cx > width - 110;
+      svg.append(s("text", { x: pt.cx + (left ? -9 : 9), y: pt.cy + 4, "text-anchor": left ? "end" : "start" }, label(pt.row)));
+    }
+
+    const ring = s("circle", { r: 8, fill: "none", stroke: "var(--ink)", "stroke-width": 2, visibility: "hidden" });
+    const hit = s("rect", { x: 0, y: 0, width, height, fill: "transparent" });
+    let near = null;
+    hit.addEventListener("pointermove", (event) => {
+      const box = svg.getBoundingClientRect(), px = event.clientX - box.left, py = event.clientY - box.top;
+      let best = 24 * 24;
+      near = null;
+      for (const pt of points) {
+        const d = (pt.cx - px) ** 2 + (pt.cy - py) ** 2;
+        if (d < best) { best = d; near = pt; }
+      }
+      hit.style.cursor = near ? "pointer" : "";
+      ring.setAttribute("visibility", near ? "visible" : "hidden");
+      if (!near) return E.tip.hide();
+      ring.setAttribute("cx", near.cx); ring.setAttribute("cy", near.cy);
+      const sum = near.row.sum;
+      E.tip.show(event, near.row.title, [
+        { value: E.pct(sum.consistency, 0), label: "same value in every run" }, { value: E.pct(sum.accuracy, 0), label: "correct across runs" },
+        { value: sum.wrong, label: "always wrong" }, { value: sum.varies, label: `vary, of ${sum.scored} scored` }]);
+    });
+    hit.addEventListener("pointerleave", () => { near = null; ring.setAttribute("visibility", "hidden"); E.tip.hide(); });
+    hit.addEventListener("click", () => { if (near) open(near.row); });
+    svg.append(ring, hit);
+    return svg;
+  }
+
+  function variability(ps) {
+    const runs = E.windowRuns();
+    if (runs.length < 2) return h("div", { class: "card muted" }, "The variability window holds one run. Pick a wider window to compare runs.");
+    const byPatient = local.dots === "patient", groups = byPatient ? E.strata(ps) : [];
+    const color = new Map();
+    for (const g of groups) for (const p of g.patients) color.set(p, g.color);
+    const rows = (byPatient
+      ? ps.map((p) => ({ id: p, title: `${P[p].patient_id} · ${P[p].tissue} ${P[p].year}`, sum: E.stability([p], ALL_V, runs) }))
+      : ALL_V.map((v) => ({ id: v, title: E.variableLabel(v), sum: E.stability(ps, [v], runs) }))).filter((row) => row.sum.scored);
+    const open = (row) => (byPatient ? E.patientDrawer(row.id) : E.variableDrawer(row.id));
+    const tokens = (row) => { const u = R[LAST].usage[row.id]; return u && u[0] != null && u[1] != null ? u[0] + u[1] : null; };
+    const number = (key, label, value, text, title) => ({ key, label, title, right: true, num: true, value, cell: (row) => h("td", { class: "r" }, text(row)) });
+
+    const cols = (byPatient ? [
+      { key: "id", label: "Patient", value: (row) => P[row.id].patient_id, cell: (row) => h("td", null, P[row.id].patient_id) },
+      { key: "tissue", label: "Tissue", value: (row) => P[row.id].tissue, cell: (row) => h("td", null, P[row.id].tissue) },
+      number("year", "Year", (row) => P[row.id].year, (row) => P[row.id].year),
+      number("notes", "Notes", (row) => P[row.id].n_notes, (row) => P[row.id].n_notes),
+    ] : [
+      { key: "id", label: "Variable", value: (row) => row.id, cell: (row) => h("td", { class: "ellip" }, name(row.id)) },
+      { key: "group", label: "Group", value: (row) => V[row.id].group_name, cell: (row) => h("td", { class: "muted ellip", style: "max-width:150px" }, V[row.id].group_name) },
+    ]).concat([
+      { key: "mix", label: "Cells over the window", cell: (row) => h("td", { style: "min-width:200px" }, E.stack(E.STABILITY_PARTS(row.sum))) },
+      number("unstable", "Vary", (row) => row.sum.varies / row.sum.scored, (row) => `${row.sum.varies} · ${E.pct(row.sum.varies / row.sum.scored, 0)}`),
+      number("wrong", "Always wrong", (row) => row.sum.wrong / row.sum.scored, (row) => `${row.sum.wrong} · ${E.pct(row.sum.wrong / row.sum.scored, 0)}`),
+      number("scored", "Scored", (row) => row.sum.scored, (row) => row.sum.scored, byPatient ? "Variables that were ever at stake for this patient" : "Patients this variable was ever at stake for"),
+      number("accuracy", "Correct", (row) => row.sum.accuracy, (row) => E.pct(row.sum.accuracy, 0), "Share of scored cells that were correct, across every run in the window"),
+    ], byPatient ? [number("tokens", `Tokens, run ${E.nR}`, tokens, (row) => E.compact(tokens(row)))] : []);
+
+    return [
+      h("div", { class: "toolbar" },
+        E.field("One dot per", E.seg([["patient", "Patient"], ["variable", "Variable"]], local.dots, (x) => redraw("dots", x), "One dot per")),
+        h("span", { class: "spacer" }), groups.length > 1 && E.legend(groups, "dot")),
+      h("div", { class: "card", style: "margin-bottom:12px" },
+        h("h2", null, `Accuracy against consistency, ${E.windowLabel()}`),
+        h("div", { class: "sub" }, `Click a dot for the ${byPatient ? "patient" : "variable"}.`),
+        E.host((width) => scatter(width, 380, rows, (row) => (byPatient ? P[row.id].patient_id : V[row.id].item_id),
+          (row) => color.get(row.id) || "var(--accent)", open), 380)),
+      h("div", { class: "toolbar" }, h("span", { class: "spacer" }), E.stabilityLegend()),
+      h("div", { class: "card scroll-x" }, E.sortable(cols, rows, local, "vsort", "vdir", open)),
+    ];
+  }
+
+  E.mount({ render: (ps) => (E.state.view === "variability" ? variability(ps) : performance(ps)) });
+})();
+</script>
+</body>
+</html>

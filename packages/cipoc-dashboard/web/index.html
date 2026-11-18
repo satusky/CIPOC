@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CIPOC evaluation · Overview</title>
+<link rel="stylesheet" href="core.css">
+<style>
+  .views { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .views a.card { display: flex; flex-direction: column; gap: 8px; text-decoration: none; color: inherit; }
+  .views a.card:hover { border-color: var(--accent); background: var(--surface-2); }
+  .views a.card:hover .btn { background: var(--ink); color: var(--surface); }
+  .views h2 { font-size: 15px; margin: 0; }
+  .views p { margin: 0; color: var(--ink-2); flex: 1; }
+  .views .btn { align-self: flex-start; font-weight: 600; }
+  .runs td.heat { border-right: 2px solid var(--surface); border-bottom: 2px solid var(--surface); }
+  .defs { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 12px; align-items: start; }
+  .defs .card > h2 { margin-bottom: 8px; }
+  .defs td, .defs th { vertical-align: top; white-space: normal; }
+  .defs p { margin: 10px 0 0; color: var(--ink-2); }
+  .defs dl { margin: 0; }
+  .defs dt { font-weight: 600; margin-top: 10px; }
+  .defs dt:first-child { margin-top: 0; }
+  .defs dd { margin: 0; color: var(--ink-2); }
+  .defs dd .legend { flex-direction: column; margin: 2px 0; }
+</style>
+<script src="data.js"></script>
+<script src="core.js"></script>
+</head>
+<body>
+<script>
+"use strict";
+/* Overview: links to the views, a log of the runs in this bundle, and how every
+ * number on the other pages is defined. Nothing here follows the filters. */
+(function () {
+  const E = window.Eval, { h, R, ALL_V } = E;
+  const everyone = E.P.map((_, p) => p);
+  const KEYS = ["f1", "precision", "recall", "accuracy"];
+  const view = (href, title, body) => h("a", { class: "card", href }, h("h2", null, title), h("p", null, body), h("span", { class: "btn" }, `Open ${title} →`));
+
+  function runs() {
+    const scores = R.map((_, r) => { const c = E.counts(r, ALL_V, everyone); return KEYS.map((key) => E.score(c, key)); });
+    const [lo] = E.domainOf(scores.flat());
+    const heat = (value) => {
+      const paint = value == null ? null : E.seqColor((value - lo) / (1 - lo));
+      return h("td", { class: "r heat", style: paint ? `background:${paint.fill};color:${paint.ink}` : "" }, E.pct(value));
+    };
+    return h("table", { class: "num runs" },
+      h("thead", null, h("tr", null, ["Run", "Started", "Label", "Model", "Config"].map((x) => h("th", null, x)),
+        ["Patients", "F1", "Precision", "Recall", "Accuracy", "Tokens / patient"].map((x) => h("th", { class: "r" }, x)), h("th", null, "Notes"))),
+      h("tbody", null, R.map((run, r) => {
+        const u = E.usage(r, everyone), done = run.pred.filter(Boolean).length;
+        return h("tr", null,
+          h("td", null, h("a", { href: "run.html#run=" + encodeURIComponent(run.run_id) }, `${r + 1} · ${run.run_id}`)), h("td", null, String(run.started_at).slice(0, 10)), h("td", null, run.label || ""),
+          h("td", null, run.model || ""), h("td", { class: "mono" }, (run.configChanged ? "▾ " : "") + (run.config_digest || "")),
+          h("td", { class: "r" }, `${done} / ${E.nP}`), scores[r].map(heat),
+          h("td", { class: "r" }, E.compact(u.mean)), h("td", { class: "muted ellip", style: "max-width:320px", title: run.notes || "" }, run.notes || ""));
+      }).reverse()));
+  }
+
+  const outcome = (key, truth, run) => h("tr", { class: "v-" + key },
+    h("td", null, h("span", { class: "glyph" }, E.GLYPH[key])), h("td", null, E.VERDICT_LABEL[key]), h("td", { class: "muted" }, truth), h("td", { class: "muted" }, run));
+  const formula = (name, text) => h("tr", null, h("td", null, name), h("td", { class: "muted" }, text));
+  const term = (name, ...text) => [h("dt", null, name), h("dd", null, text)];
+  const stable = E.STABILITY_PARTS({});
+
+  E.mount({
+    filters: [],
+    render: () => [
+      h("div", { class: "section-title", style: "margin-top:0" }, "Views"),
+      h("div", { class: "views" },
+        view("run.html", "Single run", "One run: scores, errors and tokens, by variable and by patient."),
+        view("trends.html", "Trends", "Each variable's score across runs, one chart per variable."),
+        view("matrix.html", "Matrix", "Variable × run heatmap. Variability: patient × variable grid."),
+        view("triage.html", "Triage", "Variables ranked by errors, with change from a baseline run. Variability: accuracy against consistency.")),
+      h("div", { class: "section-title" }, "Runs"),
+      h("div", { class: "card scroll-x", style: "margin-bottom:20px" }, runs()),
+      h("div", { class: "section-title" }, "Definitions"),
+      h("div", { class: "defs" },
+        h("div", { class: "card" },
+          h("h2", null, "Outcomes"),
+          h("table", null,
+            h("thead", null, h("tr", null, h("th"), h("th", null, "Outcome"), h("th", null, "Ground truth"), h("th", null, "Run extracted"))),
+            h("tbody", null,
+              outcome("match", "a value", "the same value"),
+              outcome("wrong", "a value", "a different value"),
+              outcome("missed", "a value", "nothing"),
+              outcome("spurious", "blank", "a value"),
+              outcome("tn", "blank", "nothing"),
+              outcome("none", "", "patient failed or was not in the run"))),
+          h("p", null, "Values are compared after trimming, upper-casing and dropping punctuation and leading zeros, so 01 and 1 match. A blank ground-truth cell means the variable should stay uncoded.")),
+        h("div", { class: "card" },
+          h("h2", null, "Metrics"),
+          h("table", null, h("tbody", null,
+            formula("Precision", "correct ÷ (correct + wrong + spurious)"),
+            formula("Recall", "correct ÷ (correct + wrong + missed)"),
+            formula("F1", "2 × correct ÷ (2 × correct + 2 × wrong + missed + spurious)"),
+            formula("Accuracy", "(correct + correctly blank) ÷ all cells"))),
+          h("p", null, "Pooled figures add the counts over every variable before dividing (micro-average)."),
+          h("p", null, "Precision, recall and F1 show – when no patient in the selection has a ground-truth value for the variable. Spurious values there still count as errors and lower accuracy.")),
+        h("div", { class: "card" },
+          h("h2", null, "Other definitions"),
+          h("dl", null,
+            term("Run-to-run", "Over the variability window, each patient × variable cell is one of:",
+              h("div", { class: "legend" }, stable.map((part, i) => h("span", null, h("i", { class: "key" + (i === 2 ? " dot" : ""), style: `background:${part.color}` }), part.label))),
+              "Cells that are blank in the ground truth and in every run are left out."),
+            term("Variability window", "By default, the latest runs that share the newest configuration digest."),
+            term("Intervals", "95% Wilson intervals."),
+            term("Tokens", "Mean input + output tokens per completed patient. Patients without reported usage are left out of the mean, not counted as zero.")))),
+    ],
+  });
+})();
+</script>
+</body>
+</html>

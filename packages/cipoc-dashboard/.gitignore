@@ -1,0 +1,4 @@
+# Real stores hold patient IDs and extracted values. The dummy set is regenerable.
+data/
+web/data.js
+__pycache__/

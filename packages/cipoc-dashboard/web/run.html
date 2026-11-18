@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CIPOC evaluation · Run</title>
+<link rel="stylesheet" href="core.css">
+<style>
+  .runhead h2 { font-size: 16px; }
+  .facts { display: flex; flex-wrap: wrap; gap: 2px 22px; margin-top: 6px; color: var(--ink-2); }
+  .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 12px; margin-bottom: 4px; }
+</style>
+<script src="data.js"></script>
+<script src="core.js"></script>
+</head>
+<body>
+<script>
+"use strict";
+/* One run on its own: what a sweep produced, without the other runs around it.
+ * The run is named in the URL (run.html#run=<run_id>) so the Overview can link
+ * to it; with no run named it shows the newest. */
+(function () {
+  const E = window.Eval, { h, R, V, P, ALL_V, LAST } = E;
+  const local = { vsort: "variable", vdir: 1, psort: "id", pdir: 1 };
+  const current = () => {
+    const id = decodeURIComponent((location.hash.match(/run=([^&]*)/) || [])[1] || "");
+    const r = R.findIndex((run) => run.run_id === id);
+    return r < 0 ? LAST : r;
+  };
+  const errorsOf = (c) => c.wrong + c.missed + c.spurious;
+  const duration = (x) => {
+    if (x == null) return "–";
+    const total = Math.round(x);
+    return total < 90 ? `${total}s` : `${Math.floor(total / 60)}m ${String(total % 60).padStart(2, "0")}s`;
+  };
+  const scoreCell = (value) => h("div", { class: "cell-bar" }, E.pct(value), h("div", { class: "track" }, h("i", { style: `width:${(value || 0) * 100}%` })));
+
+  function header(r) {
+    const run = R[r];
+    const twins = R.map((other, i) => (i !== r && other.config_digest === run.config_digest ? i + 1 : 0)).filter(Boolean);
+    const fact = (label, value) => value != null && value !== "" && h("span", null, h("span", { class: "muted" }, label + " "), value);
+    return h("div", { class: "card runhead", style: "margin-bottom:12px" },
+      h("h2", null, `Run ${r + 1} of ${E.nR}` + (run.label ? ` · ${run.label}` : "")),
+      h("div", { class: "facts" },
+        fact("ID", run.run_id), fact("Started", String(run.started_at).slice(0, 16).replace("T", " ")), fact("Model", run.model), fact("CIPOC", run.cipoc_version),
+        fact("Config", run.config_digest && h("span", { class: "mono" }, run.config_digest)),
+        run.config_digest && h("span", null, twins.length ? `Same configuration as run${twins.length > 1 ? "s" : ""} ${twins.join(", ")}` : "No other run has this configuration")),
+      run.notes && h("div", { class: "note", style: "margin-top:6px" }, run.notes));
+  }
+
+  function tiles(r, ps) {
+    const metric = E.METRICS[E.state.metric], c = E.counts(r, ALL_V, ps), now = E.score(c);
+    const before = r ? E.score(E.counts(r - 1, ALL_V, ps)) : null;
+    const done = ps.filter((p) => R[r].pred[p]).length, failed = ps.filter((p) => !R[r].pred[p] && R[r].usage[p]);
+    const absent = ps.length - done - failed.length, u = E.usage(r, ps), errors = errorsOf(c);
+    const others = Object.keys(E.METRICS).filter((key) => key !== E.state.metric).map((key) => `${E.METRICS[key].label} ${E.pct(E.score(c, key))}`).join(" · ");
+    return h("div", { class: "kpis" },
+      E.tile(`${metric.label}, all variables pooled`, E.pct(now), null, [r ? [E.deltaPP(now, before), ` vs run ${r} · `] : null, others]),
+      E.tile("Patients scored", `${done} / ${ps.length}`, null, [
+        failed.length ? `Failed: ${failed.slice(0, 6).map((p) => P[p].patient_id).join(", ")}${failed.length > 6 ? ` and ${failed.length - 6} more` : ""}` : "None failed",
+        absent ? ` · ${absent} not run` : ""]),
+      E.tile("Errors", errors.toLocaleString(), null, [errors ? E.stack(E.ERROR_PARTS(c), null, "tall") : null,
+        h("div", { style: "margin-top:4px" }, `${c.wrong} wrong value · ${c.missed} missed · ${c.spurious} spurious · ${c.n.toLocaleString()} cells scored`)]),
+      E.tile("Tokens per patient", E.compact(u.mean), null,
+        [`${E.compact(u.n ? u.input / u.n : null)} in, ${E.compact(u.n ? u.output / u.n : null)} out · ${duration(u.n ? u.seconds / u.n : null)} per patient`,
+          u.missing ? ` · ${u.missing} without usage` : ""]));
+  }
+
+  /* The run split by tissue or by year band, all variables pooled. */
+  function breakdown(r, ps, by, title) {
+    const metric = E.METRICS[E.state.metric];
+    const rows = E.strata(ps, by).map((g) => {
+      const c = E.counts(r, ALL_V, g.patients);
+      return { g, c, done: g.patients.filter((p) => R[r].pred[p]).length, value: E.score(c), u: E.usage(r, g.patients) };
+    });
+    const scored = (row) => {
+      const td = h("td", { class: "r" }, scoreCell(row.value));
+      td.addEventListener("pointermove", (event) => {
+        const band = metric.ci ? E.wilson(...metric.parts(row.c)) : null;
+        E.tip.show(event, row.g.label, [
+          { value: E.pct(row.value), label: metric.label + (band ? `  (95% CI ${E.pct(band[0], 0)}–${E.pct(band[1], 0)})` : "") },
+          ...E.ERROR_PARTS(row.c).map((part) => ({ color: part.color, kind: "box", value: part.value, label: part.label })),
+          { value: row.c.n, label: "cells scored" }]);
+      });
+      td.addEventListener("pointerleave", E.tip.hide);
+      return td;
+    };
+    return h("div", { class: "card" },
+      h("h2", null, title), h("div", { class: "sub" }, "All variables pooled."),
+      h("table", null,
+        h("thead", null, h("tr", null, h("th", null, by === "tissue" ? "Tissue" : "Diagnosis year"), h("th", { class: "r" }, "Patients"), h("th", { class: "r" }, metric.label),
+          h("th", { class: "r", title: "Wrong, missed and spurious values per completed patient" }, "Errors / patient"), h("th", { class: "r" }, "Tokens / patient"))),
+        h("tbody", null, rows.map((row) => h("tr", null,
+          h("td", null, h("i", { class: "key", style: `background:${row.g.color};margin-right:6px` }), row.g.label),
+          h("td", { class: "r" }, `${row.done} / ${row.g.patients.length}`), scored(row),
+          h("td", { class: "r" }, row.done ? (errorsOf(row.c) / row.done).toFixed(1) : "–"), h("td", { class: "r" }, E.compact(row.u.mean)))))));
+  }
+
+  function variables(r, ps) {
+    const metric = E.METRICS[E.state.metric];
+    const rows = ALL_V.map((v) => {
+      const c = E.counts(r, [v], ps), now = E.score(c), before = r ? E.score(E.counts(r - 1, [v], ps)) : null;
+      return { v, c, now, before, support: c.match + c.wrong + c.missed, errors: errorsOf(c), change: now == null || before == null ? null : now - before };
+    });
+    const maxErrors = Math.max(1, ...rows.map((row) => row.errors));
+    const count = (key, label) => ({ key, label, right: true, num: true, value: (row) => row.c[key], cell: (row) => h("td", { class: "r" + (row.c[key] ? "" : " muted") }, row.c[key]) });
+    const cols = [
+      { key: "variable", label: "Variable", value: (row) => V[row.v].item_id, cell: (row) => h("td", { class: "ellip" }, E.variableName(row.v)) },
+      { key: "group", label: "Group", value: (row) => V[row.v].group_name, cell: (row) => h("td", { class: "muted ellip", style: "max-width:170px" }, V[row.v].group_name) },
+      { key: "support", label: "In truth", right: true, num: true, title: "Patients whose ground truth has a value for this variable", value: (row) => row.support, cell: (row) => h("td", { class: "r" }, row.support) },
+      { key: "now", label: metric.label, right: true, num: true, value: (row) => row.now, cell: (row) => h("td", { class: "r" }, scoreCell(row.now)) },
+      r ? { key: "change", label: `vs run ${r}`, right: true, num: true, value: (row) => row.change, cell: (row) => h("td", { class: "r" }, E.deltaPP(row.now, row.before)) } : null,
+      { key: "errors", label: "Errors", num: true, value: (row) => row.errors, cell: (row) => h("td", null, E.bars(row.errors, row.errors ? E.stack(E.ERROR_PARTS(row.c), maxErrors) : null)) },
+      count("wrong", "Wrong value"), count("missed", "Missed"), count("spurious", "Spurious"),
+    ].filter(Boolean);
+    return [
+      h("div", { class: "toolbar", style: "margin-top:18px" }, h("div", { class: "section-title", style: "margin:0" }, "Variables"), h("span", { class: "spacer" }), E.errorLegend()),
+      h("div", { class: "note", style: "margin-bottom:8px" }, "Click a row for the variable's errors in this run and its trend."),
+      h("div", { class: "card scroll-x" }, E.sortable(cols, rows, local, "vsort", "vdir", (row) => E.variableDrawer(row.v, r))),
+    ];
+  }
+
+  function patientList(r, ps) {
+    const metric = E.METRICS[E.state.metric];
+    const rows = ps.map((p) => {
+      const ran = !!R[r].pred[p], u = R[r].usage[p], c = ran ? E.counts(r, ALL_V, [p]) : null;
+      return {
+        p, c, status: ran ? "completed" : u ? "failed" : "not run", value: c ? E.score(c) : null, errors: c ? errorsOf(c) : null,
+        tokens: u && u[0] != null && u[1] != null ? u[0] + u[1] : null, calls: u ? u[2] : null, seconds: u ? u[3] : null,
+      };
+    });
+    const maxErrors = Math.max(1, ...rows.map((row) => row.errors || 0));
+    const number = (key, label, value, text, title) => ({ key, label, title, right: true, num: true, value, cell: (row) => h("td", { class: "r" }, text(row)) });
+    const cols = [
+      { key: "id", label: "Patient", value: (row) => P[row.p].patient_id, cell: (row) => h("td", null, P[row.p].patient_id) },
+      { key: "tissue", label: "Tissue", value: (row) => P[row.p].tissue, cell: (row) => h("td", null, P[row.p].tissue) },
+      number("year", "Year", (row) => P[row.p].year, (row) => P[row.p].year),
+      number("notes", "Notes", (row) => P[row.p].n_notes, (row) => P[row.p].n_notes),
+      {
+        key: "status", label: "Status", value: (row) => row.status,
+        cell: (row) => h("td", { class: row.status === "completed" ? "muted" : "v-wrong" }, row.status === "completed" ? null : h("span", { class: "glyph" }, E.GLYPH.wrong), row.status),
+      },
+      { key: "value", label: metric.label, right: true, num: true, title: `${metric.label} over this patient's variables`, value: (row) => row.value, cell: (row) => h("td", { class: "r" }, row.c ? scoreCell(row.value) : "–") },
+      { key: "errors", label: "Errors", num: true, value: (row) => row.errors, cell: (row) => h("td", null, row.c ? E.bars(row.errors, row.errors ? E.stack(E.ERROR_PARTS(row.c), maxErrors) : null) : null) },
+      number("tokens", "Tokens", (row) => row.tokens, (row) => E.compact(row.tokens), "Input + output. – means usage was not reported"),
+      number("calls", "LLM calls", (row) => row.calls, (row) => (row.calls == null ? "–" : row.calls)),
+      number("seconds", "Duration", (row) => row.seconds, (row) => duration(row.seconds)),
+    ];
+    return [
+      h("div", { class: "section-title" }, "Patients"),
+      h("div", { class: "note", style: "margin-bottom:8px" }, "Click a row for the patient's values in every run."),
+      h("div", { class: "card scroll-x" }, E.sortable(cols, rows, local, "psort", "pdir", (row) => E.patientDrawer(row.p, undefined, r))),
+    ];
+  }
+
+  window.addEventListener("hashchange", E.render);
+  E.mount({
+    filters: ["metric", "tissue", "year"],
+    lead: () => E.field("Run", E.select(R.map((_, r) => [String(r), E.runTitle(r)]).reverse(), String(current()),
+      (x) => { location.hash = "run=" + encodeURIComponent(R[Number(x)].run_id); }, "Run")),
+    render: (ps) => {
+      const r = current();
+      return [header(r), tiles(r, ps),
+        h("div", { class: "split" }, breakdown(r, ps, "tissue", "By tissue"), breakdown(r, ps, "year", "By diagnosis year")),
+        variables(r, ps), patientList(r, ps)];
+    },
+  });
+})();
+</script>
+</body>
+</html>

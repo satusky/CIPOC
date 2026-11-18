@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CIPOC evaluation · Matrix</title>
+<link rel="stylesheet" href="core.css">
+<style>
+  .heat td, .heat th { padding: 3px 6px; font-size: 12px; }
+  .heat td.r { min-width: 38px; border-bottom: 2px solid var(--surface); border-right: 2px solid var(--surface); }
+  .heat td:first-child { position: sticky; left: 0; background: var(--surface); z-index: 1; }
+  .heat tr.group-row td:first-child { background: var(--plane); }
+  .scale { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-2); }
+  .scale i { display: inline-block; width: 14px; height: 10px; }
+
+  /* Patient x variable grid: shape carries the class as well as colour. */
+  .pv { display: grid; gap: 2px; align-items: center; width: max-content; }
+  .pv .head { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 10px; color: var(--muted); height: 34px; cursor: pointer; font-variant-numeric: tabular-nums; }
+  .pv .head:hover, .pv .who:hover { color: var(--ink); }
+  .pv .who { font-size: 12px; padding-right: 10px; white-space: nowrap; cursor: pointer; color: var(--ink-2); }
+  .pv .tally { font-size: 12px; padding-left: 10px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .pv b { display: block; width: 14px; height: 14px; border-radius: 2px; cursor: pointer; }
+  .pv .gap { margin-left: 6px; }
+  .pv b.right { background: var(--right); }
+  .pv b.wrong { background: var(--wrong); }
+  .pv b.varies { background: var(--varies); border-radius: 50%; }
+  .pv b.na { cursor: default; }
+  .pv b:not(.na):hover { outline: 2px solid var(--ink); outline-offset: 0; }
+  .shape { display: inline-block; width: 12px; height: 12px; border-radius: 2px; }
+  .ramp { display: inline-block; width: 48px; height: 10px; border-radius: 5px; background: linear-gradient(to right, var(--varies-lo), var(--varies-hi)); }
+</style>
+<script src="data.js"></script>
+<script src="core.js"></script>
+</head>
+<body>
+<script>
+"use strict";
+/* Matrix. Every variable and every run on one screen as a
+ * heatmap; stratifying swaps the columns from runs to strata. Variability is a
+ * patient x variable grid. */
+(function () {
+  const E = window.Eval, { h, R, V, P, ALL_V, LAST } = E;
+  const local = { mode: "value", run: LAST, order: "id" };
+  const redraw = (key, value) => { local[key] = value; E.render(); };
+
+  function scale(lo, maxChange) {
+    if (local.mode === "value" || E.state.stratify !== "none") {
+      return h("span", { class: "scale" }, E.pct(lo, 0), [0, 2, 4, 6, 8, 10, 12].map((i) => h("i", { style: `background:${E.seqColor(i / 12).fill}` })), "100%");
+    }
+    return h("span", { class: "scale" }, `−${(maxChange * 100).toFixed(0)} pp`,
+      [-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1].map((t) => h("i", { style: `background:${E.divColor(t, 1).fill}` })), `+${(maxChange * 100).toFixed(0)} pp`);
+  }
+
+  /* Variable x stratum, for one run. */
+  function strataMatrix(ps, groups, r) {
+    const columns = groups.concat([{ key: "all", label: "All", patients: ps }]);
+    const row = (vs) => columns.map((g) => { const c = E.counts(r, vs, g.patients); return { c, value: E.score(c) }; });
+    const perVariable = ALL_V.map((v) => row([v]));
+    const [lo] = E.domainOf(perVariable.flat().map((cell) => cell.value));
+    const cell = (data, column, title) => {
+      const paint = data.value == null ? null : E.seqColor((data.value - lo) / (1 - lo));
+      const td = h("td", { class: "r", style: paint ? `background:${paint.fill};color:${paint.ink}` : "" }, data.value == null ? "–" : (data.value * 100).toFixed(0));
+      td.addEventListener("pointermove", (event) => {
+        const metric = E.METRICS[E.state.metric], band = metric.ci ? E.wilson(...metric.parts(data.c)) : null;
+        E.tip.show(event, `${title} · ${column.label}`, [
+          { value: E.pct(data.value), label: metric.label + (band ? `  (95% CI ${E.pct(band[0], 0)}–${E.pct(band[1], 0)})` : "") },
+          { value: data.c.wrong + data.c.missed + data.c.spurious, label: `errors in ${data.c.n} cells` }]);
+      });
+      td.addEventListener("pointerleave", E.tip.hide);
+      return td;
+    };
+    const body = [h("tr", null, h("td", null, h("b", null, "All variables, pooled")), row(ALL_V).map((data, i) => cell(data, columns[i], "All variables")))];
+    let group = null;
+    for (const v of ALL_V) {
+      if (V[v].group_id !== group) {
+        group = V[v].group_id;
+        body.push(h("tr", { class: "group-row" }, h("td", { colspan: columns.length + 1 }, V[v].group_name)));
+      }
+      body.push(h("tr", { class: "click", onclick: () => E.variableDrawer(v) },
+        h("td", { class: "ellip" }, h("span", { class: "muted num" }, V[v].item_id + " "), V[v].name),
+        perVariable[v].map((data, i) => cell(data, columns[i], E.variableLabel(v)))));
+    }
+    return {
+      lo,
+      table: h("table", { class: "num" },
+        h("thead", null, h("tr", null, h("th", null, "Variable"), columns.map((g) => h("th", { class: "r" }, g.label, h("div", { class: "muted", style: "font-weight:400" }, `n=${g.patients.length}`))))),
+        h("tbody", null, body)),
+    };
+  }
+
+  function performance(ps) {
+    const groups = E.strata(ps), stratified = groups.length > 1 || E.state.stratify !== "none";
+    const matrix = stratified ? strataMatrix(ps, groups, local.run) : E.runMatrix(ps, { heat: true, mode: local.mode });
+    matrix.table.classList.add("heat");
+    return [
+      E.kpiRow(ps),
+      h("div", { class: "toolbar" },
+        stratified
+          ? E.field("Run", E.select(R.map((run, r) => [String(r), `${r + 1} · ${run.label || run.run_id}`]), String(local.run), (x) => redraw("run", Number(x)), "Run"))
+          : E.field("Cells show", E.seg([["value", "Value"], ["prev", "Change vs previous run"], ["first", "Change vs run 1"]], local.mode, (x) => redraw("mode", x), "Cells show")),
+        h("span", { class: "spacer" }), scale(matrix.lo, matrix.maxChange)),
+      h("div", { class: "note", style: "margin-bottom:8px" }, stratified
+        ? `${E.METRICS[E.state.metric].label} (%), ${E.runTitle(local.run)}. Click a row for the variable's detail.`
+        : `${E.METRICS[E.state.metric].label} (%). ▾ marks a configuration change. Click a row for the variable's detail.`),
+      h("div", { class: "card scroll-x" }, matrix.table),
+      h("div", { style: "margin-top:16px" }, E.usageCard(ps)),
+    ];
+  }
+
+  function variability(ps) {
+    const runs = E.windowRuns();
+    if (runs.length < 2) return h("div", { class: "card muted" }, "The variability window holds one run. Pick a wider window to compare runs.");
+    const rows = ps.map((p) => {
+      const cells = ALL_V.map((v) => E.cellStability(p, v, runs)), tally = { right: 0, wrong: 0, varies: 0 };
+      for (const cell of cells) if (cell && cell.cls !== "na") tally[cell.cls]++;
+      return { p, cells, tally };
+    });
+    rows.sort(local.order === "id" ? (a, b) => a.p - b.p : (a, b) => b.tally[local.order] - a.tally[local.order] || a.p - b.p);
+
+    const gap = (v) => (v && V[v].group_id !== V[v - 1].group_id ? " gap" : "");
+    const grid = h("div", { class: "pv", style: `grid-template-columns:max-content ${ALL_V.map((v) => (gap(v) ? "20px" : "14px")).join(" ")} max-content` });
+    grid.append(h("span"), ...ALL_V.map((v) => h("span", { class: "head" + gap(v), "data-v": v, title: E.variableLabel(v) }, V[v].item_id)), h("span"));
+    for (const row of rows) {
+      grid.append(h("span", { class: "who", "data-p": row.p }, `${P[row.p].patient_id} · ${P[row.p].tissue} ${P[row.p].year}`),
+        ...row.cells.map((cell, v) => h("b", {
+          class: (cell ? cell.cls : "na") + gap(v), "data-p": row.p, "data-v": v,
+          style: cell && cell.cls === "varies" ? `background:color-mix(in oklab, var(--varies-lo), var(--varies-hi) ${Math.round(cell.unrest * 100)}%)` : null,
+        })),
+        h("span", { class: "tally" }, `${row.tally.varies} vary · ${row.tally.wrong} wrong`));
+    }
+    const label = { right: "same every run, correct", wrong: "same every run, wrong", varies: "varies between runs" };
+    grid.addEventListener("pointermove", (event) => {
+      const el = event.target;
+      if (el.tagName !== "B" || el.classList.contains("na")) return E.tip.hide();
+      const p = Number(el.dataset.p), v = Number(el.dataset.v), cell = E.cellStability(p, v, runs);
+      E.tip.show(event, `${P[p].patient_id} · ${E.variableLabel(v)}`, [
+        { value: label[cell.cls], label: "" },
+        cell.cls === "varies" && { value: cell.changes, label: `change${cell.changes > 1 ? "s" : ""} in ${cell.k} runs` },
+        cell.cls === "varies" && { value: cell.settled, label: cell.settled > 1 ? "latest runs agree" : "changed in the latest run" },
+        { value: E.RAW.truth[p][v] == null ? "blank" : E.RAW.truth[p][v], label: "expected" },
+        ...runs.map((r) => ({ value: !E.scored(r, p, v) ? "not run" : R[r].pred[p][v] == null ? "blank" : R[r].pred[p][v], label: `run ${r + 1}` }))].filter(Boolean));
+    });
+    grid.addEventListener("pointerleave", E.tip.hide);
+    grid.addEventListener("click", (event) => {
+      const { p, v } = event.target.dataset;
+      if (p != null) E.patientDrawer(Number(p), v == null ? undefined : Number(v));
+      else if (v != null) E.variableDrawer(Number(v));
+    });
+
+    const shape = (color, round) => h("i", { class: "shape", style: `background:${color};${round ? "border-radius:50%" : ""}` });
+    return [
+      h("div", { class: "toolbar" },
+        E.field("Order patients by", E.seg([["varies", "Most variable"], ["wrong", "Most always-wrong"], ["id", "Patient ID"]], local.order, (x) => redraw("order", x), "Order")),
+        h("span", { class: "spacer" }),
+        h("div", { class: "legend" }, h("span", null, shape("var(--right)"), label.right), h("span", null, shape("var(--wrong)"), label.wrong),
+          h("span", null, label.varies + ": few, early changes", h("i", { class: "ramp" }), "many or recent"),
+          h("span", null, "empty: blank truth, never extracted"))),
+      h("div", { class: "note", style: "margin-bottom:8px" }, `Over ${E.windowLabel()}. Click a cell for the patient, a column head for the variable.`),
+      h("div", { class: "card scroll-x" }, grid),
+    ];
+  }
+
+  E.mount({ render: (ps) => (E.state.view === "variability" ? variability(ps) : performance(ps)) });
+})();
+</script>
+</body>
+</html>
