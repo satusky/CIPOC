@@ -158,6 +158,13 @@ class CipocConfig:
         """Build the :class:`DocumentsConfig` from the ``documents`` section."""
         return DocumentsConfig(**self._documents)
 
+    def with_documents(self, **overrides: Any) -> "CipocConfig":
+        """Return a copy whose ``documents`` section has ``overrides`` applied."""
+        return CipocConfig(
+            _deep_merge(self._raw, {"documents": overrides}),
+            model_kwargs=self._model_kwargs,
+        )
+
 
 def load_config(
     path: str | Path | None = None, *, model_kwargs: dict[str, Any] | None = None

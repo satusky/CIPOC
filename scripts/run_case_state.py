@@ -4,6 +4,10 @@
         --notes tests/fixtures/note_bundle.json \
         --output tests/test_outputs/case_state.json
 
+Pass ``--item-ids`` to extract only some variables. The configured variable
+groups are trimmed to those items plus any given structured data, so a known
+primary site or histology still scopes the run.
+
 Disabling LLM content capture omits only model prompts and responses. The
 artifact still contains the full processed note corpus and may contain PHI.
 """
@@ -13,6 +17,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -23,8 +28,9 @@ from cipoc.models import (
     OrchestratorRunError,
     OrchestratorRunFailure,
     OrchestratorRunResult,
-    RunObservability,
 )
+from cipoc.tools import subset_variable_groups
+from cipoc.utils import load_config
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -96,6 +102,16 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--item-ids",
+        type=int,
+        nargs="+",
+        default=None,
+        help=(
+            "Extract only these NAACCR item IDs. Items given structured data are "
+            "kept too, so they still scope the run."
+        ),
+    )
+    parser.add_argument(
         "--max-concurrency",
         type=int,
         default=None,
@@ -128,97 +144,16 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def run_case_state(
-    raw_notes: list[dict],
-    *,
-    structured_data: dict[int, str] | None = None,
-    max_concurrency: int | None = None,
-    progress: bool = True,
-    capture_llm_content: bool = True,
-    max_content_chars: int | None = None,
-) -> OrchestratorRunResult:
-    """Run the orchestrator through its public API."""
-    return OrchestratorAgent().run(
-        raw_notes,
-        structured_data=structured_data,
-        max_concurrency=max_concurrency,
-        progress=progress,
-        capture_llm_content=capture_llm_content,
-        max_content_chars=max_content_chars,
+def _subset_agent(item_ids: list[int], directory: Path) -> OrchestratorAgent:
+    """Build an orchestrator whose plan is the configured groups trimmed to
+    ``item_ids``. The trimmed file must outlive the run, which fingerprints it."""
+    config = load_config()
+    groups = _load_json(config.documents().variable_groups_path)
+    subset_path = directory / "variable_groups.json"
+    subset_path.write_text(
+        json.dumps(subset_variable_groups(groups, item_ids), indent=2), encoding="utf-8"
     )
-
-
-def usage_lines(
-    summary: LLMUsageSummary | None, *, observability: RunObservability | None = None
-) -> list[str]:
-    """Render recorded usage and optional derived, coverage-qualified timing."""
-    if summary is None:
-        lines = ["Usage: unavailable; telemetry did not produce a valid summary."]
-    else:
-        lines = [
-            (
-                f"Tokens: input={summary.input_tokens:,} "
-                f"output={summary.output_tokens:,} total={summary.total_tokens:,}"
-            ),
-            (
-                f"Calls: logical={summary.logical_calls:,} "
-                f"invocations={summary.model_invocations:,} "
-                f"retries={summary.retry_invocations:,}"
-            ),
-            (
-                "Usage coverage: "
-                f"reported={summary.usage_reported_invocations:,} "
-                f"missing={summary.missing_usage_invocations:,}"
-            ),
-        ]
-        details = [
-            f"input.{name}={count:,}"
-            for name, count in sorted(summary.input_token_details.root.items())
-            if count
-        ]
-        details.extend(
-            f"output.{name}={count:,}"
-            for name, count in sorted(summary.output_token_details.root.items())
-            if count
-        )
-        if details:
-            lines.append("Token details: " + ", ".join(details))
-    if observability is None:
-        return lines
-
-    calls = [call for values in observability.llm_exchanges.values() for call in values]
-    calls.extend(observability.unattributed_exchanges)
-    lines.append(
-        f"Timing records: retained={len(calls):,} "
-        f"diagnostic={len(observability.unattributed_exchanges):,} "
-        f"summary_invocations={summary.model_invocations if summary is not None else 'unavailable'}; "
-        f"collection={observability.collection_status or 'unknown'}"
-    )
-    if any(issue.code == "invalid_invocation_sequence" for issue in observability.collection_issues):
-        lines.append("Timing/provenance aggregates: unavailable; invalid invocation identity or sequence.")
-        return lines
-
-    for field, label in (
-        ("service_seconds", "Summed invocation time"),
-        ("queue_seconds", "Summed queue wait"),
-    ):
-        values = [value for call in calls if (value := getattr(call, field)) is not None]
-        measured = (
-            f"{sum(values):.3f}s mean={sum(values) / len(values):.3f}s max={max(values):.3f}s"
-            if values else "unavailable"
-        )
-        lines.append(f"{label}: {measured}; recorded={len(values):,} missing={len(calls) - len(values):,}")
-    verified = sum(
-        call.usage_reported_fields is not None
-        and {"input_tokens", "output_tokens"}.issubset(call.usage_reported_fields)
-        for call in calls
-    )
-    unknown = sum(call.usage_reported_fields is None for call in calls)
-    lines.append(
-        f"Scalar provenance (input/output): verified={verified:,} "
-        f"incomplete={len(calls) - verified - unknown:,} unknown={unknown:,}"
-    )
-    return lines
+    return OrchestratorAgent(config=config.with_documents(variable_groups_path=subset_path))
 
 
 RunArtifact = OrchestratorRunResult | OrchestratorRunFailure
@@ -229,17 +164,65 @@ def _write_artifact(path: Path, artifact: RunArtifact) -> None:
     path.write_text(artifact.model_dump_json(indent=2), encoding="utf-8")
 
 
+def run_case_state(
+    raw_notes: list[dict],
+    output: str | Path,
+    *,
+    item_ids: list[int] | None = None,
+    structured_data: dict[int, str] | None = None,
+    max_concurrency: int | None = None,
+    progress: bool = True,
+    capture_llm_content: bool = True,
+    max_content_chars: int | None = None,
+) -> OrchestratorRunResult:
+    """Run the orchestrator through its public API, optionally on a subset of
+    the configured variables, and write the run artifact to ``output``.
+
+    A failed run writes its partial failure artifact there before the
+    ``OrchestratorRunError`` propagates.
+    """
+    output = Path(output)
+    with tempfile.TemporaryDirectory() as directory:
+        agent = (
+            OrchestratorAgent()
+            if item_ids is None
+            else _subset_agent([*item_ids, *(structured_data or {})], Path(directory))
+        )
+        try:
+            result = agent.run(
+                raw_notes,
+                structured_data=structured_data,
+                max_concurrency=max_concurrency,
+                progress=progress,
+                capture_llm_content=capture_llm_content,
+                max_content_chars=max_content_chars,
+            )
+        except OrchestratorRunError as error:
+            _write_artifact(output, error.failure)
+            raise
+    _write_artifact(output, result)
+    return result
+
+
+def usage_line(summary: LLMUsageSummary | None) -> str:
+    """One line of token usage. Per-call detail and timing stay in the artifact."""
+    # Counts are zero-filled when no call reported usage; that is unknown, not zero.
+    if summary is None or (summary.model_invocations and not summary.usage_reported_invocations):
+        return "Usage: unavailable."
+    line = f"Usage: {summary.total_tokens:,} tokens over {summary.model_invocations:,} model calls"
+    if summary.missing_usage_invocations:
+        line += f" ({summary.missing_usage_invocations:,} without reported usage)"
+    return line + "."
+
+
 def _print_outcome(path: Path, artifact: RunArtifact) -> None:
-    size_kb = path.stat().st_size / 1024
-    print(f"Wrote {path} ({size_kb:.1f} KB)")
-    if artifact.observability.collection_status in {"partial", "unavailable"}:
-        print(f"Telemetry collection: {artifact.observability.collection_status}")
-        for issue in artifact.observability.collection_issues:
+    print(f"Wrote {path}")
+    observability = artifact.observability
+    if observability.collection_status in {"partial", "unavailable"}:
+        print(f"Telemetry collection: {observability.collection_status}")
+        for issue in observability.collection_issues:
             print(f"  {issue.code}: {issue.message}")
-    for line in usage_lines(
-        artifact.observability.llm_usage_summary, observability=artifact.observability
-    ):
-        print(line)
+    print(usage_line(observability.llm_usage_summary))
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -248,8 +231,10 @@ def main(argv: list[str] | None = None) -> int:
     structured_data = _load_structured_data(args.structured_data)
 
     try:
-        artifact = run_case_state(
+        result = run_case_state(
             raw_notes,
+            args.output,
+            item_ids=args.item_ids,
             structured_data=structured_data,
             max_concurrency=args.max_concurrency,
             progress=not args.no_progress,
@@ -257,14 +242,11 @@ def main(argv: list[str] | None = None) -> int:
             max_content_chars=args.max_content_chars,
         )
     except OrchestratorRunError as error:
-        artifact = error.failure
-        _write_artifact(args.output, artifact)
-        _print_outcome(args.output, artifact)
+        _print_outcome(args.output, error.failure)
         print(f"Orchestration failed: {error}", file=sys.stderr)
         return 1
 
-    _write_artifact(args.output, artifact)
-    _print_outcome(args.output, artifact)
+    _print_outcome(args.output, result)
     return 0
 
 

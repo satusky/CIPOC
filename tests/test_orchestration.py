@@ -1,5 +1,8 @@
 import json
+import tempfile
 import unittest
+
+import pandas as pd
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -19,7 +22,7 @@ from cipoc.models import (
     TextSpan,
     VariableOutput,
 )
-from cipoc.tools import build_corpus_descriptors, load_variable_groups, site_applies
+from cipoc.tools import build_corpus_descriptors, case_fact_seed, load_variable_groups, site_applies, subset_variable_groups
 from cipoc.utils.progress.events import normalize
 
 from tests.fake_orchestrator import build_fake_orchestrator, graph_input, load_notes
@@ -47,6 +50,63 @@ class SiteApplicabilityTests(unittest.TestCase):
 
         self.assertTrue(site_applies(group.applies_to, CaseFacts(primary_site="C50.4")))
         self.assertFalse(site_applies(group.applies_to, CaseFacts(primary_site="C34.9")))
+
+
+class VariableGroupSubsetTests(unittest.TestCase):
+    def plan(self, item_ids, **options):
+        subset = subset_variable_groups(json.loads(VARIABLE_GROUPS.read_text()), item_ids, **options)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "variable_groups.json"
+            path.write_text(json.dumps(subset))
+            return load_variable_groups(path)
+
+    def test_keeps_only_requested_variables_and_drops_emptied_groups(self):
+        plan = self.plan([764, 400])
+
+        self.assertEqual(
+            [(group.group_id, [v.item_id for v in group.variables]) for group in plan],
+            [("initial_llm_extraction", [400]), ("other", [764])],
+        )
+
+    def test_subgroup_keeps_parent_settings_it_inherits(self):
+        [group] = self.plan([3840])
+
+        self.assertEqual(group.group_id, "prostate_only")
+        self.assertEqual(group.stage, "dependent")
+        self.assertIsNotNone(group.applies_to)
+
+    def test_unknown_item_ids_are_rejected(self):
+        with self.assertRaisesRegex(ValueError, r"\[220, 99999\]"):
+            self.plan([400, 220, 99999])
+
+    def test_with_case_facts_keeps_the_defined_case_fact_items(self):
+        plan = self.plan([764], with_case_facts=True)
+
+        self.assertEqual(
+            [(group.group_id, [v.item_id for v in group.variables]) for group in plan],
+            [
+                ("initial_llm_extraction", [390, 400]),
+                ("histologic_type_and_behavior", [522, 523]),
+                ("other", [764]),
+            ],
+        )
+        with self.assertRaisesRegex(ValueError, r"\[99999\]"):
+            self.plan([99999], with_case_facts=True)
+
+
+class CaseFactSeedTests(unittest.TestCase):
+    def test_seeds_only_unrequested_case_facts_with_known_values(self):
+        truth = {"mrn": "A1", "390": "", "400": "C504", "522": "8500", "523": None, "764": "3"}
+
+        self.assertEqual(case_fact_seed(truth, [764, 522]), {400: "C504"})
+
+    def test_reads_a_dataframe_row_with_blanks(self):
+        truth = pd.DataFrame(
+            {"mrn": ["A1", "A2"], 400: ["C504", None], 522: [8500, None], 523: [3, 2]}
+        ).set_index("mrn")
+
+        self.assertEqual(case_fact_seed(truth.loc["A1"], []), {400: "C504", 522: "8500", 523: "3"})
+        self.assertEqual(case_fact_seed(truth.loc["A2"], []), {523: "2"})
 
 
 class VariableCitationTests(unittest.TestCase):
