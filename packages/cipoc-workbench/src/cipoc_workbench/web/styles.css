@@ -537,6 +537,12 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 }
 .file-pick:hover span { color: var(--text); border-color: var(--accent); }
 .file-pick input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 1px; }
+/* The button and its status wrap to a second toolbar line together. */
+#view-variables .pane-head { flex-wrap: wrap; row-gap: 8px; }
+.truth-pick { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.truth-status { font-size: 12px; color: var(--text-dim); overflow-wrap: anywhere; }
+.truth-status.bad { color: var(--error); }
+.truth-status:empty { display: none; }
 
 /* ----------------------------------------------------------- notes list */
 

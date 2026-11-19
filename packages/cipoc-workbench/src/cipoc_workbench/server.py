@@ -3,8 +3,8 @@
 The workbench frontend is a directory of static files that reads one canonical
 run-result JSON artifact. Everything it needs to *display* a run is available
 over plain ``http.server`` — this module exists for the two things a static
-server cannot do: hand the page a ground-truth file chosen at launch, and accept
-the annotations a reviewer writes back.
+server cannot do: hand the page ground truth from files chosen at launch, and
+accept the annotations a reviewer writes back.
 
 The package is independent from the CIPOC runtime and depends only on its web
 server libraries. It communicates with CIPOC through the versioned JSON artifact.
@@ -174,6 +174,7 @@ def build_app(
     *,
     state_path: Path | None = None,
     ground_truth_path: Path | None = None,
+    ground_truth_dir: Path | None = None,
     feedback_path: Path | None = None,
     feedback_dir: Path | None = None,
 ) -> FastAPI:
@@ -191,6 +192,13 @@ def build_app(
     except (OSError, ValueError, RecursionError):
         # Feedback binding must not prevent raw serving or local-file recovery.
         pass
+
+    def startup_ground_truth() -> Path | None:
+        """--ground-truth, else the --ground-truth-dir file named like --state."""
+        if ground_truth_path is not None or ground_truth_dir is None or state_path is None:
+            return ground_truth_path
+        match = ground_truth_dir / state_path.name
+        return match if match.is_file() else None
 
     def feedback_destination(run_id: str | None) -> tuple[Path | None, str | None]:
         if feedback_path is None and feedback_dir is None:
@@ -296,7 +304,7 @@ def build_app(
         """
         if state_path is None:
             raise HTTPException(status_code=409, detail="No startup artifact was configured; ground truth cannot be bound.")
-        data = _read_json(ground_truth_path)
+        data = _read_json(startup_ground_truth())
         return JSONResponse(data if isinstance(data, dict) else {})
 
     @app.get("/api/runs/{run_id}/ground-truth")
@@ -309,13 +317,33 @@ def build_app(
             return JSONResponse({"run_id": run_id, "detail": "The startup artifact has no valid canonical run UUID; ground truth cannot be bound."}, status_code=409)
         if run_id != startup_run_id:
             return JSONResponse({"run_id": run_id, "detail": "Ground truth is bound to the initial startup run only."}, status_code=409)
+        path = startup_ground_truth()
         try:
-            values = _read_json(ground_truth_path) if ground_truth_path is not None else {}
+            values = _read_json(path) if path is not None else {}
             if not isinstance(values, dict):
                 raise ValueError("Ground truth must be a JSON object.")
-            return JSONResponse({"run_id": run_id, "values": values})
+            return JSONResponse({"run_id": run_id, "values": values, "source": path.name if path else None})
         except (OSError, ValueError, RecursionError):
             return JSONResponse({"run_id": run_id, "detail": "Cannot read the ground-truth document."}, status_code=500)
+
+    @app.get("/api/ground-truth/files/{name}")
+    def matching_ground_truth(name: str) -> JSONResponse:
+        """The --ground-truth-dir file with the same name as a locally opened run file."""
+        if ground_truth_dir is None:
+            return JSONResponse({"name": name, "detail": "No --ground-truth-dir was configured."}, status_code=409)
+        # Only a bare name: the browser must not reach outside the directory.
+        if name in ("", ".", "..") or "/" in name or "\\" in name:
+            return JSONResponse({"name": name, "detail": "Expected a bare file name."}, status_code=400)
+        path = ground_truth_dir / name
+        if not path.is_file():
+            return JSONResponse({"name": name, "detail": "No matching ground-truth file."}, status_code=404)
+        try:
+            values = _read_json(path)
+            if not isinstance(values, dict):
+                raise ValueError("Ground truth must be a JSON object.")
+            return JSONResponse({"name": name, "values": values})
+        except (OSError, ValueError, RecursionError):
+            return JSONResponse({"name": name, "detail": "Cannot read the ground-truth document."}, status_code=500)
 
     @app.get("/api/feedback")
     def feedback() -> JSONResponse:

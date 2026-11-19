@@ -19,17 +19,28 @@ drafts intact. Unsaved feedback prompts **Cancel** or **Discard and Load**;
 switching is blocked while a save is pending, and a failed save retains its draft.
 Successful activation clears ground truth, selection, filters, and old feedback,
 and resets the lens to confidence. Theme, view/layout preferences, and pricing
-remain. Server-configured ground truth applies only at startup; load the new
-run's reference explicitly. Late file/reference/feedback responses cannot replace
-another activation's state. Loading remains usable if startup or feedback fails.
+remain. `--ground-truth` applies only at startup; other runs get their reference
+from `--ground-truth-dir` or the picker. Late file/reference/feedback responses
+cannot replace another activation's state. Loading remains usable if startup or
+feedback fails.
 
-Automatic ground truth uses `GET /api/runs/{run_id}/ground-truth`, returning
-`{run_id, values}` only for the UUID captured at server startup. Replacing the
-startup artifact does not rebind that reference. Without a startup artifact,
-ground truth cannot bind to a run, including the first locally loaded run.
+Automatic ground truth for the startup run uses
+`GET /api/runs/{run_id}/ground-truth`, returning `{run_id, values, source}` only
+for the UUID captured at server startup. `source` is the reference file's name:
+`--ground-truth`, else the `--ground-truth-dir` file named like `--state`, else
+`null` with empty values. Replacing the startup artifact does not rebind that
+reference.
+
+A run opened with **Load Run...** uses `GET /api/ground-truth/files/{name}`,
+where `name` is the selected file's name. It returns `{name, values}` from
+`<--ground-truth-dir>/<name>`; 404 when there is no such file, 409 without
+`--ground-truth-dir`, 400 for anything but a bare file name, and 500 when the
+file isn't a JSON object. Only the name is sent, never the artifact.
+
 The frontend checks response identity and never falls back to unbound
-`/api/ground-truth` or `ground_truth.json`.
-Use the local ground-truth picker when no bound reference is available.
+`/api/ground-truth` or `ground_truth.json`. The status beside
+**Ground truth...** names the loaded file or says no match was found; use the
+local picker then.
 
 ## Feedback
 
@@ -223,7 +234,7 @@ recovery. Startup identity is captured once, never rebound by local selection or
 later file replacement. There is no global active run or first-local-run binding.
 Both `build_app` and the CLI reject ground truth or legacy single-file feedback
 without an explicit startup path (`ValueError` and a friendly nonzero exit,
-respectively).
+respectively). `--ground-truth-dir` works with or without `--state`.
 
 The reader expects `observability.collection_issues` as a list of
 `{code, message}` objects and `unattributed_exchanges` as a list with

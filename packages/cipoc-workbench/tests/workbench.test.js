@@ -323,6 +323,9 @@ async function openRun(harness, result = canonicalResult(), name = "run.json") {
   harness.context.file = { name, content: JSON.stringify(result) };
   return harness.evaluate("loadRunFile(file)");
 }
+const feedbackRequests = (h) => h.requests.filter((r) => r.url.includes("/feedback"));
+const truthUrls = (h) => h.requests.filter((r) => /ground[_-]truth/.test(r.url)).map((r) => r.url);
+const RUN_TRUTH_URL = "/api/ground-truth/files/run.json";
 
 function reviewSnapshot(h) {
   const nodes = [".views", "#case-summary", "#facts", "#run-source", "#view-notes", "#view-variables", "#view-run", "#detail", "#tooltip"]
@@ -398,7 +401,7 @@ test("post-validation rendering failures restore all prior nodes, form edits, st
     assert.equal(await loading, false);
     assert.deepEqual(reviewSnapshot(h), before);
     assert.equal(h.document.querySelector('#truth-file').value, 'keep-reference.json');
-    assert.equal(h.requests.length, 1, 'failed activation must not start feedback loading');
+    assert.equal(h.requests.length, 2, 'failed activation must not start feedback or ground-truth loading');
     assert.match(h.document.querySelector('#run-load-status').textContent, /injected rendering failure/);
     h.evaluate(renderer + ' = originalRenderer');
     // The restored elements, not clones lacking handlers, remain interactive.
@@ -481,7 +484,7 @@ test("local activation clears case-local state but preserves view, layout, group
   assert.equal(h.evaluate("App.runSource"), "<img onerror=bad>.json");
   assert.match(h.document.querySelector("#run-source").textContent, /<img onerror=bad>\.json/);
   assert.equal(h.document.querySelector("#run-source img"), null);
-  assert.ok(h.requests.every((r) => r.url.startsWith("/api/runs/") && !r.options.body));
+  assert.ok(h.requests.every((r) => (r.url.startsWith("/api/runs/") || r.url.startsWith("/api/ground-truth/files/")) && !r.options.body));
   assert.ok([...h.storage.keys()].every((key) => key.startsWith("cipoc-lens")));
 });
 
@@ -651,7 +654,7 @@ test("first local load activates an empty workbench and uses only run-scoped fee
   for (const tab of h.document.querySelectorAll(".view-tab")) assert.equal(tab.disabled, false);
   h.document.querySelector('[data-view="run"]').click();
   assert.equal(h.document.querySelector("#view-run").hidden, false);
-  assert.equal(h.requests.filter((r) => r.url.includes("ground-truth")).length, 0);
+  assert.deepEqual(truthUrls(h), [RUN_TRUTH_URL]);
   const feedback = h.requests.find((r) => r.url.includes("/feedback"));
   assert.equal(feedback.url, "/api/runs/" + canonicalResult().run.run_id + "/feedback");
   feedback.resolve(feedbackDocument(canonicalResult().run.run_id)); await settle();
@@ -710,7 +713,7 @@ test("late empty startup response cannot reset a pending or completed local sele
     if (!completed) { h.reads[0].resolve(); assert.equal(await local, true); }
     assert.equal(h.evaluate("App.run.run_id"), runB().run.run_id);
     assert.equal(h.document.querySelector("#boot").hidden, true);
-    assert.equal(h.requests.filter((r) => r.url.includes("ground-truth")).length, 0);
+    assert.deepEqual(truthUrls(h), [RUN_TRUTH_URL]);
   }
 });
 
@@ -743,7 +746,7 @@ test("late startup fetch cannot replace a local selection, including a pending l
   h.reads[0].resolve();
   assert.equal(await local, true);
   assert.equal(h.evaluate("App.run.run_id"), runB().run.run_id);
-  assert.equal(h.requests.filter((r) => r.url.includes("ground-truth")).length, 0);
+  assert.deepEqual(truthUrls(h), [RUN_TRUTH_URL]);
 });
 
 test("startup error leaves Load Run accessible, and catalog or feedback failure never prevents local review", async () => {
@@ -784,7 +787,7 @@ test("startup ground truth is non-blocking and cannot follow a local switch or s
   h.reads[1].resolve(); await referenceRead;
   assert.equal(h.evaluate("App.truth.size"), 0);
   assert.equal(h.evaluate("App.truthSource"), null);
-  assert.equal(h.requests.filter((r) => r.url.includes("ground-truth")).length, 1);
+  assert.deepEqual(truthUrls(h), ["/api/runs/" + canonicalResult().run.run_id + "/ground-truth", RUN_TRUTH_URL]);
 });
 
 test("reference picker also uses latest-read wins and reports only current read errors", async () => {
@@ -797,10 +800,12 @@ test("reference picker also uses latest-read wins and reports only current read 
   h.reads[2].resolve(); await second;
   h.reads[1].reject(); await first;
   assert.equal(h.evaluate("truthFor(400)"), "second");
-  assert.equal(h.alerts.length, 0);
+  assert.equal(h.document.querySelector("#truth-status").textContent, "Loaded truth.json");
   const failed = h.evaluate("onTruthFile(event)");
   h.reads[3].reject(); await failed;
-  assert.match(h.alerts[0], /Could not load ground truth/);
+  assert.match(h.document.querySelector("#truth-status").textContent, /^Could not load truth\.json: /);
+  assert.ok(h.document.querySelector("#truth-status").classList.contains("bad"));
+  assert.equal(h.alerts.length, 0);
 });
 
 test("current activation reference reads survive invalid, cancelled, and save-blocked run selections", async () => {
@@ -877,6 +882,79 @@ test("automatic truth requires an explicit matching run binding, with no unbound
   assert.equal(h.evaluate('App.truth.size'), 0);
 });
 
+test("an opened run loads the ground-truth file with the same name and says so", async () => {
+  const h = loadWorkbench({ manualFetch: true });
+  const status = () => h.document.querySelector("#truth-status");
+  const name = "case 01 <b>.json";
+  assert.equal(await openRun(h, canonicalResult(), name), true);
+  assert.equal(status().textContent, "Checking for matching ground truth...");
+  const lookup = h.requests.find((r) => r.url.includes("ground-truth"));
+  assert.equal(lookup.url, "/api/ground-truth/files/" + encodeURIComponent(name));
+  lookup.resolve({ name, values: { 400: "C504" } }); await settle();
+  assert.equal(h.evaluate("truthFor(400)"), "C504");
+  assert.equal(h.evaluate("App.truthSource"), name);
+  assert.equal(status().textContent, "Loaded " + name);
+  assert.equal(status().classList.contains("bad"), false);
+  assert.equal(h.document.querySelector('[data-lens="accuracy"]').hidden, false);
+});
+
+test("without a matching ground-truth file the status points to the picker", async () => {
+  const name = "case01.json";
+  for (const [body, statusCode] of [
+    [{ detail: "No matching ground-truth file." }, 404],
+    [{ detail: "No --ground-truth-dir was configured." }, 409],
+    [{ name: "other.json", values: { 400: "C504" } }, 200],
+    [{ name, values: {} }, 200],
+    [{ name, values: [] }, 200],
+  ]) {
+    const h = loadWorkbench({ manualFetch: true });
+    await openRun(h, canonicalResult(), name);
+    h.requests.find((r) => r.url.includes("ground-truth")).resolve(body, statusCode); await settle();
+    assert.equal(h.evaluate("App.truth.size"), 0, JSON.stringify(body));
+    assert.equal(h.document.querySelector("#truth-status").textContent,
+      "No matching ground truth found. Click Ground truth\u2026 to choose a file.");
+    h.context.event = { target: { files: [{ name: "picked.json", content: '{"400":"C504"}' }] } };
+    await h.evaluate("onTruthFile(event)");
+    assert.equal(h.document.querySelector("#truth-status").textContent, "Loaded picked.json");
+  }
+  const h = loadWorkbench({ manualFetch: true });
+  await openRun(h, canonicalResult(), name);
+  h.requests.find((r) => r.url.includes("ground-truth")).resolve({ detail: "Cannot read the ground-truth document." }, 500);
+  await settle();
+  assert.equal(h.document.querySelector("#truth-status").textContent, "Could not read the matching ground-truth file.");
+  assert.ok(h.document.querySelector("#truth-status").classList.contains("bad"));
+});
+
+test("a late ground-truth match cannot replace a picked file or follow a run switch", async () => {
+  const h = loadWorkbench({ manualFetch: true });
+  await openRun(h, canonicalResult(), "a.json");
+  const first = h.requests.find((r) => r.url.endsWith("/a.json"));
+  h.context.event = { target: { files: [{ name: "picked.json", content: '{"400":"picked"}' }] } };
+  await h.evaluate("onTruthFile(event)");
+  first.resolve({ name: "a.json", values: { 400: "stale" } }); await settle();
+  assert.equal(h.evaluate("truthFor(400)"), "picked");
+  assert.equal(h.document.querySelector("#truth-status").textContent, "Loaded picked.json");
+
+  await openRun(h, canonicalResult(), "b.json");
+  const second = h.requests.find((r) => r.url.endsWith("/b.json"));
+  await openRun(h, runB(), "c.json");
+  second.resolve({ name: "b.json", values: { 400: "stale" } }); await settle();
+  assert.equal(h.evaluate("App.truth.size"), 0);
+  assert.equal(h.document.querySelector("#truth-status").textContent, "Checking for matching ground truth...");
+});
+
+test("startup ground truth names the file the server bound", async () => {
+  const h = loadWorkbench({ manualFetch: true });
+  const boot = h.evaluate("boot()");
+  h.requests.find((r) => r.url === "case_state.json").resolve(canonicalResult());
+  await boot;
+  const runId = canonicalResult().run.run_id;
+  assert.deepEqual(truthUrls(h), ["/api/runs/" + runId + "/ground-truth"]);
+  h.requests.at(-1).resolve({ run_id: runId, values: { 400: "C504" }, source: "case01.json" }); await settle();
+  assert.equal(h.evaluate("App.truthSource"), "case01.json");
+  assert.equal(h.document.querySelector("#truth-status").textContent, "Loaded case01.json");
+});
+
 test("legacy sparse annotation documents stay readable without mutating server response metadata", async () => {
   const h = loadWorkbench({ manualFetch: true });
   await openRun(h);
@@ -897,7 +975,7 @@ test("legacy sparse annotation documents stay readable without mutating server r
   assert.equal(note.querySelector('.fb-save').disabled, false);
   assert.equal(h.evaluate("currentAnnotation('variable',400).note"), '');
   assert.equal(JSON.stringify(document), before);
-  assert.equal(h.requests.length, 1, 'reading legacy feedback must not trigger a migration write');
+  assert.ok(h.requests.every((r) => !r.options.body), 'reading legacy feedback must not trigger a migration write');
 });
 
 test("feedback saves keep arbitrary entity IDs in the query, not URL path segments", async () => {
@@ -927,20 +1005,20 @@ test("feedback A/B/A loads use canonical identity and activation, never overlapp
   const h = loadWorkbench({ manualFetch: true });
   const a = canonicalResult(), b = runB();
   await openRun(h, a);
-  const firstA = h.requests.at(-1);
+  const firstA = feedbackRequests(h).at(-1);
   await openRun(h, b);
-  const requestB = h.requests.at(-1);
+  const requestB = feedbackRequests(h).at(-1);
   requestB.resolve(feedbackDocument(b.run.run_id, "B review")); await settle();
   assert.equal(h.evaluate("annotationFor('variable',400).note"), "B review");
   await openRun(h, a);
-  const secondA = h.requests.at(-1);
+  const secondA = feedbackRequests(h).at(-1);
   assert.equal(h.evaluate("annotationFor('variable',400)"), null);
   firstA.resolve(feedbackDocument(a.run.run_id, "stale A response")); await settle();
   assert.equal(h.evaluate("annotationFor('variable',400)"), null);
   secondA.resolve(feedbackDocument(a.run.run_id, "saved A review")); await settle();
   assert.equal(h.evaluate("annotationFor('variable',400).note"), "saved A review");
   assert.equal(h.evaluate("App.feedbackWritable"), true);
-  assert.deepEqual(h.requests.map((r) => r.url), [a, b, a].map((r) => "/api/runs/" + r.run.run_id + "/feedback"));
+  assert.deepEqual(feedbackRequests(h).map((r) => r.url), [a, b, a].map((r) => "/api/runs/" + r.run.run_id + "/feedback"));
 });
 
 test("read-only capability, identity mismatch and corrupt feedback are explicit and cannot write", async () => {
@@ -962,7 +1040,7 @@ test("read-only capability, identity mismatch and corrupt feedback are explicit 
     assert.equal(h.document.querySelector(".fb-text").disabled, true);
     assert.match(h.document.querySelector("#detail-body").textContent, /Use --feedback-dir|Feedback unavailable/);
     assert.equal(await h.evaluate("saveAnnotation('variable',400,{flags:[],note:'no write'},h('span'))"), false);
-    assert.equal(h.requests.length, 1);
+    assert.ok(h.requests.every((r) => !r.options.body));
   }
 });
 
@@ -1067,7 +1145,7 @@ test("defensive save completion guard includes activation even when the run UUID
   // The UI blocks this switch; simulate an external activation to exercise the callback guard.
   h.evaluate("App.feedbackPending.clear(); App.feedbackDraft.clear()");
   await openRun(h);
-  h.requests.at(-1).resolve(feedbackDocument(canonicalResult().run.run_id, "current saved")); await settle();
+  feedbackRequests(h).at(-1).resolve(feedbackDocument(canonicalResult().run.run_id, "current saved")); await settle();
   h.evaluate("App.feedbackDraft.set('variable:400',{flags:[],note:'current draft'})");
   oldPut.resolve({ run_id: canonicalResult().run.run_id, kind: "variable", id: "400", annotation: { flags: [], note: "stale save" } });
   assert.equal(await saving, false);
