@@ -8,6 +8,7 @@ Stdlib only. Nothing here imports ``cipoc``.
 
     python evalstore.py init        data/eval.sqlite
     python evalstore.py load-truth  data/eval.sqlite ground_truth.csv [--names variable_groups.json]
+    python evalstore.py load-truth  data/eval.sqlite ground_truth/    [--names variable_groups.json]
     python evalstore.py export      data/eval.sqlite web/data.js
 """
 
@@ -29,15 +30,17 @@ CREATE TABLE IF NOT EXISTS variables (
     group_name TEXT,
     sort_order INTEGER NOT NULL DEFAULT 0
 );
+-- NULL until known. JSON ground truth carries no tissue or note count; the
+-- patient's first recorded artifact fills them in.
 CREATE TABLE IF NOT EXISTS patients (
     patient_id TEXT PRIMARY KEY,
-    tissue     TEXT NOT NULL,
-    dx_year    INTEGER NOT NULL,
-    n_notes    INTEGER NOT NULL
+    tissue     TEXT,
+    dx_year    INTEGER,
+    n_notes    INTEGER
 );
 -- One row per ground-truth cell. A NULL value is a blank cell: the variable is
--- expected to stay uncoded for that patient. A variable with no column in the
--- ground-truth file has no rows at all and is not scored.
+-- expected to stay uncoded for that patient. A missing row is untested and not
+-- scored: the variable had no CSV column, or no key in the patient's JSON file.
 CREATE TABLE IF NOT EXISTS ground_truth (
     patient_id TEXT NOT NULL REFERENCES patients(patient_id),
     item_id    INTEGER NOT NULL REFERENCES variables(item_id),
@@ -79,6 +82,7 @@ CREATE TABLE IF NOT EXISTS predictions (
 """
 
 PATIENT_COLUMNS = ("patient_id", "tissue", "year", "n_notes")
+DATE_OF_DIAGNOSIS = 390
 
 # One character per variable in the bundle's status strings. "-" means no
 # prediction was recorded (the run did not plan the variable) and "?" a
@@ -120,6 +124,35 @@ def variable_names(variable_groups_path: str | Path) -> dict[int, dict]:
     return found
 
 
+def _record_variable(conn: sqlite3.Connection, item_id: int, meta: dict, order: int) -> None:
+    conn.execute(
+        "INSERT OR REPLACE INTO variables VALUES (?, ?, ?, ?, ?)",
+        (
+            item_id,
+            meta.get("name", f"Item {item_id}"),
+            meta.get("group_id"),
+            meta.get("group_name"),
+            meta.get("sort_order", order),
+        ),
+    )
+
+
+def _truth_text(value) -> str | None:
+    """A JSON ground-truth value as stored: text, or None for a blank."""
+    if value is None:
+        return None
+    # Pandas writes integer columns with blanks as floats; 2.0 means "2".
+    if isinstance(value, float) and value.is_integer():
+        value = int(value)
+    return str(value).strip() or None
+
+
+def _diagnosis_year(date: str | None) -> int | None:
+    """Year of a YYYYMMDD or YYYY-MM-DD date; None if missing or unknown (9999)."""
+    year = int(date[:4]) if date and date[:4].isdigit() else None
+    return year if year is not None and 1900 <= year <= 2100 else None
+
+
 def load_ground_truth(
     conn: sqlite3.Connection,
     csv_path: str | Path,
@@ -135,17 +168,7 @@ def load_ground_truth(
         item_columns = [c for c in reader.fieldnames if c not in PATIENT_COLUMNS]
         for order, column in enumerate(item_columns):
             item_id = int(column)
-            meta = names.get(item_id, {})
-            conn.execute(
-                "INSERT OR REPLACE INTO variables VALUES (?, ?, ?, ?, ?)",
-                (
-                    item_id,
-                    meta.get("name", f"Item {item_id}"),
-                    meta.get("group_id"),
-                    meta.get("group_name"),
-                    meta.get("sort_order", order),
-                ),
-            )
+            _record_variable(conn, item_id, names.get(item_id, {}), order)
         for row in reader:
             conn.execute(
                 "INSERT OR REPLACE INTO patients VALUES (?, ?, ?, ?)",
@@ -158,6 +181,45 @@ def load_ground_truth(
                     for c in item_columns
                 ],
             )
+    conn.commit()
+
+
+def load_ground_truth_dir(
+    conn: sqlite3.Connection,
+    directory: str | Path,
+    names: dict[int, dict] | None = None,
+) -> None:
+    """Load the Workbench's ground truth: one ``<patient_id>.json`` per patient.
+
+    Each file is ``{item_id: value}``. A null or empty value is a blank cell. An
+    item missing from a patient's file is untested for that patient, and keys
+    that aren't item IDs, such as ``mrn``, are ignored. The diagnosis year comes
+    from item 390; tissue and note count come from the first recorded artifact.
+    """
+    names = names or {}
+    truth: dict[str, dict[int, str | None]] = {}
+    for path in sorted(Path(directory).glob("*.json")):
+        raw = json.loads(path.read_text())
+        if not isinstance(raw, dict):
+            raise ValueError(f"{path} is not a JSON object of {{item_id: value}}.")
+        truth[path.stem] = {int(k): _truth_text(v) for k, v in raw.items() if k.strip().isdigit()}
+    if not truth:
+        raise ValueError(f"No .json files in {directory}.")
+    for order, item_id in enumerate(sorted({i for values in truth.values() for i in values})):
+        _record_variable(conn, item_id, names.get(item_id, {}), order)
+    for patient_id, values in truth.items():
+        conn.execute(
+            "INSERT INTO patients (patient_id, dx_year) VALUES (?, ?)"
+            " ON CONFLICT (patient_id) DO UPDATE SET dx_year = COALESCE(excluded.dx_year, dx_year)",
+            (patient_id, _diagnosis_year(values.get(DATE_OF_DIAGNOSIS))),
+        )
+        # The file is the patient's whole reference, so an item removed from it
+        # becomes untested rather than keeping its old value.
+        conn.execute("DELETE FROM ground_truth WHERE patient_id = ?", (patient_id,))
+        conn.executemany(
+            "INSERT INTO ground_truth VALUES (?, ?, ?)",
+            [(patient_id, item_id, value) for item_id, value in values.items()],
+        )
     conn.commit()
 
 
@@ -216,7 +278,19 @@ def record_patient(
 def record_case_artifact(
     conn: sqlite3.Connection, run_id: str, patient_id: str, artifact: dict
 ) -> None:
-    """Store one orchestrator run artifact (the ``OrchestratorRunResult`` JSON)."""
+    """Store one orchestrator run artifact (the ``OrchestratorRunResult`` JSON).
+
+    Also fills in patient details the ground truth left unknown. Tissue is the
+    run's ``gross_primary_site``, which is unset when the run already knew the
+    primary site (for example from structured data).
+    """
+    facts = artifact["case"].get("case_facts") or {}
+    notes = (artifact.get("corpus") or {}).get("note_corpus") or {}
+    conn.execute(
+        "UPDATE patients SET tissue = COALESCE(tissue, ?), dx_year = COALESCE(dx_year, ?),"
+        " n_notes = COALESCE(n_notes, ?) WHERE patient_id = ?",
+        (facts.get("gross_primary_site"), _diagnosis_year(facts.get("date_of_diagnosis")), len(notes) or None, patient_id),
+    )
     results = {
         int(item_id): (result.get("value"), result.get("status"))
         for item_id, result in artifact["case"]["variable_results"].items()
@@ -255,7 +329,7 @@ def build_bundle(conn: sqlite3.Connection) -> dict:
         )
     ]
     patients = [
-        {"patient_id": r[0], "tissue": r[1], "year": r[2], "n_notes": r[3]}
+        {"patient_id": r[0], "tissue": r[1] or "unknown", "year": r[2], "n_notes": r[3]}
         for r in conn.execute(
             "SELECT patient_id, tissue, dx_year, n_notes FROM patients ORDER BY patient_id"
         )
@@ -264,8 +338,11 @@ def build_bundle(conn: sqlite3.Connection) -> dict:
     p_index = {p["patient_id"]: i for i, p in enumerate(patients)}
 
     truth = [[None] * len(variables) for _ in patients]
+    tested = set()
     for patient_id, item_id, value in conn.execute("SELECT * FROM ground_truth"):
         truth[p_index[patient_id]][v_index[item_id]] = value
+        tested.add((p_index[patient_id], v_index[item_id]))
+    untested = [[p, v] for p in range(len(patients)) for v in range(len(variables)) if (p, v) not in tested]
 
     runs = []
     for run_id, started_at, label, model, version, digest, notes in conn.execute(
@@ -313,6 +390,7 @@ def build_bundle(conn: sqlite3.Connection) -> dict:
         "variables": variables,
         "patients": patients,
         "truth": truth,
+        "untested": untested,
         "runs": runs,
     }
 
@@ -328,7 +406,7 @@ def main() -> None:
     commands.add_parser("init").add_argument("db")
     load = commands.add_parser("load-truth")
     load.add_argument("db")
-    load.add_argument("csv")
+    load.add_argument("path", help="wide CSV, or a directory of <patient_id>.json files")
     load.add_argument("--names", help="variable groups JSON, for names and grouping")
     export = commands.add_parser("export")
     export.add_argument("db")
@@ -337,7 +415,11 @@ def main() -> None:
 
     conn = connect(args.db)
     if args.command == "load-truth":
-        load_ground_truth(conn, args.csv, variable_names(args.names) if args.names else None)
+        names = variable_names(args.names) if args.names else None
+        if Path(args.path).is_dir():
+            load_ground_truth_dir(conn, args.path, names)
+        else:
+            load_ground_truth(conn, args.path, names)
     elif args.command == "export":
         export_bundle(conn, args.out)
     conn.close()

@@ -139,7 +139,7 @@
     const color = new Map();
     for (const g of groups) for (const p of g.patients) color.set(p, g.color);
     const rows = (byPatient
-      ? ps.map((p) => ({ id: p, title: `${P[p].patient_id} · ${P[p].tissue} ${P[p].year}`, sum: E.stability([p], ALL_V, runs) }))
+      ? ps.map((p) => ({ id: p, title: `${P[p].patient_id} · ${P[p].tissue} ${P[p].year ?? ""}`, sum: E.stability([p], ALL_V, runs) }))
       : ALL_V.map((v) => ({ id: v, title: E.variableLabel(v), sum: E.stability(ps, [v], runs) }))).filter((row) => row.sum.scored);
     const open = (row) => (byPatient ? E.patientDrawer(row.id) : E.variableDrawer(row.id));
     const tokens = (row) => { const u = R[LAST].usage[row.id]; return u && u[0] != null && u[1] != null ? u[0] + u[1] : null; };

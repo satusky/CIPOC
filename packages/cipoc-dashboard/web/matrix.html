@@ -121,7 +121,7 @@
     const grid = h("div", { class: "pv", style: `grid-template-columns:max-content ${ALL_V.map((v) => (gap(v) ? "20px" : "14px")).join(" ")} max-content` });
     grid.append(h("span"), ...ALL_V.map((v) => h("span", { class: "head" + gap(v), "data-v": v, title: E.variableLabel(v) }, V[v].item_id)), h("span"));
     for (const row of rows) {
-      grid.append(h("span", { class: "who", "data-p": row.p }, `${P[row.p].patient_id} · ${P[row.p].tissue} ${P[row.p].year}`),
+      grid.append(h("span", { class: "who", "data-p": row.p }, `${P[row.p].patient_id} · ${P[row.p].tissue} ${P[row.p].year ?? ""}`),
         ...row.cells.map((cell, v) => h("b", {
           class: (cell ? cell.cls : "na") + gap(v), "data-p": row.p, "data-v": v,
           style: cell && cell.cls === "varies" ? `background:color-mix(in oklab, var(--varies-lo), var(--varies-hi) ${Math.round(cell.unrest * 100)}%)` : null,

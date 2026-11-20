@@ -28,7 +28,8 @@
    *   tn        truth is blank, nothing extracted
    * A variable the run did not plan (status "-") or was given as structured
    * data (status "s") was never extracted, so it keeps the "none" verdict and
-   * is not scored, the same as every cell of a failed patient.
+   * is not scored, the same as every cell of a failed patient. So does an
+   * untested cell: one with no ground-truth entry at all, unlike a blank one.
    */
   const NONE = 0, MATCH = 1, WRONG = 2, MISSED = 3, SPURIOUS = 4, TN = 5;
   const VERDICT = ["none", "match", "wrong", "missed", "spurious", "tn"];
@@ -45,6 +46,7 @@
   };
 
   const UNSCORED_STATUS = new Set(["-", "s"]);
+  const UNTESTED = new Set((RAW.untested || []).map(([p, v]) => p * nV + v));
   const TRUTH = RAW.truth.map((row) => row.map(norm));
   R.forEach((run, r) => {
     run.norm = run.pred.map((row) => row && row.map(norm));
@@ -53,7 +55,7 @@
       const got = run.norm[p];
       if (!got) continue;
       for (let v = 0; v < nV; v++) {
-        if (UNSCORED_STATUS.has(run.status[p][v])) continue;
+        if (UNSCORED_STATUS.has(run.status[p][v]) || UNTESTED.has(p * nV + v)) continue;
         const t = TRUTH[p][v], g = got[v];
         run.verdict[p * nV + v] = t == null ? (g == null ? TN : SPURIOUS) : g == null ? MISSED : g === t ? MATCH : WRONG;
       }
@@ -128,7 +130,7 @@
     if (kept.length < names.length) list.push({ key: "other", label: "other", color: "var(--series-8)", has: (p) => !kept.includes(p.tissue) });
     return list;
   })();
-  const YEARS = [...new Set(P.map((p) => p.year))].sort();
+  const YEARS = [...new Set(P.map((p) => p.year))].filter((year) => year != null).sort();
   const YEAR_BANDS = (() => {
     // At most five bands, so the ordinal ramp keeps visible steps. Bands are
     // counted back from the newest year.
@@ -738,7 +740,8 @@
         }
         body.push(h("tr", { class: v === focus ? "hl" : "" },
           h("td", { class: "ellip" }, h("span", { class: "muted num" }, V[v].item_id + " "), V[v].name),
-          h("td", { class: "mono" }, RAW.truth[p][v] == null ? h("span", { class: "muted" }, "blank") : RAW.truth[p][v]),
+          h("td", { class: "mono" }, UNTESTED.has(p * nV + v) ? h("span", { class: "muted" }, "untested")
+            : RAW.truth[p][v] == null ? h("span", { class: "muted" }, "blank") : RAW.truth[p][v]),
           R.map((_, r) => verdictCell(p, v, r))));
       }
       gridHost.replaceChildren(h("table", { class: "values" },
@@ -755,7 +758,8 @@
       h("div", { class: "sub" }, "A tick is a correct value; anything else shows what was extracted. Underlined runs are the variability window; ▾ marks a configuration change."
         + (at == null ? "" : ` The shaded column head is run ${at + 1}.`)),
       gridHost, h("div", { style: "margin-top:8px" }, glyphLegend()));
-    openDrawer(patient.patient_id, `${patient.tissue} · diagnosed ${patient.year} · ${patient.n_notes} notes`, [summary, grid]);
+    openDrawer(patient.patient_id, [patient.tissue, patient.year != null && `diagnosed ${patient.year}`,
+      patient.n_notes != null && `${patient.n_notes} notes`].filter(Boolean).join(" · "), [summary, grid]);
   }
 
   /* ---- Page -------------------------------------------------------------- */

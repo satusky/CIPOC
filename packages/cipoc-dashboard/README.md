@@ -66,8 +66,8 @@ import json
 import evalstore
 
 conn = evalstore.connect("/local_disk0/eval.sqlite")
-evalstore.load_ground_truth(                      # once, or whenever the truth changes
-    conn, "ground_truth.csv", evalstore.variable_names("config/variable_groups.json")
+evalstore.load_ground_truth_dir(                  # once, or whenever the truth changes
+    conn, "ground_truth/", evalstore.variable_names("config/variable_groups.json")
 )
 
 first = json.load(open(artifact_paths[patient_ids[0]]))
@@ -89,9 +89,19 @@ evalstore.export_bundle(conn, "web/data.js")
 with the same `config_digest` are treated as replicates: the default variability
 window is the trailing block of runs that share the latest digest.
 
-Ground truth is a CSV with `patient_id`, `tissue`, `year`, `n_notes`, then one
-column per NAACCR item ID. A blank cell means the variable should stay uncoded for
-that patient.
+Ground truth is either of these. `python evalstore.py load-truth DB PATH` takes
+both, with `--names config/variable_groups.json` for variable names and groups.
+
+- A directory of `<patient_id>.json` files, the same files the Workbench loads.
+  Each is `{item_id: value}`. `null` or `""` means the variable should stay
+  uncoded; an item missing from a file is untested for that patient. Keys that
+  aren't item IDs, such as `mrn`, are ignored. Reloading replaces each patient's
+  truth with its file. The diagnosis year comes from item 390, and tissue and
+  note count from the patient's first recorded artifact. Tissue is the run's
+  `gross_primary_site`, which a run leaves unset when it already knows the
+  primary site, so such patients show as "unknown".
+- A CSV with `patient_id`, `tissue`, `year`, `n_notes`, then one column per
+  NAACCR item ID. A blank cell means the variable should stay uncoded.
 
 ## Scoring
 
@@ -122,3 +132,4 @@ blank in the truth and in every run are left out.
 Failed patients are excluded from that run's metrics and counted in the "Patients
 scored" tile. Variables a run did not plan, and values given as structured data,
 are left out of its metrics too, since neither was extracted. Both show as "not run".
+Untested cells are left out of every run.
