@@ -806,6 +806,8 @@
     filtersEl = h("div", { class: "filters" });
     mainEl = h("main");
     document.body.append(topBar(), filtersEl, mainEl, tipEl);
+    // Every view compares runs; with none there is nothing to draw.
+    if (!nR) return mainEl.append(h("div", { class: "card" }, "No sweeps yet. Add one to the sweeps folder and refresh."));
     let timer = null;
     window.addEventListener("resize", () => { clearTimeout(timer); timer = setTimeout(render, 150); });
     render();

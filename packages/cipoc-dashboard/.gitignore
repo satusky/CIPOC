@@ -1,4 +1,6 @@
-# Real stores hold patient IDs and extracted values. The dummy set is regenerable.
+# Bundles hold patient IDs and extracted values. The dummy set is regenerable.
 data/
 web/data.js
 __pycache__/
+# Local paths to your sweeps and ground truth.
+dashboard.toml

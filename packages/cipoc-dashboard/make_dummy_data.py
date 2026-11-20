@@ -1,10 +1,11 @@
 """Generate a synthetic evaluation store for developing the dashboard.
 
-    python make_dummy_data.py            # writes data/ground_truth.csv, data/eval.sqlite, web/data.js
+    python make_dummy_data.py            # writes data/ground_truth/, data/sweeps/ and web/data.js
 
 Everything is invented: patients, values, runs and token counts. The variable list
-is the real one from ``config/variable_groups.json``. The generator plants a few
-patterns for the dashboard to find:
+is the real one from ``config/variable_groups.json``. Artifacts carry only the
+fields the dashboard reads. The generator plants a few patterns for the
+dashboard to find:
 
 - a slow overall improvement, with a jump at the model change (run 6)
 - a regression in first-course treatment for runs 8-9 (a gate closing wrongly)
@@ -17,12 +18,13 @@ patterns for the dashboard to find:
 
 from __future__ import annotations
 
-import csv
+import json
 import random
+import shutil
 from datetime import date, timedelta
 from pathlib import Path
 
-import evalstore
+import dashboard
 
 HERE = Path(__file__).resolve().parent
 VARIABLE_GROUPS = HERE.parents[1] / "config" / "variable_groups.json"
@@ -206,27 +208,47 @@ def skill(run: int, item: int, group: str, patient: dict) -> float:
     return max(0.05, min(0.985, value))
 
 
+def artifact(run_id: str, started_at: str, fingerprint: dict, patient: dict, truth: dict, *,
+             results: dict | None, usage: dict, seconds: float | None) -> dict:
+    """The fields of an OrchestratorRunResult (or failure, without results) the dashboard reads."""
+    document = {
+        "schema_version": "1.2",
+        "run": {
+            "run_id": run_id, "started_at": started_at, "duration_seconds": seconds,
+            "status": "completed" if results is not None else "failed", "config_fingerprint": fingerprint,
+        },
+        "corpus": {"note_corpus": {}, "note_corpus_descriptors": {"note_count": patient["n_notes"]}},
+        "observability": {"llm_usage_summary": usage},
+    }
+    if results is None:
+        document["error"] = "Synthetic failure."
+    else:
+        document["case"] = {
+            "case_facts": {"gross_primary_site": patient["tissue"], "date_of_diagnosis": truth[390]},
+            "variable_results": {str(item): {"value": value, "status": status} for item, (value, status) in results.items()},
+        }
+    return document
+
+
+def write_json(path: Path, payload) -> None:
+    path.write_text(json.dumps(payload, separators=(",", ":")))
+
+
 def main() -> None:
     rng = random.Random(SEED)
-    names = evalstore.variable_names(VARIABLE_GROUPS)
+    names = dashboard.variable_names(json.loads(VARIABLE_GROUPS.read_text()))
     items = list(names)
     patients = [make_patient(rng, i) for i in range(N_PATIENTS)]
     truths = [make_truth(rng, p) for p in patients]
     pools = {item: sorted({t[item] for t in truths if t[item] is not None}) for item in items}
 
     data_dir = HERE / "data"
-    data_dir.mkdir(exist_ok=True)
-    truth_csv = data_dir / "ground_truth.csv"
-    with open(truth_csv, "w", newline="") as handle:
-        writer = csv.writer(handle)
-        writer.writerow([*evalstore.PATIENT_COLUMNS, *items])
-        for patient, truth in zip(patients, truths):
-            writer.writerow([*patient.values(), *("" if truth[i] is None else truth[i] for i in items)])
-
-    db_path = data_dir / "eval.sqlite"
-    db_path.unlink(missing_ok=True)
-    conn = evalstore.connect(db_path)
-    evalstore.load_ground_truth(conn, truth_csv, names)
+    truth_dir, sweeps_dir = data_dir / "ground_truth", data_dir / "sweeps"
+    for directory in (truth_dir, sweeps_dir):
+        shutil.rmtree(directory, ignore_errors=True)
+        directory.mkdir(parents=True)
+    for patient, truth in zip(patients, truths):
+        write_json(truth_dir / f"{patient['patient_id']}.json", {str(item): truth[item] for item in items})
 
     # Latent, run-independent state for every patient and patient-variable cell.
     cells = []
@@ -246,11 +268,15 @@ def main() -> None:
         cells.append({"cells": row, "gate_victim": rng.random() < 0.45, "dates": patient_dates})
 
     for run_index, (day, label, model, version, digest, note) in enumerate(RUNS):
-        run_id = f"sweep-{run_index + 1:02d}"
-        evalstore.record_run(
-            conn, run_id, f"{day}T09:00:00+00:00",
-            label=label, model=model, cipoc_version=version, config_digest=digest, notes=note,
-        )
+        sweep_dir = sweeps_dir / f"sweep-{run_index + 1:02d}"
+        sweep_dir.mkdir()
+        write_json(sweep_dir / dashboard.SWEEP_META, {"label": label, "notes": note})
+        started_at = f"{day}T09:00:00+00:00"
+        fingerprint = {
+            "cipoc_version": version,
+            "agent_llm_config": {"extractor": {"model": model}},
+            "prompt_digests": {"synthetic": digest},
+        }
         failed = set(rng.sample(range(N_PATIENTS), FAILED.get(run_index, 0)))
         for p, (patient, truth, latent) in enumerate(zip(patients, truths, cells)):
             notes = patient["n_notes"]
@@ -262,11 +288,11 @@ def main() -> None:
             tokens_out = round((notes * 140 + rng.uniform(5000, 8000)) * (1.8 if large else 1.0))
             calls = notes + rng.randrange(14, 22)
             seconds = round(calls * rng.uniform(0.5, 0.9) * (1.5 if large else 1.0), 1)
+            path = sweep_dir / f"{patient['patient_id']}.json"
             if p in failed:
-                evalstore.record_patient(
-                    conn, run_id, patient["patient_id"], {}, status="failed",
-                    model_invocations=calls // 3,
-                )
+                usage = {"model_invocations": calls // 3, "usage_reported_invocations": 0}
+                run_id = f"{run_index:08x}-0000-4000-8000-{p:012x}"
+                write_json(path, artifact(run_id, started_at, fingerprint, patient, truth, results=None, usage=usage, seconds=None))
                 continue
 
             gate_closed = run_index in (7, 8) and latent["gate_victim"]
@@ -299,21 +325,18 @@ def main() -> None:
                 else:
                     status = "error" if rng.random() < 0.03 else "not_found"
                 results[item] = (value, status)
-            evalstore.record_patient(
-                conn, run_id, patient["patient_id"], results,
-                case_run_id=f"{rng.getrandbits(128):032x}",
+            run_id = f"{rng.getrandbits(128):032x}"
+            usage = {
+                "input_tokens": tokens_in, "output_tokens": tokens_out, "model_invocations": calls,
                 # A few cases come back without provider usage.
-                input_tokens=None if rng.random() < 0.01 else tokens_in,
-                output_tokens=tokens_out,
-                model_invocations=calls,
-                duration_seconds=seconds,
-            )
-        conn.commit()
+                "usage_reported_invocations": 0 if rng.random() < 0.01 else calls,
+            }
+            write_json(path, artifact(run_id, started_at, fingerprint, patient, truth, results=results, usage=usage, seconds=seconds))
 
-    evalstore.export_bundle(conn, HERE / "web" / "data.js")
-    conn.close()
+    out = HERE / "web" / "data.js"
+    out.write_bytes(dashboard.Bundler(sweeps_dir, truth_dir, VARIABLE_GROUPS).script())
     print(f"{N_PATIENTS} patients, {len(items)} variables, {len(RUNS)} runs")
-    print(f"  {truth_csv}\n  {db_path}\n  {HERE / 'web' / 'data.js'}")
+    print(f"  {truth_dir}\n  {sweeps_dir}\n  {out}")
 
 
 if __name__ == "__main__":
