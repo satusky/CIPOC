@@ -1,5 +1,5 @@
 "use strict";
-/* CIPOC workbench — shell, data indexing, routing and shared helpers.
+/* CIPOC workbench -- shell, data indexing, routing and shared helpers.
  *
  * Input is one JSON file: a canonical OrchestratorRunResult. Nothing here
  * re-implements orchestration logic; every status, reason and value is read
@@ -7,7 +7,7 @@
  * grouping (waves, per-group roll-ups), which is layout, not a decision.
  *
  * All model- and note-produced text reaches the DOM through h(), which sets
- * textContent — never innerHTML — so nothing in the state can inject markup.
+ * textContent -- never innerHTML -- so nothing in the state can inject markup.
  */
 
 const STATE_URL = "case_state.json";
@@ -23,7 +23,7 @@ function h(tag, props, ...children) {
     else if (key === "html") throw new Error("h(): raw HTML is not allowed");
     else if (key.startsWith("on")) node.addEventListener(key.slice(2), value);
     /* Not Object.assign: assigning null to a dataset property stringifies it,
-       so `{annotated: null}` yields data-annotated="null" — present, and matched
+       so `{annotated: null}` yields data-annotated="null" -- present, and matched
        by every [data-annotated] selector. Skip absent keys the same way the
        top-level props above do. */
     else if (key === "dataset") {
@@ -132,7 +132,7 @@ const hasValue = (result) => result.value != null && result.value !== "";
  * A bubble's dot and outline answer whichever question the result actually
  * raises: for a coded value, how far to trust it (confidence); for an empty
  * one, why it is empty (status), drawn hollow so the two never read alike.
- * That is one reading, not two — `extracted` and `not found` are not rival
+ * That is one reading, not two -- `extracted` and `not found` are not rival
  * answers to the same question, and no variable is ever eligible for both
  * halves. Splitting them across two tabs made the reader toggle to learn
  * something the single dot had already told them.
@@ -144,10 +144,10 @@ const hasValue = (result) => result.value != null && result.value !== "";
  * Each entry answers three questions and nothing else: which classes exist and
  * in what order (`classes`), what a class is called (`labelFor`), and which
  * class a variable falls in (`reading`). `classFor` maps a class to its CSS
- * class — per class, not per lens, because this lens draws from two ramps.
+ * class -- per class, not per lens, because this lens draws from two ramps.
  *
  * `classes` is a thunk because the accuracy lens reads VERDICTS out of
- * truth.js, which is a later <script> — the binding does not exist yet when
+ * truth.js, which is a later <script> -- the binding does not exist yet when
  * this object is built, only by the time anything renders.
  */
 const LENSES = {
@@ -162,7 +162,7 @@ const LENSES = {
        in one row, and STATUS.label is title-cased for the table's own column. */
     labelFor: (cls) => (CONFIDENCE_LEVELS.includes(cls) ? cls : statusLabel(cls).toLowerCase()),
     /* `structured_data` carries a value but never an extraction, so it has no
-       rating to show and falls through to its status colour — filled, because
+       rating to show and falls through to its status colour -- filled, because
        it does hold a value. */
     reading: (entry) => {
       const level = (entry.result.extraction || {}).presence_confidence;
@@ -183,8 +183,8 @@ const LENSES = {
     aria: (cls) => "verdict " + VERDICT_LABEL[cls],
     available: () => hasTruth(),
     /* The one lens whose indicator is a glyph rather than a dot, and it has to
-       be. Its two most consequential classes are `match` and `mismatch` —
-       correct and wrong — which are green and red, ΔE 2.2 under deuteranopia:
+       be. Its two most consequential classes are `match` and `mismatch` --
+       correct and wrong -- which are green and red, dE 2.2 under deuteranopia:
        indistinguishable. Both carry a value, so the hollow rule cannot separate
        them either. Shape is the channel that survives, and these verdicts
        already had a designed glyph vocabulary. It rides in the indicator column
@@ -200,7 +200,7 @@ const activeLens = () => LENSES[App.lens] || LENSES[DEFAULT_LENS];
 
 /* {key, cls, hollow} for one App.variables entry under a lens.
  *
- * `hollow` means exactly one thing under both lenses — this variable holds no
+ * `hollow` means exactly one thing under both lenses -- this variable holds no
  * value. It is what tells the confidence half of a reading from the status
  * half at a glance, and it is the secondary encoding the ramps need where
  * colour alone fails under CVD: `missed` vs `mismatch`, `not_found` vs
@@ -218,13 +218,13 @@ function indicatorFor(entry, lensId) {
 
 /* The status dot for the table and the detail pane. Those two show every axis
    at once in labelled columns, so their dot is fixed on status and does NOT
-   follow the lens — the lens is the control room's way of choosing what to
+   follow the lens -- the lens is the control room's way of choosing what to
    show, and a table has no such shortage of room. */
 const statusDot = (result) =>
   "s-" + result.status + (hasValue(result) ? "" : " hollow");
 
 /* Counts per class for the active lens, in the lens's own order, dropping the
-   classes this run never produced — the legend then shows what actually
+   classes this run never produced -- the legend then shows what actually
    happened rather than the vocabulary in the abstract. */
 function lensTally(lensId) {
   const lens = LENSES[lensId] || LENSES[DEFAULT_LENS];
@@ -510,7 +510,7 @@ function indexUnrequested(next) {
     const group = ssf && ssf.group_id != null ? next.groupById.get(ssf.group_id) : null;
     const entry = {
       item_id: itemId,
-      name: ssf ? ssf.label + " · " + ssf.name : "Item " + itemId,
+      name: ssf ? ssf.label + " \u00b7 " + ssf.name : "Item " + itemId,
       group_id: group ? group.group_id : otherId,
       group_name: group ? group.name : OTHER_RESULTS_NAME,
       result: next.results.get(itemId) || { item_id: itemId, status: "pending" },
@@ -719,10 +719,10 @@ function waves() {
   for (const stage of ordered) {
     const { groups, gated } = stages.get(stage);
     if (groups.length) list.push({ label: stage, groups });
-    if (gated.length) list.push({ label: stage + " · after prerequisites", groups: gated });
+    if (gated.length) list.push({ label: stage + " \u00b7 after prerequisites", groups: gated });
   }
   const numbered = list.map((wave, position) => ({
-    title: "wave " + (position + 1) + " · " + wave.label,
+    title: "wave " + (position + 1) + " \u00b7 " + wave.label,
     groups: wave.groups,
   }));
   if (unstaged.length) numbered.push({ title: "not requested", groups: unstaged });
@@ -853,7 +853,7 @@ function setMode(mode) {
 }
 
 /* The lens is remembered the way the theme is. A stored `accuracy` is only
-   honoured when a reference file is actually loaded — restoring it without one
+   honoured when a reference file is actually loaded -- restoring it without one
    would select a tab that is not on screen and paint every bubble `untested`;
    it falls back to DEFAULT_LENS instead. */
 /* Bumped when the default changed: the old key had been written on every load
@@ -863,7 +863,7 @@ function setMode(mode) {
 const LENS_KEY = "cipoc-lens-v2";
 const storedLens = () => { try { return localStorage.getItem(LENS_KEY); } catch (err) { return null; } };
 
-/* `remember` is false for the restore at startup — only a choice gets stored,
+/* `remember` is false for the restore at startup -- only a choice gets stored,
    so the remembered lens stays a preference rather than a snapshot of whatever
    the default happened to be. */
 function setLens(lens, remember = true) {
@@ -888,12 +888,12 @@ function syncLensTabs() {
   /* Tells styles.css whether to reserve the bubble's leading glyph column.
      Keyed on lens AVAILABILITY, not on App.lens: with a reference loaded the
      column is reserved under both lenses, so toggling between them still shifts
-     no label sideways — the invariant the fixed track was there to protect.
+     no label sideways -- the invariant the fixed track was there to protect.
      With no reference the accuracy lens cannot be chosen at all, and the column
      would be 20px of dead indent on every row.
 
      `delete` rather than assigning null, which would write the string "null"
-     and leave the attribute present — and [data-marks] matches on presence. */
+     and leave the attribute present -- and [data-marks] matches on presence. */
   if (lensChoices().some((id) => LENSES[id].mark)) {
     document.documentElement.dataset.marks = "1";
   } else {
@@ -954,7 +954,7 @@ function renderChrome() {
     $("#run-source").textContent = App.runSource + " | " + App.run.run_id;
     $("#run-source").title = $("#run-source").textContent;
     const duration = Number.isFinite(App.run.duration_seconds)
-      ? " · " + App.run.duration_seconds.toFixed(1) + "s" : "";
+      ? " \u00b7 " + App.run.duration_seconds.toFixed(1) + "s" : "";
     $("#case-summary").append(h("span", {
       title: [App.run.started_at, App.run.finished_at].filter(Boolean).join(" to "),
       text: "run " + String(App.run.run_id).slice(0, 8) + duration,
@@ -1174,7 +1174,7 @@ async function activateRun(raw, source, generation, startup = false) {
   runLoadStatus(startup ? "Startup run loaded. Use Load Run to choose another artifact."
     : "Loaded locally. Artifact contents are not uploaded.");
   void loadFeedback(App.activation);
-  if (startup) void loadTruth(App.activation);
+  void loadTruth(App.activation, startup ? null : source);
   return true;
 }
 

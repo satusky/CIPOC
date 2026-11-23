@@ -9,7 +9,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
-from typing import Callable, Collection, Iterable, Mapping, Sequence, get_args
+from typing import Any, Callable, Collection, Iterable, Mapping, Sequence, get_args
 
 from cipoc.models import (
     CancerMention,
@@ -240,6 +240,49 @@ def load_group_hierarchy(path: str | Path) -> list[GroupNode]:
                 )
             )
     return nodes
+
+
+def subset_variable_groups(
+    config: dict, item_ids: Iterable[int], *, with_case_facts: bool = False
+) -> dict:
+    """Trim a variable-group config to ``item_ids``, keeping each kept
+    variable's group settings (stage, gate, note filter, site restriction).
+
+    Groups and subgroups left without variables are dropped, except that a
+    parent stays while any of its subgroups does, since subgroups inherit its
+    ``stage``, ``gate``, and ``note_filter``. Raises ``ValueError`` for item IDs
+    the config does not define rather than silently planning fewer variables.
+    ``with_case_facts`` also keeps whichever ``ITEM_ID_TO_CASE_FACT`` items the
+    config defines, so they can be seeded as structured data to scope the run.
+    """
+    wanted = set(item_ids)
+    keep = wanted | (set(ITEM_ID_TO_CASE_FACT) if with_case_facts else set())
+    found: set[int] = set()
+
+    def _trim(node: dict) -> dict:
+        variables = [v for v in node.get("variables", []) if v["item_id"] in keep]
+        found.update(variable["item_id"] for variable in variables)
+        return {**node, "variables": variables}
+
+    groups: list[dict] = []
+    for group in config.get("groups", []):
+        trimmed = _trim(group)
+        subgroups = [
+            subgroup
+            for subgroup in map(_trim, group.get("subgroups", []))
+            if subgroup["variables"]
+        ]
+        if subgroups:
+            trimmed["subgroups"] = subgroups
+        else:
+            trimmed.pop("subgroups", None)
+        if trimmed["variables"] or subgroups:
+            groups.append(trimmed)
+
+    missing = wanted - found
+    if missing:
+        raise ValueError(f"Item IDs not in the variable-group config: {sorted(missing)}.")
+    return {**config, "groups": groups}
 
 
 def _parse_note_date(value: str | None) -> date | None:
@@ -1101,6 +1144,38 @@ ITEM_ID_TO_CASE_FACT: dict[int, str] = {
     220: "sex",
     **DISCRIMINATOR_FACTS,
 }
+
+
+def _is_blank(value: Any) -> bool:
+    """None, empty text, or a missing-value marker such as NaN, NaT, or pd.NA."""
+    if value is None:
+        return True
+    try:
+        return bool(value != value) or not str(value).strip()
+    except TypeError:  # pd.NA refuses truth testing
+        return True
+
+
+def case_fact_seed(truth: Mapping[Any, Any], item_ids: Iterable[int]) -> dict[int, str]:
+    """Structured data for the case-fact items a run will not extract, read from
+    one patient's known values, such as a ground-truth DataFrame row whose labels
+    are item IDs (int or str).
+
+    Items in ``item_ids`` are left out so they are still extracted, and blank
+    values are skipped, leaving that fact to the run. Whole floats become
+    integers, since a numeric column with blanks loads as float (8500.0).
+    """
+    known = {str(key): value for key, value in truth.items()}
+    requested = set(item_ids)
+    seed: dict[int, str] = {}
+    for item_id in ITEM_ID_TO_CASE_FACT:
+        value = known.get(str(item_id))
+        if item_id in requested or _is_blank(value):
+            continue
+        if isinstance(value, float) and value.is_integer():
+            value = int(value)
+        seed[item_id] = str(value).strip()
+    return seed
 
 
 def derive_case_facts(

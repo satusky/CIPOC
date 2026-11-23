@@ -1,21 +1,21 @@
-/* CIPOC workbench — one stylesheet, no external assets.
+/* CIPOC workbench -- one stylesheet, no external assets.
 
    Colour encoding: a result that holds a value is coloured by its recorded
    confidence, one that does not by its status, drawn hollow. Every colour is a
    token here, and the whole palette is redefined once under
-   [data-theme="light"] — no component rule names a literal colour, so a theme
+   [data-theme="light"] -- no component rule names a literal colour, so a theme
    swap needs no change below this block. The theme itself is resolved before
    first paint by the head script in index.html.
 
    ---- Palette -------------------------------------------------------------
 
-   NEITHER THEME IS ON THE BRAND HUE. Both surface ramps started there — the
+   NEITHER THEME IS ON THE BRAND HUE. Both surface ramps started there -- the
    UNC Chapel Hill palette carried over from the demo UI, every surface, line
    and text colour Navy #13294B mixed with black or white at a stated percentage
-   — and both left, for different reasons found in this UI rather than in the
+   -- and both left, for different reasons found in this UI rather than in the
    brand. What survives the departure is the DISCIPLINE, not the hue: one stated
    axis per theme, every surface derived from a lightness and checked against the
-   surface below it, no eyeballed greys. And the brand survives where it reads —
+   surface below it, no eyeballed greys. And the brand survives where it reads --
    Navy is the light theme's ink, Carolina Blue is the accent in both.
 
    Dark left first, for fatigue. Its ramp had to widen: the three surfaces sat at
@@ -26,14 +26,14 @@
    to chroma 0.062 at hue 259, which is a great deal of blue for the largest
    surface on screen, repeated across ten cards. It read as fatiguing rather than
    as branded. Dark surfaces are now a near-neutral graphite with a slight cool
-   bias — chroma 0.005 to 0.012, about 85% below where the card was.
+   bias -- chroma 0.005 to 0.012, about 85% below where the card was.
 
    Light left second, for GLARE. It carried the same 1.101:1 flatness, and worse:
-   `--bg-raised` — under cards, rows, the table and the topbar, so most of the
-   screen — was literally #ffffff, the display's peak output, with the page
-   ground beside it at Y 0.904. The whole UI sat at 90–100% of white and had no
-   edges either. Light is now warm paper, OKLCH hue 78 at chroma 0.005–0.011,
-   with area-weighted screen luminance down 15% (0.953 → 0.779) and #ffffff kept
+   `--bg-raised` -- under cards, rows, the table and the topbar, so most of the
+   screen -- was literally #ffffff, the display's peak output, with the page
+   ground beside it at Y 0.904. The whole UI sat at 90-100% of white and had no
+   edges either. Light is now warm paper, OKLCH hue 78 at chroma 0.005-0.011,
+   with area-weighted screen luminance down 15% (0.953 -> 0.779) and #ffffff kept
    only for form fields. A warm ground was chosen over a neutral or a cooler one
    because at equal luminance it reads softer, which is the whole point here.
 
@@ -45,31 +45,31 @@
    Carolina Blue is the one value that differs by role rather than by ramp. Dark
    uses the brand hex itself (#4B9CD3, 5.9:1 on the dark ground). On paper it
    cannot carry text, so light uses the brand's own digital-link blue darkened to
-   #005F83 — #007FAE cleared 4.6:1 on white but only 3.6:1 once the paper came
+   #005F83 -- #007FAE cleared 4.6:1 on white but only 3.6:1 once the paper came
    off peak white, which is the kind of thing a surface change quietly breaks.
 
    The data colours were never on the Navy axis in either theme, so they are
    unaffected by both departures. Status and confidence hues are not brand
    colours and are not tinted toward one: they encode data, and re-tinting them
    for tidiness would trade legibility for it. `--structured` is the exception
-   that proves the rule — a royal blue 20° of hue from Carolina, indistinguishable
+   that proves the rule -- a royal blue 20 deg of hue from Carolina, indistinguishable
    from the accent it sits beside, so it moved to the brand's Tile Teal, far
    enough from both Carolina and `--extracted` green to read at dot size. */
 
 :root {
-  /* Surfaces — graphite, OKLCH hue 255 at chroma 0.003–0.012. Stated as L
+  /* Surfaces -- graphite, OKLCH hue 255 at chroma 0.003-0.012. Stated as L
      because that is what was actually chosen; the hex is derived from it. The
      ratio on each line is against the surface directly below, which is the step
      the eye has to see. */
-  --bg: #0c0e10;            /* L 0.163 — the page ground */
-  --bg-raised: #222529;     /* L 0.262 — cards and note rows; 1.257 on --bg */
-  --bg-panel: #30343a;      /* L 0.324 — hover/selected rows, detail cards; 1.230 */
-  --bg-input: #070809;      /* L 0.133 — recessed, so below the ground */
-  --line: #43474b;          /* L 0.395 — 1.643 on --bg-raised */
-  --line-soft: #25282b;     /* L 0.205 — the receded edge only; 1.305 on --bg */
+  --bg: #0c0e10;            /* L 0.163 -- the page ground */
+  --bg-raised: #222529;     /* L 0.262 -- cards and note rows; 1.257 on --bg */
+  --bg-panel: #30343a;      /* L 0.324 -- hover/selected rows, detail cards; 1.230 */
+  --bg-input: #070809;      /* L 0.133 -- recessed, so below the ground */
+  --line: #43474b;          /* L 0.395 -- 1.643 on --bg-raised */
+  --line-soft: #25282b;     /* L 0.205 -- the receded edge only; 1.305 on --bg */
 
   /* Text. Each value is the DARKEST that clears its floor (7 / 4.5 / 4.5) on
-     every surface above and — for --text and --text-dim — on every washed
+     every surface above and -- for --text and --text-dim -- on every washed
      bubble ground as well, which is the binding constraint and is why they are
      not simply the old values renamed. --text-faint is excluded from that
      second set by construction: inside a bubble it only ever paints `.val.none`,
@@ -78,10 +78,10 @@
   --text-dim: #a9aeb4;      /* 7.9:1 on --bg, 4.53 on the `low` wash */
   --text-faint: #979ca2;    /* 6.1:1 on --bg, 4.52 on --bg-panel */
 
-  --accent: #4b9cd3;        /* Carolina Blue, PMS 542 — 5.9:1 here */
+  --accent: #4b9cd3;        /* Carolina Blue, PMS 542 -- 5.9:1 here */
 
   --extracted: #3fb950;
-  --structured: #00a5ad;    /* Tile Teal — 6.0:1 */
+  --structured: #00a5ad;    /* Tile Teal -- 6.0:1 */
   --not-found: #8b949e;
   --not-applicable: #4a5261;
   --blocked: #a371f7;
@@ -91,7 +91,7 @@
   --warn: #f0c93b;          /* Sunburst Yellow lifted for the dark ground */
   --mark: #665400;          /* Sunburst at 40% over black */
 
-  /* Confidence ramp — cool to hot: steel blue, green, gold, red. Four hues, not
+  /* Confidence ramp -- cool to hot: steel blue, green, gold, red. Four hues, not
      four strengths of one, and monotone in lightness (L 0.51 / 0.55 / 0.70 /
      0.78) because that ordering is load-bearing twice over: it is what makes the
      scale read as ranked, and it is the only channel that survives CVD.
@@ -102,41 +102,41 @@
      itself to stay calm. Every ramp before this one paid for calm with chroma
      and went muddy at the step that is half the grid.
 
-     WHY NOT THE WARM RAINBOW it replaces (green → yellow-green → gold → orange).
-     Not taste, and not a dislike of rainbows — a wider search found ~31k
+     WHY NOT THE WARM RAINBOW it replaces (green -> yellow-green -> gold -> orange).
+     Not taste, and not a dislike of rainbows -- a wider search found ~31k
      four-hue sets that clear every gate. The warm arc specifically cannot be
      fixed, for a structural reason: monotone lightness forces its second step
      dark, and dark yellow is olive. Every warm arc searched lands `high` on
-     #847d23 / #977522 / #856c1e — which is exactly the khaki an earlier pass was
+     #847d23 / #977522 / #856c1e -- which is exactly the khaki an earlier pass was
      reacting to when it flattened the ramp to one hue. Anchoring the quiet end
      in blue instead moves the gold to the THIRD step, at L 0.70, where gold is
      still gold. This ramp spans more of the spectrum than the warm one did.
 
      What the arc must clear, measured on the outline AS COMPOSITED rather than
-     on the token, since a 48–74% mix of a low-chroma colour is what actually
+     on the token, since a 48-74% mix of a low-chroma colour is what actually
      produced the mud:
-       - adjacent steps ≥ 8 ΔE2000 under normal, protan AND deutan simulation
+       - adjacent steps >= 8 dE2000 under normal, protan AND deutan simulation
          (Machado 2009, applied in linear RGB). Worst here: 14.4.
-       - ≥ 15 ΔE to Tile Teal --structured, the one status drawn FILLED like a
+       - >= 15 dE to Tile Teal --structured, the one status drawn FILLED like a
          confidence step, so the fill rule cannot separate them. Here 24.3.
-       - composited chroma ≥ 0.055, below which a step reads as grey rather than
+       - composited chroma >= 0.055, below which a step reads as grey rather than
          as itself. Here 0.059.
      The ramp this replaced failed the third at 0.019; the one before that failed
-     the first at 1.4, and additionally set --conf-max to #3fb950 — byte-identical
+     the first at 1.4, and additionally set --conf-max to #3fb950 -- byte-identical
      to --extracted, so the commonest confidence class and a status class were
      the same colour.
 
-     Lightness runs up here and down under [data-theme="light"] — same four hues,
+     Lightness runs up here and down under [data-theme="light"] -- same four hues,
      same semantics, opposite direction, because the grounds are opposite and
      "prominent" means brighter on one, darker on the other.
 
      THE TRILEMMA INVERTS WITH THE DIRECTION, and light resolves it by refusing
      the optimum rather than by escaping it. Descending lightness lands gold on
      the SECOND step, below green, which is the position ascending lightness
-     would not let it hold. Maximising adjacent ΔE from there drives it to L 0.48
-     — dot #7b5600, composited #a0874c, the light-side olive, and precisely the
+     would not let it hold. Maximising adjacent dE from there drives it to L 0.48
+     -- dot #7b5600, composited #a0874c, the light-side olive, and precisely the
      khaki an earlier pass produced and was told to remove. Light pins it at
-     L 0.60 (composited #b38d3a, chroma 0.110) and pays about 1 ΔE for it. That
+     L 0.60 (composited #b38d3a, chroma 0.110) and pays about 1 dE for it. That
      is a deliberate trade, not a search result: the gates are floors, and a
      ramp that clears them by less but is not khaki is the better ramp. Anything
      that re-derives these four values by maximising separation will re-introduce
@@ -146,7 +146,7 @@
   --conf-medium: #c89430;   /* gold */
   --conf-low: #f79a93;      /* red */
 
-  /* Verdict ramp — a value's agreement with the ground-truth reference. These
+  /* Verdict ramp -- a value's agreement with the ground-truth reference. These
      are semantic aliases rather than direct reuse of the status colours: a
      verdict that happens to share a hue with a status today is still a
      different axis, and has to stay renamable without disturbing the other.
@@ -156,10 +156,10 @@
   --v-near: var(--structured);
   --v-mismatch: var(--error);
   /* NOT var(--conf-low), though it once was. The two scales never share a screen
-     — accuracy is the other lens — so the alias saved nothing, and it silently
+     -- accuracy is the other lens -- so the alias saved nothing, and it silently
      dragged this token wherever the confidence ramp went. It has now moved three
      times (khaki, coral, and the current cool-to-hot red), and under the coral
-     ramp the alias put it 8.7 ΔE from --v-mismatch red, which is the one
+     ramp the alias put it 8.7 dE from --v-mismatch red, which is the one
      distinction the accuracy lens exists to make. Its own value now. */
   --v-missed: #f9b223;
   --v-spurious: var(--blocked);
@@ -169,28 +169,28 @@
 
      A control-room bubble carries its reading on two coupled channels, both
      mixed from the same --dot: a dim ground (--wash) and an outline of the same
-     hue at greater strength (--rim). It used to carry three — an 8px dot, a
-     full-strength outline and a raised ground — and at 44 bubbles per screen
+     hue at greater strength (--rim). It used to carry three -- an 8px dot, a
+     full-strength outline and a raised ground -- and at 44 bubbles per screen
      the innermost element on the page held the strongest edge, which is
      backwards and is what made the grid read as clutter.
 
      The ladder is ordinal, not per-class, so a class is retuned by moving which
-     step it points at rather than by editing a component rule — and so light can
+     step it points at rather than by editing a component rule -- and so light can
      redefine the numbers in one place, which it does, for all eight.
 
-     ITS RIMS ARE MUCH STRONGER: 69–88% against 48–74%, and that is structural
+     ITS RIMS ARE MUCH STRONGER: 69-88% against 48-74%, and that is structural
      rather than taste. Mixing a rim toward a DARK ground drains lightness;
      mixing it toward a LIGHT one drains chroma, so paper needs a rim much nearer
      full strength to arrive at the same place. Run light's ramp at dark's
-     percentages and its minimum composited chroma falls 0.110 → 0.096, its
-     worst-vision ΔE 11.7 → 10.7, and `max`'s rim lands on 1.30:1 against its own
-     ground — the floor exactly, with nothing left for the legend swatch, which
+     percentages and its minimum composited chroma falls 0.110 -> 0.096, its
+     worst-vision dE 11.7 -> 10.7, and `max`'s rim lands on 1.30:1 against its own
+     ground -- the floor exactly, with nothing left for the legend swatch, which
      mixes against the darker --bg and is the tightest case in either theme.
 
      Both rims and washes mix against --surface, NOT the one against the other:
      a bubble's rim is `--dot` at --rim into the card, not into the washed ground
-     it encloses. The distinction is small but it runs the wrong way — modelling
-     the rim over the wash overstates every rim by roughly wash x (1 - rim) — so
+     it encloses. The distinction is small but it runs the wrong way -- modelling
+     the rim over the wash overstates every rim by roughly wash x (1 - rim) -- so
      any checker written for these tokens has to mix both channels from the same
      base the CSS does.
 
@@ -199,12 +199,12 @@
      readings are actually painted. Each step is >= 1.09 from its neighbour.
 
      WHY `max` IS 6% AND NOT 0%. Under this scheme the fill means "this variable
-     holds a value" — it is the secondary encoding the CVD-collapsing pairs need
+     holds a value" -- it is the secondary encoding the CVD-collapsing pairs need
      (see the indicator vocabulary below), and every unvalued class sits flat on
      the card ground at wash 0. A literal 0% on `max` would put a valued class
      and an unvalued one on the identical ground and break that invariant. 6% is
      1.055:1, invisible at a glance, and keeps it exact. Light reads 8% for the
-     same reason and lands at 1.053 on its own card — the invariant is
+     same reason and lands at 1.053 on its own card -- the invariant is
      theme-independent, because the pairs it protects collapse under CVD in both. */
   --wash-0: 6%;   --rim-0: 48%;   /* max, match */
   --wash-1: 13%;  --rim-1: 58%;   /* high, extracted, structured_data, near */
@@ -230,16 +230,16 @@
 }
 
 :root[data-theme="light"] {
-  /* Surfaces — warm paper, OKLCH hue 78 at chroma 0.005–0.011. Stated here as
+  /* Surfaces -- warm paper, OKLCH hue 78 at chroma 0.005-0.011. Stated here as
      the luminance and the ratio against the surface BELOW, which is the step the
      eye has to see; the hex is derived from the lightness. The order is an exact
-     mirror of dark's — there, input < bg < raised < panel; here it runs the other
+     mirror of dark's -- there, input < bg < raised < panel; here it runs the other
      way, and --bg-input is the one white left rather than the deepest recess,
      because a white well is what reads as "you can type here" and a field is too
      small to buy the glare back. */
-  --bg: #d9d3c8;            /* Y 0.655 — the page ground */
-  --bg-raised: #e9e6e0;     /* Y 0.793 — cards, rows, topbar; 1.196 on --bg */
-  --bg-panel: #fbfbf9;      /* Y 0.963 — hover/selected, detail cards; 1.202 */
+  --bg: #d9d3c8;            /* Y 0.655 -- the page ground */
+  --bg-raised: #e9e6e0;     /* Y 0.793 -- cards, rows, topbar; 1.196 on --bg */
+  --bg-panel: #fbfbf9;      /* Y 0.963 -- hover/selected, detail cards; 1.202 */
   --bg-input: #ffffff;      /* fields only; 1.246 on --bg-raised */
 
   /* Both edges must be darker than every surface here, where dark hides
@@ -251,7 +251,7 @@
   --line: #bcb09f;          /* 1.712 on --bg-raised */
   --line-soft: #c7bdad;     /* the receded edge; 1.247 on --bg, 1.491 on a card */
 
-  /* Navy ink on warm paper — the brand survives here rather than in the surfaces.
+  /* Navy ink on warm paper -- the brand survives here rather than in the surfaces.
      Each value is the LIGHTEST that clears its floor (7 / 4.5 / 4.5) on every
      surface above and, for --text and --text-dim, on every washed bubble ground.
      --text-faint is excluded from that second set by construction: inside a
@@ -262,28 +262,28 @@
      miss. An excluded card sets --surface to --bg, so its bubbles wash against
      the page ground rather than against the card. In dark that ground is darker,
      which moves it AWAY from light ink and helps; here it is darker too, which
-     moves it TOWARD dark ink and hurts — the excluded card and the wash compound
+     moves it TOWARD dark ink and hurts -- the excluded card and the wash compound
      instead of cancelling. At Navy 87% this read 4.14:1 on a `low` bubble in an
-     excluded card. Navy 90% clears it at 4.63 and is still 6.8 ΔE from --text,
+     excluded card. Navy 90% clears it at 4.63 and is still 6.8 dE from --text,
      so the three ink tiers stay distinguishable. */
-  --text: #13294b;          /* Navy, PMS 2767 — 9.75 on --bg, 7.28 on the `low` wash */
-  --text-dim: #2b3e5d;      /* Navy at 90% — 7.23 on --bg, 5.44 on the `low` wash */
+  --text: #13294b;          /* Navy, PMS 2767 -- 9.75 on --bg, 7.28 on the `low` wash */
+  --text-dim: #2b3e5d;      /* Navy at 90% -- 7.23 on --bg, 5.44 on the `low` wash */
   --text-faint: #4a5a73;    /* 4.70 on --bg */
 
-  --accent: #005f83;        /* brand digital-link blue, darkened — 5.69 on a card */
+  --accent: #005f83;        /* brand digital-link blue, darkened -- 5.69 on a card */
 
   --extracted: #1a7f37;
-  --structured: #00707a;    /* Tile Teal darkened — 4.68 on a card */
+  --structured: #00707a;    /* Tile Teal darkened -- 4.68 on a card */
   --not-found: #6b7480;
-  --not-applicable: #98a1af;/* 2.09 on a card, against dark's 1.96 — the mute rung */
+  --not-applicable: #98a1af;/* 2.09 on a card, against dark's 1.96 -- the mute rung */
   --blocked: #7a41d6;
   --error: #cf222e;
   --pending: #9a6700;
 
-  --warn: #6d5100;          /* Sunburst darkened — 4.99 on --bg */
+  --warn: #6d5100;          /* Sunburst darkened -- 4.99 on --bg */
   /* A highlight on cream cannot win on luminance: the whole range above the card
-     is 1.246:1. It wins on hue instead — 26.2 ΔE from the paper, with --text at
-     9.3:1 on top of it. Judge this one by ΔE, not by contrast ratio. */
+     is 1.246:1. It wins on hue instead -- 26.2 dE from the paper, with --text at
+     9.3:1 on top of it. Judge this one by dE, not by contrast ratio. */
   --mark: #f5cb3a;
 
   /* The same four hues as dark, walked DOWN: on this ground `max` is the palest,
@@ -300,11 +300,11 @@
   --v-match: var(--extracted);
   --v-near: var(--structured);
   --v-mismatch: var(--error);
-  --v-missed: #785307;      /* own value — see the dark block */
+  --v-missed: #785307;      /* own value -- see the dark block */
   --v-spurious: var(--blocked);
   --v-untested: var(--not-applicable);
 
-  /* Light's own ladder — the override the :root block was written to allow. The
+  /* Light's own ladder -- the override the :root block was written to allow. The
      rims are far stronger than dark's for the structural reason stated there;
      the washes are shallower in effect than their percentages suggest, because
      mixing a dark ink INTO a light card moves contrast faster than mixing a
@@ -504,7 +504,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 
 .lenses { display: flex; gap: 4px; align-items: center; }
 /* `display: flex` outranks the UA's [hidden] rule, so the toggle needs its
-   own — it is hidden whenever there is only one lens to pick. */
+   own -- it is hidden whenever there is only one lens to pick. */
 .lenses[hidden] { display: none; }
 .lens-label {
   color: var(--text-faint);
@@ -537,6 +537,12 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 }
 .file-pick:hover span { color: var(--text); border-color: var(--accent); }
 .file-pick input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 1px; }
+/* The button and its status wrap to a second toolbar line together. */
+#view-variables .pane-head { flex-wrap: wrap; row-gap: 8px; }
+.truth-pick { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.truth-status { font-size: 12px; color: var(--text-dim); overflow-wrap: anywhere; }
+.truth-status.bad { color: var(--error); }
+.truth-status:empty { display: none; }
 
 /* ----------------------------------------------------------- notes list */
 
@@ -625,7 +631,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 
 /* --surface is the ground the bubbles inside this card mix against. It is a
    property rather than a hard-coded token because an excluded card sits on a
-   different one (below), and a bubble's wash has to follow it — mixing against
+   different one (below), and a bubble's wash has to follow it -- mixing against
    --bg-raised while the card is painted --bg would leave every tint stale.
 
    It deliberately does NOT move on hover or selection, and that is a real
@@ -634,14 +640,14 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
    --bg-raised and 3.85 on --bg-panel. Repainting the card ground on hover would
    therefore drop the item id below AA on precisely the bubbles a reviewer is
    most likely to be hovering. Card state moves to the border and ring instead,
-   which costs nothing on either text or the ramp — and it means a wash reads
+   which costs nothing on either text or the ramp -- and it means a wash reads
    the same on every card on screen, so the steps stay comparable across them. */
 .group-card {
   --surface: var(--bg-raised);
   background: var(--surface);
   /* The card is the container and owns the strongest edge in the control room;
      --line-soft (1.32:1) left it with effectively none. Nothing inside it draws
-     a quiet rim above this weight — see the ladder in :root. */
+     a quiet rim above this weight -- see the ladder in :root. */
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 10px 12px 12px;
@@ -658,14 +664,14 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
   border-color: var(--accent);
   box-shadow: inset 0 0 0 1px var(--accent);
 }
-/* The card's run state used to ride on a 3px top border — green for ran, slate
+/* The card's run state used to ride on a 3px top border -- green for ran, slate
    for excluded, red for a problem. It was a fourth colour vocabulary on a screen
    that already has three (the lens ramp on the bubbles, the status dots, the
    chips), and it read as a lens the card was not carrying: green-topped meant
    only "not excluded and not broken", not "correct" or "confident", which is
    what green means everywhere else here. State is said in words on the chip
-   instead. The edge is now uniform, and free to mean interaction — hover and
-   selection — and nothing else.
+   instead. The edge is now uniform, and free to mean interaction -- hover and
+   selection -- and nothing else.
 
    An excluded group still recedes, by not rising off the page rather than by
    fading. `opacity: 0.72` dimmed its text along with everything else and dragged
@@ -689,8 +695,8 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 
    It was briefly a two-line block with the value under the label, which cost a
    card its height twice over. `.bubbles` was a minmax(200px) track inside a
-   minmax(310px) card, and two 200px tracks need 406px of inner width — 432px
-   of card — which `auto-fill` never grants, since it packs 310px cards before
+   minmax(310px) card, and two 200px tracks need 406px of inner width -- 432px
+   of card -- which `auto-fill` never grants, since it packs 310px cards before
    stretching them. So every bubble was both full-width and two lines tall, and
    the 12-variable `first_course_treatment` card ran 784px in a 310px column
    (1552px for the whole control room). One line each takes that to 483px and
@@ -700,14 +706,14 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
    median two characters, longest eight (the dates). The name is. */
 .bubbles { display: flex; flex-direction: column; gap: 4px; }
 
-/* Three tracks: item id, name, value — four when a glyph lens is available, see
+/* Three tracks: item id, name, value -- four when a glyph lens is available, see
    the [data-marks] rule below. `.bub-label` is `display: contents` further down,
    so its two children are items of *this* grid, which is why the value can be
    right-aligned against the name without touching control.js.
 
    The bubble carries the active lens on two coupled channels, both mixed from
    --dot against the card's --surface: a dim ground and an outline of the same
-   hue at greater strength. There used to be a third — an 8px dot — and the
+   hue at greater strength. There used to be a third -- an 8px dot -- and the
    outline ran at full strength; 44 bubbles each drawing a saturated rim inside
    a card whose own border was fainter than any of them is an inverted
    hierarchy, and it is what the grid's clutter actually was.
@@ -735,7 +741,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 /* The accuracy lens supplies a glyph, and it needs a column of its own. The
    track is reserved on lens AVAILABILITY, not on the active lens: with a
    ground-truth file loaded it is present under both lenses, so toggling between
-   them still shifts nothing sideways — the invariant the fixed 12px track was
+   them still shifts nothing sideways -- the invariant the fixed 12px track was
    there to protect. With no reference loaded the accuracy lens cannot be
    selected at all, and the track plus its gap is 20px of dead indent on every
    row, which is why the default above does not reserve it.
@@ -753,7 +759,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
    it is the obvious idiom and it is the one thing this palette cannot afford:
    --text-dim clears 4.5:1 on the `low` wash with 1 point of headroom, so any
    hover that adds hue puts the item id below AA on exactly the bubbles worth
-   hovering. The rim is free — it is not behind any text — and going to full
+   hovering. The rim is free -- it is not behind any text -- and going to full
    strength is a bigger jump than a tint would have been anyway (the quietest
    class moves 1.66 -> 2.58 against its own ground).
 
@@ -771,7 +777,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 
 /* No value: no wash at all, so the bubble sits flat on the card ground and the
    rows with nothing in them drop out of the scan. This is also the load-bearing
-   half of the fill rule — see the wash ladder in :root and the indicator
+   half of the fill rule -- see the wash ladder in :root and the indicator
    vocabulary below. `.bubble.hollow` (0,2,0) outranks the class rules that set
    --wash (0,1,0), so this holds by specificity rather than by source order. */
 .bubble.hollow,
@@ -814,8 +820,8 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
    puts the verdict on the dot and the outline instead, which is why the track
    is gone. .vmark survives inside the table's verdict pill, where it is the
    secondary encoding the ramp needs rather than the whole signal: `missed` and
-   `mismatch` are 6.2 ΔE apart under deuteranopia, so wrapping the column in
-   colour does not remove the need for the glyph — it is why the pill keeps it. */
+   `mismatch` are 6.2 dE apart under deuteranopia, so wrapping the column in
+   colour does not remove the need for the glyph -- it is why the pill keeps it. */
 .vmark {
   text-align: center;
   font-size: 11px;
@@ -828,7 +834,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 .m-untested .vmark { opacity: 0.5; }
 
 /* One row: the key for the active lens, the run's distribution along it, and
-   the filter over it. Three static rows stood here before — they had to spell
+   the filter over it. Three static rows stood here before -- they had to spell
    out three vocabularies because all three were live at once. */
 .legend {
   display: flex; flex-wrap: wrap; align-items: center;
@@ -839,7 +845,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 }
 .legend-mark { width: 10px; display: inline-block; }
 /* The swatch mirrors the bubble it stands for, running the same two-channel
-   formula — that is how the fill rule gets taught without a sentence explaining
+   formula -- that is how the fill rule gets taught without a sentence explaining
    it. Mixed against --bg because the legend sits on the page ground rather than
    on a card, so --surface is set locally here instead of being inherited. */
 .legend-swatch {
@@ -883,7 +889,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
    reads stale. So the two rules below restate it alongside their `background`,
    and the two declarations must always change together.
 
-   The control room deliberately does the opposite — a card's ground is frozen
+   The control room deliberately does the opposite -- a card's ground is frozen
    because --text-dim on the `low` wash clears AA by 0.11 there. That constraint
    does not bind here: a pill's label is full --text, and the worst cell in the
    app is `low` confidence on a selected row at 5.86 (dark; light's worst is
@@ -919,12 +925,12 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
    and a glyph alone made a wrong answer and a right one the same shape, so
    finding the rows worth acting on meant reading every row.
 
-   A pill is the control-room BUBBLE'S VOCABULARY at cell scale — the same wash
+   A pill is the control-room BUBBLE'S VOCABULARY at cell scale -- the same wash
    ground and same-hue rim, mixed from the same --dot against --surface, taking
    the same ladder step off the same `.c-`/`.m-` class. It is a different SHAPE
    because a bubble is a whole row washed, and a table row is already a row that
    owns a moving background; only the label-sized box fits inside a cell.
-   Deliberately NOT a fifth colour vocabulary — the run-state border it echoes
+   Deliberately NOT a fifth colour vocabulary -- the run-state border it echoes
    was removed from .group-card for being exactly that.
 
    Both columns carry one always, rather than only the active lens's column. The
@@ -957,15 +963,15 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
    status by design (statusDot in app.js), and its pills are fixed on the column
    they sit in.
 
-   FILL IS LOAD-BEARING, in both idioms. It means one thing everywhere — this
-   variable holds a value — and it is the secondary encoding two of the lens
+   FILL IS LOAD-BEARING, in both idioms. It means one thing everywhere -- this
+   variable holds a value -- and it is the secondary encoding two of the lens
    ramps need, because two pairs do not separate on colour alone: verdict
-   `missed` ↔ `mismatch` (ΔE 6.2 deutan) and status `not_found` ↔
-   `structured_data` (ΔE 3.1 protan). In each pair one side is filled and the
+   `missed` <-> `mismatch` (dE 6.2 deutan) and status `not_found` <->
+   `structured_data` (dE 3.1 protan). In each pair one side is filled and the
    other is not, which is what makes them legal. A `.dot` spells that as solid
    vs ring; a bubble spells it as a washed ground vs the bare card ground. Do
    not give an unvalued class a --wash, or take one from a valued class, without
-   re-checking that ramp — and note that `.c-max`'s wash is 6% rather than 0%
+   re-checking that ramp -- and note that `.c-max`'s wash is 6% rather than 0%
    for exactly this reason (see the ladder in :root). */
 .dot {
   display: inline-block; width: 8px; height: 8px; border-radius: 50%;
@@ -992,8 +998,8 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 .c-low    { --dot: var(--conf-low);    --wash: var(--wash-3); --rim: var(--rim-3); }
 /* Verdict classes set the same --dot property the status/confidence classes do,
    so the shapes above render a verdict with no rules of their own. They are
-   only ever applied to a *different element* than the status class — the
-   trailing mark, never the dot — because the two axes are read together. */
+   only ever applied to a *different element* than the status class -- the
+   trailing mark, never the dot -- because the two axes are read together. */
 /* Same ladder, stepped by how much the verdict asks of a reviewer rather than
    by hue: a `match` is as quiet as a `max`, a `mismatch` as loud as a `low`.
    `missed` and `untested` hold no value and so take no wash. */
@@ -1006,7 +1012,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 
 /* An entity carrying reviewer feedback is marked where it is listed, so saved
    annotations are findable without opening each one in turn. The glyph rides in
-   the existing id track rather than a column of its own — nothing shifts when
+   the existing id track rather than a column of its own -- nothing shifts when
    nothing is annotated. */
 .bubble[data-annotated] .bub-id::after,
 .vtable tr[data-annotated] td:first-child::after,
@@ -1018,8 +1024,8 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 /* ------------------------------------------------------------ feedback */
 
 /* No element styling for form controls existed before this: the only input in
-   the app was `.filter`, styled by class. These follow it — --bg-input ground,
-   --line border, accent on focus — so the form reads as part of the app rather
+   the app was `.filter`, styled by class. These follow it -- --bg-input ground,
+   --line border, accent on focus -- so the form reads as part of the app rather
    than as the browser's default chrome. */
 .flag-grid {
   display: grid;

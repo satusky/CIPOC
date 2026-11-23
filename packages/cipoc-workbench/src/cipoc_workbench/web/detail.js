@@ -1,5 +1,5 @@
 "use strict";
-/* Detail pane — note, group and variable dossiers, plus the shared renderers
+/* Detail pane -- note, group and variable dossiers, plus the shared renderers
  * for prompts/responses, extraction attempts and evidence highlighting.
  *
  * Evidence spans carry no character offsets, so highlighting is a verbatim
@@ -92,7 +92,7 @@ function evidenceList(spans, { showNote = true } = {}) {
       showNote
         ? h("span", {}, crossLink("note", span.note_id, "note " + span.note_id), " ")
         : null,
-      h("span", { text: "“" + (span.text || "") + "”" }),
+      h("span", { text: "\u201c" + (span.text || "") + "\u201d" }),
       matched ? null : h("span", { class: "chip warn", style: "margin-left:6px", text: "not verbatim" })));
   }
   return list;
@@ -210,7 +210,7 @@ function attemptCard(attempt) {
       h("span", { class: attempt.is_valid ? "chip good" : "chip bad",
         text: attempt.is_valid ? "valid" : "rejected" })),
     kv([
-      ["value", candidate.value == null ? "—" : candidate.value],
+      ["value", candidate.value == null ? "\u2014" : candidate.value],
       ["confidence", candidate.presence_confidence || null],
       ["explanation", candidate.explanation || null],
       ["most important note", candidate.most_important_note != null
@@ -242,9 +242,9 @@ function noteDetail(noteId) {
   body.append(section("Metadata", kv([
     ["note id", note.note_id],
     ["date", note.date || "undated"],
-    ["type", note.note_type || "—"],
+    ["type", note.note_type || "\u2014"],
     ["cancer status", (note.cancer_status || []).join(", ") || "none"],
-    ["keywords", (note.flags || []).join(", ") || "—"],
+    ["keywords", (note.flags || []).join(", ") || "\u2014"],
   ])));
 
   body.append(section("Summary",
@@ -291,7 +291,7 @@ function noteDetail(noteId) {
     touching.length
       ? touching.map((t) => h("div", { class: "check-row" },
           h("span", { class: t.role === "selected" ? "mark-pass" : "mark-fail",
-            text: t.role === "selected" ? "✓" : "✕" }),
+            text: t.role === "selected" ? "\u2713" : "\u2715" }),
           h("div", {},
             crossLink("group", t.group.group_id, t.group.name),
             h("span", { class: "chip", style: "margin-left:6px", text: t.role }),
@@ -314,7 +314,7 @@ function noteDetail(noteId) {
 
 function checkRow(pass, label, observed) {
   return h("div", { class: "check-row" },
-    h("span", { class: pass ? "mark-pass" : "mark-fail", text: pass ? "✓" : "✕" }),
+    h("span", { class: pass ? "mark-pass" : "mark-fail", text: pass ? "\u2713" : "\u2715" }),
     h("div", {},
       h("div", { text: label }),
       observed ? h("div", { class: "observed", text: observed }) : null));
@@ -354,7 +354,7 @@ function groupDetail(groupId) {
 
   body.append(section("Configuration", kv([
     ["group id", group.group_id],
-    ["stage", group.stage || "—"],
+    ["stage", group.stage || "\u2014"],
     ["extraction", group.extract_as_group === false ? "per variable" : "as a group"],
     ["depends on", (group.depends_on || []).join(", ") || null],
     ["outcome", state.label],
@@ -375,16 +375,16 @@ function groupDetail(groupId) {
       }[gate] || [];
       const observed = related
         .map((c) => c + ": " + conceptPresence(concepts[c]))
-        .join(" · ");
-      checks.append(checkRow(state.kind !== "excluded", "corpus gate — " + gate, observed || null));
+        .join(" \u00b7 ");
+      checks.append(checkRow(state.kind !== "excluded", "corpus gate \u2014 " + gate, observed || null));
     }
   } else {
-    checks.append(checkRow(true, "corpus gate — ungated", null));
+    checks.append(checkRow(true, "corpus gate \u2014 ungated", null));
   }
 
   if (group.applies_to) {
     checks.append(checkRow(state.kind !== "excluded",
-      "site applicability — " + applicabilityLabel(group.applies_to),
+      "site applicability \u2014 " + applicabilityLabel(group.applies_to),
       "case: primary_site=" + (facts.primary_site || "unknown") +
       ", gross_primary_site=" + (facts.gross_primary_site || "unknown") +
       ((facts.candidate_gross_sites || []).length
@@ -393,7 +393,7 @@ function groupDetail(groupId) {
       ((facts.candidate_histology_families || []).length
         ? ", candidate_histology_families=" + facts.candidate_histology_families.join(" or ") : "")));
   } else {
-    checks.append(checkRow(true, "site applicability — unrestricted", null));
+    checks.append(checkRow(true, "site applicability \u2014 unrestricted", null));
   }
 
   if (group.note_filter) {
@@ -403,7 +403,7 @@ function groupDetail(groupId) {
     if ((filter.keywords || []).length) bits.push("keywords: " + filter.keywords.join(", "));
     if ((filter.cancer_status || []).length) bits.push("status: " + filter.cancer_status.join(", "));
     if (filter.within_days != null) bits.push("within " + filter.within_days + " days");
-    checks.append(checkRow(true, "note filter", bits.join(" · ")));
+    checks.append(checkRow(true, "note filter", bits.join(" \u00b7 ")));
   }
 
   body.append(section("Gating", checks,
@@ -423,7 +423,7 @@ function groupDetail(groupId) {
             ["correct", gv.correct + " of " + gv.tested],
             ["disagreements", VERDICTS
               .filter((v) => v !== "match" && v !== "untested" && gv.counts[v])
-              .map((v) => gv.counts[v] + " " + VERDICT_LABEL[v]).join(" · ") || "none"],
+              .map((v) => gv.counts[v] + " " + VERDICT_LABEL[v]).join(" \u00b7 ") || "none"],
           ])
         : h("p", { class: "faint", style: "margin:0",
             text: "The reference file mentions none of this group's variables." }),
@@ -432,9 +432,9 @@ function groupDetail(groupId) {
             h("h4", {}, h("span", { class: "chip bad", text: "gate" })),
             h("p", { style: "margin:0", text: gv.finding === "wrongly_excluded"
               ? "This group was excluded, but the reference file carries values for its " +
-                "variables — the gate or site rule above rejected a case it should have admitted."
+                "variables \u2014 the gate or site rule above rejected a case it should have admitted."
               : "This group ran and coded values, but the reference file says none of its " +
-                "variables should have one — the gate admitted a case it should have rejected." }))
+                "variables should have one \u2014 the gate admitted a case it should have rejected." }))
         : null));
   }
 
@@ -445,14 +445,14 @@ function groupDetail(groupId) {
       const chosen = (sel.selected_note_ids || []).some((n) => String(n) === String(noteId));
       const note = App.notes.get(String(noteId));
       rows.append(h("div", { class: "check-row" },
-        h("span", { class: chosen ? "mark-pass" : "mark-fail", text: chosen ? "✓" : "✕" }),
+        h("span", { class: chosen ? "mark-pass" : "mark-fail", text: chosen ? "\u2713" : "\u2715" }),
         h("div", {},
-          crossLink("note", noteId, "note " + noteId + (note ? " · " + note.note_type : "")),
+          crossLink("note", noteId, "note " + noteId + (note ? " \u00b7 " + note.note_type : "")),
           h("span", { class: "chip", style: "margin-left:6px", text: chosen ? "selected" : "not selected" }))));
     }
     for (const [noteId, reasons] of Object.entries(sel.rejected_note_ids || {})) {
       rows.append(h("div", { class: "check-row" },
-        h("span", { class: "mark-fail", text: "✕" }),
+        h("span", { class: "mark-fail", text: "\u2715" }),
         h("div", {},
           crossLink("note", noteId, "note " + noteId),
           h("span", { class: "chip", style: "margin-left:6px", text: "filtered out" }),
@@ -469,14 +469,14 @@ function groupDetail(groupId) {
     }
     for (const code of sel.unevaluated_checks || []) {
       rows.append(h("div", { class: "check-row" },
-        h("span", { class: "mark-fail", text: "—" }),
+        h("span", { class: "mark-fail", text: "\u2014" }),
         h("div", {},
           h("span", { class: "chip", text: "not evaluated" }),
           h("div", { class: "observed", text:
             presentationMessage(NOTE_SELECTION_UNEVALUATED_MESSAGES, code) }))));
     }
     body.append(section(
-      "Note selection — " + (sel.selected_note_ids || []).length + " of " +
+      "Note selection \u2014 " + (sel.selected_note_ids || []).length + " of " +
       ((sel.candidate_note_ids || []).length + Object.keys(sel.rejected_note_ids || {}).length),
       (sel.requested_item_ids || []).length
         ? h("p", { class: "faint", text: "Requested items: " + sel.requested_item_ids.join(", ") })
@@ -512,7 +512,7 @@ function variableDetail(itemId) {
     ["item id", id],
     ["group", crossLink("group", entry.group_id, entry.group_name)],
     ["status", resultLabel(result)],
-    ["value", result.value == null ? "—" : result.value],
+    ["value", result.value == null ? "\u2014" : result.value],
     ["confidence", extraction ? extraction.presence_confidence : null],
     ["valid", extraction ? (extraction.is_valid ? "yes" : "no") : null],
     ["attempts", extraction ? extraction.extraction_attempts : null],
@@ -543,7 +543,7 @@ function variableDetail(itemId) {
     body.append(section("Replaced by", kv(replacedBy.map((record) => [
       record.label,
       h("span", {}, crossLink("variable", record.item_id, record.item_id + " " + record.name),
-        (record.schemas || []).length ? " · " + record.schemas.join(", ") : ""),
+        (record.schemas || []).length ? " \u00b7 " + record.schemas.join(", ") : ""),
     ]))));
   }
 
@@ -560,11 +560,11 @@ function variableDetail(itemId) {
       body.append(section("Ground truth",
         checkRow(CORRECT.has(v.verdict), VERDICT_LABEL[v.verdict],
           v.verdict === "match" ? null
-            : "recorded " + (v.got || "no value") + " · expected " + (v.expected || "no value")),
+            : "recorded " + (v.got || "no value") + " \u00b7 expected " + (v.expected || "no value")),
         v.verdict === "near"
           ? h("p", { class: "muted", style: "margin:8px 0 0", text:
               "These agree once case and separators are ignored and leading zeros " +
-              "are dropped — a formatting difference, not a different answer." })
+              "are dropped \u2014 a formatting difference, not a different answer." })
           : null));
     }
   }
@@ -578,7 +578,7 @@ function variableDetail(itemId) {
 
   if (extraction) {
     body.append(section("Explanation",
-      h("p", { style: "margin:0", text: extraction.explanation || "—" })));
+      h("p", { style: "margin:0", text: extraction.explanation || "\u2014" })));
 
     const choice = extraction.histology;
     if (choice) {
@@ -610,7 +610,7 @@ function variableDetail(itemId) {
       const spans = (extraction.spans || []).filter(
         (s) => String(s.note_id) === String(primary.note_id));
       const { node } = highlightedContent(primary.content, spans);
-      body.append(section("Cited note " + primary.note_id + " · " + (primary.note_type || ""), node));
+      body.append(section("Cited note " + primary.note_id + " \u00b7 " + (primary.note_type || ""), node));
     }
   }
 
@@ -651,7 +651,7 @@ function renderDetail() {
     body = telemetryDetail();
   } else if (kind === "note") {
     const note = App.notes.get(String(id));
-    title = note ? (note.note_type || "Note") + " · " + (note.date || "undated") : "Note " + id;
+    title = note ? (note.note_type || "Note") + " \u00b7 " + (note.date || "undated") : "Note " + id;
     body = noteDetail(id);
   } else if (kind === "group") {
     const group = App.groupById.get(id);
@@ -659,7 +659,7 @@ function renderDetail() {
     body = groupDetail(id);
   } else {
     const entry = App.variables.find((v) => v.item_id === Number(id));
-    title = entry ? entry.item_id + " · " + entry.name : "Variable " + id;
+    title = entry ? entry.item_id + " \u00b7 " + entry.name : "Variable " + id;
     body = variableDetail(id);
   }
 

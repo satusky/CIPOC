@@ -1,10 +1,10 @@
 "use strict";
-/* Ground truth — classify each recorded result against a `{item_id: value}`
+/* Ground truth -- classify each recorded result against a `{item_id: value}`
  * reference file, and roll those verdicts up to the group.
  *
  * Everything here is pure: it reads `App.truth` and the already-indexed
  * results, and derives nothing that is not implied by the two. A ground-truth
- * file is always allowed to be partial — an item it does not mention is
+ * file is always allowed to be partial -- an item it does not mention is
  * `untested` and is excluded from every accuracy count, because the alternative
  * (scoring an unlisted item as wrong) makes a half-built reference file look
  * like a catastrophic run.
@@ -29,20 +29,20 @@ const VERDICT_LABEL = {
  * asserted" rather than as any kind of result.
  *
  * Shape rather than colour alone is load-bearing, not decorative: `match` and
- * `mismatch` — correct and wrong, the pair this whole lens exists to separate —
- * are green and red, ΔE 2.2 under deuteranopia, and both carry a value so the
+ * `mismatch` -- correct and wrong, the pair this whole lens exists to separate --
+ * are green and red, dE 2.2 under deuteranopia, and both carry a value so the
  * hollow rule cannot tell them apart either. These glyphs are the channel that
  * survives. Do not reduce the accuracy indicator to a bare dot. */
 const VERDICT_MARK = {
-  match: "\u2713",     // ✓
-  near: "\u2248",      // ≈
-  mismatch: "\u2715",  // ✕
-  missed: "\u25cb",    // ○  — hollow: a value that should be there and is not
-  spurious: "\u25cf",  // ●  — filled: a value that is there and should not be
-  untested: "\u00b7",  // ·
+  match: "\u2713",     // check mark
+  near: "\u2248",      // almost equal to
+  mismatch: "\u2715",  // multiplication x
+  missed: "\u25cb",    // white circle  -- hollow: a value that should be there and is not
+  spurious: "\u25cf",  // black circle  -- filled: a value that is there and should not be
+  untested: "\u00b7",  // middle dot
 };
 
-/* Only these count as coded-correctly. `near` is included deliberately — see
+/* Only these count as coded-correctly. `near` is included deliberately -- see
  * looseValue() for why a formatting difference is not an extraction error. */
 const CORRECT = new Set(["match", "near"]);
 
@@ -65,7 +65,7 @@ const exactValue = (value) => (value == null ? "" : String(value).trim());
  * answers `2025-03-18` for a YYYYMMDD item has understood the note perfectly
  * and formatted the answer wrongly. Both are real defects, but they are defects
  * of a different kind than reading the wrong date, and folding them together
- * hides the difference exactly where refinement needs it — item 1280 in the
+ * hides the difference exactly where refinement needs it -- item 1280 in the
  * committed state failed validation on precisely that dash-date shape.
  */
 function looseValue(value) {
@@ -110,7 +110,7 @@ const caseAccuracy = () => tally(App.variables);
 /* A group's roll-up, plus the one finding no per-variable verdict can carry.
  *
  * When a gate or a site rule excludes a whole group, every variable in it is
- * stamped `not_applicable` and each one compares as `missed` in isolation —
+ * stamped `not_applicable` and each one compares as `missed` in isolation --
  * six identical verdicts that all have a single cause upstream. Naming that
  * cause at the group level is what turns "six wrong answers" into "one wrong
  * gate", which is the actionable form.
@@ -150,26 +150,51 @@ function indexTruth(raw, source) {
   App.truthSource = App.truth.size ? source : null;
 }
 
-/* Only the server's explicit run binding may supply an automatic reference.
+/* The line beside Ground truth...: which file is loaded, or that none was. */
+function truthStatus(message, error = false) {
+  const status = $("#truth-status");
+  status.textContent = message;
+  status.className = "truth-status" + (error ? " bad" : "");
+}
+
+const NO_MATCHING_TRUTH = "No matching ground truth found. Click Ground truth\u2026 to choose a file.";
+
+/* Only a server binding may supply an automatic reference: the startup run's
+ * (`fileName` null), or the --ground-truth-dir file named like the run file.
  * Static/unbound references remain available through the local file picker. */
-async function loadTruth(activation = App.activation) {
+async function loadTruth(activation = App.activation, fileName = null) {
   if (activation !== App.activation) return false;
   const runId = App.run.run_id;
   const generation = ++App.truthGeneration;
   const current = () => activation === App.activation && generation === App.truthGeneration;
+  truthStatus("Checking for matching ground truth...");
   try {
-    if (!canonicalRunId(runId)) return false;
-    const response = await fetch("/api/runs/" + runId + "/ground-truth", { cache: "no-store" });
-    if (!response.ok) return false;
+    if (fileName == null && !canonicalRunId(runId)) throw new Error("No run binding.");
+    const url = fileName == null ? "/api/runs/" + runId + "/ground-truth"
+      : "/api/ground-truth/files/" + encodeURIComponent(fileName);
+    const response = await fetch(url, { cache: "no-store" });
+    if (!current()) return false;
+    if (response.status === 500) {
+      truthStatus("Could not read the matching ground-truth file.", true);
+      return false;
+    }
+    if (!response.ok) throw new Error("No match.");
     const document = await response.json();
-    if (!current() || !isRecord(document) || document.run_id !== runId || !isRecord(document.values)) return false;
-    if (!Object.keys(document.values).length) return false;
-    indexTruth(document.values, "server");
+    if (!current()) return false;
+    const bound = fileName == null ? document?.run_id === runId : document?.name === fileName;
+    if (!isRecord(document) || !bound || !isRecord(document.values)) throw new Error("Unbound response.");
+    if (!Object.keys(document.values).length) throw new Error("No values.");
+    const source = fileName ?? document.source;
+    indexTruth(document.values, source || "server");
+    truthStatus("Loaded " + (source || "ground truth from the server"));
     renderChrome();
     setLens(storedLens() || App.lens, false);
     if (App.selection) renderDetail();
     return true;
-  } catch (err) { /* Optional service unavailable; never use an unbound fallback. */ }
+  } catch (err) {
+    /* Optional service unavailable or no match; never use an unbound fallback. */
+    if (current()) truthStatus(NO_MATCHING_TRUTH);
+  }
   return false;
 }
 
@@ -192,13 +217,14 @@ async function onTruthFile(event) {
     const raw = JSON.parse(text);
     if (!isRecord(raw)) throw new Error("Expected a JSON object of {item_id: value}.");
     indexTruth(raw, file.name);
+    truthStatus(hasTruth() ? "Loaded " + file.name : file.name + " has no values.");
     renderChrome();
-    /* setLens re-renders, and switches to the lens the file just enabled —
+    /* setLens re-renders, and switches to the lens the file just enabled --
        picking a reference file is only ever a prelude to reading against it. */
     setLens(hasTruth() ? "accuracy" : App.lens);
     if (App.selection) renderDetail();
   } catch (err) {
-    if (current()) alert("Could not load ground truth: " + err.message);
+    if (current()) truthStatus("Could not load " + file.name + ": " + err.message, true);
   }
 }
 
@@ -214,6 +240,6 @@ function accuracyTooltip() {
     h("h4", { text: acc.correct + " of " + acc.tested + " tested values correct" }),
     dl,
     h("p", { class: "muted", style: "margin:6px 0 0",
-      text: "reference: " + (App.truthSource || "—") + " · " +
+      text: "reference: " + (App.truthSource || "\u2014") + " \u00b7 " +
         acc.counts.untested + " variable(s) it does not mention" }));
 }

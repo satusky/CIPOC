@@ -44,7 +44,7 @@ class WorkbenchCliTests(unittest.TestCase):
                             patch("cipoc_workbench.server.build_app", wraps=build_app) as build:
                         result = main(argv)
                     self.assertEqual(result, 0)
-                    expected = dict(state_path=state, ground_truth_path=None, feedback_path=None, feedback_dir=None)
+                    expected = dict(state_path=state, ground_truth_path=None, ground_truth_dir=None, feedback_path=None, feedback_dir=None)
                     if key:
                         expected[key] = destination
                     build.assert_called_once_with(**expected)
@@ -99,8 +99,26 @@ class WorkbenchCliTests(unittest.TestCase):
         with redirect_stdout(io.StringIO()), patch("uvicorn.run") as run, \
                 patch("cipoc_workbench.server.build_app", wraps=build_app) as build:
             self.assertEqual(main(["serve", "--state", str(state), "--ground-truth", str(truth)]), 0)
-        build.assert_called_once_with(state_path=state, ground_truth_path=truth, feedback_path=None, feedback_dir=None)
+        build.assert_called_once_with(state_path=state, ground_truth_path=truth, ground_truth_dir=None, feedback_path=None, feedback_dir=None)
         run.assert_called_once()
+
+    def test_ground_truth_dir_is_forwarded_without_state(self):
+        stdout = io.StringIO()
+        with redirect_stdout(stdout), patch("uvicorn.run") as run, \
+                patch("cipoc_workbench.server.build_app", wraps=build_app) as build:
+            self.assertEqual(main(["serve", "--ground-truth-dir", str(EXAMPLE_DIR)]), 0)
+        build.assert_called_once_with(state_path=None, ground_truth_path=None, ground_truth_dir=EXAMPLE_DIR, feedback_path=None, feedback_dir=None)
+        self.assertIn(f"Ground truth: {EXAMPLE_DIR} (matched by run file name)", stdout.getvalue())
+        run.assert_called_once()
+
+    def test_ground_truth_dir_must_be_a_directory(self):
+        for path in (EXAMPLE_DIR / "missing", EXAMPLE_DIR / "ground_truth.json"):
+            stderr = io.StringIO()
+            with self.subTest(path=path), redirect_stderr(stderr), patch("uvicorn.run") as run:
+                self.assertEqual(main(["serve", "--ground-truth-dir", str(path)]), 1)
+            self.assertIn("--ground-truth-dir:", stderr.getvalue())
+            self.assertIn("is not a directory", stderr.getvalue())
+            run.assert_not_called()
 
     def test_missing_configured_input_is_still_rejected(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -1,5 +1,5 @@
 "use strict";
-/* Notes view — one row per scanned note, organised by date and type, showing
+/* Notes view -- one row per scanned note, organised by date and type, showing
  * the scan results the note carries. */
 
 function noteMatches(note) {
