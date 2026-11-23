@@ -33,7 +33,7 @@
    */
   const NONE = 0, MATCH = 1, WRONG = 2, MISSED = 3, SPURIOUS = 4, TN = 5;
   const VERDICT = ["none", "match", "wrong", "missed", "spurious", "tn"];
-  const GLYPH = { none: "–", match: "✓", wrong: "✕", missed: "○", spurious: "●", tn: "·" };
+  const GLYPH = { none: "\u2013", match: "\u2713", wrong: "\u2715", missed: "\u25cb", spurious: "\u25cf", tn: "\u00b7" };
   const VERDICT_LABEL = {
     none: "not run", match: "correct", wrong: "wrong value", missed: "missed",
     spurious: "spurious", tn: "correctly blank",
@@ -60,7 +60,8 @@
         run.verdict[p * nV + v] = t == null ? (g == null ? TN : SPURIOUS) : g == null ? MISSED : g === t ? MATCH : WRONG;
       }
     }
-    run.configChanged = r > 0 && run.config_digest !== R[r - 1].config_digest;
+    // No digest (files from before schema 1.0) means an unknown configuration, never a replicate.
+    run.configChanged = r > 0 && (run.config_digest == null || run.config_digest !== R[r - 1].config_digest);
   });
 
   const scored = (r, p, v) => R[r].verdict[p * nV + v] !== NONE;
@@ -138,7 +139,7 @@
     for (let end = YEARS.length; end > 0; end -= size) bands.unshift(YEARS.slice(Math.max(0, end - size), end));
     return bands.map((years, i) => {
       const step = bands.length === 1 ? 3 : 1 + Math.round((i * 4) / (bands.length - 1));
-      const label = years.length === 1 ? String(years[0]) : `${years[0]}–${String(years[years.length - 1]).slice(2)}`;
+      const label = years.length === 1 ? String(years[0]) : `${years[0]}\u2013${String(years[years.length - 1]).slice(2)}`;
       return { key: label, label, color: `var(--ord-${step})`, has: (p) => years.includes(p.year) };
     });
   })();
@@ -159,12 +160,12 @@
     if (state.window === "last3") return all.slice(-3);
     if (state.window === "last5") return all.slice(-5);
     let first = LAST;
-    while (first > 0 && R[first - 1].config_digest === R[LAST].config_digest) first--;
+    while (first > 0 && R[LAST].config_digest != null && R[first - 1].config_digest === R[LAST].config_digest) first--;
     return all.slice(first);
   }
   function windowLabel() {
     const runs = windowRuns();
-    const span = runs.length === nR ? `all ${nR} runs` : runs.length === 1 ? `run ${runs[0] + 1} only` : `runs ${runs[0] + 1}–${runs[runs.length - 1] + 1}`;
+    const span = runs.length === nR ? `all ${nR} runs` : runs.length === 1 ? `run ${runs[0] + 1} only` : `runs ${runs[0] + 1}\u2013${runs[runs.length - 1] + 1}`;
     return state.window === "config" ? `${span}, same configuration` : span;
   }
 
@@ -248,23 +249,23 @@
     // Labels come from data files: always text nodes, never markup.
     for (const kid of kids.flat(Infinity)) if (kid != null && kid !== false) el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
   }
-  const pct = (x, digits) => (x == null ? "–" : (x * 100).toFixed(digits == null ? 1 : digits) + "%");
-  const compact = (n) => n == null ? "–" : n >= 1e6 ? (n / 1e6).toFixed(2) + "M" : n >= 1e3 ? (n / 1e3).toFixed(n >= 1e5 ? 0 : 1) + "K" : String(Math.round(n));
-  const runTitle = (r) => `Run ${r + 1} · ${R[r].label || R[r].run_id} · ${String(R[r].started_at).slice(0, 10)}`;
+  const pct = (x, digits) => (x == null ? "\u2013" : (x * 100).toFixed(digits == null ? 1 : digits) + "%");
+  const compact = (n) => n == null ? "\u2013" : n >= 1e6 ? (n / 1e6).toFixed(2) + "M" : n >= 1e3 ? (n / 1e3).toFixed(n >= 1e5 ? 0 : 1) + "K" : String(Math.round(n));
+  const runTitle = (r) => `Run ${r + 1} \u00b7 ${R[r].label || R[r].run_id} \u00b7 ${String(R[r].started_at).slice(0, 10)}`;
   const variableLabel = (v) => `${V[v].item_id} ${V[v].name}`;
 
   /* A signed change with an arrow, so direction never rides on colour alone. */
   function delta(change, text, goodWhenUp) {
-    if (change == null) return h("span", { class: "delta flat" }, "–");
+    if (change == null) return h("span", { class: "delta flat" }, "\u2013");
     const flat = Math.abs(change) < 1e-9;
     const good = goodWhenUp === false ? change < 0 : change > 0;
-    return h("span", { class: "delta " + (flat ? "flat" : good ? "up" : "down") }, (flat ? "■ " : change > 0 ? "▲ " : "▼ ") + text);
+    return h("span", { class: "delta " + (flat ? "flat" : good ? "up" : "down") }, (flat ? "\u25a0 " : change > 0 ? "\u25b2 " : "\u25bc ") + text);
   }
   const deltaPP = (now, before) => (now == null || before == null ? delta(null) : delta(now - before, Math.abs((now - before) * 100).toFixed(1) + " pp"));
 
   const tipEl = h("div", { class: "tip", hidden: true });
   const tip = {
-    /* rows: [{ color?, kind?: "line"|"box", value, label }] — value leads, label follows. */
+    /* rows: [{ color?, kind?: "line"|"box", value, label }] -- value leads, label follows. */
     show(event, title, rows) {
       tipEl.replaceChildren();
       fill(tipEl, null, [
@@ -338,7 +339,7 @@
   }
 
   /* opts: { series: [{label, color, values, lo?, hi?}], domain, compact, fmt,
-   *         title(i), extra(i) -> rows, onclick, markers } — one value per run. */
+   *         title(i), extra(i) -> rows, onclick, markers } -- one value per run. */
   function lineChart(width, height, opts) {
     const compactMode = !!opts.compact, fmt = opts.fmt || pct;
     const m = compactMode ? { l: 4, r: 6, t: 6, b: 5 } : { l: 44, r: 16, t: 14, b: 24 };
@@ -398,7 +399,7 @@
       });
       const rows = opts.series.map((series) => ({
         color: series.color, value: fmt(series.values[i]),
-        label: series.label + (series.lo && series.lo[i] != null ? `  (95% CI ${fmt(series.lo[i], 0)}–${fmt(series.hi[i], 0)})` : ""),
+        label: series.label + (series.lo && series.lo[i] != null ? `  (95% CI ${fmt(series.lo[i], 0)}\u2013${fmt(series.hi[i], 0)})` : ""),
       }));
       tip.show(event, opts.title ? opts.title(i) : runTitle(i), rows.concat(opts.extra ? opts.extra(i) : []));
     });
@@ -415,7 +416,7 @@
   function sparkline(values, width, height) {
     width = width || 84; height = height || 24;
     const real = values.filter((x) => x != null);
-    if (real.length < 2) return h("span", { class: "muted" }, "–");
+    if (real.length < 2) return h("span", { class: "muted" }, "\u2013");
     const lo = Math.min(...real), hi = Math.max(...real), n = values.length;
     const x = (i) => 3 + (i * (width - 8)) / (n - 1);
     const y = (value) => 4 + (height - 8) * (1 - (value - lo) / (hi - lo || 1));
@@ -536,7 +537,7 @@
         ? h("th", {
           class: "sortable" + (c.right ? " r" : ""), tabindex: 0, title: c.title, "aria-sort": c === col ? (dir < 0 ? "descending" : "ascending") : null,
           onclick: () => pick(c), onkeydown: (event) => { if (event.key === "Enter") pick(c); },
-        }, c.label, c === col ? (dir < 0 ? " ▼" : " ▲") : "")
+        }, c.label, c === col ? (dir < 0 ? " \u25bc" : " \u25b2") : "")
         : h("th", { title: c.title }, c.label))))),
       h("tbody", null, sorted.map((row) => h("tr", { class: "click", onclick: () => onRow(row) }, cols.map((c) => c.cell(row))))));
   }
@@ -547,20 +548,20 @@
     const sum = stability(ps, ALL_V, windowRuns());
     const tokens = R.map((_, r) => usage(r, ps));
     const now = tokens[LAST], before = LAST ? tokens[LAST - 1] : null;
-    const share = (value) => (sum.scored ? pct(value / sum.scored, 0) : "–");
+    const share = (value) => (sum.scored ? pct(value / sum.scored, 0) : "\u2013");
     return h("div", { class: "kpis" },
       tile(`${METRICS[state.metric].label}, all variables pooled`, pct(trend[LAST]), sparkline(trend),
-        [LAST ? deltaPP(trend[LAST], trend[LAST - 1]) : null, ` vs run ${LAST} · run ${nR}, ${R[LAST].label || ""}`]),
+        [LAST ? deltaPP(trend[LAST], trend[LAST - 1]) : null, ` vs run ${LAST} \u00b7 run ${nR}, ${R[LAST].label || ""}`]),
       tile("Patients scored, latest run", `${done} / ${ps.length}`, null,
-        `${ps.length - done} failed or not run · ${nV} variables`),
+        `${ps.length - done} failed or not run \u00b7 ${nV} variables`),
       tile("Run-to-run, patient-variable cells", share(sum.right + sum.wrong) + " stable", null,
         [stack(STABILITY_PARTS(sum), null, "tall"),
-          h("div", { style: "margin-top:4px" }, `${share(sum.wrong)} always wrong · ${share(sum.varies)} vary · ${windowLabel()}`)]),
+          h("div", { style: "margin-top:4px" }, `${share(sum.wrong)} always wrong \u00b7 ${share(sum.varies)} vary \u00b7 ${windowLabel()}`)]),
       tile("Tokens per patient, latest run", compact(now.mean), sparkline(tokens.map((u) => u.mean)),
         [before && now.mean != null && before.mean != null
           ? delta(now.mean - before.mean, Math.abs((now.mean / before.mean - 1) * 100).toFixed(1) + "%", false) : null,
-          ` vs run ${LAST} · ${compact(now.n ? now.input / now.n : null)} in, ${compact(now.n ? now.output / now.n : null)} out`,
-          now.missing ? ` · ${now.missing} without usage` : ""]));
+          ` vs run ${LAST} \u00b7 ${compact(now.n ? now.input / now.n : null)} in, ${compact(now.n ? now.output / now.n : null)} out`,
+          now.missing ? ` \u00b7 ${now.missing} without usage` : ""]));
   }
 
   function usageCard(ps) {
@@ -573,7 +574,7 @@
       groups.length > 1 && legend(groups, "line"),
       host((width) => lineChart(width, 200, {
         series, domain: [0, niceMax(top)], fmt: compact, label: "tokens per patient by run",
-        extra: (i) => { const u = usage(i, ps); return [{ value: R[i].model || "–", label: "model" }, { value: `${u.failed} failed, ${u.missing} no usage`, label: "" }]; },
+        extra: (i) => { const u = usage(i, ps); return [{ value: R[i].model || "\u2013", label: "model" }, { value: `${u.failed} failed, ${u.missing} no usage`, label: "" }]; },
       }), 200));
   }
 
@@ -589,11 +590,11 @@
     const maxChange = Math.max(0.1, ...perVariable.flatMap((row) => row.map((_, r) => Math.abs(shown(row, r) || 0))));
     const cell = (row, r, title) => {
       const value = shown(row, r);
-      const text = value == null ? "–" : mode === "value" ? (value * 100).toFixed(0) : (value > 0 ? "+" : value < 0 ? "−" : "") + Math.abs(value * 100).toFixed(0);
+      const text = value == null ? "\u2013" : mode === "value" ? (value * 100).toFixed(0) : (value > 0 ? "+" : value < 0 ? "\u2212" : "") + Math.abs(value * 100).toFixed(0);
       const paint = !opts.heat || value == null ? null : mode === "value" ? seqColor((value - lo) / (1 - lo)) : divColor(value, maxChange);
       const td = h("td", { class: "r", style: (paint ? `background:${paint.fill};color:${paint.ink};` : "") + (R[r].configChanged ? "border-left:2px solid var(--surface);" : "") }, text);
-      td.addEventListener("pointermove", (event) => tip.show(event, `${title} · ${runTitle(r)}`,
-        [{ value: pct(row[r]), label: METRICS[state.metric].label }].concat(r ? [{ value: row[r] == null || row[r - 1] == null ? "–" : ((row[r] - row[r - 1]) * 100).toFixed(1) + " pp", label: "vs previous run" }] : [])));
+      td.addEventListener("pointermove", (event) => tip.show(event, `${title} \u00b7 ${runTitle(r)}`,
+        [{ value: pct(row[r]), label: METRICS[state.metric].label }].concat(r ? [{ value: row[r] == null || row[r - 1] == null ? "\u2013" : ((row[r] - row[r - 1]) * 100).toFixed(1) + " pp", label: "vs previous run" }] : [])));
       td.addEventListener("pointerleave", tip.hide);
       return td;
     };
@@ -609,7 +610,7 @@
     }
     const table = h("table", { class: "num" },
       h("thead", null, h("tr", null, h("th", null, "Variable"),
-        R.map((run, r) => h("th", { class: "r", title: `${runTitle(r)}\n${run.notes || ""}` }, (run.configChanged ? "▾" : "") + (r + 1))))),
+        R.map((run, r) => h("th", { class: "r", title: `${runTitle(r)}\n${run.notes || ""}` }, (run.configChanged ? "\u25be" : "") + (r + 1))))),
       h("tbody", null, body));
     return { table, lo, maxChange };
   }
@@ -697,7 +698,7 @@
     const rows = ps.map((p) => ({ p, cell: cellStability(p, v, windowed), verdict: R[at].verdict[p * nV + v] }))
       .filter((row) => (row.verdict >= WRONG && row.verdict <= SPURIOUS) || (row.cell && (row.cell.cls === "wrong" || row.cell.cls === "varies")))
       .sort((a, b) => (order[a.cell ? a.cell.cls : "na"] - order[b.cell ? b.cell.cls : "na"]) || a.p - b.p);
-    const label = { wrong: "always wrong", varies: "varies", right: "stable", na: "–" };
+    const label = { wrong: "always wrong", varies: "varies", right: "stable", na: "\u2013" };
     const failing = h("div", { class: "card" },
       h("h2", null, "Patients to look at"),
       h("div", { class: "sub" }, `Wrong in run ${at + 1}, or unstable over ${windowLabel()}. Click a patient for every variable.`),
@@ -711,7 +712,7 @@
       rows.length > 60 && h("div", { class: "note", style: "margin-top:6px" }, `Showing 60 of ${rows.length}.`),
       h("div", { style: "margin-top:8px" }, glyphLegend()));
 
-    openDrawer(variableLabel(v), `${V[v].group_name} · ${ps.length} patients in the current filter`, [trend, h("div", { class: "two" }, confusions, failing)]);
+    openDrawer(variableLabel(v), `${V[v].group_name} \u00b7 ${ps.length} patients in the current filter`, [trend, h("div", { class: "two" }, confusions, failing)]);
   }
 
   function patientDrawer(p, focus, at) {
@@ -722,7 +723,7 @@
     const summary = h("div", { class: "two" },
       h("div", { class: "card" }, h("h2", null, "Run-to-run"), h("div", { class: "sub" }, `${sum.scored} scored variables over ${windowLabel()}.`),
         stack(STABILITY_PARTS(sum), null, "tall"),
-        h("div", { style: "margin:8px 0" }, `${sum.right} stable and correct · ${sum.wrong} always wrong · ${sum.varies} vary`), stabilityLegend()),
+        h("div", { style: "margin:8px 0" }, `${sum.right} stable and correct \u00b7 ${sum.wrong} always wrong \u00b7 ${sum.varies} vary`), stabilityLegend()),
       h("div", { class: "card" }, h("h2", null, "Tokens by run"), h("div", { class: "sub" }, "Input + output for this patient."),
         host((width) => lineChart(width, 120, { series: [{ label: "tokens", color: "var(--accent)", values: tokens }], domain: [0, niceMax(top)], fmt: compact }), 120)));
 
@@ -746,7 +747,7 @@
       }
       gridHost.replaceChildren(h("table", { class: "values" },
         h("thead", null, h("tr", null, h("th", null, "Variable"), h("th", null, "Expected"),
-          R.map((run, r) => h("th", { class: "r" + (windowed.includes(r) ? " win" : "") + (r === at ? " at" : ""), title: `${runTitle(r)}\n${run.notes || ""}` }, (run.configChanged ? "▾" : "") + (r + 1))))),
+          R.map((run, r) => h("th", { class: "r" + (windowed.includes(r) ? " win" : "") + (r === at ? " at" : ""), title: `${runTitle(r)}\n${run.notes || ""}` }, (run.configChanged ? "\u25be" : "") + (r + 1))))),
         h("tbody", null, body.length ? body : h("tr", null, h("td", { colspan: nR + 2, class: "muted" }, "Every variable was correct in every run.")))));
     };
     const toggle = h("span", null);
@@ -755,11 +756,11 @@
     drawToggle(); drawGrid();
     const grid = h("div", { class: "card" },
       h("div", { class: "toolbar", style: "margin:0 0 8px" }, h("h2", null, "Every run, every variable"), h("span", { class: "spacer" }), toggle),
-      h("div", { class: "sub" }, "A tick is a correct value; anything else shows what was extracted. Underlined runs are the variability window; ▾ marks a configuration change."
+      h("div", { class: "sub" }, "A tick is a correct value; anything else shows what was extracted. Underlined runs are the variability window; \u25be marks a configuration change."
         + (at == null ? "" : ` The shaded column head is run ${at + 1}.`)),
       gridHost, h("div", { style: "margin-top:8px" }, glyphLegend()));
     openDrawer(patient.patient_id, [patient.tissue, patient.year != null && `diagnosed ${patient.year}`,
-      patient.n_notes != null && `${patient.n_notes} notes`].filter(Boolean).join(" · "), [summary, grid]);
+      patient.n_notes != null && `${patient.n_notes} notes`].filter(Boolean).join(" \u00b7 "), [summary, grid]);
   }
 
   /* ---- Page -------------------------------------------------------------- */
@@ -798,7 +799,7 @@
     return h("div", { class: "top" },
       h("h1", null, "CIPOC test-set evaluation"),
       h("nav", null, PAGES.map(([href, text]) => h("a", { href, "aria-current": href === here ? "page" : null }, text))),
-      h("div", { class: "meta" }, `${nR} runs · ${nP} patients · ${nV} variables · bundle ${String(RAW.generated_at).slice(0, 10)}`),
+      h("div", { class: "meta" }, `${nR} runs \u00b7 ${nP} patients \u00b7 ${nV} variables \u00b7 bundle ${String(RAW.generated_at).slice(0, 10)}`),
       h("button", { class: "btn", type: "button", onclick: () => { state.theme = isDark() ? "light" : "dark"; applyTheme(); set("theme", state.theme); } }, "Light / dark"));
   }
   function mount(spec) {

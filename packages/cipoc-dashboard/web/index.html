@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CIPOC evaluation · Overview</title>
+<title>CIPOC evaluation &#183; Overview</title>
 <link rel="stylesheet" href="core.css">
 <style>
   .views { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 20px; }
@@ -36,7 +36,7 @@
   const E = window.Eval, { h, R, ALL_V } = E;
   const everyone = E.P.map((_, p) => p);
   const KEYS = ["f1", "precision", "recall", "accuracy"];
-  const view = (href, title, body) => h("a", { class: "card", href }, h("h2", null, title), h("p", null, body), h("span", { class: "btn" }, `Open ${title} →`));
+  const view = (href, title, body) => h("a", { class: "card", href }, h("h2", null, title), h("p", null, body), h("span", { class: "btn" }, `Open ${title} \u2192`));
 
   function runs() {
     const scores = R.map((_, r) => { const c = E.counts(r, ALL_V, everyone); return KEYS.map((key) => E.score(c, key)); });
@@ -51,8 +51,8 @@
       h("tbody", null, R.map((run, r) => {
         const u = E.usage(r, everyone), done = run.pred.filter(Boolean).length;
         return h("tr", null,
-          h("td", null, h("a", { href: "run.html#run=" + encodeURIComponent(run.run_id) }, `${r + 1} · ${run.run_id}`)), h("td", null, String(run.started_at).slice(0, 10)), h("td", null, run.label || ""),
-          h("td", null, run.model || ""), h("td", { class: "mono" }, (run.configChanged ? "▾ " : "") + (run.config_digest || "")),
+          h("td", null, h("a", { href: "run.html#run=" + encodeURIComponent(run.run_id) }, `${r + 1} \u00b7 ${run.run_id}`)), h("td", null, String(run.started_at).slice(0, 10)), h("td", null, run.label || ""),
+          h("td", null, run.model || ""), h("td", { class: "mono" }, (run.configChanged ? "\u25be " : "") + (run.config_digest || "")),
           h("td", { class: "r" }, `${done} / ${E.nP}`), scores[r].map(heat),
           h("td", { class: "r" }, E.compact(u.mean)), h("td", { class: "muted ellip", style: "max-width:320px", title: run.notes || "" }, run.notes || ""));
       }).reverse()));
@@ -71,7 +71,7 @@
       h("div", { class: "views" },
         view("run.html", "Single run", "One run: scores, errors and tokens, by variable and by patient."),
         view("trends.html", "Trends", "Each variable's score across runs, one chart per variable."),
-        view("matrix.html", "Matrix", "Variable × run heatmap. Variability: patient × variable grid."),
+        view("matrix.html", "Matrix", "Variable \u00d7 run heatmap. Variability: patient \u00d7 variable grid."),
         view("triage.html", "Triage", "Variables ranked by errors, with change from a baseline run. Variability: accuracy against consistency.")),
       h("div", { class: "section-title" }, "Runs"),
       h("div", { class: "card scroll-x", style: "margin-bottom:20px" }, runs()),
@@ -92,16 +92,16 @@
         h("div", { class: "card" },
           h("h2", null, "Metrics"),
           h("table", null, h("tbody", null,
-            formula("Precision", "correct ÷ (correct + wrong + spurious)"),
-            formula("Recall", "correct ÷ (correct + wrong + missed)"),
-            formula("F1", "2 × correct ÷ (2 × correct + 2 × wrong + missed + spurious)"),
-            formula("Accuracy", "(correct + correctly blank) ÷ all cells"))),
+            formula("Precision", "correct \u00f7 (correct + wrong + spurious)"),
+            formula("Recall", "correct \u00f7 (correct + wrong + missed)"),
+            formula("F1", "2 \u00d7 correct \u00f7 (2 \u00d7 correct + 2 \u00d7 wrong + missed + spurious)"),
+            formula("Accuracy", "(correct + correctly blank) \u00f7 all cells"))),
           h("p", null, "Pooled figures add the counts over every variable before dividing (micro-average)."),
-          h("p", null, "Precision, recall and F1 show – when no patient in the selection has a ground-truth value for the variable. Spurious values there still count as errors and lower accuracy.")),
+          h("p", null, "Precision, recall and F1 show \u2013 when no patient in the selection has a ground-truth value for the variable. Spurious values there still count as errors and lower accuracy.")),
         h("div", { class: "card" },
           h("h2", null, "Other definitions"),
           h("dl", null,
-            term("Run-to-run", "Over the variability window, each patient × variable cell is one of:",
+            term("Run-to-run", "Over the variability window, each patient \u00d7 variable cell is one of:",
               h("div", { class: "legend" }, stable.map((part, i) => h("span", null, h("i", { class: "key" + (i === 2 ? " dot" : ""), style: `background:${part.color}` }), part.label))),
               "Cells that are blank in the ground truth and in every run are left out."),
             term("Variability window", "By default, the latest runs that share the newest configuration digest."),

@@ -5,7 +5,7 @@ over time, stratified by tissue or diagnosis year, token usage per patient, and
 run-to-run variability.
 
 It reads run artifacts and ground-truth files straight from their folders. Nothing
-here imports `cipoc`, and the Python side is stdlib only (Python 3.11+).
+here imports `cipoc`, and the Python side is stdlib only.
 
 This is a prototype with three candidate layouts over one shared core. Pick one and
 delete the others.
@@ -22,13 +22,15 @@ extracted values, so treat them as PHI.
 
 ## Run it on your data
 
-Set your folders once in `dashboard.toml`, next to `dashboard.py` (gitignored).
+Set your folders once in `dashboard.json`, next to `dashboard.py` (gitignored).
 Relative paths are relative to that file.
 
-```toml
-sweeps = "/path/to/sweeps"
-truth = "/path/to/ground_truth"
-names = "/path/to/CIPOC/config/variable_groups.json"
+```json
+{
+  "sweeps": "/path/to/sweeps",
+  "truth": "/path/to/ground_truth",
+  "names": "/path/to/CIPOC/config/variable_groups.json"
+}
 ```
 
 Then run `python dashboard.py serve`. `--sweeps`, `--truth` and `--names` override
@@ -44,7 +46,7 @@ until it changes.
 ```
 sweeps/
   2026-11-13-date-prompt/     # one folder per sweep; the name is its run ID
-    sweep.json                # optional: {"label": "date prompt v2", "notes": "..."}
+    sweep.json                # optional: {"label": "...", "notes": "...", "started_at": "2026-11-13"}
     P0001.json                # one artifact per patient, named like its ground-truth file
     P0002.json
 ground_truth/
@@ -52,10 +54,16 @@ ground_truth/
 ```
 
 - **Artifacts** are `OrchestratorRunResult` JSON, or the failure artifact of a case
-  that raised, which counts as failed. Sweeps are ordered by their earliest
-  `started_at`. Model, CIPOC version and config digest come from the config
-  fingerprint. Sweeps with the same digest are replicates: the default variability
-  window is the trailing block that shares the latest one.
+  that raised, which counts as failed. Sweeps are ordered by `started_at` in
+  `sweep.json`, else by their earliest artifact. Model, CIPOC version and config
+  digest come from the config fingerprint. Sweeps with the same digest are
+  replicates: the default variability window is the trailing block that shares
+  the latest one.
+- **Older files** from before schema 1.0, which hold the orchestrator's final state
+  at the top level, are read as they are. They record no date, so set `started_at`
+  in the sweep's `sweep.json`. They also have no duration or config fingerprint:
+  the model comes from their model calls, and each such sweep counts as its own
+  configuration.
 - **Ground truth** defines the test set: one patient per file, and every item the
   files mention is a variable. `null` or `""` means the variable should stay
   uncoded; an item missing from a file is untested for that patient. Keys that

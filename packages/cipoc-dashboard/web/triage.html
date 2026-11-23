@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CIPOC evaluation · Triage</title>
+<title>CIPOC evaluation &#183; Triage</title>
 <link rel="stylesheet" href="core.css">
 <style>
   .list td.heat { border-right: 2px solid var(--surface); border-bottom: 2px solid var(--surface); min-width: 44px; }
@@ -39,11 +39,11 @@
     const [lo] = E.domainOf(rows.flatMap((row) => row.strata.map((x) => x.value)));
     const heat = (row, i) => {
       const data = row.strata[i], paint = data.value == null ? null : E.seqColor((data.value - lo) / (1 - lo));
-      const td = h("td", { class: "r heat", style: paint ? `background:${paint.fill};color:${paint.ink}` : "" }, data.value == null ? "–" : (data.value * 100).toFixed(0));
+      const td = h("td", { class: "r heat", style: paint ? `background:${paint.fill};color:${paint.ink}` : "" }, data.value == null ? "\u2013" : (data.value * 100).toFixed(0));
       td.addEventListener("pointermove", (event) => {
         const band = metric.ci ? E.wilson(...metric.parts(data.c)) : null;
-        E.tip.show(event, `${E.variableLabel(row.v)} · ${groups[i].label}`, [
-          { value: E.pct(data.value), label: metric.label + (band ? `  (95% CI ${E.pct(band[0], 0)}–${E.pct(band[1], 0)})` : "") },
+        E.tip.show(event, `${E.variableLabel(row.v)} \u00b7 ${groups[i].label}`, [
+          { value: E.pct(data.value), label: metric.label + (band ? `  (95% CI ${E.pct(band[0], 0)}\u2013${E.pct(band[1], 0)})` : "") },
           { value: data.c.wrong + data.c.missed + data.c.spurious, label: `errors in ${data.c.n} patients` }]);
       });
       td.addEventListener("pointerleave", E.tip.hide);
@@ -60,7 +60,7 @@
         cell: (row) => h("td", { class: "r" }, h("div", { class: "cell-bar" }, E.pct(row.now), h("div", { class: "track" }, h("i", { style: `width:${(row.now || 0) * 100}%` })))),
       },
       { key: "change", label: `vs run ${base + 1}`, right: true, num: true, value: (row) => row.change, cell: (row) => h("td", { class: "r" }, E.deltaPP(row.now, row.trend[base])) },
-      { key: "trend", label: `Runs 1–${E.nR}`, cell: (row) => h("td", null, E.sparkline(row.trend)) },
+      { key: "trend", label: `Runs 1\u2013${E.nR}`, cell: (row) => h("td", null, E.sparkline(row.trend)) },
       { key: "errors", label: `Errors, run ${E.nR}`, num: true, value: (row) => row.errors, cell: (row) => h("td", null, bars(row.errors, row.errors ? E.stack(E.ERROR_PARTS(row.c), maxErrors) : null)) },
       {
         key: "unstable", label: "Varies run to run", num: true, title: `Share of scored patients whose value changes over ${E.windowLabel()}`, value: unstable,
@@ -74,7 +74,7 @@
     return [
       E.kpiRow(ps),
       h("div", { class: "toolbar" },
-        E.field("Compare latest run to", E.select(R.slice(0, LAST).map((run, r) => [String(r), `Run ${r + 1} · ${run.label || run.run_id}`]), String(base), (x) => redraw("base", Number(x)), "Baseline run")),
+        E.field("Compare latest run to", E.select(R.slice(0, LAST).map((run, r) => [String(r), `Run ${r + 1} \u00b7 ${run.label || run.run_id}`]), String(base), (x) => redraw("base", Number(x)), "Baseline run")),
         h("span", { class: "spacer" }), E.errorLegend(), E.stabilityLegend()),
       h("div", { class: "note", style: "margin-bottom:8px" }, `Run-to-run covers ${E.windowLabel()}. Click a row for the variable's detail.`
         + (stratified ? ` ${E.state.stratify === "tissue" ? "Tissue" : "Year"} columns are ${metric.label} (%) in run ${E.nR}.` : "")),
@@ -95,7 +95,7 @@
     for (const tick of E.ticksFor(x0, 1)) {
       svg.append(s("line", { class: "gridline", x1: x(tick), x2: x(tick), y1: m.t, y2: m.t + ih }), s("text", { x: x(tick), y: m.t + ih + 18, "text-anchor": "middle" }, E.pct(tick, 0)));
     }
-    svg.append(s("text", { x: 0, y: 12 }, "↑ Correct"), s("text", { x: width - m.r, y: height - 6, "text-anchor": "end" }, "Same value every run →"));
+    svg.append(s("text", { x: 0, y: 12 }, "\u2191 Correct"), s("text", { x: width - m.r, y: height - 6, "text-anchor": "end" }, "Same value every run \u2192"));
 
     const points = rows.map((row) => ({ row, cx: x(row.sum.consistency), cy: y(row.sum.accuracy) }));
     for (const pt of points) svg.append(s("circle", { cx: pt.cx, cy: pt.cy, r: 5, fill: colorOf(pt.row), stroke: "var(--surface)", "stroke-width": 2 }));
@@ -139,7 +139,7 @@
     const color = new Map();
     for (const g of groups) for (const p of g.patients) color.set(p, g.color);
     const rows = (byPatient
-      ? ps.map((p) => ({ id: p, title: `${P[p].patient_id} · ${P[p].tissue} ${P[p].year ?? ""}`, sum: E.stability([p], ALL_V, runs) }))
+      ? ps.map((p) => ({ id: p, title: `${P[p].patient_id} \u00b7 ${P[p].tissue} ${P[p].year ?? ""}`, sum: E.stability([p], ALL_V, runs) }))
       : ALL_V.map((v) => ({ id: v, title: E.variableLabel(v), sum: E.stability(ps, [v], runs) }))).filter((row) => row.sum.scored);
     const open = (row) => (byPatient ? E.patientDrawer(row.id) : E.variableDrawer(row.id));
     const tokens = (row) => { const u = R[LAST].usage[row.id]; return u && u[0] != null && u[1] != null ? u[0] + u[1] : null; };
@@ -155,8 +155,8 @@
       { key: "group", label: "Group", value: (row) => V[row.id].group_name, cell: (row) => h("td", { class: "muted ellip", style: "max-width:150px" }, V[row.id].group_name) },
     ]).concat([
       { key: "mix", label: "Cells over the window", cell: (row) => h("td", { style: "min-width:200px" }, E.stack(E.STABILITY_PARTS(row.sum))) },
-      number("unstable", "Vary", (row) => row.sum.varies / row.sum.scored, (row) => `${row.sum.varies} · ${E.pct(row.sum.varies / row.sum.scored, 0)}`),
-      number("wrong", "Always wrong", (row) => row.sum.wrong / row.sum.scored, (row) => `${row.sum.wrong} · ${E.pct(row.sum.wrong / row.sum.scored, 0)}`),
+      number("unstable", "Vary", (row) => row.sum.varies / row.sum.scored, (row) => `${row.sum.varies} \u00b7 ${E.pct(row.sum.varies / row.sum.scored, 0)}`),
+      number("wrong", "Always wrong", (row) => row.sum.wrong / row.sum.scored, (row) => `${row.sum.wrong} \u00b7 ${E.pct(row.sum.wrong / row.sum.scored, 0)}`),
       number("scored", "Scored", (row) => row.sum.scored, (row) => row.sum.scored, byPatient ? "Variables that were ever at stake for this patient" : "Patients this variable was ever at stake for"),
       number("accuracy", "Correct", (row) => row.sum.accuracy, (row) => E.pct(row.sum.accuracy, 0), "Share of scored cells that were correct, across every run in the window"),
     ], byPatient ? [number("tokens", `Tokens, run ${E.nR}`, tokens, (row) => E.compact(tokens(row)))] : []);

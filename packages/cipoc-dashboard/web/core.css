@@ -1,4 +1,4 @@
-/* CIPOC evaluation dashboard — one stylesheet for every page, no external assets.
+/* CIPOC evaluation dashboard -- one stylesheet for every page, no external assets.
    Every colour is a token; core.js stamps data-theme on <html> before first paint. */
 
 :root {

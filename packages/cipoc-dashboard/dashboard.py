@@ -5,7 +5,7 @@
 
 ``serve`` rebuilds ``data.js`` whenever a page asks for it, so a refresh shows new
 artifacts. Each file is parsed once and re-read only when its size or mtime
-changes. Paths come from flags, then ``dashboard.toml`` next to this file, then
+changes. Paths come from flags, then ``dashboard.json`` next to this file, then
 ``data/sweeps``, ``data/ground_truth`` and the repository's variable groups.
 
 Stdlib only. Nothing here imports ``cipoc``.
@@ -18,7 +18,6 @@ import hashlib
 import json
 import sys
 import threading
-import tomllib
 from datetime import datetime, timezone
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -27,7 +26,7 @@ from urllib.parse import urlsplit
 
 HERE = Path(__file__).resolve().parent
 WEB_DIR = HERE / "web"
-CONFIG_PATH = HERE / "dashboard.toml"
+CONFIG_PATH = HERE / "dashboard.json"
 DEFAULT_PATHS = {
     "sweeps": HERE / "data" / "sweeps",
     "truth": HERE / "data" / "ground_truth",
@@ -105,21 +104,52 @@ def config_digest(fingerprint: dict) -> str:
     return hashlib.sha256(text.encode()).hexdigest()[:6]
 
 
+def _from_state_dump(state: dict) -> dict:
+    """Read a file from before versioned artifacts (schema 1.0) as a completed run.
+
+    Those files are the orchestrator's final state at top level, with usage only
+    on each model call and no run block, so they carry no date, duration or
+    config fingerprint. The sweep's ``sweep.json`` supplies the date.
+    """
+    calls = [call for calls in (state.get("llm_exchanges") or {}).values() for call in calls]
+    usage = [call.get("usage") or {} for call in calls]
+    reported = [u for u in usage if u.get("input_tokens") is not None]
+    return {
+        "run": {"status": "completed"},
+        "case": {"variable_results": state["variable_results"], "case_facts": state.get("case_facts")},
+        "corpus": {
+            "note_corpus": state.get("note_corpus"),
+            "note_corpus_descriptors": state.get("note_corpus_descriptors"),
+        },
+        "observability": {"llm_usage_summary": {
+            "input_tokens": sum(u["input_tokens"] for u in reported),
+            "output_tokens": sum(u.get("output_tokens") or 0 for u in reported),
+            "model_invocations": len(calls),
+            "usage_reported_invocations": len(reported),
+            "by_model": {call["model"]: {} for call in calls if call.get("model")},
+        }},
+    }
+
+
 def summarize_artifact(artifact: dict) -> dict:
     """Keep what the dashboard needs from one ``OrchestratorRunResult`` or failure.
 
     Artifacts hold every note, so the server caches this summary, not the file.
     """
+    if not isinstance(artifact, dict) or ("run" not in artifact and "variable_results" not in artifact):
+        raise ValueError("not a CIPOC run artifact")
+    if "run" not in artifact:
+        artifact = _from_state_dump(artifact)
     run = artifact["run"]
     if run["status"] not in ("completed", "failed"):
         raise ValueError(f"unexpected run status {run['status']!r}")
     fingerprint = run.get("config_fingerprint") or {}
+    usage = (artifact.get("observability") or {}).get("llm_usage_summary") or {}
     models = {
         settings["model"]
         for settings in (fingerprint.get("agent_llm_config") or {}).values()
         if isinstance(settings, dict) and settings.get("model")
-    }
-    usage = (artifact.get("observability") or {}).get("llm_usage_summary") or {}
+    } or set(usage.get("by_model") or {})
     # A summary with no usage-reporting invocation carries zero-filled counts.
     reported = bool(usage.get("usage_reported_invocations"))
     case = artifact.get("case") or {}
@@ -201,7 +231,8 @@ def build_bundle(
     """Flatten ground truth and sweeps into the positional matrices the pages read.
 
     ``truth`` is ``{patient_id: {item_id: value}}``. ``sweeps`` is a list of
-    ``(sweep_id, sweep.json contents, {patient_id: artifact summary})``.
+    ``(sweep_id, sweep.json contents, {patient_id: artifact summary})``. A sweep's
+    date is ``started_at`` in its sweep.json, else its earliest artifact's.
 
     Patients are the ground-truth files; variables are every item they mention.
     An item missing from a patient's file is untested for that patient. The
@@ -228,10 +259,15 @@ def build_bundle(
     p_index = {patient_id: p for p, patient_id in enumerate(patient_ids)}
 
     def started(sweep):
+        if sweep[1].get("started_at"):
+            return str(sweep[1]["started_at"])
         times = [s["started_at"] for s in sweep[2].values() if s["started_at"]]
         return min(times) if times else ""
 
     sweeps = sorted((s for s in sweeps if s[2]), key=lambda s: (started(s), s[0]))
+    for sweep_id, meta, summaries in sweeps:
+        if not started((sweep_id, meta, summaries)):
+            print(f"Sweep {sweep_id} has no date, so it sorts first. Set started_at in its {SWEEP_META}.", file=sys.stderr)
 
     patients = []
     for patient_id in patient_ids:
@@ -350,11 +386,8 @@ class Bundler:
 
 
 def resolve_paths(args: argparse.Namespace) -> tuple[Path, Path, Path | None]:
-    """Flags, then ``dashboard.toml``, then the defaults. Exits on a missing folder."""
-    config = {}
-    if CONFIG_PATH.is_file():
-        with CONFIG_PATH.open("rb") as handle:
-            config = tomllib.load(handle)
+    """Flags, then ``dashboard.json``, then the defaults. Exits on a missing folder."""
+    config = json.loads(CONFIG_PATH.read_text()) if CONFIG_PATH.is_file() else {}
     paths = {}
     for key in ("sweeps", "truth", "names"):
         if getattr(args, key) is not None:
@@ -387,6 +420,11 @@ def make_handler(bundler: Bundler):
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
             self.wfile.write(body)
+
+        def guess_type(self, path) -> str:
+            # Say so explicitly, so no browser falls back to a local code page.
+            kind = super().guess_type(path)
+            return f"{kind}; charset=utf-8" if kind.startswith("text/") or kind.endswith("javascript") else kind
 
         def log_message(self, format, *args) -> None:
             pass

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CIPOC evaluation · Trends</title>
+<title>CIPOC evaluation &#183; Trends</title>
 <link rel="stylesheet" href="core.css">
 <style>
   .panels { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
@@ -21,7 +21,7 @@
 <body>
 <script>
 "use strict";
-/* Trends — small multiples. One trend panel per variable on a shared y-axis,
+/* Trends -- small multiples. One trend panel per variable on a shared y-axis,
  * so a regression is a line that bends. Variability is a ranked list of
  * composition bars. */
 (function () {
@@ -48,7 +48,7 @@
     },
       h("div", { class: "name", title: E.variableLabel(row.v) }, h("span", { class: "muted num" }, V[row.v].item_id + " "), V[row.v].name),
       h("div", { class: "now" }, h("b", null, E.pct(row.overall[LAST])), LAST ? E.deltaPP(row.overall[LAST], row.overall[LAST - 1]) : null),
-      E.host((width) => E.lineChart(width, tall, { series: row.series, domain, compact: true, title: (i) => `${E.variableLabel(row.v)} · ${E.runTitle(i)}` }), tall));
+      E.host((width) => E.lineChart(width, tall, { series: row.series, domain, compact: true, title: (i) => `${E.variableLabel(row.v)} \u00b7 ${E.runTitle(i)}` }), tall));
 
     let body;
     if (local.sort === "group") {

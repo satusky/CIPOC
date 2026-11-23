@@ -3,4 +3,4 @@ data/
 web/data.js
 __pycache__/
 # Local paths to your sweeps and ground truth.
-dashboard.toml
+dashboard.json

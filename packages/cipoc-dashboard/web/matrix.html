@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CIPOC evaluation · Matrix</title>
+<title>CIPOC evaluation &#183; Matrix</title>
 <link rel="stylesheet" href="core.css">
 <style>
   .heat td, .heat th { padding: 3px 6px; font-size: 12px; }
@@ -47,7 +47,7 @@
     if (local.mode === "value" || E.state.stratify !== "none") {
       return h("span", { class: "scale" }, E.pct(lo, 0), [0, 2, 4, 6, 8, 10, 12].map((i) => h("i", { style: `background:${E.seqColor(i / 12).fill}` })), "100%");
     }
-    return h("span", { class: "scale" }, `−${(maxChange * 100).toFixed(0)} pp`,
+    return h("span", { class: "scale" }, `\u2212${(maxChange * 100).toFixed(0)} pp`,
       [-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1].map((t) => h("i", { style: `background:${E.divColor(t, 1).fill}` })), `+${(maxChange * 100).toFixed(0)} pp`);
   }
 
@@ -59,11 +59,11 @@
     const [lo] = E.domainOf(perVariable.flat().map((cell) => cell.value));
     const cell = (data, column, title) => {
       const paint = data.value == null ? null : E.seqColor((data.value - lo) / (1 - lo));
-      const td = h("td", { class: "r", style: paint ? `background:${paint.fill};color:${paint.ink}` : "" }, data.value == null ? "–" : (data.value * 100).toFixed(0));
+      const td = h("td", { class: "r", style: paint ? `background:${paint.fill};color:${paint.ink}` : "" }, data.value == null ? "\u2013" : (data.value * 100).toFixed(0));
       td.addEventListener("pointermove", (event) => {
         const metric = E.METRICS[E.state.metric], band = metric.ci ? E.wilson(...metric.parts(data.c)) : null;
-        E.tip.show(event, `${title} · ${column.label}`, [
-          { value: E.pct(data.value), label: metric.label + (band ? `  (95% CI ${E.pct(band[0], 0)}–${E.pct(band[1], 0)})` : "") },
+        E.tip.show(event, `${title} \u00b7 ${column.label}`, [
+          { value: E.pct(data.value), label: metric.label + (band ? `  (95% CI ${E.pct(band[0], 0)}\u2013${E.pct(band[1], 0)})` : "") },
           { value: data.c.wrong + data.c.missed + data.c.spurious, label: `errors in ${data.c.n} cells` }]);
       });
       td.addEventListener("pointerleave", E.tip.hide);
@@ -96,12 +96,12 @@
       E.kpiRow(ps),
       h("div", { class: "toolbar" },
         stratified
-          ? E.field("Run", E.select(R.map((run, r) => [String(r), `${r + 1} · ${run.label || run.run_id}`]), String(local.run), (x) => redraw("run", Number(x)), "Run"))
+          ? E.field("Run", E.select(R.map((run, r) => [String(r), `${r + 1} \u00b7 ${run.label || run.run_id}`]), String(local.run), (x) => redraw("run", Number(x)), "Run"))
           : E.field("Cells show", E.seg([["value", "Value"], ["prev", "Change vs previous run"], ["first", "Change vs run 1"]], local.mode, (x) => redraw("mode", x), "Cells show")),
         h("span", { class: "spacer" }), scale(matrix.lo, matrix.maxChange)),
       h("div", { class: "note", style: "margin-bottom:8px" }, stratified
         ? `${E.METRICS[E.state.metric].label} (%), ${E.runTitle(local.run)}. Click a row for the variable's detail.`
-        : `${E.METRICS[E.state.metric].label} (%). ▾ marks a configuration change. Click a row for the variable's detail.`),
+        : `${E.METRICS[E.state.metric].label} (%). \u25be marks a configuration change. Click a row for the variable's detail.`),
       h("div", { class: "card scroll-x" }, matrix.table),
       h("div", { style: "margin-top:16px" }, E.usageCard(ps)),
     ];
@@ -121,19 +121,19 @@
     const grid = h("div", { class: "pv", style: `grid-template-columns:max-content ${ALL_V.map((v) => (gap(v) ? "20px" : "14px")).join(" ")} max-content` });
     grid.append(h("span"), ...ALL_V.map((v) => h("span", { class: "head" + gap(v), "data-v": v, title: E.variableLabel(v) }, V[v].item_id)), h("span"));
     for (const row of rows) {
-      grid.append(h("span", { class: "who", "data-p": row.p }, `${P[row.p].patient_id} · ${P[row.p].tissue} ${P[row.p].year ?? ""}`),
+      grid.append(h("span", { class: "who", "data-p": row.p }, `${P[row.p].patient_id} \u00b7 ${P[row.p].tissue} ${P[row.p].year ?? ""}`),
         ...row.cells.map((cell, v) => h("b", {
           class: (cell ? cell.cls : "na") + gap(v), "data-p": row.p, "data-v": v,
           style: cell && cell.cls === "varies" ? `background:color-mix(in oklab, var(--varies-lo), var(--varies-hi) ${Math.round(cell.unrest * 100)}%)` : null,
         })),
-        h("span", { class: "tally" }, `${row.tally.varies} vary · ${row.tally.wrong} wrong`));
+        h("span", { class: "tally" }, `${row.tally.varies} vary \u00b7 ${row.tally.wrong} wrong`));
     }
     const label = { right: "same every run, correct", wrong: "same every run, wrong", varies: "varies between runs" };
     grid.addEventListener("pointermove", (event) => {
       const el = event.target;
       if (el.tagName !== "B" || el.classList.contains("na")) return E.tip.hide();
       const p = Number(el.dataset.p), v = Number(el.dataset.v), cell = E.cellStability(p, v, runs);
-      E.tip.show(event, `${P[p].patient_id} · ${E.variableLabel(v)}`, [
+      E.tip.show(event, `${P[p].patient_id} \u00b7 ${E.variableLabel(v)}`, [
         { value: label[cell.cls], label: "" },
         cell.cls === "varies" && { value: cell.changes, label: `change${cell.changes > 1 ? "s" : ""} in ${cell.k} runs` },
         cell.cls === "varies" && { value: cell.settled, label: cell.settled > 1 ? "latest runs agree" : "changed in the latest run" },

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CIPOC evaluation · Run</title>
+<title>CIPOC evaluation &#183; Run</title>
 <link rel="stylesheet" href="core.css">
 <style>
   .runhead h2 { font-size: 16px; }
@@ -29,7 +29,7 @@
   };
   const errorsOf = (c) => c.wrong + c.missed + c.spurious;
   const duration = (x) => {
-    if (x == null) return "–";
+    if (x == null) return "\u2013";
     const total = Math.round(x);
     return total < 90 ? `${total}s` : `${Math.floor(total / 60)}m ${String(total % 60).padStart(2, "0")}s`;
   };
@@ -40,7 +40,7 @@
     const twins = R.map((other, i) => (i !== r && other.config_digest === run.config_digest ? i + 1 : 0)).filter(Boolean);
     const fact = (label, value) => value != null && value !== "" && h("span", null, h("span", { class: "muted" }, label + " "), value);
     return h("div", { class: "card runhead", style: "margin-bottom:12px" },
-      h("h2", null, `Run ${r + 1} of ${E.nR}` + (run.label ? ` · ${run.label}` : "")),
+      h("h2", null, `Run ${r + 1} of ${E.nR}` + (run.label ? ` \u00b7 ${run.label}` : "")),
       h("div", { class: "facts" },
         fact("ID", run.run_id), fact("Started", String(run.started_at).slice(0, 16).replace("T", " ")), fact("Model", run.model), fact("CIPOC", run.cipoc_version),
         fact("Config", run.config_digest && h("span", { class: "mono" }, run.config_digest)),
@@ -53,17 +53,17 @@
     const before = r ? E.score(E.counts(r - 1, ALL_V, ps)) : null;
     const done = ps.filter((p) => R[r].pred[p]).length, failed = ps.filter((p) => !R[r].pred[p] && R[r].usage[p]);
     const absent = ps.length - done - failed.length, u = E.usage(r, ps), errors = errorsOf(c);
-    const others = Object.keys(E.METRICS).filter((key) => key !== E.state.metric).map((key) => `${E.METRICS[key].label} ${E.pct(E.score(c, key))}`).join(" · ");
+    const others = Object.keys(E.METRICS).filter((key) => key !== E.state.metric).map((key) => `${E.METRICS[key].label} ${E.pct(E.score(c, key))}`).join(" \u00b7 ");
     return h("div", { class: "kpis" },
-      E.tile(`${metric.label}, all variables pooled`, E.pct(now), null, [r ? [E.deltaPP(now, before), ` vs run ${r} · `] : null, others]),
+      E.tile(`${metric.label}, all variables pooled`, E.pct(now), null, [r ? [E.deltaPP(now, before), ` vs run ${r} \u00b7 `] : null, others]),
       E.tile("Patients scored", `${done} / ${ps.length}`, null, [
         failed.length ? `Failed: ${failed.slice(0, 6).map((p) => P[p].patient_id).join(", ")}${failed.length > 6 ? ` and ${failed.length - 6} more` : ""}` : "None failed",
-        absent ? ` · ${absent} not run` : ""]),
+        absent ? ` \u00b7 ${absent} not run` : ""]),
       E.tile("Errors", errors.toLocaleString(), null, [errors ? E.stack(E.ERROR_PARTS(c), null, "tall") : null,
-        h("div", { style: "margin-top:4px" }, `${c.wrong} wrong value · ${c.missed} missed · ${c.spurious} spurious · ${c.n.toLocaleString()} cells scored`)]),
+        h("div", { style: "margin-top:4px" }, `${c.wrong} wrong value \u00b7 ${c.missed} missed \u00b7 ${c.spurious} spurious \u00b7 ${c.n.toLocaleString()} cells scored`)]),
       E.tile("Tokens per patient", E.compact(u.mean), null,
-        [`${E.compact(u.n ? u.input / u.n : null)} in, ${E.compact(u.n ? u.output / u.n : null)} out · ${duration(u.n ? u.seconds / u.n : null)} per patient`,
-          u.missing ? ` · ${u.missing} without usage` : ""]));
+        [`${E.compact(u.n ? u.input / u.n : null)} in, ${E.compact(u.n ? u.output / u.n : null)} out \u00b7 ${duration(u.n ? u.seconds / u.n : null)} per patient`,
+          u.missing ? ` \u00b7 ${u.missing} without usage` : ""]));
   }
 
   /* The run split by tissue or by year band, all variables pooled. */
@@ -78,7 +78,7 @@
       td.addEventListener("pointermove", (event) => {
         const band = metric.ci ? E.wilson(...metric.parts(row.c)) : null;
         E.tip.show(event, row.g.label, [
-          { value: E.pct(row.value), label: metric.label + (band ? `  (95% CI ${E.pct(band[0], 0)}–${E.pct(band[1], 0)})` : "") },
+          { value: E.pct(row.value), label: metric.label + (band ? `  (95% CI ${E.pct(band[0], 0)}\u2013${E.pct(band[1], 0)})` : "") },
           ...E.ERROR_PARTS(row.c).map((part) => ({ color: part.color, kind: "box", value: part.value, label: part.label })),
           { value: row.c.n, label: "cells scored" }]);
       });
@@ -93,7 +93,7 @@
         h("tbody", null, rows.map((row) => h("tr", null,
           h("td", null, h("i", { class: "key", style: `background:${row.g.color};margin-right:6px` }), row.g.label),
           h("td", { class: "r" }, `${row.done} / ${row.g.patients.length}`), scored(row),
-          h("td", { class: "r" }, row.done ? (errorsOf(row.c) / row.done).toFixed(1) : "–"), h("td", { class: "r" }, E.compact(row.u.mean)))))));
+          h("td", { class: "r" }, row.done ? (errorsOf(row.c) / row.done).toFixed(1) : "\u2013"), h("td", { class: "r" }, E.compact(row.u.mean)))))));
   }
 
   function variables(r, ps) {
@@ -140,10 +140,10 @@
         key: "status", label: "Status", value: (row) => row.status,
         cell: (row) => h("td", { class: row.status === "completed" ? "muted" : "v-wrong" }, row.status === "completed" ? null : h("span", { class: "glyph" }, E.GLYPH.wrong), row.status),
       },
-      { key: "value", label: metric.label, right: true, num: true, title: `${metric.label} over this patient's variables`, value: (row) => row.value, cell: (row) => h("td", { class: "r" }, row.c ? scoreCell(row.value) : "–") },
+      { key: "value", label: metric.label, right: true, num: true, title: `${metric.label} over this patient's variables`, value: (row) => row.value, cell: (row) => h("td", { class: "r" }, row.c ? scoreCell(row.value) : "\u2013") },
       { key: "errors", label: "Errors", num: true, value: (row) => row.errors, cell: (row) => h("td", null, row.c ? E.bars(row.errors, row.errors ? E.stack(E.ERROR_PARTS(row.c), maxErrors) : null) : null) },
-      number("tokens", "Tokens", (row) => row.tokens, (row) => E.compact(row.tokens), "Input + output. – means usage was not reported"),
-      number("calls", "LLM calls", (row) => row.calls, (row) => (row.calls == null ? "–" : row.calls)),
+      number("tokens", "Tokens", (row) => row.tokens, (row) => E.compact(row.tokens), "Input + output. \u2013 means usage was not reported"),
+      number("calls", "LLM calls", (row) => row.calls, (row) => (row.calls == null ? "\u2013" : row.calls)),
       number("seconds", "Duration", (row) => row.seconds, (row) => duration(row.seconds)),
     ];
     return [
