@@ -1,10 +1,10 @@
 "use strict";
-/* Ground truth — classify each recorded result against a `{item_id: value}`
+/* Ground truth -- classify each recorded result against a `{item_id: value}`
  * reference file, and roll those verdicts up to the group.
  *
  * Everything here is pure: it reads `App.truth` and the already-indexed
  * results, and derives nothing that is not implied by the two. A ground-truth
- * file is always allowed to be partial — an item it does not mention is
+ * file is always allowed to be partial -- an item it does not mention is
  * `untested` and is excluded from every accuracy count, because the alternative
  * (scoring an unlisted item as wrong) makes a half-built reference file look
  * like a catastrophic run.
@@ -29,20 +29,20 @@ const VERDICT_LABEL = {
  * asserted" rather than as any kind of result.
  *
  * Shape rather than colour alone is load-bearing, not decorative: `match` and
- * `mismatch` — correct and wrong, the pair this whole lens exists to separate —
- * are green and red, ΔE 2.2 under deuteranopia, and both carry a value so the
+ * `mismatch` -- correct and wrong, the pair this whole lens exists to separate --
+ * are green and red, dE 2.2 under deuteranopia, and both carry a value so the
  * hollow rule cannot tell them apart either. These glyphs are the channel that
  * survives. Do not reduce the accuracy indicator to a bare dot. */
 const VERDICT_MARK = {
-  match: "\u2713",     // ✓
-  near: "\u2248",      // ≈
-  mismatch: "\u2715",  // ✕
-  missed: "\u25cb",    // ○  — hollow: a value that should be there and is not
-  spurious: "\u25cf",  // ●  — filled: a value that is there and should not be
-  untested: "\u00b7",  // ·
+  match: "\u2713",     // check mark
+  near: "\u2248",      // almost equal to
+  mismatch: "\u2715",  // multiplication x
+  missed: "\u25cb",    // white circle  -- hollow: a value that should be there and is not
+  spurious: "\u25cf",  // black circle  -- filled: a value that is there and should not be
+  untested: "\u00b7",  // middle dot
 };
 
-/* Only these count as coded-correctly. `near` is included deliberately — see
+/* Only these count as coded-correctly. `near` is included deliberately -- see
  * looseValue() for why a formatting difference is not an extraction error. */
 const CORRECT = new Set(["match", "near"]);
 
@@ -65,7 +65,7 @@ const exactValue = (value) => (value == null ? "" : String(value).trim());
  * answers `2025-03-18` for a YYYYMMDD item has understood the note perfectly
  * and formatted the answer wrongly. Both are real defects, but they are defects
  * of a different kind than reading the wrong date, and folding them together
- * hides the difference exactly where refinement needs it — item 1280 in the
+ * hides the difference exactly where refinement needs it -- item 1280 in the
  * committed state failed validation on precisely that dash-date shape.
  */
 function looseValue(value) {
@@ -110,7 +110,7 @@ const caseAccuracy = () => tally(App.variables);
 /* A group's roll-up, plus the one finding no per-variable verdict can carry.
  *
  * When a gate or a site rule excludes a whole group, every variable in it is
- * stamped `not_applicable` and each one compares as `missed` in isolation —
+ * stamped `not_applicable` and each one compares as `missed` in isolation --
  * six identical verdicts that all have a single cause upstream. Naming that
  * cause at the group level is what turns "six wrong answers" into "one wrong
  * gate", which is the actionable form.
@@ -193,7 +193,7 @@ async function onTruthFile(event) {
     if (!isRecord(raw)) throw new Error("Expected a JSON object of {item_id: value}.");
     indexTruth(raw, file.name);
     renderChrome();
-    /* setLens re-renders, and switches to the lens the file just enabled —
+    /* setLens re-renders, and switches to the lens the file just enabled --
        picking a reference file is only ever a prelude to reading against it. */
     setLens(hasTruth() ? "accuracy" : App.lens);
     if (App.selection) renderDetail();
@@ -214,6 +214,6 @@ function accuracyTooltip() {
     h("h4", { text: acc.correct + " of " + acc.tested + " tested values correct" }),
     dl,
     h("p", { class: "muted", style: "margin:6px 0 0",
-      text: "reference: " + (App.truthSource || "—") + " · " +
+      text: "reference: " + (App.truthSource || "\u2014") + " \u00b7 " +
         acc.counts.untested + " variable(s) it does not mention" }));
 }

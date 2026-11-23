@@ -1,10 +1,10 @@
 "use strict";
-/* Control room — variables as bubbles inside their group's card, cards laid out
+/* Control room -- variables as bubbles inside their group's card, cards laid out
  * in wave order.
  *
  * A bubble carries exactly one reading: whichever metric the active lens
  * selects, painted on both of its channels (a dim ground and a matching
- * outline, both mixed from the class's own colour — see styles.css). The lens
+ * outline, both mixed from the class's own colour -- see styles.css). The lens
  * vocabulary, its class order and its per-variable reading all live in the
  * LENSES table in app.js; nothing here knows what a status or a verdict is.
  */
@@ -15,7 +15,7 @@ function bubbleTooltip(entry) {
   const rows = [
     ["item", String(entry.item_id)],
     ["status", statusLabel(r.status)],
-    ["value", r.value == null ? "—" : r.value],
+    ["value", r.value == null ? "\u2014" : r.value],
   ];
   if (e.presence_confidence) rows.push(["confidence", e.presence_confidence]);
   if (e.extraction_attempts) rows.push(["attempts", String(e.extraction_attempts)]);
@@ -23,7 +23,7 @@ function bubbleTooltip(entry) {
   if (hasTruth()) {
     /* The bubble shows one metric; the tooltip is where the others stay
      * reachable. With the lens on confidence this is the only place the
-     * verdict appears without switching tabs — and a max-confidence wrong
+     * verdict appears without switching tabs -- and a max-confidence wrong
      * answer is exactly the pair worth reading together. */
     const v = verdictFor(entry);
     rows.push(["verdict", VERDICT_LABEL[v.verdict]]);
@@ -53,12 +53,12 @@ function bubble(entry) {
     /* The spoken label states the same one reading the colour does, so the
        screen-reader pass tracks the lens instead of describing a fixed axis
        the sighted view may not be showing. */
-    "aria-label": entry.item_id + " " + entry.name + " — " +
+    "aria-label": entry.item_id + " " + entry.name + " \u2014 " +
       (value ? "value " + value : "no value") + " \u2014 " + lens.aria(ind.key),
     onclick: (ev) => { ev.stopPropagation(); select("variable", entry.item_id); },
   },
     /* Occupies the indicator column, which styles.css reserves whenever a glyph
-       lens is AVAILABLE rather than active — so the column is the same width
+       lens is AVAILABLE rather than active -- so the column is the same width
        under either lens and switching between them shifts nothing. */
     ind.mark ? h("i", { class: "vmark bub-mark " + ind.cls, text: ind.mark }) : null,
     h("span", { class: "bub-label" },
@@ -75,9 +75,9 @@ function bubble(entry) {
 function groupTooltip(group, state) {
   const rows = [
     ["group", group.group_id],
-    ["stage", group.stage || "—"],
+    ["stage", group.stage || "\u2014"],
     ["outcome", state.label],
-    ["variables", state.total + " · " + state.coded + " coded"],
+    ["variables", state.total + " \u00b7 " + state.coded + " coded"],
   ];
   if ((group.gate || []).length) rows.push(["gate", group.gate.join(", ")]);
   if (group.applies_to) {
@@ -102,18 +102,18 @@ function groupTooltip(group, state) {
   );
 }
 
-/* The card's one roll-up chip, for the active lens — and only when it has
+/* The card's one roll-up chip, for the active lens -- and only when it has
  * something to say. `complete` and `6/6 correct` are ink that reports the
  * absence of news; suppressing them is what lets the cards that DO carry news
  * stand out at a glance, and a card with no chip at all is the clean case.
  *
  * That silence is now the ONLY thing marking a clean card: the state colour on
  * the card's top border is gone (see .group-card in styles.css). Which is why
- * the fallback below still emits `pending` and `nothing coded` — those are not
+ * the fallback below still emits `pending` and `nothing coded` -- those are not
  * clean, and with no border left to say so the chip is the whole signal.
  *
- * The group's static configuration — gate, site applicability, note filter,
- * per-variable extraction — used to sit here as four more chips of identical
+ * The group's static configuration -- gate, site applicability, note filter,
+ * per-variable extraction -- used to sit here as four more chips of identical
  * weight. It belongs to no lens, never varies between runs, and is already in
  * this card's hover tooltip (groupTooltip, below) and in the detail pane's
  * Configuration and Gating sections.
@@ -150,7 +150,7 @@ function groupCard(group) {
     /* A gate that excluded a group the reference says should have run produces
      * a whole card of identical `missed` verdicts with one upstream cause.
      * Naming the cause here is what turns six wrong answers into one wrong
-     * gate — the actionable form. */
+     * gate -- the actionable form. */
     App.lens === "accuracy" && hasTruth() && groupVerdict(group).finding
       ? h("span", { class: "chip bad", text: FINDING_LABEL[groupVerdict(group).finding] })
       : null,
@@ -183,7 +183,7 @@ function groupCard(group) {
   return hoverable(card, () => groupTooltip(group, state));
 }
 
-/* The one legend row — the key for the active lens, and the run's distribution
+/* The one legend row -- the key for the active lens, and the run's distribution
  * along it, and the filter over it, all in the same object.
  *
  * It replaced three static legend rows (16 entries) stacked above the first
@@ -192,7 +192,7 @@ function groupCard(group) {
  * space that buys pays for the counts. Classes this run never produced are
  * dropped, so the row describes what happened rather than what could.
  *
- * The swatch mirrors the bubble it stands for, fill rule included — that is how
+ * The swatch mirrors the bubble it stands for, fill rule included -- that is how
  * the fill rule gets taught without a sentence explaining it, and it is what
  * makes the row's two halves self-evident: the confidence classes carry a
  * washed ground, the no-value statuses sit bare. It is a rounded swatch rather

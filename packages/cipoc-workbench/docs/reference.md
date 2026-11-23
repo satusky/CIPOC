@@ -159,9 +159,11 @@ headroom, saturation, or retry causation.
 
 ### Optional Pricing
 
-The Workbench tries same-origin `web/endpoint_catalog.json` at startup; the bundled
-catalog has no model prices. Use **Load Pricing...** in Observability for a local
-JSON catalog without editing the installed package or uploading the file:
+The Workbench tries same-origin `web/endpoint_catalog.json` at startup. The bundled
+catalog holds Azure Databricks foundation model list prices, keyed by lowercase
+model name; models with short- and long-context prices use the short-context
+rates. Use **Load Pricing...** in Observability for a different local JSON catalog
+without editing the installed package or uploading the file:
 
 ```json
 {

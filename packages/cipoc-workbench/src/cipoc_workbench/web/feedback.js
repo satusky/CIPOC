@@ -1,5 +1,5 @@
 "use strict";
-/* Reviewer feedback — canned failure-mode flags plus free text, per entity.
+/* Reviewer feedback -- canned failure-mode flags plus free text, per entity.
  *
  * The flags name *where in the pipeline* something went wrong rather than how
  * bad it was, so a body of annotations aggregates into "what should I fix
@@ -9,7 +9,7 @@
  *
  * Persistence needs the workbench server (`cipoc-workbench serve`).
  * Under a plain static server the form still renders, disabled, with the
- * command that enables it — failing at save time, after someone has typed a
+ * command that enables it -- failing at save time, after someone has typed a
  * paragraph, would be the worse trade.
  */
 
@@ -232,7 +232,7 @@ function feedbackSection(kind, id) {
   text.value = current.note || "";
 
   /* Prefilled from the reference file when there is a disagreement, so the
-     common case — confirming what the answer should have been — is no typing. */
+     common case -- confirming what the answer should have been -- is no typing. */
   let expected = null;
   if (kind === "variable") {
     const verdict = hasTruth() ? verdictFor(App.variables.find((v) => v.item_id === Number(id))) : null;
@@ -254,7 +254,7 @@ function feedbackSection(kind, id) {
   });
   /* Seeded from the draft store, not from this render: navigating away and back
      rebuilds the form, and the edits survive that (currentAnnotation reads the
-     draft) — so the "unsaved" marker has to survive it too, or the form would
+     draft) -- so the "unsaved" marker has to survive it too, or the form would
      come back looking saved while holding unsaved edits. */
   const dirty = h("span", {
     class: "chip warn", text: "unsaved",
@@ -269,7 +269,7 @@ function feedbackSection(kind, id) {
     disabled: disabled || undefined,
     /* Read the live controls rather than the draft. The draft only holds what
        someone has *edited*, and `expected` is prefilled from the reference file
-       — so a reviewer who accepts the prefill (the common case, and the reason
+       -- so a reviewer who accepts the prefill (the common case, and the reason
        it is prefilled at all) never fires an input event, and a draft-sourced
        save would silently drop the value that is plainly on screen. */
     onclick: () => editable() && saveAnnotation(kind, id, {

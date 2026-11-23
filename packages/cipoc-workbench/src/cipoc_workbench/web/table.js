@@ -1,5 +1,5 @@
 "use strict";
-/* Tabular view — one row per variable, sortable, filterable, grouped or flat.
+/* Tabular view -- one row per variable, sortable, filterable, grouped or flat.
  * "Derived" means the value came in as structured data rather than from the
  * extractor; that is the recorded status, not an inference. */
 
@@ -88,8 +88,8 @@ function headerCell(column) {
 
 /* Hollow comes from the result, not from the class, and it is the same rule the
  * control-room bubble applies (indicatorFor in app.js): a wash means this
- * variable holds a value. The two agree by construction for most classes —
- * `.m-missed` and `.m-untested` carry no wash of their own — but not for all of
+ * variable holds a value. The two agree by construction for most classes --
+ * `.m-missed` and `.m-untested` carry no wash of their own -- but not for all of
  * them: a correctly-empty variable is a `match` (truth.js, want and got both
  * empty), and it must not be filled just because the verdict is a good one.
  */
@@ -112,7 +112,7 @@ function bodyRow(entry) {
     }
     /* Not indicatorFor(entry, "confidence"): that lens falls back to the STATUS
        when a result carries no rating, which is right for a bubble that must say
-       something and wrong for a column headed Confidence — a status-coloured
+       something and wrong for a column headed Confidence -- a status-coloured
        pill under that header would be a reading the column does not claim to
        show. The cell shows the recorded rating or nothing, exactly as its
        `get` does, so sorting and filtering still see the same string. */
@@ -160,7 +160,7 @@ function renderTable() {
       const state = groupState(group);
       body.append(h("tr", { class: "group-sep" },
         h("td", { colspan: String(activeColumns().length) },
-          group.name + " · " + rows.length + " of " + state.total + " · " + state.label)));
+          group.name + " \u00b7 " + rows.length + " of " + state.total + " \u00b7 " + state.label)));
       for (const entry of rows) body.append(bodyRow(entry));
     }
   } else {

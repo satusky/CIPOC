@@ -104,8 +104,10 @@ file is called.
 
 ### Pricing (optional)
 
-Cost estimates need a JSON price list loaded with **Load Pricing...** in the
-Observability view. The format is in [docs/reference.md](docs/reference.md#optional-pricing).
+Cost estimates use the bundled Azure Databricks list prices
+(`web/endpoint_catalog.json`). To use other rates, load a JSON price list with
+**Load Pricing...** in the Observability view. The format is in
+[docs/reference.md](docs/reference.md#optional-pricing).
 
 ## Usage guide
 
