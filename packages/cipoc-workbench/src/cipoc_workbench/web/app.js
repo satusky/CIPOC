@@ -997,7 +997,7 @@ async function activateRun(raw, source, generation, startup = false) {
   runLoadStatus(startup ? "Startup run loaded. Use Load Run to choose another artifact."
     : "Loaded locally. Artifact contents are not uploaded.");
   void loadFeedback(App.activation);
-  if (startup) void loadTruth(App.activation);
+  void loadTruth(App.activation, startup ? null : source);
   return true;
 }
 

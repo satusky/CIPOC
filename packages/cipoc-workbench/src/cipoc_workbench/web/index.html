@@ -100,10 +100,13 @@
             <button class="lens-tab" role="tab" data-lens="confidence">Confidence</button>
             <button class="lens-tab" role="tab" data-lens="accuracy" hidden>Accuracy</button>
           </div>
-          <label class="check file-pick" title="Load a ground-truth JSON: {item_id: value}">
-            <input id="truth-file" type="file" accept="application/json,.json" />
-            <span>Ground truth&hellip;</span>
-          </label>
+          <div class="truth-pick">
+            <label class="check file-pick" title="Load a ground-truth JSON: {item_id: value}">
+              <input id="truth-file" type="file" accept="application/json,.json" />
+              <span>Ground truth&hellip;</span>
+            </label>
+            <span id="truth-status" class="truth-status" role="status" aria-live="polite"></span>
+          </div>
         </div>
         <div id="control" class="control" hidden></div>
         <div id="table-wrap" class="table-wrap" hidden></div>

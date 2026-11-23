@@ -645,7 +645,7 @@ class WorkbenchServerTests(unittest.IsolatedAsyncioTestCase):
             app = build_app(state_path=state, ground_truth_path=truth)
             status, body = await self.request(app, f"/api/runs/{RUN_A}/ground-truth")
             self.assertEqual(status, 200)
-            self.assertEqual(json.loads(body), {"run_id": RUN_A, "values": values})
+            self.assertEqual(json.loads(body), {"run_id": RUN_A, "values": values, "source": "truth.json"})
             replacement = json.dumps({"run": {"run_id": RUN_B}}, indent=4).encode()
             state.write_bytes(replacement)
             status, body = await self.request(app, "/case_state.json")
@@ -657,7 +657,7 @@ class WorkbenchServerTests(unittest.IsolatedAsyncioTestCase):
             self.assertNotIn("values", json.loads(body))
             status, body = await self.request(app, f"/api/runs/{RUN_A}/ground-truth")
             self.assertEqual(status, 200)
-            self.assertEqual(json.loads(body), {"run_id": RUN_A, "values": values})
+            self.assertEqual(json.loads(body), {"run_id": RUN_A, "values": values, "source": "truth.json"})
             status, body = await self.request(app, "/api/ground-truth")
             self.assertEqual(status, 200)
             self.assertEqual(json.loads(body), values, "Legacy route retains its shipped unscoped response")
@@ -671,7 +671,7 @@ class WorkbenchServerTests(unittest.IsolatedAsyncioTestCase):
             app = build_app(state_path=state)
             status, body = await self.request(app, f"/api/runs/{RUN_A}/ground-truth")
             self.assertEqual(status, 200)
-            self.assertEqual(json.loads(body), {"run_id": RUN_A, "values": {}})
+            self.assertEqual(json.loads(body), {"run_id": RUN_A, "values": {}, "source": None})
             for run_id, expected in ((RUN_B, 409), ("invalid", 400), (RUN_A.upper(), 400), ("..", 400)):
                 status, body = await self.request(app, f"/api/runs/{run_id}/ground-truth")
                 self.assertEqual(status, expected)
@@ -716,6 +716,51 @@ class WorkbenchServerTests(unittest.IsolatedAsyncioTestCase):
                     self.assertEqual(status, 500)
                     self.assertEqual(json.loads(body)["run_id"], RUN_A)
                     self.assertNotIn("values", json.loads(body))
+
+    async def test_ground_truth_dir_matches_opened_run_files_by_name(self):
+        with tempfile.TemporaryDirectory() as directory:
+            truth_dir = Path(directory) / "truth"
+            truth_dir.mkdir()
+            values = {"400": "C500", "001": "Keep string keys"}
+            (truth_dir / "case 01.json").write_text(json.dumps(values))
+            (truth_dir / "broken.json").write_text("[]")
+            (Path(directory) / "outside.json").write_text('{"400": "secret"}')
+            app = build_app(ground_truth_dir=truth_dir)
+            status, body = await self.request(app, "/api/ground-truth/files/case%2001.json")
+            self.assertEqual(status, 200)
+            self.assertEqual(json.loads(body), {"name": "case 01.json", "values": values})
+            for name, expected in (("other.json", 404), ("broken.json", 500), ("..", 400), ("a%5Cb.json", 400)):
+                with self.subTest(name=name):
+                    status, body = await self.request(app, "/api/ground-truth/files/" + name)
+                    self.assertEqual(status, expected)
+                    self.assertNotIn("values", json.loads(body))
+            status, body = await self.request(app, "/api/ground-truth/files/..%2Foutside.json")
+            self.assertEqual(status, 404)
+            self.assertNotIn(b"secret", body)
+            status, body = await self.request(build_app(), "/api/ground-truth/files/case%2001.json")
+            self.assertEqual(status, 409)
+            self.assertNotIn("values", json.loads(body))
+
+    async def test_ground_truth_dir_supplies_the_startup_run_unless_a_file_is_given(self):
+        with tempfile.TemporaryDirectory() as directory:
+            truth_dir = Path(directory) / "truth"
+            truth_dir.mkdir()
+            (truth_dir / "run.json").write_text('{"400": "from dir"}')
+            explicit = Path(directory) / "explicit.json"
+            explicit.write_text('{"400": "explicit"}')
+            for name, truth, expected in (
+                ("run.json", None, {"run_id": RUN_A, "values": {"400": "from dir"}, "source": "run.json"}),
+                ("run.json", explicit, {"run_id": RUN_A, "values": {"400": "explicit"}, "source": "explicit.json"}),
+                ("other.json", None, {"run_id": RUN_A, "values": {}, "source": None}),
+            ):
+                with self.subTest(name=name, truth=truth):
+                    state = Path(directory) / name
+                    state.write_text(json.dumps({"run": {"run_id": RUN_A}}))
+                    app = build_app(state_path=state, ground_truth_path=truth, ground_truth_dir=truth_dir)
+                    status, body = await self.request(app, f"/api/runs/{RUN_A}/ground-truth")
+                    self.assertEqual((status, json.loads(body)), (200, expected))
+                    status, body = await self.request(app, "/api/ground-truth")
+                    self.assertEqual((status, json.loads(body)), (200, expected["values"]))
 
     def test_feedback_destinations_are_mutually_exclusive_for_direct_callers(self):
         with self.assertRaisesRegex(ValueError, "mutually exclusive"):

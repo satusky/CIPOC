@@ -150,26 +150,51 @@ function indexTruth(raw, source) {
   App.truthSource = App.truth.size ? source : null;
 }
 
-/* Only the server's explicit run binding may supply an automatic reference.
+/* The line beside Ground truth...: which file is loaded, or that none was. */
+function truthStatus(message, error = false) {
+  const status = $("#truth-status");
+  status.textContent = message;
+  status.className = "truth-status" + (error ? " bad" : "");
+}
+
+const NO_MATCHING_TRUTH = "No matching ground truth found. Click Ground truth\u2026 to choose a file.";
+
+/* Only a server binding may supply an automatic reference: the startup run's
+ * (`fileName` null), or the --ground-truth-dir file named like the run file.
  * Static/unbound references remain available through the local file picker. */
-async function loadTruth(activation = App.activation) {
+async function loadTruth(activation = App.activation, fileName = null) {
   if (activation !== App.activation) return false;
   const runId = App.run.run_id;
   const generation = ++App.truthGeneration;
   const current = () => activation === App.activation && generation === App.truthGeneration;
+  truthStatus("Checking for matching ground truth...");
   try {
-    if (!canonicalRunId(runId)) return false;
-    const response = await fetch("/api/runs/" + runId + "/ground-truth", { cache: "no-store" });
-    if (!response.ok) return false;
+    if (fileName == null && !canonicalRunId(runId)) throw new Error("No run binding.");
+    const url = fileName == null ? "/api/runs/" + runId + "/ground-truth"
+      : "/api/ground-truth/files/" + encodeURIComponent(fileName);
+    const response = await fetch(url, { cache: "no-store" });
+    if (!current()) return false;
+    if (response.status === 500) {
+      truthStatus("Could not read the matching ground-truth file.", true);
+      return false;
+    }
+    if (!response.ok) throw new Error("No match.");
     const document = await response.json();
-    if (!current() || !isRecord(document) || document.run_id !== runId || !isRecord(document.values)) return false;
-    if (!Object.keys(document.values).length) return false;
-    indexTruth(document.values, "server");
+    if (!current()) return false;
+    const bound = fileName == null ? document?.run_id === runId : document?.name === fileName;
+    if (!isRecord(document) || !bound || !isRecord(document.values)) throw new Error("Unbound response.");
+    if (!Object.keys(document.values).length) throw new Error("No values.");
+    const source = fileName ?? document.source;
+    indexTruth(document.values, source || "server");
+    truthStatus("Loaded " + (source || "ground truth from the server"));
     renderChrome();
     setLens(storedLens() || App.lens, false);
     if (App.selection) renderDetail();
     return true;
-  } catch (err) { /* Optional service unavailable; never use an unbound fallback. */ }
+  } catch (err) {
+    /* Optional service unavailable or no match; never use an unbound fallback. */
+    if (current()) truthStatus(NO_MATCHING_TRUTH);
+  }
   return false;
 }
 
@@ -192,13 +217,14 @@ async function onTruthFile(event) {
     const raw = JSON.parse(text);
     if (!isRecord(raw)) throw new Error("Expected a JSON object of {item_id: value}.");
     indexTruth(raw, file.name);
+    truthStatus(hasTruth() ? "Loaded " + file.name : file.name + " has no values.");
     renderChrome();
     /* setLens re-renders, and switches to the lens the file just enabled --
        picking a reference file is only ever a prelude to reading against it. */
     setLens(hasTruth() ? "accuracy" : App.lens);
     if (App.selection) renderDetail();
   } catch (err) {
-    if (current()) alert("Could not load ground truth: " + err.message);
+    if (current()) truthStatus("Could not load " + file.name + ": " + err.message, true);
   }
 }
 

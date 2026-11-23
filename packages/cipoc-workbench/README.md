@@ -37,6 +37,15 @@ cipoc-workbench serve --feedback-dir reviews
 
 Open <http://127.0.0.1:8000> and choose **Load Run...** to open a run file.
 
+To load ground truth automatically, keep the files in one folder, named like
+the run files they belong to:
+
+```bash
+cipoc-workbench serve --ground-truth-dir ground_truth --feedback-dir reviews
+```
+
+Opening `case01.json` then loads `ground_truth/case01.json`, if it exists.
+
 To open a run at startup, with ground truth:
 
 ```bash
@@ -50,6 +59,7 @@ cipoc-workbench serve \
 |---|---|
 | `--state FILE` | Run to open at startup. Without it, the page starts empty. |
 | `--ground-truth FILE` | Reference values for the startup run. Requires `--state`. |
+| `--ground-truth-dir DIR` | Folder of reference files. Opening a run loads the file with the same name. |
 | `--feedback-dir DIR` | Folder for saved feedback. Without it, feedback is read-only. |
 | `--feedback FILE` | Older single-file feedback for the startup run. Use `--feedback-dir` instead. |
 | `--host`, `--port` | Defaults to `127.0.0.1` and `8000`. |
@@ -93,8 +103,10 @@ A JSON object of NAACCR item ID to expected value:
 - Values that differ only in case, punctuation or leading zeros count as
   correct, reformatted.
 
-Pass it with `--ground-truth`, or load it with **Ground truth...** in the
-Variables view.
+Name it like its run file and keep it in the `--ground-truth-dir` folder, pass
+it with `--ground-truth`, or load it with **Ground truth...** in the Variables
+view. The text beside **Ground truth...** names the loaded file, or says that no
+matching file was found.
 
 ### Feedback
 
@@ -185,10 +197,11 @@ Variables, groups and notes with saved feedback are marked in the main views.
 ### Opening another run
 
 **Load Run...** switches to another run without restarting the server. You'll be
-asked before unsaved feedback is discarded. Ground truth passed with
-`--ground-truth` applies only to the startup run, so load the new run's ground
-truth with **Ground truth...**. Refreshing the page goes back to the startup run,
-or to an empty page if there isn't one.
+asked before unsaved feedback is discarded. The new run's ground truth loads
+from `--ground-truth-dir` if a file there has the same name; otherwise load it
+with **Ground truth...**. `--ground-truth` applies only to the startup run.
+Refreshing the page goes back to the startup run, or to an empty page if there
+isn't one.
 
 ## Development
 
