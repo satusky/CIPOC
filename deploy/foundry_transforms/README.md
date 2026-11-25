@@ -15,6 +15,8 @@ language model Foundry injects into the transform, not to an OpenAI endpoint:
 | File here | Goes to (in the Foundry repository) | Purpose |
 | --- | --- | --- |
 | `cipoc_extract.py` | `transforms-python/src/myproject/datasets/cipoc_extract.py` | The transform |
+| `cipoc_omop.py` | `transforms-python/src/myproject/datasets/cipoc_omop.py` | OMOP export of its output ([below](#omop-export)) |
+| `pipeline.py` | `transforms-python/src/myproject/pipeline.py` | Registers both transforms ([below](#pipelinepy)) |
 | `foundry_models.py` | `transforms-python/src/myproject/foundry_models.py` | OpenAI ↔ Foundry request/response translation |
 | `config.yaml` | `transforms-python/src/myproject/resources/config.yaml` | CIPOC runtime config |
 
@@ -37,11 +39,12 @@ transforms-python/
     ├── cipoc/                       # this repository's src/cipoc (see below)
     └── myproject/
         ├── __init__.py
-        ├── pipeline.py              # template; discovers transforms in myproject.datasets
+        ├── pipeline.py              # ← deploy/foundry_transforms/pipeline.py
         ├── foundry_models.py        # ← deploy/foundry_transforms/foundry_models.py
         ├── datasets/
         │   ├── __init__.py
-        │   └── cipoc_extract.py     # ← deploy/foundry_transforms/cipoc_extract.py
+        │   ├── cipoc_extract.py     # ← deploy/foundry_transforms/cipoc_extract.py
+        │   └── cipoc_omop.py        # ← deploy/foundry_transforms/cipoc_omop.py
         └── resources/
             ├── __init__.py          # empty; the transform finds this directory through it
             ├── config.yaml          # ← deploy/foundry_transforms/config.yaml
@@ -90,6 +93,17 @@ setup(
 )
 ```
 
+### `pipeline.py`
+
+This replaces the template's `discover_transforms(datasets)` with
+`add_transforms`, which registers only the transforms it names. Add any new
+transform to that call. The template's `setup.py` entry point
+(`root = myproject.pipeline:my_pipeline`) stays as it is. The Code
+Repositories **Build** button can report "No transforms discovered" for
+manually registered transforms; build from Data Lineage or the dataset
+instead
+([Palantir docs](https://www.palantir.com/docs/foundry/transforms-python/pipelines)).
+
 ## Dependencies
 
 Add these libraries in the repository's **Libraries** panel:
@@ -135,6 +149,27 @@ Fill in the three constants at the top of `cipoc_extract.py`:
   - Any other exception fails the build. That includes config, resource, and
     dependency errors.
 
+## OMOP export
+
+`cipoc_omop.py` is a second transform that reads the `cipoc_extract` output
+and makes no model calls. Its NOTE and NOTE_NLP tables have the same rows as
+`scripts/export_omop.py` followed by `scripts/merge_omop.py`. Fill in its RID
+constants:
+
+- `EXTRACT_DATASET_RID`: `cipoc_extract`'s output dataset.
+- `NOTE_DATASET_RID` and `NOTE_NLP_DATASET_RID`: the staging tables. Every
+  column is a string, and empty values are null. Concept columns hold raw
+  CIPOC values, not OMOP concept IDs, as they do locally.
+- `ERRORS_DATASET_RID`: one row per rejected staging row, with `mspi`,
+  `table_name` (`note` or `note_nlp`), `source_id`, `issues` (JSON), and
+  `row_data` (the partial row, as JSON).
+
+Only `completed` rows are exported; `failed` and `invalid_input` patients
+appear only in the extract output. `person_id` is the `mspi`, and `note_id` and
+`note_nlp_id` are namespaced by it as `merge_omop` does, so a duplicate `mspi`
+fails the build. `nlp_date` is the date the run finished (UTC), so rebuilding
+doesn't change it.
+
 ## `config.yaml`
 
 This file has the same format as `config/config.yaml`. Several settings
@@ -176,5 +211,6 @@ exception text. The `type` field identifies the source:
 The output dataset contains PHI. `capture_llm_content=False` keeps prompts and
 model responses out of `result_json`, but the artifact still contains the full
 processed notes (`corpus.note_corpus`). Error text can also quote note content.
-Restrict access to the output dataset accordingly. Test changes in Preview on
-synthetic notes first.
+Restrict access to the output dataset accordingly. All three OMOP outputs
+contain PHI too: `note_text`, NOTE_NLP snippets and evidence text, and the
+errors' `row_data`. Test changes in Preview on synthetic notes first.

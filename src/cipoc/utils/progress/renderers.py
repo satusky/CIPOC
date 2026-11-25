@@ -372,7 +372,6 @@ class NotebookDisplay:
 
             display_fn = display if display_fn is None else display_fn
             html_factory = HTML if html_factory is None else html_factory
-        assert display_fn is not None and html_factory is not None
         self.width = max(MIN_WIDTH, min(width, MAX_WIDTH))
         self._display = display_fn
         self._html_factory = html_factory

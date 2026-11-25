@@ -167,7 +167,7 @@ class _RepaintLoop:
     def _run(self) -> None:
         try:
             if self._pending is not None:
-                self._run_plain_log()
+                self._run_plain_log(self._pending)
                 return
             interval = max(self.renderer.min_interval, _PLAIN_POLL_INTERVAL)
             while not self._stop.is_set():
@@ -212,11 +212,10 @@ class _RepaintLoop:
                 interrupt = _finalize_renderer(self.renderer, self.snapshot, self.tick)
             self.cleanup_interrupt = self.cleanup_interrupt or interrupt
 
-    def _run_plain_log(self) -> None:
-        assert self._pending is not None
-        while not self._stop.is_set() or not self._pending.empty():
+    def _run_plain_log(self, pending: queue.Queue[Snapshot]) -> None:
+        while not self._stop.is_set() or not pending.empty():
             try:
-                snapshot = self._pending.get(timeout=_PLAIN_POLL_INTERVAL)
+                snapshot = pending.get(timeout=_PLAIN_POLL_INTERVAL)
                 self.renderer.paint(snapshot, now=time.monotonic(), tick=self.tick)
             except queue.Empty:
                 continue
